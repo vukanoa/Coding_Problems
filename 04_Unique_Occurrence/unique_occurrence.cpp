@@ -9,20 +9,15 @@
 	Complexity
 	==========
 	
-	O(n*logn) - Time
+	O(n)      - Time // If we get reeeeally unlucky then O(n^2)
 	O(R)      - Space, where R is Number of Unique elements in Original array
 */
 
 int
 solution(std::vector<int>& A)
 {
-	/* Set & Map */
-	std::unordered_set<int> set;
+	/* Map */
 	std::map<int, int> map;
-
-	// O(n*logn)       // O(logn) is the time for insert in Red-Black Tree
-	for(const int& x: A)
-		set.insert(x); // Fill with unique elements
 
 	// O(n)
 	for(const int& x: A) // Fill hash table with occurence per each unique element
@@ -33,11 +28,10 @@ solution(std::vector<int>& A)
 	// 	std::cout << "[" << x.first << "] = " << x.second << std::endl;
 
 
-	set.clear();
-
-	/* Maps */
+	/* Maps & Set*/
 	std::map<int, int> occur;
 	std::map<int, int> to_del;
+	std::unordered_set<int> set;
 
 	int ret_count = 0;
 	int tmp = 0;
@@ -45,16 +39,16 @@ solution(std::vector<int>& A)
 
 	std::vector<int>::iterator it;
 
-	// O(n*logn)
+	// O(n) // O(n^2) in the very worst case where we have disastrous hash table
 	for(it = A.begin(); it != A.end();)
 	{
 		int index = std::distance(A.begin(), it);
-		if (!set.count(*it)) // If exists in the set
+		if (!set.count(*it)) // If exists in the set, O(1), unlikely to be O(n)
 		{
 			if (occur[map[*it]] == 0) // If that num of occurence hasn't happened
 			{
 				occur[map[*it]] = *it;
-				set.insert(*it); // O(logn)
+				set.insert(*it); // O(1), it's unlikely that we would have O(n)
 				it++;
 			}
 			else
@@ -69,7 +63,7 @@ solution(std::vector<int>& A)
 				if (map[*it] > 0)
 					occur[map[*it]] = *it;
 
-				set.insert(*it); // O(logn)
+				set.insert(*it); // O(1), it's unlikely that we would have O(n)
 				to_del[*it] = tmp - map[*it]; 
 				to_del[*it]--;
 
