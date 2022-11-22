@@ -24,9 +24,6 @@
 	*** Constraints ***
 	1 <= s.length <= 1000
 	s consists of only digits and English letters
-
-	TODO: Implement Manacher's Algorithm
-
 */
 
 
@@ -287,13 +284,155 @@ public:
 
 /* ------------------------------------------------------------------------- */
 
+/*
+	============
+	=== O(n) ===
+	============
+*/
+
+/*
+	Note: 'Position' pertains to expanded string. The one where separator
+	      character is added between every character in the original string
+		  plus two more(one at the very beginning and one at the very end)
+
+		  'Index', on the other hand, pertains to the original string.
+	
+             a b a a b
+Indexes ->   0 1 2 3 4
+
+             $ a $ b $ a $ a $ b $
+Positions -> 0 1 2 3 4 5 6 7 8 9 10
+
+*/
+
+
+class Solution_manacher{
+public:
+	string longestPalindrome(string s)
+	{
+		if (s.length() == 1)
+			return s;
+
+		int N = 2 * s.length() + 1;
+
+		int LPS[N];
+		LPS[0] = 0;
+		LPS[1] = 1;
+
+		int center_position = 1;       // center_position_position
+		int right_border_position = 2; // center_position_right_position
+		int i = 0;                     // current_right_position
+		int i_mirror;                  // current_left_position
+
+		int max_LPS_length = 0;
+		int max_LPS_center_position = 0;
+
+		int start_index = -1;
+		int end_index   = -1;
+
+		int difference = -1;
+		int expand     = -1;
+
+		for (i = 2; i < N; i++)
+		{
+			i_mirror = 2 * center_position - i;
+
+			expand = 0;
+			difference = right_border_position - i;
+
+			if (difference >= 0)
+			{
+				// Case 1
+				if (LPS[i_mirror] < difference)
+					LPS[i] = LPS[i_mirror];
+
+				// Case 2
+				else if (LPS[i_mirror] == difference && right_border_position == N - 1)
+					LPS[i] = LPS[i_mirror];
+
+				// Case 3
+				else if (LPS[i_mirror] == difference && right_border_position < N - 1)
+				{
+					LPS[i] = LPS[i_mirror];
+
+					// Expansions required
+					expand = 1;
+				}
+
+				// Case 4
+				else if (LPS[i_mirror] > difference)
+				{
+					LPS[i] = difference;
+
+					// Expansion required
+					expand = 1;
+				}
+			}
+			else
+			{
+				LPS[i] = 0;
+
+				// Expansion required
+				expand = 1;
+			}
+
+			// Expansion required
+			if (expand == 1)
+			{
+				while (
+						(
+							(i + LPS[i]) < N
+							&&
+							(i - LPS[i]) > 0
+						)
+						&&
+						(
+							((i + LPS[i] + 1) % 2 == 0)
+							||
+							(s[(i + LPS[i] + 1) / 2] == s[(i - LPS[i] - 1) / 2])
+						)
+					)
+				{
+					LPS[i]++;
+				}
+			}
+
+			if (LPS[i] > max_LPS_length)
+			{
+				max_LPS_length = LPS[i];
+				max_LPS_center_position = i;
+			}
+
+			if (i + LPS[i] > right_border_position)
+			{
+				center_position = i;
+				right_border_position = i + LPS[i];
+			}
+		}
+
+		// Real indexes in string 's', that is -> w/o separator characters
+		start_index = (max_LPS_center_position - max_LPS_length) / 2;
+		end_index   = start_index + max_LPS_length - 1;
+
+		string longest_pal_substr = "";
+
+		for (i = start_index; i <= end_index; i++)
+			longest_pal_substr += s[i];
+
+		return longest_pal_substr;
+	}
+
+};
+
+
 int
 main()
 {
-	// Solution_n3 sol_n3;          // O(n^3)
-	// Solution_nlogn sol_nlogn;    // O(n^2 * logn)
-	// Solution_n2 sol_n2;          // O(n^2)
-	Solution_n2_table sol_n2_table; // O(n^2)
+	// Solution_n3 sol_n3;             // O(n^3)
+	// Solution_nlogn sol_nlogn;       // O(n^2 * logn)
+	// Solution_n2 sol_n2;             // O(n^2)
+	// Solution_n2_table sol_n2_table; // O(n^2)
+	Solution_manacher sol_manacher;    // O(n)
 
 	/* Example 1 */
 	// string s = "babad";
@@ -307,13 +446,18 @@ main()
 	/* Example 4 */
 	string s = "abaxabaxabybaxabyb";
 
+	cout << "\n\t=====================================";
+	cout << "\n\t=== LONGEST PALINDROMIC SUBSTRING ===";
+	cout << "\n\t=====================================\n\n";
 
-	cout << "\n\tString:\n\t\t\"" << s << "\"";
 
-	// cout << "\n\n\n\tLongest palindrome substring is:\n\t\t" << "\"" << sol_n3.longestPalindrome(s) << "\"";    // O(n^3)
-	// cout << "\n\n\n\tLongest palindrome substring is:\n\t\t" << "\"" << sol_nlogn.longestPalindrome(s) << "\""; // O(n^2 * logn)
-	// cout << "\n\n\n\tLongest palindrome substring is:\n\t\t" << "\"" << sol_n2.longestPalindrome(s) << "\"";    // O(n^2)
-	cout << "\n\n\n\tLongest palindrome substring is:\n\t\t" << "\"" << sol_n2_table.longestPalindrome(s) << "\""; // O(n^2)
+	cout << "\n\t--- String --- \n\t\"" << s << "\"";
+
+	// cout << "\n\n\n\t--- Longest palindromic substring --- \n\t\"" << sol_n3.longestPalindrome(s) << "\"";       // O(n^3)
+	// cout << "\n\n\n\t--- Longest palindromic substring --- \n\t\"" << sol_nlogn.longestPalindrome(s) << "\"";    // O(n^2 * logn)
+	// cout << "\n\n\n\t--- Longest palindromic substring --- \n\t\"" << sol_n2.longestPalindrome(s) << "\"";       // O(n^2)
+	// cout << "\n\n\n\t--- Longest palindromic substring --- \n\t\"" << sol_n2_table.longestPalindrome(s) << "\""; // O(n^2)
+	cout << "\n\n\n\t--- Longest palindromic substring --- \n\t\"" << sol_manacher.longestPalindrome(s) << "\"";    // O(n)
 
 	cout << "\n\n\n";
 
