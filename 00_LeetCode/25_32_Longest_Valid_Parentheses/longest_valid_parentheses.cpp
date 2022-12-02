@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stack>
 
 
 /*
@@ -51,8 +52,6 @@
 
 */
 
-
-
 /*
 	------------
 	--- IDEA ---
@@ -99,12 +98,12 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution{
+class Solution_dp{
 public:
 	int
 	longestValidParentheses(std::string s)
 	{
-		int max = 0;
+		int longest = 0;
 
 		int dp[s.length()];
 		for (int i = 0; i < s.length(); i++)
@@ -119,11 +118,74 @@ public:
 				else if (i - dp[i - 1] > 0 && s[i - dp[i - 1] - 1] == '(')
 					dp[i] = dp[i - 1] + ((i - dp[i - 1]) >= 2 ? dp[i - dp[i - 1] - 2] : 0) + 2;
 
-				max = std::max(max, dp[i]);
+				longest = std::max(longest, dp[i]);
 			}
 		}
 
-		return max;
+		return longest;
+	}
+};
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Using Stack
+
+	Instead of finding every possible strin and checking its validiy, we can
+	make use of a stack while scanning the given string to:
+		1. Check if the string scanned so far is valid.
+		2. Find the length of the longest valid string.
+	
+	In order to do so, we start by pushing -1 onto the stack. For every '('
+	encountered, we push its index onto the stack.
+
+	For every ')' encountered, we pop the topmost element. Then, the length of
+	the currently encountered valid string of parentheses will be the
+	difference between the current element's index and the top element of the
+	stack.
+
+	If, while popping the element, the stack becomes empty, we will push the
+	current element's index onto the stack. In this way, we can continue to
+	calculate the length of the valid substrings and return the lengths of the
+	longest valid string at the end.
+
+	( ) ) ( ( ( ) )
+	0 1 2 3 4 5 6 7
+
+*/
+
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_stack{
+public:
+	int
+	longestValidParentheses(std::string s)
+	{
+		int longest = 0;
+		std::stack<int> stack;
+		stack.push(-1);
+
+		for (int i = 0; i < s.length(); i++)
+		{
+			if (s[i] == '(')
+				stack.push(i);
+			else
+			{
+				stack.pop();
+
+				if (stack.empty())
+					stack.push(i);
+				else
+					longest = std::max(longest, i - stack.top());
+			}
+		}
+		
+		return longest;
 	}
 };
 
@@ -131,7 +193,8 @@ public:
 int
 main()
 {
-	Solution sol;
+	// Solution_dp sol;
+	Solution_stack sol;
 
 	/* Example 1 */
 	std::string s = "(()";
