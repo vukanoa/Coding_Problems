@@ -4,10 +4,14 @@
 	==============
 	=== MEDIUM ===
 	==============
-
-	==================
+	
+	===========================
 	2) Add Two Numbers
-	==================
+	===========================
+	
+	============
+	Description:
+	============
 
 	You are given two non-empty linked lists representing two non-negative
 	integers. The digits are stored in reverse order, and each of their nodes
@@ -16,39 +20,44 @@
 
 	You may assume the two numbers do not contain any leading zero, except the
 	number 0 itself.
-
+	
+	==============================================================
+	FUNCTION: ListNode* addTwoNumbers(ListNode* l1, ListNode* l2);
+	==============================================================
+	
+	==========================================================================
+	================================ EXAMPLES ================================
+	==========================================================================
 	
 	--- Example 1 ---
+	Input l1 = [2, 4, 3], l2 = [5, 6, 4]
+	Output   = [7, 0, 8]
+	Explanation: 342 + 465 + 807
+	
 	2 -> 4 -> 3
 	5 -> 6 -> 4
 	-----------
 	7 -> 0 -> 8
 
-	Input l1 = [2, 4, 3], l2 = [5, 6, 4]
-	Output   = [7, 0, 8]
-	Explanation: 342 + 465 + 807
-
-
 
 	--- Example 2 ---
+	Input l1 = [0], l2 = [0]
+	Output   = [0]
+	
 	0
 	0
 	-----------
 	0
 
-	Input l1 = [0], l2 = [0]
-	Output   = [0]
-
-
 
 	--- Example 3 ---
+	Input l1 = [9, 9, 9, 9, 9, 9, 9], l2 = [9, 9, 9, 9]
+	Output   = [8, 9, 9, 9, 0, 0, 0, 1]
+	
 	9 -> 9 -> 9 -> 9 -> 9 -> 9 -> 9
 	9 -> 9 -> 9 -> 9
 	-----------
 	8 -> 9 -> -> 9 -> 9 -> 0 -> 0 -> 1
-
-	Input l1 = [9, 9, 9, 9, 9, 9, 9], l2 = [9, 9, 9, 9]
-	Output   = [8, 9, 9, 9, 0, 0, 0, 1]
 
 
 	*** Constraints ***
@@ -56,6 +65,7 @@
 	0 <= Node.val <= 9
 	It is guaranteed that the list represents a number that does not have
 	leading zeros.
+
 */
 
 /* Definition for singly-linked list */
@@ -70,6 +80,26 @@ struct ListNode {
 };
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	We make a dummy node and initialize it with 0.
+	"dummy_head" and "curr" point to this dummy node.
+
+	Now as long as we haven't iterated through both lists(they can be of
+	different sizes) or "carry" is != 0)
+	
+	do the self-explanatory algorithm in the "while loop".
+	
+	After the "while loop" is finished, return dummy_head->next, since we don't
+	want the leading zero.
+
+*/
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
 class Solution {
 public:
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
