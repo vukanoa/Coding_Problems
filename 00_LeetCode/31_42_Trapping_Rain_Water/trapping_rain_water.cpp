@@ -108,6 +108,45 @@
 	the stack, hence, we can pop and add resulting trapped water to "total".
 
 
+
+	============
+	=== O(n) ===
+	============
+	(Using Two Pointers)
+
+	Instead of computing left and right parts separately, we may think of some
+	way to do it in one iteration.
+
+	Example 1:
+	Notice that as long as right_max[i] > left_max[i] (from element 0 to 6),
+	the trapped water depends upon the left_max, and similar is the case when
+	left_max[i] > right_max[i] (from element 8 to 11). So, we can say that if
+	there is a larger bar at one end(say right), we are assured that the water
+	trapped would be dependant on hright of bar in current direction (from
+	left to right).
+	As soon as we find the bar at other end(right) is smaller, we start
+	iterating in opposite direction (from right to left).
+
+	We must maintain left_max and right_max during iteration, but now we can
+	do it in one iteration using two pointers, switching between the two.
+
+	The whole idea comes down to: The way we calculate the water is:
+	if we find that the current bar isn't greater than or equal to the max
+	until this point, then that's the only situation in which we add water to
+	"total".
+
+	We add how much water "squares" can stack up in height and we base that
+	on the maximum height of the bar until this bar we're currently on(not
+	including this. Not including because in that case we won't add anything)
+
+	Since we're doing this from left to right, now we can try doing it in the
+	opposite way, but now we only add if max until this bar(from the back) is
+	greater than this bar we're currently on.
+
+	We do this using "Two Pointers" technique. We do it until left meets right,
+	that is:
+		while (left < right)
+
 */
 
 
@@ -228,12 +267,59 @@ public:
 
 
 
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_two_pointers{
+public:
+	int trap(std::vector<int>& height)
+	{
+		// Since the very left "margin" (coordinate system) cannot hold water
+		if (height.size() < 3)
+			return 0;
+
+		int n = height.size();
+		int total = 0;
+
+		int left  = 0;
+		int right = n - 1;
+		int left_max  = 0;
+		int right_max = 0;
+
+		while (left < right)
+		{
+			if (height[left] < height[right])
+			{
+				if (height[left] >= left_max)
+					left_max = height[left];
+				else
+					total += left_max - height[left];
+
+				left++;
+			}
+			else
+			{
+				if (height[right] >= right_max)
+					right_max = height[right];
+				else
+					total += right_max - height[right];
+
+				right--;
+			}
+		}
+
+		return total;
+	}
+};
+
+
+
 int
 main()
 {
 	// Solution_brute sol_brute;
 	// Solution_dp sol_dp;
-	Solution_stack sol_stack;
+	// Solution_stack sol_stack;
+	Solution_two_pointers sol_two_pointers;
 
 	/* Example 1 */
 	std::vector<int> height = {0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1};
@@ -259,7 +345,8 @@ main()
 
 	// int total = sol_brute.trap(height);
 	// int total = sol_dp.trap(height);
-	int total = sol_stack.trap(height);
+	// int total = sol_stack.trap(height);
+	int total = sol_two_pointers.trap(height);
 
 	std::cout << "\n\tTotal: " << total << "\n\n";
 
