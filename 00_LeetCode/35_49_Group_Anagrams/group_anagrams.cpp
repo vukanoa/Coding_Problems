@@ -2,6 +2,7 @@
 #include <vector>
 #include <unordered_map>
 #include <algorithm>
+#include <cstring>
 
 /*
 	==============
@@ -93,10 +94,70 @@ public:
 };
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Two strings are anagrams if and only if their character counts(respective
+	number of occurrences of each character) are the same.
+
+	We have an array "counter" which counts number of occurrences of each
+	letter in a current string.
+
+	Once we've done that, we transform that array into a string and we use it
+	as a key for our Hash Map.
+	As for "values" we keep a vector of original strings.
+
+	At the end we iterate through Hash Map's keys and add each "value"(entire
+	vector) to our vector of vector "results" and we return that.
+
+*/
+
+
+/* Time  Complexity: O(n * k)
+   Where 'n' is the length of "strs", and 'k' is the maximum length of a string
+   in "strs". Counting each string is linear in the size of the string, and we
+   count every string.
+*/
+/* Space Complexity: O(n * k) */
+class Solution_improved{
+public:
+	std::vector<std::vector<std::string>>
+	groupAnagrams(std::vector<std::string>& strs)
+	{
+		std::vector<std::vector<std::string>> results;
+		std::unordered_map<std::string, std::vector<std::string>> umap;
+
+		int counter[26];
+
+		for (std::string& str : strs)
+		{
+			memset(counter, 0, sizeof(counter));
+
+			for (char c : str)
+				counter[c - 'a']++;
+
+			std::string key;
+			for (int i = 0; i < 26; i++)
+				key += counter[i];
+
+			umap[key].push_back(str);
+		}
+
+		for (const auto& m : umap)
+			results.push_back(m.second);
+
+		return results;
+	}
+};
+
+
 int
 main()
 {
-	Solution sol;
+	// Solution sol;
+	Solution_improved sol_improved;
 
 	/* Example 1 */
 	std::vector<std::string> strs = {"eat", "tea", "tan", "ate", "nat", "bat"};
@@ -137,7 +198,8 @@ main()
 	std::cout << "]\n";
 
 	/* Solution */
-	std::vector<std::vector<std::string>> results = sol.groupAnagrams(strs);
+	// std::vector<std::vector<std::string>> results = sol.groupAnagrams(strs);
+	std::vector<std::vector<std::string>> results = sol_improved.groupAnagrams(strs);
 
 	/* Write Output */
 	first = true;
