@@ -5,11 +5,11 @@
 	============
 	=== EASY ===
 	============
-	
+
 	===========================
 	14) Longest Common Prefix
 	===========================
-	
+
 	============
 	Description:
 	============
@@ -18,58 +18,66 @@
 	an array of strings.
 
 	If there is no common prefix, return an empty string "".
-	
+
 	===========================================================
 	FUNCTION: string longestCommonPrefix(vector<string>& strs);
 	===========================================================
-	
+
 	==========================================================================
 	================================ EXAMPLES ================================
 	==========================================================================
-	
+
 	--- Example 1 ---
 	Input:  strs = ["flower", "flow", "flight"]
 	Output: "fl"
-	
+
 	--- Example 2 ---
 	Input:  strs = ["dog", "racecar", "car"]
 	Output: ""
 	Explanation: THere is no common prefix among the input stringsn.
-	
+
 	*** Constraints ***
 	1 <= strs.length() <= 200
 	0 <= strs[i].length() <= 200
 	strs[i] consists of only lowercase English letters.
 */
 
-using namespace std;
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	The longest common prefix is common to all the strings. So, we can fix one
+	string and check the common prefix of this string with other strings. The
+	minimum such length is found and the answer is the substring of the fixed
+	string starting from 0 to the length of the above such minimum.
+
+*/
+
 
 /* Time  Complexity: O(S), where S is the sum of all characters of all strings in the vector */
 /* Space Complexity: O(1) */
 class Solution{
 public:
-	string longestCommonPrefix(vector<string>& strs)
+	std::string longestCommonPrefix(std::vector<std::string>& strs)
 	{
-		if (strs.empty())
-			return "";
-		else if (strs.size() == 1)
-			return strs[0];
-		else if (strs[0].empty() || strs[1].empty())
-			return "";
-		else if (strs[0][0] != strs[1][0])
-			return "";
+		int prefix_size = strs[0].length();
+		int n = strs.size();
 
-		string prefix = strs[0];
-		for (int i = 1; i < strs.size(); i++)
+		for (int i = 1; i < n; i++)
 		{
-			if (strs[i] == "" || prefix == "")
+			if (prefix_size == 0)
 				return "";
 
-			while (prefix != strs[i].substr(0, prefix.size()))
-				prefix.pop_back();
+			int x = 0;
+			while (x < strs[i].length() && strs[0][x] == strs[i][x])
+				x++;
+
+			prefix_size = std::min(prefix_size, x);
 		}
 
-		return prefix;
+		return strs[0].substr(0, prefix_size);
 	}
 };
 
@@ -80,19 +88,19 @@ main()
 	Solution sol;
 
 	/* Example 1 */
-	vector<string> strs = {"flower", "flow", "flight"};
+	std::vector<std::string> strs = {"flower", "flow", "flight"};
 
 	/* Example 2 */
-	// vector<string> strs = {"dog", "racecar", "car"};
+	// std::vector<std::string> strs = {"dog", "racecar", "car"};
 
 	/* Example 3 */
-	// vector<string> strs = {"",""};
+	// std::vector<std::string> strs = {"",""};
 
 	/* Example 4 */
-	// vector<string> strs = {"c", "c"};
+	// std::vector<std::string> strs = {"c", "c"};
 
 	/* Example 5 */
-	// vector<string> strs = {"apple"};
+	// std::vector<std::string> strs = {"apple"};
 
 	std::cout << "\n\t=============================";
 	std::cout << "\n\t=== LONGEST COMMON PREFIX ===";
@@ -110,7 +118,7 @@ main()
 	}
 	std::cout << "]\n";
 
-	string prefix = sol.longestCommonPrefix(strs);
+	std::string prefix = sol.longestCommonPrefix(strs);
 	std::cout << "\n\tLongest Common Prefix is: \"" << prefix << "\"\n\n";
 
 	return 0;
