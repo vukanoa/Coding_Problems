@@ -6,11 +6,11 @@
 	============
 	=== EASY ===
 	============
-	
+
 	===========================
 	20) Valid Parentheses
 	===========================
-	
+
 	============
 	Description:
 	============
@@ -26,29 +26,91 @@
 	======================================
 	FUNCTION: bool isValid(std::string s);
 	======================================
-	
+
 	==========================================================================
 	================================ EXAMPLES ================================
 	==========================================================================
-	
+
 	--- Example 1 ---
 	Input:  s = "()"
 	Output: true
-	
+
 	--- Example 2 ---
 	Input:  s = "()[]{}"
 	Output: true
-	
+
 	--- Example 3 ---
 	Input: s = "(]"
 	Output: false
-	
+
 	*** Constraints ***
 	1 <= s.legnth <= 10^4
 	s consists of parentheses only '()[]{}'.
 
 */
 
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	First check if the string 's' is of length 1. If it is then it's certainly
+	false.
+
+	Make a stack.
+
+	Example:
+		([{]})
+	is FALSE. Closing parenthesis/bracket/brace MUST match lastly opened
+	parenthesis/bracket/brace.
+
+	([)] is FALSE
+	([]) is TRUE
+	()[] is TRUE
+
+	Iterate through each character in our string 's'.
+	If it is an open parenthesis/bracket/brace then push it onto the stack.
+	If it is not an open parenthesis/bracket/brace then:
+		1. Check if the stack is Empty
+			This check if the very first character in our string 's' is a
+			closing parenthesis/bracket/brace. If it is - return false
+
+		2. If current character is a closing parenthesis:
+			Check if a corresponding open parenthesis is on the top of the
+			stack with a function: stack.top().
+			If at the top is anything other than '(' - return false.
+
+		3. If current character is a closing bracket:
+			Check if a corresponding open bracket is on the top of the stack
+			with a function: stack.top().
+			If at the top is anything other than '[' - return false.
+
+		4. If current character is a closing brace:
+			Check if a corresponding open brace is on the top of the stack with
+			a function: stack.top().
+			If at the top is anything other than '{' - return false.
+
+		5. If it was a corresponding opened parenthesis/bracket/brace on the
+		   top, then just pop from the stack.
+
+		stack.top() just returns what is at the top of the stack without
+		popping it.
+
+		After we've processed the whole string 's', just check if the stack
+		is empty.
+		If it is Empty INDEED, then return TRUE, meaning a string 's' is VALID.
+		If it is Empty NOT, then return FALSE, meaning a string 's' is INVALID.
+
+*/
+
+
+/*	Time  Complexity: O(n) */
+/*
+	Space Complexity: O(n)
+	O(n) when the string 's' is: ([{{{{{{{
+	All openened (any) combination of parentheses/brackets/braces.
+*/
 class Solution{
 public:
 	bool isValid(std::string s)
