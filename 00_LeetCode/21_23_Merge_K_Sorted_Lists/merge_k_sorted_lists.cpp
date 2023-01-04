@@ -7,11 +7,11 @@
 	============
 	=== HARD ===
 	============
-	
+
 	===========================
 	23) Merge k Sorted Lists
 	===========================
-	
+
 	============
 	Description:
 	============
@@ -20,15 +20,15 @@
 	sorted in ascending order.
 
 	Merge all the linked-lists into one sorted linked-list and return it.
-	
+
 	=============================================================================
 	FUNCTION: struct ListNode* mergeKLists(std::vector<struct ListNode*>& lists);
 	=============================================================================
-	
+
 	==========================================================================
 	================================ EXAMPLES ================================
 	==========================================================================
-	
+
 	--- Example 1 ---
 	Input:  lists = [[1, 4, 5], [1, 3, 4], [2, 6]]
 	Output: [1, 1, 2, 3, 4, 4, 5, 6]
@@ -40,16 +40,16 @@
 	]
 	merging them into one sorted list:
 	1 -> 1 -> 2 -> 3 -> 4 -> 4 -> 5 -> 6
-	
+
 	--- Example 2 ---
 	Input:  lists = []
 	Output: []
-	
-	
+
+
 	--- Example 3 ---
 	Input:  lists = [[]]
 	Output: []
-	
+
 	*** Constraints ***
 	k == lists.length
 	0 <= k <= lists[i].length <= 500
@@ -58,6 +58,42 @@
 	The sum of lists[i].length will not exceed 10^4
 
 */
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Make a dummy node and set both head and tail to point to it.
+	Set "null_cnt" to 0. "null_cnt" will count how many of the lists are now
+	pointing to nullptr. We have to use each and every one of nodes in each and
+	every one of lists, so until that happens(until null_cnt is less than n),
+	do the while loop.
+
+	In the while loop immediately set local variable "min" to INT_MAX and index
+	to -1.
+
+	Now iterate through ALL the first nodes in each list and save the lowest
+	value in variable "min" and save the index od the list with a lowest
+	first node in a variable "index".
+
+	Make tail's next point to that node with the current lowest of all the
+	first nodes in lists and make tail point now point to that node.
+
+	And make sure a list that contained that lowest first value now points to
+	its next node:
+			lists[index] = lists[index]->next;
+
+	If that "next node" is nullptr then null_cnt++.
+
+	Repeat this until every node in every list is processed, that is every
+	list points to nullptr.
+
+	Since our head points to dummy node, return head->next. We don't care about
+	our dummy node.
+*/
+
 
 
 // Definition for singly-linked list.
@@ -70,6 +106,8 @@ struct ListNode {
 };
 
 
+/* Time  Complexity: O(totalNumberOfNodes * k) */
+/* Space Complexity: O(1) */
 class Solution{
 public:
 	struct ListNode* mergeKLists(std::vector<struct ListNode*>& lists)
