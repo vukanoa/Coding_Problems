@@ -1,7 +1,7 @@
 .PHONY = all clean
 
 all:
-	g++ generate_parenthesis.cpp -o program
+	g++ generate_parentheses.cpp -o program
 
 clean:
 	rm -f program
