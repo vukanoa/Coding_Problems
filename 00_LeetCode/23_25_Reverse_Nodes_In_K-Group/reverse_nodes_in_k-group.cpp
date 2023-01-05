@@ -5,11 +5,11 @@
 	============
 	=== HARD ===
 	============
-	
+
 	============================
 	25) Reverse Nodes in k-Group
 	============================
-	
+
 	============
 	Description:
 	============
@@ -23,23 +23,23 @@
 
 	You may not alter the values in the list's nodes, only nodes themselves
 	may be changed.
-	
+
 	=========================================================
 	FUNCTION: ListNode* reverseKGroup(ListNode* head, int k);
 	=========================================================
-	
+
 	==========================================================================
 	================================ EXAMPLES ================================
 	==========================================================================
-	
+
 	--- Example 1 ---
 	Input:  head = [1, 2, 3, 4, 5], k = 2
 	Output: [2, 1, 4, 3, 5]
-	
+
 	--- Example 2 ---
 	Input:  head = [1, 2, 3, 4, 5], k = 3
 	Output: [3, 2, 1, 4, 5]
-	
+
 	*** Constraints ***
 	The number of nodes in the list is "n".
 	1 <= k <= n <= 5000
@@ -79,22 +79,158 @@ print_list(struct ListNode* head)
 }
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	We have two functions:
+		1. reverseKgroup
+		2. reverse_list
+
+	I) reverseKGroup
+		If k is equal to 1 or if head is nullptr, just return the head of the
+		original list.
+
+		First we count the number of nodes in the list and assign that number
+		to variable "remaining_nodes".
+
+		We have two pointers:
+			1. local_head
+				which points to the first node in the sublist we're trying
+				to reverse. There is a drawn comment down there.
+			2. ultimate head
+				which points to the head of the entirely k-reversed list.
+
+		There are "remaining_nodes" in the list at the beginning and after
+		each k-reverse, we subtract 'k' from "remaining_nodes".
+		While loop loops until remaining nodes is greater than or equal to k.
+
+		Example:
+		If there are 5 nodes and k = 2, then we can reverse:
+			first with second
+			third with fourth
+			fifth remains as it is
+
+		At the last "iteration", remaining nodes is going to be 1 and k = 2,
+		thus we end the while loop and return the ultimate_head.
+
+		At the beginning of the while loop, initialize:
+			1. "tail" to point to "local_head" which is going to become the end
+			of the sublist we're k-reversing afer the call of function
+			"reverse_list".
+
+			2. "rem" to nullptr, which represents the rest of the list that has
+			yet to be k-reversed after the call of function "reverse_list".
+
+		We're calling the function:
+			reverse_list(local_head, rem, k)
+
+		1. "local_head" is the head of the sublist we're reversing.
+
+		2. "rem" should point the the first node of the rest of the list that
+		has to been k-reversed. "rem" stands for Remainder(of the list).
+
+		3. 'k' is the length of the sublist we're reversing.
+
+
+		It's important to note what exactly this "reverse_list function" does.
+
+		k = 3
+                      tail ---
+ultimate_head ---            |
+         _______|      -------
+        |              |
+        v              v
+        3 -> 2 -> 1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> nullptr
+                       ^
+                       |
+        local_head -----
+
+
+
+		After the call of this function, we have this:
+
+ultimate_head ---
+         _______|
+        |
+        v
+        3 -> 2 -> 1
+                  |
+                  v
+		6 -> 5 -> 4 -> nullptr
+        ^         ^
+        |___      |
+            |     |
+local_head --     |
+                  |
+        tail-------
+
+
+       7 -> 8 -> 9 -> 10 -> nullptr
+       ^
+       |
+ rem ---
+
+		That's it. That's how the list looks like AFTER the call of
+		reverse_list function.
+
+
+		Now we have to ask if this was a first reverse of k-nodes. If it is
+		then make "ultimate_head" point to "local_head" and set "first" to
+		false.
+
+		Link current tail(in the first reversing), to the rest of the list.
+
+		If it was:
+        1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> nullptr
+
+		Now it's:
+		3 -> 2 -> 1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> nullptr
+        ^         ^    ^
+        |         |    |
+local_head        |    |
+                  |    |
+          tail ---     |
+                       |
+               rem ----
+
+		We have linked tail's next to the rest of the list denotes with pointer
+		"rem".
+
+		However, if it wasn't the first k-reverse then "first" is false and
+		thus we have to relink the previous part of the list with the newly
+		k-reversed sublist and we also have to relink the end of this newly
+		k-reversed sublist with the rest of the list denoted with a pointer
+		"rem".
+
+		So, since the additional thing we have to do here is to relink the
+		previous part of the list with this newly k-reversed sublist, that
+		means we have to keep a pointer to the end of the list that is before
+		the head of the sublist we're k-reversing. That is right before
+		the "local_head" BEFORE the call of function "reverse_list".
+
+		That pointer is going to be denoted with "tail_of_list_before_sublist".
+
+		After we're finished, subtract 'k' from "remaining_nodes" and check
+		the while loop condition and potentially loop again.
+
+*/
+
+
 class Solution{
 public:
-	void reverse_list(struct ListNode** head, struct ListNode** tail, struct ListNode** rem, int k)
+	void reverse_list(struct ListNode** head, struct ListNode** rem, int k)
 	{
 		struct ListNode* prev = nullptr;
 		struct ListNode* curr = (*head);
 		struct ListNode* next = (*head);
 
-		(*tail) = (*head);
+		// Rest of the list yet to be k-reversed
 		(*rem) = nullptr;
 
 		while (curr && k--)
 		{
-			if (curr == (*head))
-				(*tail) = curr;
-
 			if (k == 0)
 				(*rem) = next->next;
 
@@ -108,6 +244,7 @@ public:
 		(*head) = prev;
 	}
 
+
 	struct ListNode* reverseKGroup(struct ListNode* head, int k)
 	{
 		if (k == 1 || head == nullptr)
@@ -117,17 +254,24 @@ public:
 		struct ListNode* local_head = head;
 		struct ListNode* ultimate_head = head;
 
+		// Count the number of nodes in the list
 		while (local_head)
 		{
 			n++;
 			local_head = local_head->next;
 		}
-		local_head = head;
+		local_head = head; // Make local_head point to head again
 
 		int remaining_nodes = n;
 		bool first = true;
+		struct ListNode* tail_of_list_before_sublist;
 
 		/*
+            ultimate_head ---
+                            |
+            -----------------
+            |
+            v
 			3 -> 2 -> 1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 			               ^
 						   |
@@ -143,9 +287,9 @@ public:
 
 		while (remaining_nodes >= k)
 		{
-			struct ListNode* tail = nullptr;
-			struct ListNode* rem = nullptr; // Remainder
-			reverse_list(&local_head, &tail, &rem, k);
+			struct ListNode* tail = local_head;
+			struct ListNode* rem = nullptr; // Remainder, rest of the list
+			reverse_list(&local_head, &rem, k);
 
 			if (first)
 			{
@@ -153,11 +297,11 @@ public:
 				first = false;
 			}
 			else if (k < n)
-				head->next = local_head;
+				tail_of_list_before_sublist->next = local_head;
 
 			tail->next = rem;
-			head = tail;
-			local_head = head->next;
+			tail_of_list_before_sublist = tail;
+			local_head = rem;
 
 			remaining_nodes = remaining_nodes - k;
 
@@ -265,7 +409,7 @@ main()
 	/* Example 7 */
 	// struct ListNode* head = nullptr;
 	// int k = 3;
-	
+
 
 
 	std::cout << "\n\t================================";
