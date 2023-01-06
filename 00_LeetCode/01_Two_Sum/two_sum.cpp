@@ -7,11 +7,11 @@
 	============
 	=== EASY ===
 	============
-	
+
 	===========================
 	1) Two Sum
 	===========================
-	
+
 	============
 	Description:
 	============
@@ -21,33 +21,33 @@
 
 	You may assume that each input would have exactly one solution, and you may
 	not use the same element twice.
-	
+
 	=====
 	Node: You can return the answer in any order.
 	=====
-	
+
 	======================================================================
 	FUNCTION: std::vector<int> twoSum(std::vector<int>& nums, int target);
 	======================================================================
-    
-	
+
+
 	==========================================================================
 	================================ EXAMPLES ================================
 	==========================================================================
-	
+
 	--- Example 1 ---
 	Input : nums = [2, 7, 11, 15], target = 9
 	Output: [0, 1]
 	Explanation: Because nums[0] + nums[1] == 9, we return [0, 1]
-	
+
 	--- Example 2 ---
 	Input : nums = [3, 2, 4], target = 6
 	Output: [1, 2]
-	
+
 	--- Example 3 ---
 	Input : nums = [3, 3], target = 6
 	Output: [0, 1]
-	
+
 	*** Constraints ***
 	2 <= nums.length <= 10^4
 	-10^9 <= nums[i] <= 10^9
@@ -60,23 +60,23 @@
 	------------
 	--- IDEA ---
 	------------
-	
+
 	Make a Hash Map:
-	KEY		VALUE
-	value	index
-	
+	KEY     VALUE
+	value   index
+
 	At the beginning Insert:
-	KEY		VALUE
-	nums[0]	0
-	
+	KEY     VALUE
+	nums[0] 0
+
 	Iterate from 1 onwards.
-	
+
 	Subtract nums[i] from target and check if that number exists in the
-	Hash Map. 
-	
+	Hash Map.
+
 	If it DOES exist, then return the index of that number(taking it from the
 	Hash map) and the current index 'i'.
-	
+
 	If not, add it to the Hash Map with its corresponding index and continue
 	iterating.
 */
@@ -108,6 +108,8 @@ public:
 int
 main()
 {
+	Solution sol;
+
 	/* Example 1 */
 	std::vector<int> nums = {2, 7, 11, 15};
 	int target = 9;
@@ -120,11 +122,27 @@ main()
 	// std::vector<int> nums = {3, 3};
 	// int target = 6;
 
-	Solution sol;
-	std::vector<int> solution_vect = sol.twoSum(nums, target);
+	std::cout << "\n\t===============";
+	std::cout << "\n\t=== TWO SUM ===";
+	std::cout << "\n\t===============\n";
 
 	bool first = true;
-	std::cout << "\n\tSolution is: [";
+	std::cout << "\n\tNumbers: [";
+	for (auto x: nums)
+	{
+		if (!first)
+			std::cout << ", ";
+
+		std::cout << x;
+		first = false;
+	}
+	std::cout << "]\n";
+
+	/* Solution */
+	std::vector<int> solution_vect = sol.twoSum(nums, target);
+
+	first = true;
+	std::cout << "\n\tSolution: [";
 	for (auto x: solution_vect)
 	{
 		if (!first)
