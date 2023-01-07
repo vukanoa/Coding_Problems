@@ -42,6 +42,152 @@
 */
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Brute force solution would be to find first left bar that the current one
+	and first right bar less that the current one, for each bar(each number
+	in the array).
+
+	Since that would take O(n^2) we have to optimize it somehow.
+
+	We can use stack.
+	So how can a stack help us optimize this solution?
+	We have two vectors: "left" and "right". Those represent the left most bar
+	(inclusive) up to which the current bar is the lowest and the right most
+	bar(inclusive) up to which the current bar is the lowest.
+	Size of both left and right is the same as the size of the array - we will
+	have the left and the right bound for each and every bar.
+
+	After we have that it's easy to calculate max_area for each bar. After that
+	all we have to do is just return the maximum value of all of those
+	max_areas.
+
+	But how does the stack help us?
+	Consider this example:
+		[2, 1, 5, 6, 2, 3]
+
+	What's the idea behind the stack?
+	If the stack is empty, that means the left most bar that has to be included
+	in calculating the max area of the current bar is the bar at index 0, that
+	is why we say:
+		left[i] = 0;
+
+	and we push current index's in the stack. Why? Let's see.
+
+	If the stack isn't empty then while the stack is not empty and while
+	the bar under the index at the top of the stack is greater than or equals
+	to current bar's height, pop from the stack.
+
+	After the while loop ended see if stack is empty, if it is then:
+		left[i] = 0
+
+	and if it is not then:
+		left[i] = stack.top() + 1;
+
+	Why stack.top() + 1?
+	Because we have found the bar whose height is less than the height of the
+	current one, thus we have to exclude that, so we add + 1 since stack.top()
+	returns the index of the bar not the height of the bar.
+
+
+	Let's go Iteration by iteration:
+	=== 1st Iteration ===
+
+	left    = [-1, -1, -1, -1, -1, -1]
+	heights = [ 2,  1,  5,  6,  2,  3]
+	            ^
+	Stack
+	----------------
+	|
+	----------------
+
+
+	=== 2nd Iteration ===
+
+	left    = [ 0, -1, -1, -1, -1, -1]
+	heights = [ 2,  1,  5,  6,  2,  3]
+	                ^
+	Stack
+	----------------
+	| 0 |
+	----------------
+	pop()
+	push(1)
+
+
+	=== 3rd Iteration ===
+
+	left    = [ 0,  0, -1, -1, -1, -1]
+	heights = [ 2,  1,  5,  6,  2,  3]
+	                    ^
+	Stack
+	----------------
+	| 1 |
+	----------------
+	push(2)
+
+
+	=== 4th Iteration ===
+
+	left    = [ 0,  0,  2, -1, -1, -1]
+	heights = [ 2,  1,  5,  6,  2,  3]
+	                        ^
+	Stack
+	----------------
+	| 1 | 2 |
+	----------------
+	push(3)
+
+
+	=== 5th Iteration ===
+
+	left    = [ 0,  0,  2,  3, -1, -1]
+	heights = [ 2,  1,  5,  6,  2,  3]
+	                            ^
+	Stack
+	----------------
+	| 1 | 2 | 3 |
+	----------------
+	pop
+	pop
+	push(4)
+
+
+	=== 6th Iteration ===
+
+	left    = [ 0,  0,  2,  3,  2, -1]
+	heights = [ 2,  1,  5,  6,  2,  3]
+	                                ^
+	Stack
+	----------------
+	| 1 | 4 |
+	----------------
+	push(5)
+
+
+	After the for loop:
+
+	left   =  [ 0,  0,  2,  3,  2,  5]
+	heights = [ 2,  1,  5,  6,  2,  3]
+	                                   ^
+	Stack
+	----------------
+	| 1 | 4 | 5 |
+	----------------
+
+
+	After this, we have to do a similar thing for "right" vector, therefore we
+	first have to clear the stack.
+
+	The rest of the algorithm was explained at the beginning of this
+	explanation.
+
+*/
+
+
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
 class Solution{
