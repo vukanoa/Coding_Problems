@@ -57,6 +57,8 @@ struct TreeNode {
 	--- IDEA ---
 	------------
 
+	Idea is the same for both Recursive and Iterative Approach.
+
 	Postorder is a mirror order of Preorder.
 
 	We push preorder values in vector "left" along with null-nodes which are
@@ -142,10 +144,144 @@ public:
 };
 
 
+class Solution_iter{
+	void preorder_iter(TreeNode* root, std::vector<int>& left)
+	{
+		std::stack<TreeNode*> stack;
+
+		while (root != nullptr || !stack.empty())
+		{
+			if (root == nullptr)
+			{
+				left.push_back(-101); // Left null
+
+				root = stack.top();
+				stack.pop();
+			}
+			else
+			{
+				left.push_back(root->val);
+
+				if (root->val != -101)
+				{
+
+					if (root->right != nullptr)
+						stack.push(root->right);
+					else
+					{
+						TreeNode null_node(-101);
+						stack.push(&null_node);
+					}
+
+					root = root->left;
+				}
+				else
+				{
+					if (!stack.empty())
+					{
+						root = stack.top();
+						stack.pop();
+					}
+					else
+						root = nullptr;
+				}
+			}
+		}
+	}
+
+	void postorder_iter(TreeNode* root, std::vector<int>& right)
+	{
+		if (root == nullptr)
+			return;
+
+		std::stack<TreeNode*> stack_1;
+		std::stack<TreeNode*> stack_2;
+
+		stack_1.push(root);
+
+		while (!stack_1.empty())
+		{
+			root = stack_1.top();
+			stack_1.pop();
+
+			stack_2.push(root);
+
+			if (root->val == -101)
+			{
+				if (!stack_1.empty())
+				{
+					TreeNode null_node(-101);
+					stack_1.push(&null_node);
+
+					root = stack_1.top();
+					stack_1.pop();
+					continue;
+				}
+				else
+				{
+					TreeNode null_node(-101);
+					stack_1.push(&null_node);
+					break;
+				}
+			}
+
+			if (root->left != nullptr)
+				stack_1.push(root->left);
+			else
+			{
+				TreeNode null_node(-101);
+				stack_1.push(&null_node);
+			}
+
+			if (root->right != nullptr)
+				stack_1.push(root->right);
+			else
+			{
+				TreeNode null_node(-101);
+				stack_1.push(&null_node);
+			}
+		}
+
+		while (!stack_2.empty())
+		{
+			root = stack_2.top();
+			stack_2.pop();
+
+			right.push_back(root->val);
+		}
+	}
+
+public:
+	bool isSymmetric(TreeNode* root)
+	{
+		if (root == nullptr)
+			return true;
+
+		std::vector<int> left;
+		std::vector<int> right;
+
+		preorder_iter(root->left, left);
+		postorder_iter(root->right, right);
+
+		if (left.size() != right.size())
+			return false;
+
+		for (int i = 0; i < left.size(); i++)
+		{
+			if (left[i] != right[left.size() - 1 - i])
+				return false;
+		}
+
+		return true;
+	}
+};
+
+
 int
 main()
 {
-	Solution sol;
+	// Solution sol;
+	Solution_iter sol_iter;
 
 	/* Example 1 */
 	TreeNode three1(3);
@@ -192,10 +328,14 @@ main()
 	std::cout << "\n\t======================\n";
 
 	/* Solution */
-	if (sol.isSymmetric(root))
+	// if (sol.isSymmetric(root))
+	if (sol_iter.isSymmetric(root))
 		std::cout << "\n\tTree is INDEED Symmetric!\n\n";
 	else
 		std::cout << "\n\tTree is NOT Symmetric!\n\n";
 
 	return 0;
+
 }
+
+
