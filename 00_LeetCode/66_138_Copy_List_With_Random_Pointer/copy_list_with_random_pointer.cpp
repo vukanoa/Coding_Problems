@@ -123,8 +123,8 @@ public:
 
 
 		2. Go through the original linked list and for each's corresponding
-		   copy set copy's "next" and "random" pointers to copied
-		   correspondents of the "next" and "random" nodes of the original
+		   copy node set copy's "next" and "random" pointers to copied
+		   correspondings of the "next" and "random" nodes of the original
 		   linked list(from our Hash Map).
 
 		   (Originals)       (Copies)
@@ -138,6 +138,115 @@ public:
 	Return the corresponding copy of the Original List's head, from our
 	Hashmap.
 
+
+
+
+    --- Solution_DNA ---
+
+    Why am I calling it "DNA"? It is reminiscent of DNA replication. At least
+    it reminds me of it.
+
+    How does this work?
+
+    Again, we have 2 passes:
+        1. First we have to remember the Original List's next since we're
+           going to modify it.
+
+		   Now make a copy of the current Original List's node and set
+		   Original List's next pointer to point to this, just created, copy.
+
+		   We're going to link copy nodes within the first pass with a use
+		   of "prev" pointer which, at the beginning, points to "nullptr"
+		   and it always gets set to newly created copy.
+		   After the first iteration "prev" isn't a "nullptr", thus it's "next"
+		   pointer gets set to the current copy.
+		   That way we link the whole copied list.
+
+		   So, we have started the loop with this(Example):
+		   (right arrows represent "next" pointer, while the ones that go
+		   up and down, in this drawing, represent "random" pointers)
+
+Original List: (Before the while loop)
+    head -----
+             |
+--------------
+|
+|
+|
+|   ----------------------------
+|   |                          |
+|   v                          |
+|   ---------------------------|--------
+|   |             -------      |       |
+|   |             v     |      |       v
+|-> 7 ==> 13 ==> 11 ==> 10 ==> 1 ==> nullptr
+    ^      |      |            ^
+    |      |      |            |
+    -------       --------------
+
+
+Original List: (Before the while loop)
+
+    head -----
+             |
+    ----------
+    |
+    v
+  ->7     ->13     ->11     ->10     ->1                 (Original List)
+  | |     |  |     |  |     |  |     | |
+  | v     |  v     |  v     |  v     | v
+  --7 ==> --13 ==> --11 ==> --10 ==> --1 ==> nullptr     (Copied List)
+
+// From up (Origian List) downards is the "next" pointer of Original List.
+// From down(Copied List) upwards is the "random" pointer of the Copied List.
+
+
+        2. Iterate through this Copied List and make:
+           curr_copy->random (instead of now pointing at its Original
+           List's corresponding node), make it now point to:
+
+           curr_copy->random->random->next;
+
+           Let's unpack this:
+           curr_copy->random points to its Original List corresponding
+           node:
+               meaning Copied Node(7)'s random is pointing to Original
+               Node(7)
+
+          Now let's see the next pointer:
+          curr_copy->random->random
+          ~~~~~~~~~~~~~~~~~
+                ^
+                |
+                |
+   Original List's corresponding node of the Copied Node
+
+
+          Now when we are on that node(Original List's corresponding
+          node), now take ITS random pointer.
+          Its random pointer points to the random node in the Original
+          List.
+
+          So can we use this?
+          Well, remember that we have modified Original List's "next"
+          pointers?
+          They are pointing to its Copied corresponding nodes.
+
+          Thus:
+          curr_copy->random->random->next
+
+          will give us the appropriate Random Node but from out Copied
+          List.
+
+          We do that for every curr_copy in the list and we're done.
+
+          Now just return the:
+              head->next
+
+          Since head is pointing to the head of the Original List, and we have
+          left Original List modified in terms of its "next" pointers, that
+          means that head->next is pointing to the head of our copied list
+          which we're asked to return.
 */
 
 
@@ -175,6 +284,63 @@ public:
 		}
 
 		return umap.at(head);
+	}
+};
+
+
+
+/*	Time  Complexity: O(n) */
+/*
+	Space Complexity: O(1)
+	Technically it's still O(n) since we need the space for new 'n' nodes.
+	However, we don't need to use anything other than that, so it could, maybe,
+	be considered O(1) since I'm not using anything additional that I
+	absolutely must.
+
+	Also there is a downside to this solution:
+		It leaves the Original List Modified.
+*/
+class Solution_DNA{
+public:
+	Node* copyRandomList(Node* head)
+	{
+		Node* curr_original = head;
+		Node* next_original = nullptr;
+		Node* prev_copy = nullptr;
+
+		while (curr_original)
+		{
+			next_original = curr_original->next;
+
+			Node* curr_copy = new Node(curr_original->val);
+			curr_original->next = curr_copy;
+
+			// Update Copy's next
+			if (prev_copy != nullptr)
+				prev_copy->next = curr_copy;
+
+			// Update Copy's random
+			curr_copy->random = curr_original;
+
+			prev_copy = curr_copy;
+			curr_original = next_original;
+		}
+
+		// Since we have just adjusted it to point like this
+		Node* curr_copy = head->next;
+
+		// Assign Copied Nodes to "random" pointers.
+		while (curr_copy)
+		{
+			if (curr_copy->random->random != nullptr)
+				curr_copy->random = curr_copy->random->random->next;
+			else
+				curr_copy->random = nullptr;
+
+			curr_copy = curr_copy->next;
+		}
+
+		return head->next;
 	}
 };
 
@@ -220,6 +386,7 @@ int
 main()
 {
 	Solution sol;
+	// Solution_DNA sol_dna;
 
 	/* Example 1 */
 	Node* seven    = new Node(7);
@@ -346,6 +513,7 @@ main()
 
 	/* Solution */
 	Node* ret = sol.copyRandomList(head);
+	// Node* ret = sol_dna.copyRandomList(head);
 
 	/* Write Output */
 	print_list(ret);
