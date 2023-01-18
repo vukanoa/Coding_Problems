@@ -53,10 +53,39 @@
 */
 
 
+/* Time  Complexity: O(n^2 * m) */
+/* Space Complexity: O(n^2 * m) */
+class Solution{
+public:
+	bool wordBreak(std::string s, std::vector<std::string>& wordDict)
+	{
+		std::set<std::string> dict(wordDict.begin(), wordDict.end());
+		std::vector<bool> dp(s.length() + 1, false);
+
+		dp[s.length()] = true;
+
+		for (int index = s.length() - 1; index >= 0; index--)
+		{
+			for (int i = index; i < s.length(); i++)
+			{
+				std::string current_str = s.substr(index, i - index + 1);
+				if (dict.find(current_str) != dict.end() && dp[i + 1])
+				{
+					dp[index] = true;
+					break;
+				}
+			}
+		}
+
+		return dp[0];
+	}
+};
+
+
 /* Time  Complexity: O(n^3) */
 /* Space Complexity: O(n^3) */
 // TLE (Time Limit Exceeded)
-class Solution{
+class Solution_brute{
 public:
 	bool wordBreak(std::string s, std::vector<std::string>& wordDict)
 	{
