@@ -58,7 +58,7 @@ struct ListNode {
 
 /* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(logn) */
-class Solution{
+class Solution_worse{
 public:
 	struct ListNode* sortList(struct ListNode* head)
 	{
@@ -115,6 +115,125 @@ public:
         slow->next = nullptr;
 
         return mid;
+	}
+};
+
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(1) */
+class Solution{
+public:
+	ListNode* tail = new ListNode();
+	ListNode* next_sublist = new ListNode();
+
+	ListNode* sortList(ListNode* head)
+	{
+		if (!head || !head->next)
+			return head;
+
+		int n = get_count(head);
+
+		ListNode* start = head;
+		ListNode dummy_head(0);
+
+		for (int size = 1; size < n; size = size * 2)
+		{
+			tail = &dummy_head;
+
+			while (start)
+			{
+				if (!start->next)
+				{
+					tail->next = start;
+					break;
+				}
+
+				ListNode* mid = split(start, size);
+				merge(start, mid);
+
+				start = next_sublist;
+			}
+			start = dummy_head.next;
+		}
+
+		return dummy_head.next;
+	}
+
+	ListNode* split(ListNode* start, int size)
+	{
+		ListNode* mid_prev = start;
+		ListNode* end = start->next;
+
+		// Use "Fast and Slow" approach to find middle and end of second linked list
+		for (int index = 1; index < size && (mid_prev->next || end->next); index++)
+		{
+			if (end->next)
+			{
+				if (end->next->next)
+					end = end->next->next;
+				else
+					end = end->next;
+			}
+
+			if (mid_prev->next)
+				mid_prev = mid_prev->next;
+		}
+
+		ListNode* mid = mid_prev->next;
+		next_sublist = end->next;
+		mid_prev->next = nullptr;
+		end->next = nullptr;
+
+		// Return the start of second linked list
+		return mid;
+	}
+
+	void merge(ListNode* list1, ListNode* list2)
+	{
+		ListNode dummy_head(0);
+		ListNode* new_tail = &dummy_head;
+
+		while (list1 && list2)
+		{
+			if (list1->val < list2->val)
+			{
+				new_tail->next = list1;
+				list1 = list1->next;
+				new_tail = new_tail->next;
+			}
+			else
+			{
+				new_tail->next = list2;
+				list2 = list2->next;
+				new_tail = new_tail->next;
+			}
+		}
+
+		new_tail->next = (list1) ? list1 : list2;
+
+		// Traverse till the end of merged list to get the new_tail
+		while (new_tail->next)
+			new_tail = new_tail->next;
+
+		// Link the old tail with the head of merged list
+		tail->next = dummy_head.next;
+
+		// Update the old tail with the new tail of merged list
+		tail = new_tail;
+	}
+
+	int get_count(ListNode* head)
+	{
+		int cnt = 0;
+
+		ListNode* ptr = head;
+		while (ptr)
+		{
+			ptr = ptr->next;
+			cnt++;
+		}
+
+		return cnt;
 	}
 };
 
