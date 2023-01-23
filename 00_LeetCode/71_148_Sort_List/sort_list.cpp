@@ -56,6 +56,99 @@ struct ListNode {
 };
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	--- Solution_wose ---
+	classic Merge Sort on Linked List.
+	Top-Down Approach:
+		Time:  O(n * logn)
+		Space: O(1)
+
+
+                                          ^
+        10 -> 1 -> 60 -> 30 -> 5          |
+            /        \                    |
+    10 -> 1          60 -> 30 -> 5        |  log n
+    /      \             /    \           |
+  10       1           60      30 -> 5    |
+  |        |           |       /      \   |
+  |        |           |      30       5  v
+--\--------/-----------|------\--------/-----------
+   v      v            v       v      v
+  1  ->  10           60      5   ->  30
+  |                   \       /
+  |                    v     v
+   \                  5  ->  30  -> 60
+    \                      /
+     v                    v
+   1  ->  5  -> 10  -> 30  -> 60
+
+
+
+
+
+	--- Solution ---
+	Bottom-Up Approach:
+		Time:  O(n * logn)
+		Space: O(1)
+	The idea is simple.
+	Go through the list and merge sorted lists.
+
+	How do you do that is you have an unsorted list? Well in any list, a single
+	element is always sorted - one element in the list, array or any other
+	data structure, is considered sorted.
+
+	So what we're doing here is:
+		Merge Two Sorted Lists:
+			1. 1st List is a single element
+			2. 2nd List is a single element
+
+	consider this example:
+
+	15 -> 7 -> 32 -> 1 -> 10 -> 11 -> 3 -> 4 -> 12 -> 8
+
+	Now sort every two elements:
+
+	Size = 2
+	7 -> 15 -> 1 -> 32 -> 10 -> 11 -> 3 -> 4 -> 8 -> 12
+    ~~~~~~~    ~~~~~~~    ~~~~~~~~    ~~~~~~~   ~~~~~~~~
+
+	Now when we have sublists of 2 elements sorted, now we do the same, but
+	for 4 elements. (Always the power of 2).
+
+	Now we have:
+
+	Size = 4
+	1 -> 7 -> 15 -> 32 -> 3 -> 4 -> 10 -> 11 -> 8 -> 12
+	~~~~~~~~~~~~~~~~~~    ~~~~~~~~~~~~~~~~~~
+
+	The rest is left untouched sinced we know that part is sorted.
+
+	Now size is not 4, but 8.
+
+	Size = 8
+	1 -> 3 -> 4 -> 7 -> 10 -> 11 -> 15 -> 32 -> 8 -> 12
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	And finally, do it for 16.
+
+	Size = 16
+	1 -> 3 -> 4 -> 7 -> 8 -> 10 -> 11 -> 12 -> 15 -> 32
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	So we're passing the list logn times. For sizes: 2, 4, 8 and 16
+	But each time we're doing "Merge Two Sorted Lists" which is O(n).
+
+	Thus the overall Time Complexity is O(n * logn);
+	But the Space Complexity is O(1) since we do not need the Stack for
+	recursion for we are doing it iteratively.
+*/
+
+
+
 /* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(logn) */
 class Solution_worse{
