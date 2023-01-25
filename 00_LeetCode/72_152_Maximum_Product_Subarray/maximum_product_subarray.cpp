@@ -61,12 +61,19 @@
 	Why is that?
 	Consider this example:
 	array: [-1,    -2,  -9, -6]
-	low:   [-18, -108,   0,  0]
-	high:  [108,   18,  54,  0]
 
 	If we were to keep only high values, then we would've had:
 	array: [-1, -2, -9, -6]
-	high:  [ 2, 18,  0,  0]
+	high:  [ 2, 18, 54,  0]
+
+	In the above example we always multiply:
+		1. nums[i] * high[i + 1]
+		2. nums[i] * nums[i + 1]
+	and we start second element from the back. That is: n-2
+
+	If both products are positive, put the greater one in high[i].
+	if one is positive and the other is negative, put the positive in high[i]
+	If neither is positive, put 0 in high[i].
 
 	In high[0] we check if current element, that is nums[0] in this case
 	multiplied by high[1] is greater than high[1], that of course, would be
@@ -81,7 +88,7 @@
 	position would actually give us the highest value globally.
 
 	Thus we MUST have another array and that is the one consisted of lowest
-	products.
+	products, as well.
 
 	There are two edge cases:
 		1. There is only one element in the entire array.
@@ -104,52 +111,53 @@
 	variable "max".
 
 	Here are all the examples with their corresponding "low" and "high" arrays:
-	Example 1
+
+		Example 1
 	array: [  2,   3, -2, 4]
 	low:   [-48, -24, -8, 0]
 	high:  [  6,   0,  0, 0]
 
-	Example 2
+		Example 2
 	array: [-2, 0, -1]
 	low:   [ 0, 0,  0]
 	high:  [ 0, 0,  0]
 
-	Example 3
+		Example 3
 	array: [   2,    7,   5, -2,  3,  0,  4]
 	low:   [-560, -280, -30, -6,  0,  0,  0]
 	high:  [  70,   35,   0,  0,  0,  0,  0]
 
-	Example 4
+		Example 4
 	array: [    2,     7,    5,   -2,  3,  8,  4]
 	low:   [-7770, -3885, -555, -192,  0,  0,  0]
 	high:  [   70,    35,    0,    0, 96, 32,  0]
 
-	Example 5
+		Example 5
 	array: [    2,     7,     5,  -2,    3,   8,   4, -3]
 	low:   [ -420,  -210,   -30,  -6, -288, -96, -12,  0]
 	high:  [40320, 20160,  2880,  576,  96,  32,   0,  0]
 
-	Example 6
+		Example 6
 	array: [-3, -1, -1]
 	low:   [-3,  0,  0]
 	high:  [ 3,  1,  0]
 
-	Example 7
+		Example 7
 	array: [0, 2]
 	low:   [0, 0]
 	high:  [0, 0]
 
-	Example 8
+		Example 8
 	array: [-2,   3, -4]
 	low:   [-6, -12,  0]
 	high:  [24,   0,  0]
 
-	Example 9
+		Example 9
 	array: [-1,    -2,  -9, -6]
 	low:   [-18, -108,   0,  0]
 	high:  [108,   18,  54,  0]
 
-	Example 10
+		Example 10
 	array: [ 2, -1, 1, 1]
 	low:   [-2, -1, 0, 0]
 	high:  [ 0,  0, 1, 0]
@@ -212,6 +220,10 @@
 	iteration values.
 	Those values will be used in the NEXT iteration BEFORE the update of both
 	"high" and "low" variables.
+
+	Also, the reason we assign max to be nums[n - 1] is because that is the
+	only element we won't be iterating with in the while loop, thus just assume
+	that it is the answe and if proven otherwise in the loop, update the value.
 
 	Thus, we end up with the implementation below.
 
