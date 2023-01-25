@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <climits>
 
 /*
 	==============
@@ -63,6 +64,10 @@
 	--- IDEA ---
 	------------
 
+	--- Solution 1 ---
+
+	*** Binary Search (Recursively) ***
+
 	At the very beginning we assign the nums[0] as the minimum value.
 
 	Then we forward an entire arrya in a helper function called: binary_search
@@ -104,8 +109,74 @@
 	And the end of the recursion we have our minimum value stored in our
 	variable "min", so we return that from our function "findMin".
 
-*/
 
+
+
+	--- Solution 2 ---
+
+	*** Binary Search (Iteratively) ***
+
+	If there is a single element in the "nums" array, return nums[0]
+	immediately.
+
+	If nums[0] is less than nums[n - 1], return nums[0] as well.
+
+	Let's consider this example again:
+		[4, 5, 6, 7, 0, 1, 2]
+		 0  1  2  3  4  5  6
+
+	nums[0] is greater than nums[end] which indicated that the array is
+	rotated.
+	This means there is a point in the array at which you would notice a
+	change. This is the point which we call "Inflection Point".
+
+		increase          decrease
+		------------->   --------->
+		[4 | 5 | 6 | 7 | 0 | 1 | 2]
+		 0   1   2   3   4   5   6
+	                   ^
+	                   |
+	Inflection Point ---
+
+	In this modified version of binary search, we are looking for this point.
+		- All the elements to the left of inflection point are greater than
+		  the first element of the array.
+
+		- All the elements to the right of the inflection point are less than
+		  the first element of the array.
+
+	So the algorithm goes - We find a mid position(index) and then we check:
+		1. if mid's right is smaller than the current "mid", that is - we have
+		   found the "Inflection Point", thus return nums[mid + 1];
+
+		2. If not, we check if mid's left is greater than the current
+		   nums[mid], that is - we have found the "Inflection point", thus
+		   return nums[mid].
+
+	If neither of those two things is true, check if:
+		nums[mid] is greater than nums[0]
+	If it is, then check the right subarray. [0, mid - 1]
+
+	If it is not, then check the left subarray. [mid + 1, n - 1]
+
+	Algorithm:
+		1. Find the "mid" element of the array
+
+		2. If "mid" element > first element of the array, this means that we
+		   need to look for the inflection point on the right of "mid".
+
+		3. If "mid" element < firs telement of the array, this means that we
+		   need to look for the Inflection Point on the left of "mid".
+
+		4. We stop our search(while loop) when we find the inflection point,
+		   when either of the two conditions is satisfied:
+		       a) nums[mid] > nums[mid + 1]
+		           Hence, nums[mid + 1] is the smallest.
+
+			   b) nums[mid - 1] > nums[mid]
+			       Hence, nums[mid] is the smallest.
+
+*/
 
 
 /* Time  Complexity: O(logn) */
@@ -152,11 +223,48 @@ public:
 };
 
 
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+	int findMin(std::vector<int>& nums)
+	{
+		if (nums.size() == 1)
+			return nums[0];
+
+		int left = 0;
+		int right = nums.size() - 1;
+
+		if (nums[right] > nums[0])
+			return nums[0];
+
+		// Binary Search
+		while (right >= left)
+		{
+			int mid = left + (right - left) / 2;
+
+			if (nums[mid] > nums[mid + 1])
+				return nums[mid + 1];
+
+			if (nums[mid - 1] > nums[mid])
+				return nums[mid];
+
+			if (nums[mid] > nums[0])
+				left = mid + 1;
+			else
+				right = mid - 1;
+		}
+
+		return INT_MAX;
+	}
+};
+
 
 int
 main()
 {
 	Solution sol;
+	// Solution_2 sol_2;
 
 	/* Example 1 */
 	std::vector<int> nums = {3, 4, 5, 1, 2};
@@ -197,6 +305,7 @@ main()
 
 	/* Solution */
 	int min = sol.findMin(nums);
+	// int min = sol_2.findMin(nums);
 
 	/* Write Output */
 	std::cout << "\n\tMinimum is: " << min << "\n\n";
