@@ -104,6 +104,8 @@
 	--- IDEA ---
 	------------
 
+	--- Solution 1 ---
+
 	The whole idea is to have two stacks so that you can implement getMin in
 	O(1) as well.
 
@@ -205,6 +207,13 @@
 		3. I often check if (sp >= 0) or if (min >= 0) to prevent underflow and
 		   overflow, since both "sp" and "min" are set to -1 in the constructor
 
+
+
+	--- Solution 2 ---
+
+	It's the same idea, but we're just using Singly Linked List instead of
+	vectors/arrays.
+
 */
 
 
@@ -271,6 +280,50 @@ public:
     }
 };
 
+class MinStack_2{
+private:
+	struct Node{
+		int val;
+		int min;
+		struct Node* next;
+
+		Node(int val, int min, struct Node* next) : val(val), min(min), next(next)
+		{}
+	};
+
+public:
+	MinStack_2()
+	{
+		head = nullptr;
+	}
+
+	void push(int val)
+	{
+		if (head == nullptr)
+			head = new Node(val, val, nullptr);
+		else
+			head = new Node(val, std::min(val, head->min), head);
+	}
+
+	void pop()
+	{
+		head = head->next;
+	}
+
+	int top()
+	{
+		return head->val;
+	}
+
+	int getMin()
+	{
+		return head->min;
+	}
+
+private:
+	struct Node* head;
+};
+
 
 int
 main()
@@ -281,41 +334,19 @@ main()
 
 	/* Example 1 */
 	// MinStack* obj = new MinStack();
- 	// obj->push(-2);
-	// std::cout << "\tpush: -2\n";
- 	// obj->push(0);
-	// std::cout << "\tpush: 0\n";
- 	// obj->push(-3);
-	// std::cout << "\tpush: -3\n";
-
- 	// int min = obj->getMin();
-	// std::cout << "\tCurrent min: " << min << "\n";
-
- 	// obj->pop();
-	// std::cout << "\tpop!\n";
-
- 	// int top = obj->top();
-	// std::cout << "\tCurrent top: " << top << "\n";
-
- 	// min = obj->getMin();
-	// std::cout << "\tCurrent min: " << min << "\n";
-
-	// std::cout << "\n";
-
-	/* Example 2 */
-	MinStack* obj = new MinStack();
- 	obj->push(4);
-	std::cout << "\tpush: 4\n";
- 	obj->push(3);
-	std::cout << "\tpush: 3\n";
+	MinStack_2* obj = new MinStack_2();
+ 	obj->push(-2);
+	std::cout << "\tpush: -2\n";
+ 	obj->push(0);
+	std::cout << "\tpush: 0\n";
+ 	obj->push(-3);
+	std::cout << "\tpush: -3\n";
 
  	int min = obj->getMin();
 	std::cout << "\tCurrent min: " << min << "\n";
 
- 	obj->push(6);
-	std::cout << "\tpush: 6\n";
- 	obj->push(7);
-	std::cout << "\tpush: 7\n";
+ 	obj->pop();
+	std::cout << "\tpop!\n";
 
  	int top = obj->top();
 	std::cout << "\tCurrent top: " << top << "\n";
@@ -323,18 +354,44 @@ main()
  	min = obj->getMin();
 	std::cout << "\tCurrent min: " << min << "\n";
 
- 	obj->push(2);
-	std::cout << "\tpush: 2\n";
- 	obj->push(5);
-	std::cout << "\tpush: 5\n";
-
- 	top = obj->top();
-	std::cout << "\tCurrent top: " << top << "\n";
-
- 	min = obj->getMin();
-	std::cout << "\tCurrent min: " << min << "\n";
-
 	std::cout << "\n";
+
+
+
+	/* Example 2 */
+	// // MinStack* obj = new MinStack();
+	// MinStack_2* obj = new MinStack_2();
+ 	// obj->push(4);
+	// std::cout << "\tpush: 4\n";
+ 	// obj->push(3);
+	// std::cout << "\tpush: 3\n";
+
+ 	// int min = obj->getMin();
+	// std::cout << "\tCurrent min: " << min << "\n";
+
+ 	// obj->push(6);
+	// std::cout << "\tpush: 6\n";
+ 	// obj->push(7);
+	// std::cout << "\tpush: 7\n";
+
+ 	// int top = obj->top();
+	// std::cout << "\tCurrent top: " << top << "\n";
+
+ 	// min = obj->getMin();
+	// std::cout << "\tCurrent min: " << min << "\n";
+
+ 	// obj->push(2);
+	// std::cout << "\tpush: 2\n";
+ 	// obj->push(5);
+	// std::cout << "\tpush: 5\n";
+
+ 	// top = obj->top();
+	// std::cout << "\tCurrent top: " << top << "\n";
+
+ 	// min = obj->getMin();
+	// std::cout << "\tCurrent min: " << min << "\n";
+
+	// std::cout << "\n";
 
 	return 0;
 }
