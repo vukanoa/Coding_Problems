@@ -54,6 +54,99 @@
 */
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Consider this example:
+		[[0, 1], [1, 2], [2, 3]]
+
+	We would interpret the example as:
+	In order to take Course 0, you need to take Course 1.
+	In order to take Course 1, you need to take Course 2.
+	In order to take Course 2, you need to take Course 3.
+
+	If we represent this as a Graph, it looks like this:
+
+	   1 -> 2
+	   ^     \
+	  /       v
+	 0         3
+
+	So if we're able to take this Course 3 without any prerequisite, then
+	we would be eligible to take Course 2.
+	And if you take Course 2 then you would be eligible to take Course 1.
+	And if you take Course 1 then you would be eligible to take Course 0.
+	And if you take Course 0, you're done. It is possible to take all the
+	courses.
+
+	Now let's assume that there was another Course:
+		[[0, 1], [1, 2], [2, 3], [3, 1]]
+
+	Now the Graph would look like this:
+
+     --> 1 ----> 2
+	 |   ^       |
+	 |    \      |
+	 |     \     |
+	 0      3 <---
+
+	Now there's no starting point. Let's say we start from Course 3:
+	In order to take Course 3 you need to take Course 1.
+	In order to take Course 1 you need to take Course 2.
+	In order to take Course 2 you need to take Course 3.
+
+	Therefore, there's a cycle and we return "false".
+
+	This is a similar problem to Dead Lock Detection in a Single Resource
+	Instance Distributed System.
+
+	(If we have a cycle in the Graph then we will have Deadlock)
+	Note: This has nothing to do with the concept of Deadlock considering
+	multiple Threads)
+
+	So we just need to find out if there's a cycle in our Directed Graph.
+
+	This Problem can be solved using:
+		Cycle Detection: Graph Coloring
+
+	We will have a "visited" array with possible values:
+	0: Unused
+	1: Processed
+	2: Processing
+
+	Consider this Example:
+	    3
+	     \
+		  -> 2
+	          \
+	           -> 0
+	               \
+	                -> 1
+
+	So if we start from Node 2, then step by step, this will look like this:
+	[0, 0, 0, 0]
+	[2, 0, 0, 0]
+	[2, 2, 0, 0]
+	[2, 1, 0, 0]
+	[1, 1, 0, 0]
+
+	Now let's say we want to process Node 2:
+	[1, 1, 0, 0]
+	[1, 1, 2, 0]
+	[1, 1, 1, 0]
+
+	Now we're left only with Node 3:
+	[1, 1, 1, 0]
+	[1, 1, 1, 2]
+	[1, 1, 1, 1] => Return "true"
+
+
+*/
+
+
+
 /* Time  Complexity: O(V + E) */
 /* Space Complexity: O(V) */
 class Solution{
@@ -112,8 +205,17 @@ main()
 	// std::vector<std::vector<int>> prerequisites {{1, 0}};
 
 	/* Example 2 */
-	int numCourses = 2;
-	std::vector<std::vector<int>> prerequisites {{1, 0}, {0, 1}};
+	// int numCourses = 2;
+	// std::vector<std::vector<int>> prerequisites {{1, 0}, {0, 1}};
+
+	/* Example 3 */
+	int numCourses = 4;
+	std::vector<std::vector<int>> prerequisites {{0, 1}, {1, 2}, {2, 3}};
+
+	/* Example 4 */
+	// int numCourses = 4;
+	// std::vector<std::vector<int>> prerequisites {{0, 1}, {1, 2}, {2, 3}, {3, 1}};
+
 
 
 	std::cout << "\n\t=======================";
