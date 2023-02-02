@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <unordered_set>
 
 /*
 	==============
@@ -146,7 +147,6 @@
 */
 
 
-
 /* Time  Complexity: O(V + E) */
 /* Space Complexity: O(V) */
 class Solution{
@@ -195,10 +195,136 @@ public:
 };
 
 
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Consider this Graph represented:
+		1. Adjacency Matrix
+		2. ASCII picture
+
+	1. Adjacency Matrix
+	   [[5, 3], [5, 1], [7, 3], [7, 0], [6, 3], [6, 4], [3, 0], [3, 2], [4, 1]]
+
+	2. ASCII Picture
+	   2    0    1
+	   |   /|   /|
+	   |  / |  / |
+	   | /  | /  |
+	   v    |/   v
+	   3----/--  4
+	   | \ /| |  |
+	   |  \ | |__|
+	   | / \|    |
+	   v    v    v
+	   5    7    6
+
+	Valid Topological Orders for this Graph would be:
+		1)
+		    2, 0, 1, 3, 4, 5, 7, 6 (Visual left to right, top to bottom)
+
+		2)
+		    0, 1, 2, 3, 4, 5, 6, 7 (smallest-numbered available vertex first)
+
+		3)
+		    2, 0, 1, 4, 3, 5, 7, 6 (fewest edges first)
+
+		4)
+		    2, 0, 3, 7, 1, 5, 4, 6 (largest-numbered available vertex first)
+
+		5)
+		    2, 0, 3, 1, 5, 7, 4, 6 (arbitrary)
+
+	Kahn's Algorithm:
+		Find a list of "start nodes" where there are no incoming edges and
+		collect them into a set startSet(or zeroSet), at least one such node
+		should exist in a non-empty ACYCLIC graph; "result" is the empty list
+		that will contain the sorted elements.
+
+		-------------------
+		--- Pseudo Code ---
+		-------------------
+
+		while startSet is no empty:
+			take a node "n" from "startSet"
+			add "n" to the tail of "result"
+			for each node "m" with an edge "e" from "n" to "m":
+				mark "e" as removed
+				if "m" does not have incoming edges anymore:
+					add "m" into "startSet"
+
+		if graph still has edges
+			return false
+		else
+			return true
+
+*/
+
+
+/* This one is slower than DFS Solution*/
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V) */
+class Solution_Topological{
+public:
+	bool canFinish(int numCourses, std::vector<std::vector<int>>& prerequisites)
+	{
+		int n = prerequisites.size();
+
+		std::vector<int> indegree(numCourses, 0);
+
+
+        for (int i = 0; i < prerequisites.size(); i++)
+            indegree[prerequisites[i][0]]++;
+
+		std::unordered_set<int> zeroDegree;
+		for (int i = 0; i < numCourses; i++)
+		{
+			if (indegree[i] == 0)
+				zeroDegree.insert(i);
+		}
+
+		if (zeroDegree.empty())
+			return false;
+
+		while (!zeroDegree.empty())
+		{
+			auto it = zeroDegree.begin();
+			int course = *it;
+
+			zeroDegree.erase(course);
+
+			for (const auto& pre : prerequisites)
+			{
+				if (course == pre[1])
+				{
+					indegree[pre[0]]--;
+
+					if (indegree[pre[0]] == 0)
+						zeroDegree.insert(pre[0]);
+				}
+			}
+		}
+
+		for (int& num : indegree)
+		{
+			if (num != 0)
+				return false;
+		}
+
+		return true;
+	}
+};
+
+
+
+
 int
 main()
 {
 	Solution sol;
+	Solution_Topological sol_topo;
 
 	/* Example 1 */
 	// int numCourses = 2;
@@ -209,12 +335,16 @@ main()
 	// std::vector<std::vector<int>> prerequisites {{1, 0}, {0, 1}};
 
 	/* Example 3 */
-	int numCourses = 4;
-	std::vector<std::vector<int>> prerequisites {{0, 1}, {1, 2}, {2, 3}};
+	// int numCourses = 4;
+	// std::vector<std::vector<int>> prerequisites {{0, 1}, {1, 2}, {2, 3}};
 
 	/* Example 4 */
 	// int numCourses = 4;
 	// std::vector<std::vector<int>> prerequisites {{0, 1}, {1, 2}, {2, 3}, {3, 1}};
+
+	/* Example 5 */
+	int numCourses = 7;
+	std::vector<std::vector<int>> prerequisites {{5, 3}, {5, 1}, {7, 3}, {7, 0}, {6, 3}, {6, 4}, {3, 0}, {3, 2}, {4, 1}};
 
 
 
@@ -247,7 +377,8 @@ main()
 	std::cout << "]\n";
 
 	/* Solution */
-	if (sol.canFinish(numCourses, prerequisites))
+	// if (sol.canFinish(numCourses, prerequisites))
+	if (sol_topo.canFinish(numCourses, prerequisites))
 		std::cout << "\n\tResult: Possible!\n\n";
 	else
 		std::cout << "\n\tResult: Impossible!\n\n";
