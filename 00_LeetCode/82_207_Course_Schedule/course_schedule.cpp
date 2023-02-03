@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <unordered_set>
+#include <queue>
 
 /*
 	==============
@@ -318,13 +319,50 @@ public:
 };
 
 
+/* Using Queue */
+/* This Topological Sort is a lot faster than the above one */
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V) */
+class Solution_Topological_2{
+public:
+	bool canFinish(int n, std::vector<std::vector<int>>& pre)
+	{
+	    std::vector<std::vector<int>> adj(n, std::vector<int>());
+	    std::vector<int> degree(n, 0);
+
+	    for (int i = 0; i < pre.size(); i++)
+		{
+	        adj[pre[i][1]].push_back(pre[i][0]);
+	        degree[pre[i][0]]++;
+	    }
+
+	    std::queue<int> q;
+
+	    for (int i = 0; i < n; i++)
+	        if (degree[i] == 0) q.push(i);
+
+	    while (!q.empty())
+		{
+	        int curr = q.front(); q.pop(); n--;
+
+	        for (auto next: adj[curr])
+			{
+	            if (--degree[next] == 0)
+					q.push(next);
+			}
+	    }
+
+	    return n == 0;
+	}
+};
 
 
 int
 main()
 {
-	Solution sol;
-	Solution_Topological sol_topo;
+	// Solution sol;
+	// Solution_Topological sol_topo;
+	Solution_Topological_2 sol_topo_2;
 
 	/* Example 1 */
 	// int numCourses = 2;
@@ -343,7 +381,7 @@ main()
 	// std::vector<std::vector<int>> prerequisites {{0, 1}, {1, 2}, {2, 3}, {3, 1}};
 
 	/* Example 5 */
-	int numCourses = 7;
+	int numCourses = 8;
 	std::vector<std::vector<int>> prerequisites {{5, 3}, {5, 1}, {7, 3}, {7, 0}, {6, 3}, {6, 4}, {3, 0}, {3, 2}, {4, 1}};
 
 
@@ -378,7 +416,8 @@ main()
 
 	/* Solution */
 	// if (sol.canFinish(numCourses, prerequisites))
-	if (sol_topo.canFinish(numCourses, prerequisites))
+	// if (sol_topo.canFinish(numCourses, prerequisites))
+	if (sol_topo_2.canFinish(numCourses, prerequisites))
 		std::cout << "\n\tResult: Possible!\n\n";
 	else
 		std::cout << "\n\tResult: Impossible!\n\n";
