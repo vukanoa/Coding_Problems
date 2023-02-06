@@ -214,39 +214,39 @@
 	Inserting "le" into the Trie:
 
 	root
-	 1
-	  \'l'
-	   2
-	    \'e'
-		 3 (end of key "le")
+     1
+      \'l'
+       2
+        \'e'
+         3 (end of key "le")
 
 
 	Inserting "leet" into the Trie:
 
 	root
-	 1
-	  \'l'
-	   2
-	    \'e'
-		 3 (end of key "le")
-		  \'e'
-		   4
-		    \'t'
-			 5 (end of key "leet")
+     1
+      \'l'
+       2
+        \'e'
+         3 (end of key "le")
+          \'e'
+           4
+            \'t'
+             5 (end of key "leet")
 
 
 
 	Inserting "code" into the Trie:
-	                     root
-						  1
-					  'c'/ \'l'
-					    6   2
-					'o'/     \'e'
+                        root
+                          1
+                      'c'/ \'l'
+                        6   2
+                    'o'/     \'e'
 					  7       3 (end of key "le")
 				  'd'/         \'e'
 				    8           4
 				'e'/             \'t'
-				 9 (end "code"    5 (end "leet"))
+                  9 (end "code")  5 (end "leet")
 
 	This was built from dataset {"le", "leet", "code"}
 
@@ -315,18 +315,18 @@
 
 		Search for key "leet" in the Trie
 
-	                     root
-						  1
-					  'c'/ \'l'        <---------------- 'l'
-					    6   2
-					'o'/     \'e'      <---------------- 'e'
-					  7       3 (end of key "le")
-				  'd'/         \'e'    <---------------- 'e'
-				    8           4
-				'e'/             \'t'  <---------------- 't'
-				 9 (end "code"    5 (end "leet")) <----- KEY FOUND
+                        root
+                          1
+                      'c'/ \'l'        <---------------- 'l'
+                        6   2
+                    'o'/     \'e'      <---------------- 'e'
+                      7       3 (end of key "le")
+                  'd'/         \'e'    <---------------- 'e'
+                    8           4
+                'e'/             \'t'  <---------------- 't'
+                  9(end "code")   5(end "leet") <----- KEY FOUND
 
-		Searching for a key in a Trie from dataset {le, leet, code}
+           Searching for a key in a Trie from dataset {le, leet, code}
 
 	============
 	=== CODE ===
@@ -382,16 +382,16 @@
 
 			Searching for "co" in the Trie
 
-	                     root
-						  1
-	c ----------->    'c'/ \'l'
-					    6   2
-	o ----------->  'o'/     \'e'
+                         root
+                          1
+    c ----------->    'c'/ \'l'
+                        6   2
+    o ----------->  'o'/     \'e'
 	PREFIX FOUND      7       3 (end of key "le")
-				  'd'/         \'e'
-				    8           4
-				'e'/             \'t'
-				 9 (end "code"    5 (end "leet"))
+                  'd'/         \'e'
+                    8           4
+                'e'/             \'t'
+                  9 (end "code")  5 (end "leet")
 
 	Searching for a prefix in a Trie from dataset {le, leet, code};
 
