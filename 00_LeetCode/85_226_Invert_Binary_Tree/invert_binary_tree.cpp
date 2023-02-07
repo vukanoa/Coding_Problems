@@ -1,4 +1,5 @@
 #include <iostream>
+#include <queue>
 
 /*
 	============
@@ -69,6 +70,12 @@ struct TreeNode {
 
 
 
+/*	Time  Complexity: O(n) */
+/*
+	Space Complexity: O(h)
+	where 'h' is the height of the tree. At wrost 'h' can be 'n' and that makes
+	it O(n)
+*/
 class Solution{
 public:
 	TreeNode* invertTree(TreeNode* root)
@@ -86,6 +93,12 @@ public:
 };
 
 
+/*	Time  Complexity: O(n) */
+/*
+	Space Complexity: O(h)
+	where 'h' is the height of the tree. At wrost 'h' can be 'n' and that makes
+	it O(n)
+*/
 class Solution_initial{
 public:
     TreeNode* invertTree(TreeNode* root)
@@ -117,6 +130,64 @@ public:
 };
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Alternatively, we can solve the problem iteratively, in a manner similar
+	to Breadth-first search(BFS). (Or DFS as well)
+
+	Algorithm
+	The idea is that we need to swap the left and right child of all nodes in
+	the tree. So we create a queue to store nodes whose left and right child
+	have not been swapped yet. Initially, only the root is in the queue. As
+	long as the queue is not empty, remove the next node from the queue, swap
+	its children, and add the children to the queue. Null nodes are not added
+	to the queue. Eventually, the queue will be empty and all the children
+	swapped, and we return the original root.
+
+*/
+
+
+/*	Time  Complexity: O(n) */
+/*
+	Space Complexity: O(h)
+	In the worst case the queue will contain al nodes in one level of the
+	binary tree. For a full binary tree, the leaf level has ceil(n / 2) = O(n)
+	leaves.
+*/
+class Solution_iterative{
+public:
+	TreeNode* invertTree(TreeNode* root)
+	{
+		if (root == nullptr)
+			return nullptr;
+
+		std::queue<TreeNode*> queue;
+		queue.push(root);
+
+		while (!queue.empty())
+		{
+			TreeNode* curr = queue.front();
+			queue.pop();
+			TreeNode* tmp  = curr->left;
+
+			curr->left  = curr->right;
+			curr->right = tmp;
+
+			if (curr->left != nullptr)
+				queue.push(curr->left);
+
+			if (curr->right != nullptr)
+				queue.push(curr->right);
+		}
+
+		return root;
+	}
+};
+
+
 void
 inorder(TreeNode* root)
 {
@@ -133,6 +204,8 @@ int
 main()
 {
 	Solution sol;
+	// Solution_initial sol_in;
+	// Solution_iterative sol_iter;
 
 	/* Example 1 */
 	TreeNode four(4);
@@ -180,6 +253,8 @@ main()
 
 	/* Solution */
 	sol.invertTree(root);
+	// sol_in.invertTree(root);
+	// sol_iter.invertTree(root);
 
 	/* Write Output */
 	std::cout << "\n\tAfter:  ";
