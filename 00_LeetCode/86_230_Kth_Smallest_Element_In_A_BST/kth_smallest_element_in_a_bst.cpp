@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 /*
 	==============
@@ -166,6 +167,43 @@ public:
 };
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	It's a very straightforward approach with O(N) time complexity. The idea is
+	to bulid an inorder traversal of BST which is an array sorted in the
+	ascending order. now the answer is the "k - 1"th element of this array.
+
+*/
+
+
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_inorder{
+	void inorder_traversal(TreeNode* root, std::vector<int>& vec)
+	{
+		if (root == nullptr)
+			return;
+
+		inorder_traversal(root->left, vec);
+		vec.push_back(root->val);
+		inorder_traversal(root->right, vec);
+	}
+public:
+	int kthSmallest(TreeNode* root, int k)
+	{
+		std::vector<int> vec;
+
+		inorder_traversal(root, vec);
+
+		return vec[k - 1];
+	}
+};
+
+
 void
 inorder(TreeNode* root)
 {
@@ -182,6 +220,7 @@ int
 main()
 {
 	Solution sol;
+	Solution_inorder sol_ino;
 
 	/* Example 1 */
 	// TreeNode three(3);
@@ -226,7 +265,8 @@ main()
 	std::cout << "\n";
 
 	/* Solution */
-	int kth = sol.kthSmallest(root, k);
+	// int kth = sol.kthSmallest(root, k);
+	int kth = sol_ino.kthSmallest(root, k);
 
 	/* Write Output */
 	if (k == 1)
