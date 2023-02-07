@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <stack>
 
 /*
 	==============
@@ -41,30 +42,6 @@
 	The number of nodes in the tree is 'n'.
 	1 <= k <= n <= 10^4
 	0 <= Nodelva. <= 10^4
-
-*/
-
-
-/*
-	------------
-	--- IDEA ---
-	------------
-
-	If it was the k-th Largest Element:
-		count the left subtree
-		count the right subtree
-
-		if (right_subtree_num_nodes + 1 == k)
-			return root->val; // That's what we're looking for
-		else if (k <= right_subtree_num_nodes)
-		{
-			recursively do this in the right subtree.
-		}
-		else
-		{
-			k = right_subtree_num_nodes - 1
-			recursively try to find in the left subtree with new k
-		}
 
 */
 
@@ -204,6 +181,62 @@ public:
 };
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Iterative Inorder Traversal
+
+	The above recursion could be converted into iteration, with the help of
+	stack. This way one could speed up the solution because there is no need
+	to build the entire inroder traversal, and one could stop after the kth
+	element.
+
+*/
+
+
+/*
+	Time  Complexity: O(H + k)
+	where H is a tree height. This complexity is defined by the stack, which
+	contains at leat H + k elements, since before starting to pop out one has
+	to go down to a leaf. This results in O(logN + k) for the balaced tree and
+	O(N + k) for completely unbalanced tree with all the nodes in the left
+	subtree.
+*/
+/*
+	Space Complexity: O(H)
+	to keep the stack, where H is a tree height. That makes O(N) in the worst
+	case of the skewed tree, and O(log N) in the average case of the balanced
+	tree.
+*/
+class Solution_follow_up{
+public:
+	int kthSmallest(TreeNode* root, int k)
+	{
+		std::stack<TreeNode*> stack;
+
+		for(;;)
+		{
+			while (root != nullptr)
+			{
+				stack.push(root);
+				root = root->left;
+			}
+
+			root = stack.top();
+			stack.pop();
+
+			if (--k == 0)
+				return root->val;
+
+			root = root->right;
+		}
+	}
+};
+
+
+
 void
 inorder(TreeNode* root)
 {
@@ -221,6 +254,7 @@ main()
 {
 	Solution sol;
 	Solution_inorder sol_ino;
+	Solution_follow_up sol_follow;
 
 	/* Example 1 */
 	// TreeNode three(3);
@@ -266,7 +300,8 @@ main()
 
 	/* Solution */
 	// int kth = sol.kthSmallest(root, k);
-	int kth = sol_ino.kthSmallest(root, k);
+	// int kth = sol_ino.kthSmallest(root, k);
+	int kth = sol_follow.kthSmallest(root, k);
 
 	/* Write Output */
 	if (k == 1)
