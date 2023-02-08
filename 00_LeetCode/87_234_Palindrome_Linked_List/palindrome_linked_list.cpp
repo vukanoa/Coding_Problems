@@ -108,6 +108,45 @@ public:
 };
 
 
+
+// Much more inneficient than the previous, above, solution
+/*	Time  Complexity: O(n) */
+/*
+	Space Complexity: O(n)
+	It's always O(n) because of the Stack Frame. It needs to get to n before
+	it starts to pop.
+*/
+class Solution_recursive{
+private:
+	ListNode* front_pointer;
+
+	bool recursive_check(ListNode* current_node)
+	{
+		if (current_node != nullptr)
+		{
+			if (!recursive_check(current_node->next))
+				return false;
+
+			if (current_node->val != front_pointer->val)
+				return false;
+
+			front_pointer = front_pointer->next;
+		}
+
+		return true;
+	}
+
+public:
+	bool isPalindrome(ListNode* head)
+	{
+		front_pointer = head;
+
+		return recursive_check(head);
+	}
+};
+
+
+
 void
 print_list(struct ListNode* head)
 {
@@ -133,6 +172,7 @@ int
 main()
 {
 	Solution sol;
+	Solution_recursive sol_rec;
 
 	/* Example 1 */
 	// ListNode one_1(1);
@@ -187,7 +227,8 @@ main()
 	print_list(head);
 
 	/* Solution */
-	if (sol.isPalindrome(head))
+	// if (sol.isPalindrome(head))
+	if (sol_rec.isPalindrome(head))
 		std::cout << "\n\tIt is INDEED a Palindrome!\n\n";
 	else
 		std::cout << "\n\tIt is NOT a Palindrome!\n\n";
