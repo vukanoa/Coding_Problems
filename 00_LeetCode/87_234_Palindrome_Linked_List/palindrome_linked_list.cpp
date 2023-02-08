@@ -146,6 +146,111 @@ public:
 };
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Reverse Second Half In-place
+
+	The ONLY way we can avoid using O(n) extra space is by modifying the input
+	in-place.
+
+	The strategy we can use is to reverse the second half of the Linked List
+	in-place (modifying the Linked List structure), and then comparing it with
+	the first half.
+	Afterwards, we should re-reverse the second half and put the list back
+	together. While you don't need to restore the list to pass the test cases,
+	it is still good programming practice because the function could be a part
+	of a bigger program that doesn't want the Linked List broken.
+
+	Algorithm
+	Steps are:
+		1. Find the end of the fist half
+		2. Reverse the second hal.f
+		3. Determine whether or not there is a palindrome
+		4. Restore the list
+		5. Return the result
+
+*/
+
+
+
+class Solution_Follow_Up {
+private:
+	ListNode* middle(ListNode* head)
+	{
+		ListNode* slow = head;
+		ListNode* fast = head->next;
+
+		while (fast && fast->next)
+		{
+			slow = slow->next;
+			fast = fast->next->next;
+		}
+
+		return slow;
+	}
+
+	ListNode* reverse_list(ListNode* head)
+	{
+		ListNode* prev = nullptr;
+		ListNode* curr = head;
+		ListNode* next = head;
+
+		while (curr != nullptr)
+		{
+			next = curr->next;
+
+			curr->next = prev;
+			prev = curr;
+			curr = next;
+		}
+
+		return prev;
+	}
+
+	bool check_palindrome(ListNode* first, ListNode* second)
+	{
+		while (second != nullptr)
+		{
+			if (first->val != second->val)
+				return false;
+
+			first  = first->next;
+			second = second->next;
+		}
+
+		return true;
+	}
+
+public:
+	bool isPalindrome(ListNode* head)
+	{
+
+		ListNode* first_list_tail  = middle(head);
+		ListNode* second_list_head = first_list_tail->next;
+
+		// Unlink from the 2nd List
+		first_list_tail->next = nullptr;
+
+		// Reverse 2nd List
+		second_list_head = reverse_list(second_list_head);
+
+		// Check if it is a palindrome and store the result
+		bool palindrome = check_palindrome(head, second_list_head);
+
+		// Reverse 2nd List again
+		second_list_head = reverse_list(second_list_head);
+
+		// Reconstruct the list
+		first_list_tail->next = second_list_head;
+
+		return palindrome;
+	}
+};
+
+
 
 void
 print_list(struct ListNode* head)
@@ -173,6 +278,7 @@ main()
 {
 	Solution sol;
 	Solution_recursive sol_rec;
+	Solution_Follow_Up sol_follow_up;
 
 	/* Example 1 */
 	// ListNode one_1(1);
@@ -228,7 +334,8 @@ main()
 
 	/* Solution */
 	// if (sol.isPalindrome(head))
-	if (sol_rec.isPalindrome(head))
+	// if (sol_rec.isPalindrome(head))
+	if (sol_follow_up.isPalindrome(head))
 		std::cout << "\n\tIt is INDEED a Palindrome!\n\n";
 	else
 		std::cout << "\n\tIt is NOT a Palindrome!\n\n";
