@@ -129,6 +129,8 @@ struct TreeNode {
 */
 
 
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
 class Solution {
 private:
 	int inorder_search(TreeNode* root, TreeNode* x, std::stack<TreeNode*>& stack_x)
@@ -191,6 +193,41 @@ public:
 };
 
 
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Similar idea, much more concisely written.
+
+*/
+
+
+/* Faster */
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2{
+public:
+	TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
+	{
+		if (root == nullptr || root == p || root == q)
+			return root;
+
+		TreeNode* left  = lowestCommonAncestor(root->left,  p, q);
+		TreeNode* right = lowestCommonAncestor(root->right, p, q);
+
+		if (left == nullptr)
+			return right;
+
+		if (right == nullptr)
+			return left;
+		else // If both are not null that means that we have found our solution
+			return root;
+	}
+};
+
+
 int
 tree_height(TreeNode* root)
 {
@@ -243,6 +280,7 @@ int
 main()
 {
 	Solution sol;
+	Solution_2 sol_2;
 
 	/* Example 1 */
 	// TreeNode three(3);
@@ -321,7 +359,8 @@ main()
 	std::cout << "\tq: " << q->val << "\n";
 
 	/* Solution */
-	TreeNode* ancestor = sol.lowestCommonAncestor(root, p, q);
+	// TreeNode* ancestor = sol.lowestCommonAncestor(root, p, q);
+	TreeNode* ancestor = sol_2.lowestCommonAncestor(root, p, q);
 
 	/* Write Output */
 	std::cout << "\n\tLCA is: " << ancestor->val << "\n\n";
