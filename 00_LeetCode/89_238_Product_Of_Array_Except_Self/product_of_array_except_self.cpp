@@ -57,59 +57,92 @@
 	--- IDEA ---
 	------------
 
-	First we got from left to right and multiply:
-		answer[i - 1] with nums[i - 1]
+	Finding Prefix Product and Suffix Product
 
-	Why?
-	That will create an array answer where only the very last element have
-	fulfilled the description. Only that element in an array "answer" is truly
-	a product of all the other elements without itself.
-	So:
-		n-1st element is fulfilled
-		n-2nd element needs to be multiplied by the n-1st element
-		n-3rd element needs to be multiplied by both n-1st and n-2nd element
-		...
-		0th   element needs to be multiplied by elements from n-1st to 1st, inclusive
+	Similar to finding Prefix Sum Array, here we would intend to find the
+	Prefix Product Array and Suffix Product Array for our original array, i.e.
+		prefix[i] = prefix[i - 1] * nums[i - 1]
+	(yes, we multiply with nums[i - 1] and not with nums[i] on purpose) and
+	similarly:
+		suffix[i] = suffix[i + 1] * nums[i + 1]
 
-	So essentially we only need 2 passes.
-	One from left to right.
-	One from right to left.
+	Now, at any index 'i' our final answer "answer[i]" would be given by:
+		answer[i] = prefix[i] * suffix[i]
 
-	If we were to start from the right to left first, then we would have:
-		0th element is fulfilled
-		1st element needs to be multiplied by 1st
-		2nd element needs to be multiplied by 1st and 0th
-		...
-		n-1st eleemnt needs to be multiplied by every element from 0 to n-2, inclusive
+	Why? Because the "prefix[i] * suffix[i]" contains product of every element
+	before 'i' and every element after 'i' but not the element at index 'i'
+	(and that is the reson why we excluded a[i] in our prefix and suffix
+	product).
 
-	However, since we've already done the "left to right", once we finish the
-	"right to left" as well, we will have required values.
+	Follow-Up:
+	Directly store the product of prefix and suffix into the finan "answer"
+	array.
 
-	Let's look at an example:
-	[2, 3, 4, 5]
+	The logic is, we don't actually need seperate array to store prefix product
+	and suffix products, we can do all the approach discussed in method 3
+	directly onto our final answer array.
 
-	Regarding the third number '4' the product of array except '4' is 2 * 3 * 5
-	which consists of two parts:
-		left:  2 * 3
-		right: 5
-
-	The product is left * right. We can get lefts and rights:
-        Numbers:     2     3     4     5
-        Lefts:       1     2    2*3  2*3*4
-        Rights:    3*4*5  4*5    5     1
-
-	We can calculate lefts and rights in 2 loops.
-	We store lefts in "answer". If we allocate a new array for rights the
-	space complexity is O(n). To make it O(1), we just need to store it in a
-	variable which is "remaining_product" and multiply with the "answer" array.
+	Now the Time Complexity reduces from O(n) to O(1)
 
 */
 
 
 
 /* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
+/* Space Complexity: O(n) */
 class Solution{
+public:
+	std::vector<int> productExceptSelf(std::vector<int>& nums)
+	{
+		int n = nums.size();
+		std::vector<int> prefix(n, 1);
+		std::vector<int>  suffix(n, 1);
+
+		for (int i = 1; i < n; i++)
+			prefix[i] = prefix[i - 1] * nums[i - 1];
+
+		for (int i = n - 2; i >= 0; i--)
+			suffix[i] = suffix[i + 1] * nums[i + 1];
+
+		std::vector<int> answer(n, 1);
+		for (int i = 0; i < n; i++)
+			answer[i] = prefix[i] * suffix[i];
+
+		return answer;
+	}
+};
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Let's look at an example:
+	[2, 3, 4, 5]
+
+	Regarding the third number '4' the product of array except '4' is 2 * 3 * 5
+	which consists of two parts:
+		Prefix:  2 * 3
+		Suffix: 5
+
+	The product is left * right. We can get lefts and rights:
+        Numbers:        2     3     4     5
+        Prefixes:       1     2    2*3  2*3*4
+        Suffixes:    3*4*5   4*5    5     1
+
+	We can calculate prefixes and suffixes in 2 loops.
+
+	We store prefixes in "answer". If we allocate a new array for suffixes the
+	space complexity is O(n). To make it O(1), we just need to store it in a
+	variable which is "remaining_product" and multiply with the "answer" array.
+*/
+
+
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Follow_Up{
 public:
 	std::vector<int> productExceptSelf(std::vector<int>& nums)
 	{
@@ -135,6 +168,7 @@ int
 main()
 {
 	Solution sol;
+	Solution_Follow_Up sol_followup;
 
 	/* Example 1 */
 	std::vector<int> nums {1, 2, 3, 4};
@@ -165,7 +199,8 @@ main()
 
 
 	/* Solution */
-	std::vector<int> answer = sol.productExceptSelf(nums);
+	// std::vector<int> answer = sol.productExceptSelf(nums);
+	std::vector<int> answer = sol_followup.productExceptSelf(nums);
 
 	/* Write Output */
 
