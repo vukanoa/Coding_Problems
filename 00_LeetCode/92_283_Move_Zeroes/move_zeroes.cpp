@@ -106,6 +106,63 @@ public:
 	--- IDEA ---
 	------------
 
+	This question comes under a broad category of "Array Transformation". This
+	category is the meat of tech interviews. Mostly because arrays are such a
+	simple and easy to use data structure. Traversal or representation doesn't
+	require any boilerplate code and most of your code will look like the
+	Pseudocode itself.
+
+	The 2 requirements of the question are:
+		1. Move all the 0's to the end of array.
+		2. All the non-zero elelments must retian their original order.
+
+	It's good to realize here that both the requirements are mutually exclusive
+	i.e you can solve the individual sub-problems and then combine them for the
+	final solution.
+
+	If asked in an interview, this approach would be a good start. You can
+	explain the interviewer(not code) the above and build your base for the
+	next Optimal Solution.
+*/
+
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Space_Inefficient{
+public:
+	void moveZeroes(std::vector<int>& nums)
+	{
+		int n = nums.size();
+
+		// Count the zeroes
+		int num_zeroes = 0;
+		for (int i = 0; i < n; i++)
+			num_zeroes += (nums[i] == 0);
+
+		// Make all the non-zero elelments retain their original order.
+		std::vector<int> help_vec;
+		for (int i = 0; i < n; i++)
+		{
+			if (nums[i] != 0)
+				help_vec.push_back(nums[i]);
+		}
+
+		// Move all zeroes to the end
+		while (num_zeroes--)
+			help_vec.push_back(0);
+
+		// Overwrite original vector "nums"
+		for (int i = 0; i < n; i++)
+			nums[i] = help_vec[i];
+	}
+};
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
 	The idea is that we go through the array and gather all zeros on our road.
 
 	Let's take our example:
@@ -190,6 +247,7 @@ main()
 {
 	Solution_inefficient sol_ineff;
 	Solution sol;
+	Solution_Space_Inefficient sol_space;
 
 	/* Example 1 */
 	// std::vector<int> nums = {0, 1, 0, 3, 12};
@@ -224,7 +282,8 @@ main()
 
 	/* Solution */
 	// sol_ineff.moveZeroes(nums);
-	sol.moveZeroes(nums);
+	// sol.moveZeroes(nums);
+	sol_space.moveZeroes(nums);
 
 	std::cout << "\t\t*** MOVE ZEROES ***\n";
 
