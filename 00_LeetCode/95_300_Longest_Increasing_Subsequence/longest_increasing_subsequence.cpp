@@ -183,11 +183,95 @@ public:
 
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Binary Indexed Tree(Increase base of "nums" into one-basing indexing)
+
+	- Let f[x] is the length of longest increase subsequence, where all number
+	in the subsequence <= x. This is the max element in indices [1..x] if we
+	build the Binary Indexed Tree(BIT)
+
+	- Since -10^4 <= nums[i] <= 10^4, we can convert nums into:
+	      1 <= nums[i] <= 2 * 10^4 + 1 by plus base=10001 to store into the BIT
+
+	- We build Max BIT, which has 2 operators:
+		- get(idx): Return the maximum value of indices in range [1..idx].
+		- update(idx, val): Update a value "val" into BIT at index "idx".
+
+	- Iterate numbers "i" in range [0..n-1]:
+		- subLongest = bit.get(nums[i] - 1) // Get longest increasing
+		  // subsequence so far, which idx < nums[i], or idx <= nums[i] - 1
+		- bit.update(nums[i], subLongest + 1) // Update latest longest to the
+		  BIT.
+
+	- The answer is bit.get(20001) // Maximum of all elemenst in the BIT
+
+*/
+
+
+/* Beats 83.20% (It's the most left bar) */
+/*
+	Time  Complexity: O(n * logMAX)
+	where MAX <= 20000 is the difference between minimum and maximum elements
+	in nums, N <= 2500 is the number of elements in array nums.
+*/
+/*
+	Space Complexity: O(MAX)
+*/
+class MaxBIT {
+private:
+	std::vector<int> bit;
+
+public:
+	MaxBIT(int size)
+	{
+		bit.resize(size + 1);
+	}
+
+	int get(int idx)
+	{
+		int ans = 0;
+		for (; idx > 0; idx -= idx & -idx)
+			ans = std::max(ans, bit[idx]);
+
+		return ans;
+	}
+
+	void update(int idx, int val)
+	{
+		for(; idx < bit.size(); idx += idx & -idx)
+			bit[idx] = std::max(bit[idx], val);
+	}
+
+};
+
+class Solution_BIT {
+public:
+	int lengthOfLIS(std::vector<int>& nums)
+	{
+		int base = 10001;
+		MaxBIT bit(20001);
+
+		for (int x : nums)
+		{
+			int subLongest = bit.get(base + x - 1);
+			bit.update(base + x, subLongest + 1);
+		}
+
+		return bit.get(20001);
+	}
+};
+
+
 int
 main()
 {
 	Solution_DP sol_dp;
 	Solution_Greedy_Binary sol_grd_bin;
+	Solution_BIT sol_bit;
 
 	/* Example 1 */
 	std::vector<int> nums = {10, 9, 2, 5, 3, 7, 101, 18};
@@ -219,7 +303,8 @@ main()
 
 	/* Solution */
 	// int longest = sol_dp.lengthOfLIS(nums);
-	int longest = sol_grd_bin.lengthOfLIS(nums);
+	// int longest = sol_grd_bin.lengthOfLIS(nums);
+	int longest = sol_bit.lengthOfLIS(nums);
 
 
 	std::cout << "\n\tLongest Increasing Subsequence: " << longest << "\n\n";
