@@ -266,12 +266,77 @@ public:
 };
 
 
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Binary Indexed Tree(Compress nums into values [i..N])
+
+	In previous solution(the one above this one), -10^4 <= nums[i] <= 10^4 is
+	small enough, so we can store in our Binary Indexed Tree (BIT)
+
+	Can we store when -10^9 <= nums[i] <= 10^9 is very big? In that case, we
+	can compress our nums array while keeping the relative comparation order
+	between numbers.
+
+	How to compress?
+		- In the nums array the length n, where n <= 2500, there are maximum n
+		  different numbers.
+
+		- We can ge the unique values of numbers in nums, and sort those values
+		  in increasing order, let's name it uniqueSorted.
+
+		- Then we traverse i in ragen [0..n-1], we get the compressed value of
+		  nums[i] by looking hte index in uniqueSorted.
+
+		- As the result, elements in nums is compressed into values in range
+		  [1..N]
+
+*/
+
+// It uses the same Max BIT class as the Solution above
+// Beats 77.49% (The bar is, again, all the way to the left)
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n) */
+class Solution_Compress {
+public:
+	int lengthOfLIS(std::vector<int>& nums)
+	{
+		int nUnique = compress(nums);
+		MaxBIT bit(nUnique);
+
+		for(int x : nums)
+		{
+			int subLongest = bit.get(x - 1);
+			bit.update(x, subLongest + 1);
+		}
+
+		return bit.get(nUnique);
+	}
+
+	int compress(std::vector<int>& arr)
+	{
+		std::vector<int> uniqueSorted(arr);
+		std::sort(uniqueSorted.begin(), uniqueSorted.end());
+		uniqueSorted.erase(unique(uniqueSorted.begin(), uniqueSorted.end()), uniqueSorted.end()); // Remove duplicated values
+
+		for (int& x: arr)
+			x = lower_bound(uniqueSorted.begin(), uniqueSorted.end(), x) - uniqueSorted.begin() + 1;
+
+		return uniqueSorted.size();
+	}
+};
+
 int
 main()
 {
 	Solution_DP sol_dp;
 	Solution_Greedy_Binary sol_grd_bin;
 	Solution_BIT sol_bit;
+	Solution_Compress sol_com;
 
 	/* Example 1 */
 	std::vector<int> nums = {10, 9, 2, 5, 3, 7, 101, 18};
@@ -304,7 +369,8 @@ main()
 	/* Solution */
 	// int longest = sol_dp.lengthOfLIS(nums);
 	// int longest = sol_grd_bin.lengthOfLIS(nums);
-	int longest = sol_bit.lengthOfLIS(nums);
+	// int longest = sol_bit.lengthOfLIS(nums);
+	int longest = sol_com.lengthOfLIS(nums);
 
 
 	std::cout << "\n\tLongest Increasing Subsequence: " << longest << "\n\n";
