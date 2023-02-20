@@ -54,18 +54,162 @@
 */
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Inuitively, at a first glance at this problem you'd probably think:
+	"Is it this easy? Is it just a greedy?"
+
+	But upon a further examination, you'll quickly find an example that
+	dispproves such hypothesis.
+
+	Consider this:
+	Array: [1, 3, 4]
+	Amount: 6
+
+	If you were to use a greedy algorithm, you'd quickly find that you'd need
+	3 coins which we clearly see that is not optimal.
+	So you cannot "just pick the largest one and go with it and then drop it
+	after you cannot fit it once again and go for a smaller one", since the
+	largest one maybe isn't even once in the solution.
+
+	The next thing that comes up to mind is: Can this be a DFS-Backtracking?
+
+	Well, yes it can be. It will work, but probably will give you a TLE(Time
+	Limit Exceeded) on LeetCode.
+
+	However, if you were to draw yourself a whole tree in DFS-Backtracking
+	process you would've seen that there are certain things that unnecessarily
+	compute more than once.
+
+	So a natural question arises - Can I memorize this?
+	As soon as you as yourself this question, the answer almost always is: Yes.
+
+	We could you a "Top-Down memoization"(Not memoRization) approach and that
+	would be a DP(Dynamic Programming approach).
+
+	However, a more natural way of using DP is writing it "Bottom-Up".
+
+	So is it possible to write a "Bottom-Up" approach for this problem? Yes.
+
+	We have to solve the subproblems of our given problem, one by one, and then
+	at the very end - Solve our given problem.
+
+	So how do we do this?
+	Let's consider the previous example that crushed your "Is it greedy?"
+	question.
+
+	Array: [1, 3, 4]
+	Amount: 6
+
+	We have to solve subproblems, but what are those subproblems?
+	Since out goal is to reach 6, let's try to find an answer to:
+		1, 2, 3, 4 & 5
+	before we try to go for our given amount 6.
+
+	First, let's make an array dp. What length it should be of?
+	Well, since dp[0] is always 0 since we need 0 coins to get to amount of 0,
+	we have to have this base case solved as well which will make our dp of
+	size amount + 1.
+
+	What are the values we should initialize this array with?
+	It's important that we assign 0 to dp[0] and all the other should be either
+	amount + 1(since any combination we try will be less than that) or INT_MAX
+
+	I'll go with INT_MAX. So initially our DP looks like this:
+
+	[0, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX]
+	 0     1        2        3        4        5        6
+
+	So let's try to solve this problem as if the amount given is 1.
+
+	We should iterate through all the coins and if our amount(1 in this case)
+	minus current coin we're on is less than 0, then that means there is no
+	solution for this amount.(We are iterating through coins from the smallest
+	to the largest)
+
+	Note that the coins don't have to be in sorted order, thus we should always
+	sort it as a first thing.
+
+	So, we're doing this:
+	Array: [1, 3, 4]
+	Amount: 1
+
+	if (1 - coins[0] < 0)
+		break; // This will return -1 to denote that there is no way getting it
+
+	else if (dp[1 - coins[0]] != MAX)
+		dp[1] = std::mind(dp[1], dp[1 - coins[0]] + 1); // +1 to add this coin
+
+	The idea is to find the minimum number of coins needed to solve all these
+	subproblems and then each time we search for amount X, subtract value of
+	the current coin from the amount and then try to see what is the minimum
+	number of coins for that newly calulated amount.
+
+	Example:
+	Array: [1, 3, 4]
+	Amount: 1
+
+	dp[0] = 0;
+	dp[1] = 1
+	dp[2] = 2
+	dp[3] = 1
+	dp[4] = 1
+	dp[5] = 2
+
+	So how do we find what is the minimum number of coins needed that sum up to
+	6?
+
+	Let's iterate through all the coins:
+		1) We take coin with value 1(coin at index 0)
+			Amount(which is 6) minus value of current coin => 6 - 1 = 5
+			Now we try and see what is the value of dp[5] since that is the
+			minimum number of coins needed to sum up to 5 and then we add 1
+			more(this very coin we're trying)
+			Previously dp[6] was INT_MAX, now it's 3.
+			Let's continue
+
+		2) We take coin with value 3(coin at index 1)
+			6 - 3 = 3
+			dp[3] = 1
+			dp[3] + 1 = 2
+			dp[6] = std::min(dp[6], dp[3] + 1)
+			Now our dp[6] is 2.
+
+		3) We take coin with value 4(coin at index 2)
+			6 - 4 = 2
+			dp[2] = 2
+			dp[2] + 1 = 3
+			dp[6] = std::min(dp[6], dp[2] + 1);
+
+			Since dp[6] was 2 because of the previous step, we're doing this:
+			dp[6] = std::min(2, 2 + 1);
+			dp[6] = std::min(2, 3);
+
+			Thus we won't change the dp[6] to 3, since 2 is smaller.
+
+	And at the end we ask if dp[6] is NOT INT_MAX. If it's not we return the
+	value we got, if it is INT_MAX then that means we did not found a way to
+	sum up to the amount value and thus return -1.
+
+*/
+
+
+
 /* Time  Complexity: O(amount * coins.size()) */
 /* Space Complexity: O(amount) */
 class Solution {
 public:
     int coinChange(std::vector<int>& coins, int amount)
 	{
-        int dp[++amount];
+        int dp[amount + 1];
         dp[0] = 0;
 
         std::sort(begin(coins), end(coins));
 
-        for (int a = 1; a < amount; a++)
+        for (int a = 1; a <= amount; a++)
         {
             dp[a] = INT_MAX;
             for (int c: coins)
@@ -76,7 +220,7 @@ public:
                     dp[a] = std::min(dp[a], 1 + dp[a - c]);
             }
         }
-        return dp[--amount] == INT_MAX ? -1 : dp[amount];
+        return dp[amount] == INT_MAX ? -1 : dp[amount];
     }
 };
 
