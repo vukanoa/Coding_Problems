@@ -134,10 +134,132 @@ public:
 };
 
 
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Step 1 is the same as in the previous(above) idea.
+
+	Now we should simulate what Bucket Sort does, but not all the way. We do
+	not have to sort it completely.
+
+	Okay, first of all, why are we doing this?
+
+	Consider this example:
+	[1, 1, 1, 2, 2, 100]
+
+	If we were to do the exact same thing as in Bucket Sort, we would possibly
+	use waay more Space than necessary.
+
+	If we were to store the number of occurrences of each element in a separate
+	array, then in this case we would have:
+	[0, 3, 2, ..., 1]
+	 0  1  2      100
+
+	That means that we have allocated 100 elements on the Stack or Heap, but
+	we only use 3 slots. That is unacceptable.
+
+	We can overcome this with a clever observation. We can see that there are
+	most N(nums.size()) elements in the vector "nums".
+
+	Since that is the case, we know for a fact that a maximum number of
+	occurences that an element can have is N. (Array is consisted of a single
+	element repeated N times).
+
+	Example:
+		[8, 8, 8, 8, 8]
+
+	It is absolutely impossible to have more than N occurences. Also we can
+	observe that we can have two elements occur the same amount of time.
+	(Though there will always be K distinct unique elements. Meaning we will
+	always have a result, we don't have to check these cases)
+
+	The solution is to to have an array of size N(maximum possible number of
+	occurences) and that for each slot, we maintain a vector of elements that
+	have that number of occurences in the array "nums".
+
+	Example:
+	[5, 6, 2, 3, 4, 9, 9, 9, 6, 6, 6, 7, 7]
+
+	Map:
+		5: 1
+		6: 4
+		2: 1
+		3: 1
+		4: 1
+		9: 3
+		7: 2
+
+	vector of vectors "freq" is of size N
+
+        freq:
+        [
+   0:   /
+   1:   [5, 2, 3, 4]
+   2:   [7]
+   3:   [9]
+   4:   [6]
+   5:   /
+   6:   /
+   7:   /
+   8:   /
+   9:   /
+  10:   /
+  11:   /
+        ]
+
+	After forming this "freq", we just iterate from the back and push in vector
+	"ret" until ret.size() becomes k, that is until we have "pushed" k elements
+	in our vector that is our return value.
+
+*/
+
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Bucket{
+public:
+	std::vector<int> topKFrequent(std::vector<int>& nums, int k)
+	{
+		std::unordered_map<int, int> map;
+
+		// Step 1: Store frequence of all elements in map
+		// O(N)
+		for (int n : nums)
+			map[n]++;
+
+		// Step 2: Bucket Sort's first step
+		// O(N)
+		std::vector<std::vector<int>> freq(nums.size() + 1);
+		for (auto it: map)
+			freq[it.second].push_back(it.first);
+
+		// Step 3: Take every item from the back until k elements are taken
+		// O(K)
+		std::vector<int> ret;
+		for (int i = freq.size() - 1; i >= 0; i--)
+		{
+			for (int elem : freq[i])
+			{
+				ret.push_back(elem);
+
+				if (ret.size() == k)
+					return ret;
+			}
+		}
+
+		return ret;
+	}
+};
+
+
 int
 main()
 {
 	Solution sol;
+	Solution_Bucket sol_bucket;
 
 	/* Example 1 */
 	// std::vector<int> nums = {1, 1, 1, 2, 2, 3};
@@ -173,9 +295,11 @@ main()
 
 
 	/* Solution */
-	std::vector ret = sol.topKFrequent(nums, k);
+	// std::vector ret = sol.topKFrequent(nums, k);
+	std::vector ret = sol_bucket.topKFrequent(nums, k);
 
 
+	/* Write Output */
 	first = true;
 	if (k > 1)
 		std::cout << "\n\tTop " << k << " Frequent elements: [";
