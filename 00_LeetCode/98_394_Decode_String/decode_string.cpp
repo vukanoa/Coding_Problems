@@ -154,10 +154,145 @@ public:
 };
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	The only "problematic" scenarios in this problem are 2 cases:
+	k[k[k[]]]
+		and
+	k[k[]k[]k[]]
+
+	It could be done using recursion, as we have already did in the above
+	solution, however, we could do it using a stack, as well.
+
+	Consider this example:
+	54[ab6[cd]]
+
+	Let's go character by character:
+
+	1)
+	54[ab6[cd]]
+	#
+
+	Stack:
+	{5 |   |   |   |   |   |   |   |   }
+	{5 | 4 |   |   |   |   |   |   |   }
+	{5 | 4 | [ |   |   |   |   |   |   }
+	{5 | 4 | [ | a |   |   |   |   |   }
+	{5 | 4 | [ | a | b |   |   |   |   }
+	{5 | 4 | [ | a | b | 6 |   |   |   }
+	{5 | 4 | [ | a | b | 6 | [ |   |   }
+	{5 | 4 | [ | a | b | 6 | [ | c | d }
+	// First ']' closed bracket detected
+
+	Now we're going to pop from our stack into our string "substr" like this:
+		substr = stack.back() + substr;
+	Since we want the right order.
+
+	We pop until we get to an opening bracket '['. (We are sure there is at
+	least one since we're told that the string input will always be valid. So
+	If we had stumbled upon a closing bracket ']' then we're sure that an
+	opening bracket '[' is already in our stack).
+
+	After the while loop we pop once more, to get rid of the opening bracket
+	'[' itself.
+
+	Now we have the substring "cd". What do we want to do with it?
+	Now that we have popped an opening bracket '[' as well, we have to pop
+	digits until we get to a non digit character or until we get to the
+	beginning of the string and then convert that number in our string 'k' and
+	then multiply our substring "cd" exactly k numbers.
+
+	The stack should look like this:
+
+	{5 | 4 | [ | a | b                 }
+
+	k = "6" // We have to convert a string to integer
+
+	By multiplying it is meant that we push that substring into the stack
+	exactly k times.
+
+	So our stack now looks like this:
+
+	{5 | 4 | [ | a | b | c | d | c | d | c | d | c | d | c | d | c | d }
+	                    ----------------------------------------------
+	                                 cd cd cd cd cd cd
+
+	And then we do the outer problem by continuing to iterate through our
+	while loop.
+
+	The outer problem is now: 54[abcdcdcdcdcdcd]
+
+	At the end we will have "abcdcdcdcdcdcd" repeated 54 times and put in our
+	string "stack".
+
+	We just return that.
+
+	There was a minor issue with this problem. It is said that the string will
+	always be valid, however 54-th Input was just "3".
+
+	So I've added:
+		if (isdigit(stack.back()))
+			return "";
+
+	To overcome that.
+*/
+
+
+
+/* Time  Complexity: O(n) */ /* Beats 100%   */
+/* Space Complexity: O(1) */ /* Beats 90.51% */
+class Solution_Stack{
+public:
+	std::string decodeString(std::string s)
+	{
+		std::string stack;
+
+		for (int i = 0; i < s.length(); i++)
+		{
+			if (s[i] != ']')
+				stack += s[i];
+			else
+			{
+				std::string substr;
+
+				while (stack.back() != '[')
+                {
+					substr = stack.back() + substr;
+                    stack.pop_back();
+                }
+
+				stack.pop_back(); // Pop the '['
+
+				std::string k;
+				while (!stack.empty() && isdigit(stack.back()))
+                {
+					k = stack.back() + k;
+                    stack.pop_back();
+                }
+
+				int num = std::stoi(k);
+
+				while (num-- > 0)
+					stack += substr;
+			}
+		}
+
+        if (isdigit(stack.back()))
+            return "";
+
+		return stack;
+	}
+};
+
+
 int
 main()
 {
 	Solution sol;
+	Solution_Stack sol_stack;
 
 	/* Example 1 */
 	// std::string s = "3[a]2[bc]";
@@ -179,7 +314,8 @@ main()
 	std::cout << "\n\ts = \"" << s << "\"\n";
 
 	/* Solution */
-	std::string result = sol.decodeString(s);
+	// std::string result = sol.decodeString(s);
+	std::string result = sol_stack.decodeString(s);
 
 	/* Write Output */
 	std::cout << "\n\tOutput: " << result << "\n\n";
