@@ -1,4 +1,5 @@
 #include <iostream>
+#include <unordered_map>
 
 /*
 	==============
@@ -145,6 +146,82 @@ public:
 };
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Go through the code. Stunningly clever idea.
+
+	10: 1
+	15: 1
+	// 18: 1
+	// 21: 1
+	// 20: 1
+	17: 1
+
+	count = 2 // The above "simulation" is up to the node "1" of Example 1.
+	...
+
+*/
+
+
+/*
+Time  Beats: 99.97%
+Space Beats: 42.76%
+*/
+/*
+	Time  Complexity: O(N)
+	Where N is the number of nodes in the binary tree. In the recursion we are
+	visiting each node only once.
+*/
+/*
+	Space Complexity: O(N)
+	Our hashmap takes O(N) space, also we need to consider the space taken by
+	the recursive function calls, in the worst case of a skew binary tree, our
+	stack can contain up to N funciton calls.
+*/
+class Solution_DP{
+public:
+    std::unordered_map<long, int> map;
+    int count = 0;
+
+    void countPathSum(TreeNode* root, int target, long sum)
+	{
+        if(!root)
+            return;
+
+		//Path sum from root
+        sum += root->val;
+
+        if(sum == target)
+            count++;
+
+		// Checking whether any target sum path present in the path from root
+		// to the current node
+        if(map.find(sum - target) != map.end())
+            count += map[sum - target];
+
+        map[sum]++;
+
+        countPathSum(root->left, target, sum);
+        countPathSum(root->right, target, sum);
+
+		// After visiting the left and right subtree, we have to reduce this
+		// path sum count from map since we are leaving this path
+        map[sum]--;
+    }
+
+    int pathSum(TreeNode* root, int targetSum)
+	{
+        countPathSum(root, targetSum, 0);
+
+        return count;
+    }
+};
+
+
+
 
 /* Print nodes at a current level */
 void printCurrentLevel(TreeNode* root, int level)
@@ -198,6 +275,7 @@ int
 main()
 {
 	Solution sol;
+	Solution_DP sol_dp;
 
 	/* Example 1 */
 	/*
@@ -207,27 +285,27 @@ main()
 		__3_____2__________11__
 		3__-2_____1____________
 	*/
-	// TreeNode ten(10);
-	// TreeNode five(5);
-	// TreeNode minus_three(-3);
-	// TreeNode three(3);
-	// TreeNode two(2);
-	// TreeNode eleven(11);
-	// TreeNode three_2(3);
-	// TreeNode minus_two(-2);
-	// TreeNode one(1);
+	TreeNode ten(10);
+	TreeNode five(5);
+	TreeNode minus_three(-3);
+	TreeNode three(3);
+	TreeNode two(2);
+	TreeNode eleven(11);
+	TreeNode three_2(3);
+	TreeNode minus_two(-2);
+	TreeNode one(1);
 
-	// ten.left          = &five;
-	// ten.right         = &minus_three;
-	// five.left         = &three;
-	// five.right        = &two;
-	// minus_three.right = &eleven;
-	// three.left        = &three_2;
-	// three.right       = &minus_two;
-	// two.right         = &one;
+	ten.left          = &five;
+	ten.right         = &minus_three;
+	five.left         = &three;
+	five.right        = &two;
+	minus_three.right = &eleven;
+	three.left        = &three_2;
+	three.right       = &minus_two;
+	two.right         = &one;
 
-	// TreeNode* root = &ten;
-	// int targetSum = 8;
+	TreeNode* root = &ten;
+	int targetSum = 8;
 
 
 	/* Example 2 */
@@ -238,46 +316,47 @@ main()
 		__11__________13____4__
 		7____2____________5___1
 	*/
-	TreeNode five(5);
-	TreeNode four(4);
-	TreeNode eight(8);
-	TreeNode eleven(11);
-	TreeNode thirteen(13);
-	TreeNode four_2(4);
-	TreeNode seven(7);
-	TreeNode two(2);
-	TreeNode five_2(5);
-	TreeNode one(1);
+	// TreeNode five(5);
+	// TreeNode four(4);
+	// TreeNode eight(8);
+	// TreeNode eleven(11);
+	// TreeNode thirteen(13);
+	// TreeNode four_2(4);
+	// TreeNode seven(7);
+	// TreeNode two(2);
+	// TreeNode five_2(5);
+	// TreeNode one(1);
 
-	five.left    = &four;
-	five.right   = &eight;
-	four.left    = &eleven;
-	eight.left   = &thirteen;
-	eight.right  = &four_2;
-	eleven.left  = &seven;
-	eleven.right = &two;
-	four_2.left  = &five_2;
-	four_2.right = &one;
+	// five.left    = &four;
+	// five.right   = &eight;
+	// four.left    = &eleven;
+	// eight.left   = &thirteen;
+	// eight.right  = &four_2;
+	// eleven.left  = &seven;
+	// eleven.right = &two;
+	// four_2.left  = &five_2;
+	// four_2.right = &one;
 
-	TreeNode* root = &five;
-	int targetSum = 22;
+	// TreeNode* root = &five;
+	// int targetSum = 22;
 
-	/* Example 3 */
 
 	std::cout << "\n\t====================";
 	std::cout << "\n\t=== PATH SUM III ===";
-	std::cout << "\n\t====================\n\n";
+	std::cout << "\n\t====================\n";
 
 	/* Write Input */
+	std::cout << "\n\tTarget: " << targetSum;
 	std::cout << "\n\tTree:\n\t\t";
 	printLevelOrder(root);
 	std::cout << "\n";
 
 	/* Solution */
-	int count = sol.pathSum(root, targetSum);
+	// int count = sol.pathSum(root, targetSum);
+	int count = sol_dp.pathSum(root, targetSum);
 
 	/* Write Output */
-	std::cout << "\n\tOutput: " << count << "\n\n";
+	std::cout << "\n\n\tOutput: " << count << "\n\n";
 
 	return 0;
 }
