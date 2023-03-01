@@ -325,8 +325,8 @@
 */
 
 
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
+/* Time  Complexity: O(N) */ /* Time  Beats: 21% */
+/* Space Complexity: O(N) */ /* Space Beats: 16% */
 class Solution{
 public:
 	std::vector<int> findAnagrams(std::string s, std::string p)
@@ -389,10 +389,79 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	The idea is similar to the one above.
+
+	Instead of a Hash Map, we use a vector, since we are told that both 's' and
+	'p' are consisted of only lowercase English letters.
+
+	Now we have two of those vectors. Why?
+	Because we will use "window" as a current window that we're sliding. It
+	will always have p.length() sum of values.
+
+	Each time we just compare these two vectors. In C++ it is possible to just
+	compare it like this:
+		if(freq_p == window)
+
+	We have to go through the first p.lenght() characters in string 's' to
+	'construct' the window. Then we just move one-by-one.
+	We pop from the from the front, add to the back and compare.
+
+	If they are the same, push index 'i' in vector "ret".
+
+	At the end, just return the vector "ret".
+*/
+
+
+/* Time  Complexity: O(N) */ /* Time  Beats: 70% */
+/* Space Complexity: O(1) */ /* Space Beats: 77% */
+class Solution_Sliding_Window{
+public:
+	std::vector<int> findAnagrams(std::string s, std::string p)
+	{
+		if(s.length() < p.length())
+			return {};
+
+		std::vector<int> freq_p(26,0);
+		std::vector<int> window(26,0);
+
+		/* First window */
+		for(int i = 0; i < p.length() ; i++)
+		{
+			freq_p[p[i]-'a']++;
+			window[s[i]-'a']++;
+		}
+
+		std::vector<int> ret;
+		if(freq_p == window)
+			ret.push_back(0);
+
+		/* Sliding Window */
+		for(int i = p.length(); i < s.length(); i++)
+		{
+			window[s[i - p.length()] - 'a']--;
+			window[s[i] - 'a']++;
+
+			if(freq_p == window)
+				ret.push_back(i - p.length() + 1);
+		}
+
+		return ret;
+	}
+};
+
+
 int
 main()
 {
 	Solution sol;
+	Solution_Sliding_Window sol_win;
 
 	/* Example 1 */
 	std::string s = "cbaebabacd";
@@ -413,7 +482,8 @@ main()
 	std::cout << "\n\tp = \"" << p << "\"\n";
 
 	/* Solution */
-	std::vector<int> ret = sol.findAnagrams(s, p);
+	// std::vector<int> ret = sol.findAnagrams(s, p);
+	std::vector<int> ret = sol_win.findAnagrams(s, p);
 
 	/* Write Output */
 
