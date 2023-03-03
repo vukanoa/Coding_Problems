@@ -49,6 +49,45 @@
 	--- IDEA ---
 	------------
 
+
+*/
+
+
+/* Time  Beats: 96.4% */
+/* Space Beats: 46.7% */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution{
+public:
+	int subarraySum(std::vector<int>& nums, int k)
+	{
+		int ret = 0;
+		int curr_sum = 0;
+
+		std::unordered_map<int, int> prefix_sums;
+		prefix_sums = {{0, 1}};
+
+		for (auto& n : nums)
+		{
+			curr_sum += n;
+			int diff = curr_sum - k;
+
+			if (prefix_sums.find(diff) != prefix_sums.end())
+				ret += prefix_sums[diff];
+
+			prefix_sums[curr_sum]++;
+		}
+
+		return ret;
+	}
+};
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
 	This approach, while a bit optimized, is still a Brute Force Solution.
 
 	Consider this example:
@@ -148,6 +187,7 @@ int
 main()
 {
 	Solution_Brute_DP sol_brute;
+	Solution sol;
 
 	/* Example 1 */
 	// std::vector<int> nums = {1, 1, 1};
@@ -755,6 +795,7 @@ main()
 	std::cout << "\n\tK = " << k << "\n";
 
 	/* Solution */
+	// int count = sol_brute.subarraySum(nums, k);
 	int count = sol_brute.subarraySum(nums, k);
 
 	/* Write Output */
