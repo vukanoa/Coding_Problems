@@ -1,5 +1,6 @@
 #include <iostream>
 #include <unordered_map>
+#include <vector>
 
 /*
 	==============
@@ -168,10 +169,69 @@ public:
 };
 
 
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Idea is THE SAME as for LeetCode Problem 438 find all Anagrams in a string.
+	The only thing that differs is the return type.
+
+	In the 438-th Problem we needed to count all the anagrams, while in this
+	one we only have to tell if there is a permuration of s1 in s2.
+
+	So it's even simpler.
+
+*/
+
+
+
+/* Time  Beats: 75.31% */
+/* Space Beats: 93.20% */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Sliding_Window
+{
+public:
+	bool checkInclusion(std::string s1, std::string s2)
+	{
+		if(s2.length() < s1.length())
+			return false;
+
+		std::vector<int> freq_s1(26,0);
+		std::vector<int> window(26,0);
+
+		/* First window */
+		for(int i = 0; i < s1.length() ; i++)
+		{
+			freq_s1[s1[i]-'a']++;
+			window[s2[i]-'a']++;
+		}
+
+		if(freq_s1 == window)
+			return true;
+
+		/* Sliding Window */
+		for(int i = s1.length(); i < s2.length(); i++)
+		{
+			window[s2[i - s1.length()] - 'a']--;
+			window[s2[i] - 'a']++;
+
+			if(freq_s1 == window)
+				return true;
+		}
+
+		return false;
+	}
+};
+
+
 int
 main()
 {
 	Solution sol;
+	Solution_Sliding_Window sol_win;
 
 	/* Example 1 */
 	// std::string s1 = "ab";
@@ -194,7 +254,8 @@ main()
 	std::cout << "\n\ts2 = \"" << s2 << "\"\n";
 
 	/* Solution */
-	bool b = sol.checkInclusion(s1, s2);
+	// bool b = sol.checkInclusion(s1, s2);
+	bool b = sol_win.checkInclusion(s1, s2);
 
 	/* Write Output */
 	if (b)
