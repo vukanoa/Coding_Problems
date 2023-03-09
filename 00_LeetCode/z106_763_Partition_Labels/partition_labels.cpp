@@ -108,6 +108,8 @@
 	Now we iterate through an entire string s once again. Again, only once so
 	that's also O(n).
 
+	// TO DO
+
 */
 
 
@@ -221,10 +223,60 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	// TO DO
+
+*/
+
+
+/* Time  Beats: 69.80% */
+/* Space Beats: 27.74% */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Neat{
+public:
+	std::vector<int> partitionLabels(std::string s)
+	{
+		std::unordered_map<char, int> last_index;
+
+		// O(n)
+		for (int i = 0; i < s.length(); i++)
+			last_index[s[i]] = i;
+
+
+		std::vector<int> ret;
+		int size = 0;
+		int wall = 0;
+
+		// O(n)
+		for (int i = 0; i < s.length(); i++)
+		{
+			size++;
+			wall = std::max(wall, last_index[s[i]]);
+
+			if (i == wall)
+			{
+				ret.push_back(size);
+				size = 0;
+			}
+		}
+
+		return ret;
+	}
+};
+
+
 int
 main()
 {
 	Solution sol;
+	Solution_Neat sol_neat;
 
 	/* Example 1 */
 	// std::string s = "ababcbacadefegdehijhklij";
@@ -249,10 +301,11 @@ main()
 	std::cout << "\n\t========================\n";
 
 	/* Write Input */
-	std::cout << "\n\t" << s << "\n";
+	std::cout << "\n\ts = \"" << s << "\"\n";
 
 	/* Solution */
-	std::vector<int> ret = sol.partitionLabels(s);
+	// std::vector<int> ret = sol.partitionLabels(s);
+	std::vector<int> ret = sol_neat.partitionLabels(s);
 
 	/* Write Output */
 	bool first = true;
@@ -266,7 +319,6 @@ main()
 		first = false;
 	}
 	std::cout << "]\n\n";
-
 
 	return 0;
 }
