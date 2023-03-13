@@ -147,6 +147,60 @@ public:
 };
 
 
+class Solution_Divide_And_Conquer{
+public:
+    ListNode* mergeKLists(std::vector<ListNode*>& lists)
+    {
+        // Base cases
+        if (lists.empty())
+            return nullptr;
+        else if (lists.size() == 1)
+            return lists[0];
+
+        // Divide and Conquer
+        int mid = lists.size() / 2;
+        std::vector<ListNode*> left(lists.begin(), lists.begin() + mid);
+        std::vector<ListNode*> right(lists.begin() + mid, lists.end());
+
+        ListNode* l1 = mergeKLists(left);
+        ListNode* l2 = mergeKLists(right);
+
+        return mergeTwoLists(l1, l2);
+    }
+
+private:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2)
+    {
+        ListNode dummy(0);
+        ListNode* tail = &dummy;
+
+        while (l1 && l2)
+        {
+            if (l1->val < l2->val)
+            {
+                tail->next = l1;
+                l1 = l1->next;
+            }
+            else
+            {
+                tail->next = l2;
+                l2 = l2->next;
+            }
+
+            tail = tail->next;
+        }
+
+        if (l1)
+            tail->next = l1;
+
+        if (l2)
+            tail->next = l2;
+
+        return dummy.next;
+    }
+};
+
+
 void
 print_list(struct ListNode* head)
 {
@@ -173,6 +227,7 @@ int
 main()
 {
 	Solution sol;
+	Solution_Divide_And_Conquer sol_divide_and_conquer;
 
 	/* Example 1 */
 	struct ListNode five1(5);
@@ -199,12 +254,16 @@ main()
 	std::cout << "\n\t=== MERGE K SORTED LISTS ===";
 	std::cout << "\n\t============================\n\n";
 
+	/* Write Input */
 	std::cout << "\n\tOriginal Lists:";
 	for (const auto& x : lists)
 		print_list(x);
 
-	struct ListNode* head = sol.mergeKLists(lists);
+	/* Solution */
+	// struct ListNode* head = sol.mergeKLists(lists);
+	struct ListNode* head = sol_divide_and_conquer.mergeKLists(lists);
 
+	/* Write Output */
 	std::cout << "\n\n\n\tMerged k Sorted Lists:";
 	print_list(head);
 	std::cout << "\n\n";
