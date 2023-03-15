@@ -106,6 +106,10 @@ struct ListNode {
 };
 
 
+/* Much more Space  efficient than the, divide and conquer, solution below */
+
+/* Time  Beats:  5.40% */
+/* Space Beats: 96.36% */
 /* Time  Complexity: O(totalNumberOfNodes * k) */
 /* Space Complexity: O(1) */
 class Solution{
@@ -133,6 +137,9 @@ public:
 				}
 			}
 
+			if (index < 0)
+				break;
+
 			tail->next = lists[index];
 			tail = tail->next;
 
@@ -147,6 +154,11 @@ public:
 };
 
 
+
+/* More Time efficient than the above solution */
+
+/* Time  Beats: 31.16% */
+/* Space Beats:  8.90% */
 class Solution_Divide_And_Conquer{
 public:
     ListNode* mergeKLists(std::vector<ListNode*>& lists)
