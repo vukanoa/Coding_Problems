@@ -4,11 +4,11 @@
 	==============
 	=== MEDIUM ===
 	==============
-	
+
 	===========================
 	2) Add Two Numbers
 	===========================
-	
+
 	============
 	Description:
 	============
@@ -20,20 +20,20 @@
 
 	You may assume the two numbers do not contain any leading zero, except the
 	number 0 itself.
-	
+
 	==============================================================
 	FUNCTION: ListNode* addTwoNumbers(ListNode* l1, ListNode* l2);
 	==============================================================
-	
+
 	==========================================================================
 	================================ EXAMPLES ================================
 	==========================================================================
-	
+
 	--- Example 1 ---
 	Input l1 = [2, 4, 3], l2 = [5, 6, 4]
 	Output   = [7, 0, 8]
 	Explanation: 342 + 465 + 807
-	
+
 	2 -> 4 -> 3
 	5 -> 6 -> 4
 	-----------
@@ -43,7 +43,7 @@
 	--- Example 2 ---
 	Input l1 = [0], l2 = [0]
 	Output   = [0]
-	
+
 	0
 	0
 	-----------
@@ -53,7 +53,7 @@
 	--- Example 3 ---
 	Input l1 = [9, 9, 9, 9, 9, 9, 9], l2 = [9, 9, 9, 9]
 	Output   = [8, 9, 9, 9, 0, 0, 0, 1]
-	
+
 	9 -> 9 -> 9 -> 9 -> 9 -> 9 -> 9
 	9 -> 9 -> 9 -> 9
 	-----------
@@ -90,40 +90,43 @@ struct ListNode {
 
 	Now as long as we haven't iterated through both lists(they can be of
 	different sizes) or "carry" is != 0)
-	
+
 	do the self-explanatory algorithm in the "while loop".
-	
+
 	After the "while loop" is finished, return dummy_head->next, since we don't
 	want the leading zero.
 
 */
 
+
+/* Time  Beats: 64.29% */
+/* Space Beats: 56.39% */
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
+	ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
 	{
-        ListNode* dummy_head = new ListNode(0);
-        ListNode* curr = dummy_head;
-        int carry = 0;
+		ListNode* dummy_head = new ListNode(0);
+		ListNode* curr = dummy_head;
+		int carry = 0;
 
-        while (l1 != NULL || l2 != NULL || carry != 0)
+		while (l1 != NULL || l2 != NULL || carry != 0)
 		{
-            int a = l1 ? l1->val : 0;
-            int b = l2 ? l2->val : 0;
+			int a = l1 ? l1->val : 0;
+			int b = l2 ? l2->val : 0;
 
-            int sum = carry + a + b;
-            carry = sum / 10;
-            curr->next = new ListNode(sum % 10);
+			int sum = carry + a + b;
+			carry = sum / 10;
+			curr->next = new ListNode(sum % 10);
 
-            curr = curr->next;
-            l1 = l1 ? l1->next : nullptr;
-            l2 = l2 ? l2->next : nullptr;
-        }
+			curr = curr->next;
+			l1 = l1 ? l1->next : nullptr;
+			l2 = l2 ? l2->next : nullptr;
+		}
 
-        return dummy_head->next;
-    }
+		return dummy_head->next;
+	}
 };
 
 
@@ -178,7 +181,12 @@ main()
 	// ListNode *l2_2 = new ListNode(9, l1_3);
 	// ListNode *l2   = new ListNode(9, l1_2);
 
+	std::cout << "\n\t=======================";
+	std::cout << "\n\t=== ADD TWO NUMBERS ===";
+	std::cout << "\n\t=======================\n";
 
+
+	/* Write Input */
 	std::cout << "\n\t    ";
 	print_list(l1);
 
@@ -187,7 +195,11 @@ main()
 
 	std::cout << "\n\t---------------";
 	std::cout << "\n\t    ";
+
+	/* Solution */
 	ListNode *l3 = sol.addTwoNumbers(l1, l2);
+
+	/* Write Input */
 	print_list(l3);
 	std::cout << "\n\n\n";
 

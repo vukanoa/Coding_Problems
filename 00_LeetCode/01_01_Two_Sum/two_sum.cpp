@@ -81,6 +81,8 @@
 	iterating.
 */
 
+/* Time  Beats: 99.81% */
+/* Space Beats: 13.85% */
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
 class Solution {
@@ -126,6 +128,7 @@ main()
 	std::cout << "\n\t=== TWO SUM ===";
 	std::cout << "\n\t===============\n";
 
+	/* Write Input */
 	bool first = true;
 	std::cout << "\n\tNumbers: [";
 	for (auto x: nums)
@@ -141,6 +144,7 @@ main()
 	/* Solution */
 	std::vector<int> solution_vect = sol.twoSum(nums, target);
 
+	/* Write Output */
 	first = true;
 	std::cout << "\n\tSolution: [";
 	for (auto x: solution_vect)
