@@ -1,6 +1,7 @@
 #include <iostream>
 #include <map>
 #include <set>
+#include <vector>
 
 /*
 	==============
@@ -111,39 +112,6 @@ public:
 };
 
 
-/*
-	Even better implementation
-
-	Note: Since it is said:
-		s consists of English letters, digits, symbols and spaces.
-	that means that we can have a:
-		std::vector<int> ascii(128, -1);
-
-	Implementation:
-	int lengthOfLongestSubstring(std::string s)
-	{
-		std::vector<int> ascii(128, -1);
-
-		int left  = 0;
-		int right = 0;
-
-		int longest = 0;
-		while (right < s.size())
-		{
-			char curr_char = s[right];
-
-			int index = ascii[curr_char];
-			if (index != -1 && index >= left && index < right)
-				left = index + 1;
-
-			longest = std::max(longest, right - left + 1);
-			ascii[curr_char] = right;
-			right++;
-		}
-		return longest;
-	}
-*/
-
 
 
 /* ========= */
@@ -181,11 +149,61 @@ public:
 };
 
 
+
+
+/*
+	Even better implementation
+
+	Note: Since it is said:
+		s consists of English letters, digits, symbols and spaces.
+	that means that we can have a:
+		std::vector<int> ascii(128, -1);
+*/
+
+
+
+/* Time  Beats: 98.50% */
+/* Space Beats: 85.65% */
+/*	Time  Complexity: O(n)	*/
+/*
+	Space Complexity: O(1)
+	Since it is said that s consists only of lowercase english letters
+*/
+class Solution_Efficient{
+public:
+	int lengthOfLongestSubstring(std::string s)
+	{
+		std::vector<int> ascii(128, -1);
+
+		int left  = 0;
+		int right = 0;
+
+		int longest = 0;
+
+		while (right < s.size())
+		{
+			char curr_char = s[right];
+
+			int index = ascii[curr_char];
+			if (index != -1 && index >= left && index < right)
+				left = index + 1;
+
+			longest = std::max(longest, right - left + 1);
+			ascii[curr_char] = right;
+			right++;
+		}
+
+		return longest;
+	}
+};
+
+
 int
 main()
 {
 	Solution sol;
 	Solution_N sol_n;
+	Solution_Efficient sol_efficient;
 
 	/* Example 1 */
 	// std::string s = "abcabcbb";
@@ -201,7 +219,7 @@ main()
 
 
 	std::cout << "\n\t======================================================";
-	std::cout << "\n\t=== LONGEST SUBSTIRNG WITHOUT REPEATING CHARACTERS ===";
+	std::cout << "\n\t=== LONGEST SUBSTRING WITHOUT REPEATING CHARACTERS ===";
 	std::cout << "\n\t======================================================\n";
 
 	/* Write Input */
@@ -209,7 +227,8 @@ main()
 
 	/* Solution */
 	// int longest = sol.lengthOfLongestSubstring(s);
-	int longest = sol_n.lengthOfLongestSubstring(s);
+	// int longest = sol_n.lengthOfLongestSubstring(s);
+	int longest = sol_efficient.lengthOfLongestSubstring(s);
 
 	/* Write Output */
 	std::cout << "\n\tLongest: " << longest << "\n\n";
