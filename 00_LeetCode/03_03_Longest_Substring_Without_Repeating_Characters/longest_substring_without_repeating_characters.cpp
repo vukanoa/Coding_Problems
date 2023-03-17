@@ -114,9 +114,216 @@ public:
 
 
 
+/* ====================================================================== */
+
 /* ========= */
 /* === N === */
 /* ========= */
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Maybe the intuitive idea is:
+		Check every substring, check if it has any duplicates and if it doesn't
+		we're just gonna take the longest one.
+
+	So let's consider this first example:
+		a b c a b c b b
+		0 1 2 3 4 5 6 7
+
+	1)
+		a b c a b c b b
+		0 1 2 3 4 5 6 7
+		L
+		R
+
+		"a" doens't have any duplicates
+
+		if ((R - L + 1) > longest) // It Is - Update Longest to 1
+			longest = R - L + 1
+
+	2)
+		a b c a b c b b
+		0 1 2 3 4 5 6 7
+		L R
+
+		"ab" doens't have any duplicates
+
+		if ((R - L + 1) > longest) // It Is - Update Longest to 2
+			longest = R - L + 1
+
+	3)
+		a b c a b c b b
+		0 1 2 3 4 5 6 7
+		L   R
+
+		"abc" doens't have any duplicates
+
+		if ((R - L + 1) > longest) // It Is - Update Longest to 3
+			longest = R - L + 1
+
+	4)
+		a b c a b c b b
+		0 1 2 3 4 5 6 7
+		L     R
+
+		"abca" DOES have duplicates
+
+		So if we were to continue, we would most certainly do unnecessary work.
+		Since now any left substring start at position 0 and including first 4
+		characters would have duplicates and certainly would not help us with
+		our end value solution.
+
+	So this is the repeated work that we will eliminate with the very
+	fundamental technique:
+		*** THE SLIDING WINDOW ***
+
+	So, we want to only check the substring without any repeating characters.
+	Let's make sure that our "window", our substring doesn't contain any
+	duplicates.
+
+	So, once we get to this 2nd 'a' in 4th step, we're going to start removing
+	characters from LEFT to RIGHT until we stumble on a characters that is
+	repeating.
+
+	In other words - We need to start shrinking window until we no longer have
+	duplicates.
+
+	So in our 4th step
+	4)
+		a b c a b c b b
+		0 1 2 3 4 5 6 7
+		L     R
+	          ^
+	          |
+	repeating-|
+
+		Remove from the Left until we find that repeating characters(inclusive)
+
+		Before:
+			a b c a b c b b
+			0 1 2 3 4 5 6 7
+			L     R
+
+		After:
+			a b c a b c b b
+			0 1 2 3 4 5 6 7
+			  L   R
+
+		if ((R - L + 1) > longest) // It's not
+			longest = R - L + 1
+
+
+
+
+	5)
+		a b c a b c b b
+		0 1 2 3 4 5 6 7
+		  L     R
+	            ^
+	            |
+	repeating --|
+
+		Before:
+			a b c a b c b b
+			0 1 2 3 4 5 6 7
+			  L     R
+
+		After:
+			a b c a b c b b
+			0 1 2 3 4 5 6 7
+			    L   R
+
+		if ((R - L + 1) > longest) // It's not
+			longest = R - L + 1
+
+
+
+	6)
+		a b c a b c b b
+		0 1 2 3 4 5 6 7
+		    L     R
+	              ^
+	              |
+	repeating ----|
+
+		Before:
+			a b c a b c b b
+			0 1 2 3 4 5 6 7
+			    L     R
+
+		After:
+			a b c a b c b b
+			0 1 2 3 4 5 6 7
+			      L   R
+
+		if ((R - L + 1) > longest) // It's not
+			longest = R - L + 1
+
+
+
+
+		*** Now this 7th step is interesting ***
+	7)
+		a b c a b c b b
+		0 1 2 3 4 5 6 7
+		      L     R
+	                ^
+	                |
+	repeating ------|
+
+		Before:
+			a b c a b c b b
+			0 1 2 3 4 5 6 7
+			      L     R
+
+		After:
+			a b c a b c b b
+			0 1 2 3 4 5 6 7
+			          L R
+
+		We removed both 'a' and 'b' since 'b' wasn't all the way to the left.
+
+		if ((R - L + 1) > longest) // It's not
+			longest = R - L + 1
+
+
+
+
+	8)
+		a b c a b c b b
+		0 1 2 3 4 5 6 7
+		          L   R
+	                  ^
+	                  |
+	repeating --------|
+
+		Before:
+			a b c a b c b b
+			0 1 2 3 4 5 6 7
+			          L   R
+
+		After:
+			a b c a b c b b
+			0 1 2 3 4 5 6 7
+			              R
+			              L
+
+		We removed both 'c' and 'b' since 'b' wasn't all the way to the left.
+
+		if ((R - L + 1) > longest) // It's not
+			longest = R - L + 1
+
+
+	return longest;
+
+*/
+
+
+/* ====================================================================== */
 
 
 /* Time  Beats: 40.53% */
@@ -159,7 +366,6 @@ public:
 	that means that we can have a:
 		std::vector<int> ascii(128, -1);
 */
-
 
 
 /* Time  Beats: 98.50% */
