@@ -42,10 +42,87 @@
     -2^31 <= x <= 2^31 - 1
 */
 
+
 /*
 	INT_MAX =  2147483647
 	INT_MIN = -2147483648
 */
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	It is self-explanatory for cases other than edge cases.
+
+	Conisder this:
+
+	x = 2147483647 // INT_MAX
+
+	We'll have this:
+
+  1   |      x       |      tmp     |     result     |
+  2   |  2147483647  |  0           |  0             |
+  3   |  214748364   |  7           |  7             |
+  4   |  21474836    |  74          |  74            |
+  5   |  2147483     |  746         |  746           |
+  6   |  214748      |  7463        |  7463          |
+  7   |  21474       |  74638       |  74638         |
+  8   |  2147        |  746384      |  746384        |
+  9   |  214         |  7463847     |  7463847       |
+  10  |  21          |  74638474    |  74638474      |
+  11  |  2           |  746384741   |  746384741     |
+  12  |              |  5555555555  |                |
+	                    ^
+	                    |
+	random value --------
+
+  So when we are at Iteration 11:
+	tmp = 746384741
+
+  If we multiply by 10 and add last_digit, it will Overflow. So how do we
+  check that?
+
+  Since result variable has the same values in each iteration as variable "tmp"
+  once we do multiply by 10 and add last_digit(of x) we then check if
+  doing mirror operations('-' for '+', '/' for '*') on variable "tmp", that is:
+	(tmp - last_digit) and then DIVIDE by 10
+
+  If it's the same value as in the varible "result" then there is no Overflow.
+  On the other hand, if simply doing mirror operations gives us another
+  value then that certainly means an Overflow happened so we return 0.
+
+*/
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution{
+public:
+	int reverse(int x)
+	{
+		int tmp    = 0;
+		int result = 0;
+
+		while (x != 0)
+		{
+			int last_digit = x % 10;
+			tmp = result * 10 + last_digit; // This
+
+			/* Checking for the Overflow */
+			// Doing a reverse operation from the previous(This) line
+			if ((tmp - last_digit) / 10 != result)
+				return 0;
+
+			result = tmp;
+			x = x / 10;
+		}
+
+		return result;
+	}
+};
+
+
 
 
 /*
@@ -111,54 +188,14 @@
 	If last_digit is greater than 7 and "rev" is 21474864 then that will
 	cause an Overflow.
 
-
-
-
-
-	--- Solution 2 ---
-	It is self-explanatory for cases other than edge cases.
-
-	Conisder this:
-
-	x = 2147483647 // INT_MAX
-
-	We'll have this:
-
-  1   |      x       |      tmp     |     result     |
-  2   |  2147483647  |  0           |  0             |
-  3   |  214748364   |  7           |  7             |
-  4   |  21474836    |  74          |  74            |
-  5   |  2147483     |  746         |  746           |
-  6   |  214748      |  7463        |  7463          |
-  7   |  21474       |  74638       |  74638         |
-  8   |  2147        |  746384      |  746384        |
-  9   |  214         |  7463847     |  7463847       |
-  10  |  21          |  74638474    |  74638474      |
-  11  |  2           |  746384741   |  746384741     |
-  12  |              |  5555555555  |                |
-	                    ^
-	                    |
-	random value --------
-
-  So when we are at Iteration 11:
-	tmp = 746384741
-
-  If we multiply by 10 and add last_digit, it will Overflow. So how do we
-  check that?
-
-  Since result variable has the same values in each iteration as variable "tmp"
-  once we do multiply by 10 and add last_digit(of x) we then check if
-  doing mirro operations('-' for '+', '/' for '*') on variable "tmp", that is:
-	(tmp - last_digit) and then DIVIDE by 10
-
-  If it's the same value as in the varible "result" then there is no Overflow.
-  On the other hand, if simply doing mirror operations gives us another
-  value then that certainly means an Overflow happened so we return 0.
-
 */
 
 
-class Solution {
+/* Time  Beats: 100% */
+/* Space Beats: 65.36% */
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Efficient{
 public:
 	int reverse(int x)
 	{
@@ -194,37 +231,11 @@ public:
 };
 
 
-class Solution_2{
-public:
-	int reverse(int x)
-	{
-		int tmp    = 0;
-		int result = 0;
-
-		while (x != 0)
-		{
-			int last_digit = x % 10;
-			tmp = result * 10 + last_digit; // This
-
-			/* Checking for the Overflow */
-			// Doing a reverse operation from the previous(This) line
-			if ((tmp - last_digit) / 10 != result)
-				return 0;
-
-			result = tmp;
-			x = x / 10;
-		}
-
-		return result;
-	}
-};
-
-
 int
 main()
 {
 	Solution sol;
-	Solution_2 sol_2;
+	Solution_Efficient sol_efficient;
 
 	// int number =  123;
 	// int number = -123;
@@ -236,21 +247,18 @@ main()
 
 	std::cout << "\n\t=======================";
 	std::cout << "\n\t=== REVERSE INTEGER ===";
-	std::cout << "\n\t=======================\n\n";
+	std::cout << "\n\t=======================\n";
 
+
+	/* Write Input */
+	std::cout << "\n\tOriginal number: " << number << "\n";
 
 	/* Solution */
-	int rev   = sol.reverse(number);
-	int rev_2 = sol_2.reverse(number);
+	// int rev = sol.reverse(number);
+	int rev = sol_efficient.reverse(number);
 
+	/* Write Output */
+	std::cout << "\n\tReversed number: " << rev << "\n\n";
 
-	/* Original Number */
-	std::cout << "\n\tOriginal number: " << number << "\n\n";
-
-	/* Output */
-	std::cout << "\n\t1. Reversed number: " << rev;
-	std::cout << "\n\t2. Reversed number: " << rev_2;
-
-	std::cout << "\n\n";
 	return 0;
 }
