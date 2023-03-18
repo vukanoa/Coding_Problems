@@ -78,21 +78,25 @@
 */
 
 
+/* Time  Beats: 91.96% */
+/* Space Beats: 63.31% */
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
 class Solution {
 public:
 	bool isPalindrome(const int& x)
 	{
 		if (x < 0 || (x != 0 && x % 10 == 0))
 			return false;
-		else if (x == 0)
-			return true;
+        else if (x == 0)
+            return true;
 
 		int tmp = x;
 		int x_rev = 0;
 
 		while (tmp)
 		{
-			if (x_rev > INT_MAX / 10 || x_rev > (INT_MAX / 10 + tmp % 10))
+			if (x_rev > INT_MAX / 10 || ( (x_rev == INT_MAX / 10) && (tmp % 10 > 7) ) )
 				return false;
 
 			x_rev = x_rev * 10 + tmp % 10;
@@ -102,6 +106,7 @@ public:
 		return x == x_rev;
 	}
 };
+
 
 int
 main()
@@ -122,11 +127,14 @@ main()
 	std::cout << "\n\t=== PALINDROME NUMBER ===";
 	std::cout << "\n\t=========================\n";
 
+	/* Write Input */
+	std::cout << "\n\tx = " << x << "\n";
 
+	/* Solution & Write Output */
 	if (sol.isPalindrome(x))
-		std::cout << "\n\tNumber: " << x << " is INDEED a Palindrome!\n\n";
+		std::cout << "\n\tOutput: It's INDEED a Palindrome!\n\n";
 	else
-		std::cout << "\n\tNumber: " << x << " is NOT a Palindrome!\n\n";
+		std::cout << "\n\tOutput: It's NOT a Palindrome!\n\n";
 
 
 	return 0;
