@@ -2,9 +2,6 @@
 #include <vector>
 #include <climits>
 
-static const int ASCII_ZERO = 48;
-static const int ASCII_NINE = 57;
-
 /*
 	==============
 	=== MEDIUM ===
@@ -126,6 +123,8 @@ static const int ASCII_NINE = 57;
 	On the other hand, if it is exactly:
 		INT_MAX / 10
 	then Overflow is caused only if number[i] > 7
+	However, even if it's exactly INT_MAX or greater than INT_MAX - return
+	INT_MAX in both cases.
 
 	That means that if "integer" is greater than:
 		INT_MAX / 10
@@ -140,16 +139,21 @@ static const int ASCII_NINE = 57;
 		integer >= ((INT_MAX / 10) + number[i])
 	if it is then return INT_MAX.
 
+	Check similar things but for INT_MIN.
+
 	And at the end of our "for loop" we ask if our original number is
 	negative or not and "construct the 'integer' based on previous value.
 	(always tens digit)
 
-	And at the very end just return that constructed "integer".
+	And at the very end just return that constructed integer.
 
 */
 
 
-
+/* Time  Beats: 100% */
+/* Time  Beats: 9.56% */
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
 class Solution{
 public:
 	int myAtoi(const std::string& s)
@@ -177,9 +181,9 @@ public:
 
 		for (int i = 0; i < number.size(); i++)
 		{
-			if ((integer > INT_MAX / 10) || (integer == INT_MAX / 10 && number[i] >= 7) || (integer >= ((INT_MAX / 10) + number[i])))
+			if ((integer > INT_MAX / 10) || (integer == INT_MAX / 10 && number[i] >= 7))
 				return INT_MAX;
-			else if ((integer < INT_MIN / 10) || (integer == INT_MIN / 10 && number[i] >= 8) || (integer <= ((INT_MIN / 10) - number[i])))
+			else if ((integer < INT_MIN / 10) || (integer == INT_MIN / 10 && number[i] >= 8))
 				return INT_MIN;
 
 			if (negative)
@@ -191,7 +195,6 @@ public:
 		return integer;
 	}
 };
-
 
 int
 main()
@@ -238,27 +241,3 @@ main()
 
 	return 0;
 }
-
-/*
-		I could've saved some memory, but the efficiency would decrease
-
-		// std::vector<int> digits;
-		// While it's a digit
-		// while (i < s.length() && s[i] >= 48 && s[i] <= 57)
-		// 	number.push_back(s[i++] - '0');
-
-		for (int i = 0; i < number.size(); i++)
-		{
-			int digit = s[i++] - '0';
-            if ((integer >= INT_MAX / 10 && digit >= 7) || (integer >= ((INT_MAX / 10) + digit)))
-				return INT_MAX;
-			else if ((integer <= INT_MIN / 10 && digit >= 8) || (integer <= ((INT_MIN / 10) - digit)))
-				return INT_MIN;
-
-			if (negative)
-			    integer = integer * 10 - digit;
-			else
-			    integer = integer * 10 + digit;
-		}
-*/
-
