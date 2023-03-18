@@ -215,8 +215,9 @@ public:
 		while (number)
 		{
 			// Exceeded 32-bit range
-			if (rev > (INT_MAX / 10) || rev > ((INT_MAX / 10) + number % 10))
+			if (rev > (INT_MAX / 10) || ( (rev == INT_MAX / 10) && (number % 10 > 7) ))
 				return 0;
+
 
 			rev = rev * 10 + number % 10;
 			number = number / 10;
