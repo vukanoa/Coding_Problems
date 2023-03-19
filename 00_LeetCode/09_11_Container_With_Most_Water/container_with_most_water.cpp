@@ -36,6 +36,17 @@
 	==========================================================================
 
 	--- Example 1 ---
+
+	8     #              #
+	7     #~~~~~~~~~~~~~~#~~~~~#
+	6     #  #           #     #
+	5     #  #     #     #     #
+	4     #  #     #  #  #     #
+	3     #  #     #  #  #  #  #
+	2     #  #  #  #  #  #  #  #
+	1  #  #  #  #  #  #  #  #  #
+	0  #  #  #  #  #  #  #  #  #
+
 	Input: height = [1, 8, 6, 2, 5, 4, 8, 3, 7]
 	Output: 49
 	Explanation: The above vertical lines are represented by array:
@@ -87,7 +98,8 @@
 */
 
 
-
+/* Time  Beats: 62.10% */
+/* Space Beats: 56.75% */
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
 class Solution {
