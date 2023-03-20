@@ -69,7 +69,6 @@
 */
 
 
-
 /*
 	------------
 	--- IDEA ---
@@ -101,6 +100,8 @@
 
 
 
+/* Time  Beats: 74.40% */
+/* Space Beats: 32.17% */
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
 class Solution{
@@ -155,9 +156,13 @@ main()
 	std::cout << "\n\t=== ROMAN TO INTEGER ===";
 	std::cout << "\n\t========================\n";
 
+	/* Write Input */
+	std::cout << "\n\tRoman: " << s << "\n";
+
+	/* Solution */
 	int number = sol.romanToInt(s);
 
-	std::cout << "\n\tRoman:   " << s;
+	/* Write Output */
 	std::cout << "\n\tInteger: " << number << "\n\n";
 
 	return 0;
