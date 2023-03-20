@@ -71,8 +71,6 @@
 	--- IDEA ---
 	------------
 
-	--- Solution 1 ---
-
 	We have 13 different values in "values" array.
 
 	While number is greater than 0 we are trying to find the very first value
@@ -90,20 +88,12 @@
 	Now we repeat the process until we have "covered" the whole number, meaning
 	num == 0
 
-
-
-	--- Solution 2 ---
-
-	It's self-explanatory. We are able to do this only because we are told that
-	the number isn't greater than 3999.
-
-	We wouldn't be able to do this if a number was able to be arbitrarily
-	large.
-
 */
 
 
 
+/* Time  Beats: 100 */
+/* Space Beats: 99.73% */
 /*
 	Time  Complexity: O(n)
 	Since 3999 is max value possible, the number of digits is negligible. It
@@ -135,27 +125,10 @@ public:
 };
 
 
-/* Time  Complexity: O(1) */
-/* Space Complexity: O(1) */
-class Solution_2 {
-public:
-	std::string intToRoman(int num)
-	{
-		std::string ones      [] = {"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"};
-		std::string tens      [] = {"", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"};
-		std::string hundreds  [] = {"", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM"};
-		std::string thousands [] = {"", "M", "MM", "MMM"};
-
-		return thousands[num/1000] + hundreds[(num % 10) / 100] + tens[(num % 100) / 10] + ones[num % 10];
-	}
-};
-
-
 int
 main()
 {
 	Solution sol;
-	// Solution sol2;
 
 	// int num = 1994;
 	// int num = 8;
@@ -168,11 +141,14 @@ main()
 	std::cout << "\n\t=== INTEGER TO ROMAN ===";
 	std::cout << "\n\t========================\n";
 
-	std::string roman = sol.intToRoman(num);
-	// std::string roman = sol2.intToRoman(num);
+	/* Write Input */
+	std::cout << "\n\tInteger: " << num << "\n";
 
-	std::cout << "\n\tInteger: " << num;
-	std::cout << "\n\tRoman:   " << roman << "\n\n";
+	/* Solution */
+	std::string roman = sol.intToRoman(num);
+
+	/* Write Output */
+	std::cout << "\n\tRoman: " << roman << "\n\n";
 
 	return 0;
 }
