@@ -35,8 +35,8 @@
 	Input:  nums = [-1, 0, 1, 2, -1, -4]
 	Output: [[-1, -1, 2], [-1, 0, 1]]
 	Explanation:
-	nums[0] + nums[1] + nums[2] = (-1) + 0 + 1 = 0
-	nums[0] + nums[2] + nums[4] = 0 + 1 + (-1) = 0
+	nums[0] + nums[1] + nums[2] = (-1) + 0 +   1  = 0
+	nums[0] + nums[2] + nums[4] =   0  + 1 + (-1) = 0
 	nums[i] + nums[3] + nums[4] = (-1) + 2 + (-1) = 0
 
 	The distinct triples are [-1, 0, 1] and [-1, -1, 2].
@@ -68,8 +68,13 @@
 	Two Sum II should be done prior to this Problem. After it, the solution
 	is straightforward.
 
-	First we should sort the vecto "nums". Why? So that we don't have duplicate
-	triplets.
+	Note: "Two Sum II" is NOT the same as "Two sum".
+
+	Make sure you do:
+		Two Sum II
+
+	First we should sort the vector "nums". Why? So that we don't have
+	duplicate triplets.
 
 	Consider this example:
 		-3 3 4 -3 1 2
@@ -83,14 +88,14 @@
 	triplet which is something we are warned about. It's something that we must
 	avoid.
 
-	So how do we fulfill thsi requirement?
+	So how do we fulfill this requirement?
 	We sort the array and in each outer loop we only ask if 'i' is greater than
 	0 and if 'i' is equal to 'i - 1'.
 
 	We ask if 'i' is greater than 0 because if we weren't then for 0th element
 	we would've asked if 0th element is equal to an element before the array
-	which is some random value. So to avoid this we check if 'i' is greater
-	than 0.
+	which is some random value(out of bounds). So to avoid this we check
+	if 'i' is greater than 0.
 
 	And we ask if nums[i] == nums[i - 1] because only the very first element
 	in a "chain of duplicates" in our, now sorted, array should be considered.
@@ -121,6 +126,12 @@
 */
 
 
+/* ========= */
+/* === N === */
+/* ========= */
+
+/* Time  Beats: 78.48% */
+/* Space Beats: 54.64% */
 /* Time  Complexity: O(n^2) */
 /* Space Complexity: O(1) or O(n), depends on the sort. Heapsort uses O(1) */
 class Solution{
@@ -192,6 +203,8 @@ main()
 	std::cout << "\n\t=== THREE SUM ===";
 	std::cout << "\n\t=================\n";
 
+
+	/* Write Input */
 	bool first = true;
 	std::cout << "\n\t=== Array ===\n\t[";
 	for (auto x: nums)
@@ -204,10 +217,11 @@ main()
 	}
 	std::cout << "]\n\n";
 
+	/* Solution */
 	std::vector<std::vector<int>> triplets = sol.threeSum(nums);
 
+	/* Write Output */
 	std::cout << "\n\t=== Triplets ===";
-
 	if (triplets.empty())
 		std::cout << "\n\t[]\n";
 
