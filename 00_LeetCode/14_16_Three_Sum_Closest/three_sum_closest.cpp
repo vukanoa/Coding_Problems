@@ -53,8 +53,11 @@ using namespace std;
 	IDEA: Fix the left element and for the other two, do two pointers technique
 */
 
+
+/* Time  Beats: 73.77% */
+/* Space Beats: 98.91% */
 /* Time  Complexity: O(n^2) */
-/* Space Complexity: O(1)   */
+/* Space Complexity: O(n) or O(1) based on the Sort  */
 class Solution{
 public:
 	int threeSumClosest(vector<int>& nums, int target)
@@ -62,23 +65,25 @@ public:
 		int n = nums.size();
 		int closest = nums[0] + nums[1] + nums[n - 1];
 
+		// O(n * logn)
 		sort(nums.begin(), nums.end());
 
+		// O(n^2)
 		for (int i = 0; i < n - 2; i++)
 		{
-			int front = i + 1;
-			int rear  = n - 1;
+			int left = i + 1;
+			int right  = n - 1;
 
-			while (front < rear)
+			while (left < right)
 			{
-				int sum = nums[i] + nums[front] + nums[rear];
+				int sum = nums[i] + nums[left] + nums[right];
 
 				if (sum == target)
 					return sum;
 				else if (sum > target)
-					rear--;
+					right--;
 				else
-					front++;
+					left++;
 
 				if (abs(sum - target) < abs(closest - target))
 					closest = sum;
@@ -145,8 +150,25 @@ main()
 	std::cout << "\n\t=== THREE SUM CLOSEST ===";
 	std::cout << "\n\t=========================\n";
 
+	/* Write Input */
+	bool first = true;
+	std::cout << "\n\tArray:  [";
+	for (auto x: nums)
+	{
+		if (!first)
+			std::cout << ", ";
+
+		std::cout << x;
+		first = false;
+	}
+	std::cout << "]";
+
 	std::cout << "\n\tTarget: " << target << "\n";
+
+	/* Solution */
 	int closest = sol.threeSumClosest(nums, target);
+
+	/* Write Output */
 	std::cout << "\n\tClosest sum to target: " << closest << "\n\n";
 
 	return 0;
