@@ -48,7 +48,6 @@
 
 */
 
-using namespace std;
 
 /*
 	------------
@@ -60,54 +59,71 @@ using namespace std;
 	// button_letters
 	Make a single array of strings where index corresponds to value of buttons
 
-	vec_results is going to store each "full" combination of all n digits in
-	the given string "digits".
+	// vec_results 
+	To store each "full" combination of all n digits in the given
+	string "digits".
 
-	Helper function: "combine"
-		* We pass original given String "digits" so we know when to stop.
-		* We pass "vec_results" to store each "full" combination.
-		* We pass the "index" of a current letter of the current digit we're working on.
-		* We pass "str_combination" which represents the combinations of letters until this current digit.
-			Once we get to the very last digits in collecting the combinations of letter, then at
-			that point our "index" is going to be digits.length() and thus recursion will unwind
-			and the next "i" will be tried with the previous combination.
-			This will happen until we finish with the last letter of a first digits in our given string.
+	Helper function: "backtracking"
+	We pass:
+		Basic:
+			digits, vec_results, button_letters
+
+		Important:
+			index, str_combination(Up to this point)
+	
+	Begin with backrackting(..., 0, "")
+	// "..." denotes Basic things we pass.
+
+	return vec_resuls
 */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n^2) */
+
+/* Time  Beats: 100% */
+/* Space Beats: 81.98% */
+/*
+	Time  Complexity: O(n * 4^n)
+	Since numbers: 9 and 7 both have 4 letters, if we had digits: 9997
+	That would mean: 4 * 4 * 4 * 4 string combinations in vec_result, but
+	the length of each and every string is going to be "n", that is number of
+	digits in vector "digits".
+
+	So overall Time Complexity is O(n * 4^n)
+	This is the Worst case Time Complexity
+
+*/
+/* Space Complexity: O(n) */
 class Solution{
 public:
 	/* Space Complexity: O(n) */
-	void combine(string digits, vector<string>& vec_results, string button_letters[], int index, string str_combination)
+	void backtrack(std::string digits, std::vector<std::string>& vec_results, std::string button_letters[], int index, std::string str_combination)
 	{
-		if (index == digits.length())
+		if (str_combination.length() == digits.length())
 		{
 			vec_results.push_back(str_combination);
 			return;
 		}
 
-		string letters = button_letters[digits[index] - '0'];
+		std::string letters_of_curr_digit = button_letters[digits[index] - '0'];
 
-		for (int i = 0; i < letters.length(); i++)
+		for (int i = 0; i < letters_of_curr_digit.length(); i++)
 		{
-			combine(digits, vec_results, button_letters, index + 1, str_combination + letters[i]);
+			backtrack(digits, vec_results, button_letters, index + 1, str_combination + letters_of_curr_digit[i]);
 		}
 	}
 
-	vector<string> letterCombinations(string digits)
+	std::vector<std::string> letterCombinations(std::string digits)
 	{
 		if (digits.length() == 0)
 			return {};
 
 		/* Space Complexity: O(n) */
-		vector<string> vec_results;
+		std::vector<std::string> vec_results;
 
 		/* Space Complexity: O(1) since this array won't grow as the input string "digits" increases */
-		string button_letters[10] = 
+		std::string button_letters[10] = 
 		{"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
 
-		combine(digits, vec_results, button_letters, 0, "");
+		backtrack(digits, vec_results, button_letters, 0, "");
 
 		return vec_results;
 	}
@@ -118,28 +134,31 @@ int
 main()
 {
 	Solution sol;
-	vector<string> vec_results;
 
 	/* Example 1 */
-	// string digits = "23";
+	std::string digits = "23";
 
 	/* Example 2 */
-	// string digits = "";
+	// std::string digits = "";
 	
 	/* Example 3 */
-	// string digits = "2";
+	// std::string digits = "2";
 
 	/* Example 4 */
-	string digits = "2789";
+	// std::string digits = "2789";
 
 	std::cout << "\n\t=============================================";
 	std::cout << "\n\t=== LETTER COMBINATIONS OF A PHONE NUMBER ===";
 	std::cout << "\n\t=============================================\n";
 
-	vec_results = sol.letterCombinations(digits);
 
+	/* Write Input */
 	std::cout << "\n\tString: \"" << digits << "\"\n";
 
+	/* Solution */
+	std::vector<std::string> vec_results = sol.letterCombinations(digits);
+
+	/* Write Output */
 	bool first = true;
 	std::cout << "\n\tAll Combinations: [";
 	for (const auto& x: vec_results)
