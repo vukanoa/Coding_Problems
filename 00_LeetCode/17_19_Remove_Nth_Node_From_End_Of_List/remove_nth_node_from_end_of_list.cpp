@@ -96,49 +96,52 @@ struct ListNode {
 		and n = 3
 	
 	then that means that after n nodes to the right the "second" pointer will
-	be nullptr. If that's the case, we need to return head's next;
+	be nullptr. If that's the case, then that means that we need to remove the
+	head element, so we need to return head's next;
 
-	If that's not the case, move "second" to the right by one, so that after
-	the while loop in which we move both "second" and "first" pointer by one
-	until "second" hits nullptr, we point to one node *before* the "n-th node
-	from the end".
-	And now we can successfully relink.
+	If that's not the case, move "second" to the right by one so that once we
+	hit the nullptr with "second" pointer, our "first" pointer will be ponting
+	to the one we need to remove and thus we will be able to successfully
+	relink with:
+		first->next = first->next->next;
 
 	Note: Memory leak happens for code is shorter.
 */
 
+
+/* Time  Beats: 100%   */
+/* Space Beats: 39.89% */
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    ListNode* removeNthFromEnd(ListNode* head, int n)
+	ListNode* removeNthFromEnd(ListNode* head, int n)
 	{
-        if (head == nullptr)
-            return nullptr;
-        else if (head->next == nullptr)
-            return nullptr;
-        
-        struct ListNode* first = head;
-        struct ListNode* second = head;
-
-        for (int i = 0; i < n && second != nullptr; i++)
-            second = second->next;
-        
-        if (second == nullptr)
-            return head->next;
-        else
-            second = second->next;
-
-        while (second != nullptr)
-        {
-            first = first->next;
-            second = second->next;
-        }
-
-        first->next = first->next->next;
-        
-        return head;
-    }
+		if (head == nullptr || head->next == nullptr)
+			return nullptr;
+		
+		struct ListNode* first = head;
+		struct ListNode* second = head;
+		
+		for (int i = 0; i < n && second != nullptr; i++)
+			second = second->next;
+		
+		// If we have to remove the head element
+		if (second == nullptr)
+			return head->next;
+		else
+			second = second->next; // So that we can relink
+		
+		while (second != nullptr)
+		{
+			first = first->next;
+			second = second->next;
+		}
+		
+		first->next = first->next->next;
+		
+		return head;
+	}
 };
 
 
@@ -194,13 +197,22 @@ main()
 
 	struct ListNode* head = &one;
 
+
 	std::cout << "\n\t========================================";
 	std::cout << "\n\t=== REMOVE NTH NODE FROM END OF LIST ===";
 	std::cout << "\n\t========================================\n";
 
+
+	/* Write Input */
 	std::cout << "\n\tOriginal List:";
 	print_list(head);
 
+
+	/* Solution */
+	head = sol.removeNthFromEnd(head, n);
+
+
+	/* Write Output */
 	if (n == 1)
 		std::cout << "\n\tAfter removal of 1st node from the End:";
 	else if (n == 2)
@@ -210,7 +222,6 @@ main()
 	else
 		std::cout << "\n\tAfter removal of n-th node from the End:";
 
-	head = sol.removeNthFromEnd(head, n);
 	print_list(head);
 
 	return 0;
