@@ -8,7 +8,7 @@
     ==============
 
     ================================
-    6) Longest Palindromic Substring
+    6) ZigZag Conversion
     ================================
 
 	============
@@ -173,79 +173,29 @@
 
 	Now we have filled the matrix, thus our final task is just to read the
 	matrix line-by-line(ignorint empty cells)
-
-
-
-
-	--- Solution ---
-	If you look carefully enough you will notice a pattern between distances
-	between characters in each row.
-
-	If we analyze the jump pattern and traverse the input string using that
-	pattern we can avoid he use of additional space.
-
-	A B C D E F G H I J K L M N O P Q S T U V W X
-	! @ # $ % $ # @ ! @ # $ % $ # @ ! @ # $ % $ #
-
-	In the above example (each character {'!', '@', '#', '$', '%'), denotes
-	one "color", i.e. one row of our previously traverse matrix when mapping it
-	in input string) in jumps denoted by '@', first, we jump 6 then 2, then 6
-	and then again 2.
-
-	Similarly, there is a pattern for all collors. Let's start analyzing this
-	pattern using the same filled matrix.
-
-	Notice in the below image the first and last rows we jump to the same
-	position in the next section, i.e. we jump(number of characters) positions
-	in each section.
-
-	But in the rest of the rows, we must traverse to the next corresponding
-	element of the same section before jumping to the next section.
-
-	The hard part will be to calculate how to jump to the next character
-
-	1. If we have to jump to the next section then it's simple: we only jump:
-	       charsInSection
-	   characters. So:
-	       currIndex += charsInSection.
-
-	2. If we have to jump to the next character in the same section, then we
-	   will have to calculate how many characters are between these two
-	   position and increment currIndex by that value.
-
-	   If the total characters in a section are charsInSection and we are in
-	   the ith row, then the number of characters above the current row will be
-	   2 * i, and the number of characters left will be:
-	       charsInBetween = charsInSection - 2 * i
-
-	   So:
-	       secondIndex = currIndex + charsInBetween
-
-	   Thus, we can iterate over the input string in line-by-line order afer
-	   writing it in a zig-zag pattern directly.
-
 */
 
 
 
 /*
-Time  Complexity: O(numRows * n)
+	Time  Complexity: O(numRows * n)
 
-We initialize an empty 2D matrix of size numRows x numCols, where O(numCols) is
-equal to O(n). So it takes O(numRows * n) time.
+	We initialize an empty 2D matrix of size numRows x numCols, where
+	O(numCols) is equal to O(n). So it takes O(numRows * n) time.
 
-Then we iterate on the input string, which takes O(n) time, and again traverse
-on the matrix to generate the final string, which takes O(numRows * n) time.
+	Then we iterate on the input string, which takes O(n) time, and again
+	traverse on the matrix to generate the final string, which takes
+	O(numRows * n) time.
 
-Thus, overall we take O(2(numRows * n) + n) = O(numRows * n) time.
+	Thus, overall we take O(2(numRows * n) + n) = O(numRows * n) time.
 */
 /*
-Space Complexity: O(numRows * n)
+	Space Complexity: O(numRows * n)
 
-We use an additional 2D array of size numRows x numCols
-where O(numCols) == O(n)
+	We use an additional 2D array of size numRows x numCols
+	where O(numCols) == O(n)
 */
-class Solution_1{
+class Solution{
 public:
 	std::string convert(const std::string& s, int numRows)
 	{
@@ -301,41 +251,221 @@ public:
 };
 
 
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	If you look carefully enough you will notice a pattern between distances
+	between characters in each row.
+
+	If we analyze the jump pattern and traverse the input string using that
+	pattern we can avoid he use of additional space.
+
+	===================
+	row = 3
+	===================
+	P   A   H   N
+	A P L S I I G
+	Y   I   R
+
+	row  -  next in that row
+	 0   -   4
+	 1   -   2
+	 2   -   4
+
+
+
+
+	===================
+	row = 4
+	===================
+	P     I     N
+	A   L S   I G
+	Y A   H R
+	P     I
+
+	row  -  next in that row
+	 0   -   6
+	 1   -   4
+	 2   -   2
+	 3   -   6
+
+
+
+
+	===================
+	row = 5
+	===================
+	P       H       U
+	A     S I     O T
+	Y   I   R   Y   O
+	P L     I G     D Y
+	A       N       A
+
+	row  -  next in that row
+	 0   -   8
+	 1   -   6
+	 2   -   4
+	 3   -   2
+	 4   -   8
+
+
+
+	==========================
+	So it's: 2 * (numRows - 1)
+	==========================
+	numRows              Increment
+	  1   => 2 * (1 - 1) =   0
+	  2   => 2 * (2 - 1) =   2
+	  3   => 2 * (3 - 1) =   4
+	  4   => 2 * (4 - 1) =   6
+	  5   => 2 * (5 - 1) =   8
+	...
+
+
+	That's gonna be for 1st and last row. However, other rows will be taken
+	care of by this formula:
+		2 * (numRows - 1) - 2 * j
+
+		Where 'j' is the number of "inner" row.
+
+		numsRows = 4
+
+		row  -  next in that row
+		0    -   6
+		1    -   4
+		2    -   2
+		3    -   6
+
+*/
+
+
+/* Time  Beats: 98.46% */
+/* Space Beats: 99.30% */
 /* Time  Complexity O(n) */
 /* Space Complexity O(1) */
-class Solution {
+class Solution_Efficient{
 public:
-    std::string convert(const std::string& s, int numRows)
-    {
-        if (numRows == 1)
-            return s;
+	std::string convert(const std::string& s, int numRows)
+	{
+		if (numRows == 1)
+			return s;
 
-        std::string conv;
-        int step = 2 * numRows - 2;
+		std::string ret = "";
 
-        for (int i = 0; i < numRows; i++)
-        {
-            for (int j = 0; j + i < s.length(); j += step)
-            {
-                conv += s[j + i];
-                if (i != 0 && i != numRows - 1 && j + step - i < s.length())
-                    conv += s[j + step - i];
-            }
-        }
+		for (int curr_row = 0; curr_row < numRows; curr_row++)
+		{
+			int increment = 2 * (numRows - 1);
 
-        return conv;
-    }
+			for (int j = curr_row; j < s.length(); j += increment)
+			{
+				ret += s[j]; // First for that 'V' shape.
+
+				// Only for inner rows
+				if (curr_row > 0 && curr_row < numRows - 1)
+				{
+					// And if it's within the bounds
+					if (j + increment - 2 * curr_row < s.length())
+						ret += s[j + increment - 2 * curr_row];
+				}
+			}
+		}
+
+		return ret;
+	}
 };
+
+
+/*
+	numRows   =   Spaces in first row
+	   2      =      1
+	   3      =      3
+	   4      =      5
+	   5      =      7
+	   6      =      9
+	   7      =      11
+	   8      =      13
+
+	for numRows = 6, there is 9 spaces
+	P_________D
+	A       D
+	Y     D
+	P   D
+	A C
+	C
+*/
+void
+print_in_zigzag(std::string& s, int numRows)
+{
+	if (numRows == 1)
+		return;
+
+	int rows[numRows];
+	int first_last = 2 * (numRows - 1) - 1;
+	int tmp = first_last;
+
+	for (int i = 0; i < numRows - 1 ; i++)
+	{
+		rows[i] = tmp;
+		tmp -= 2;
+	}
+	rows[numRows - 1] = first_last;
+
+	
+	/* Printing */
+	std::cout << "\n\tVisually:\n";
+	for (int i = 0; i < numRows; i++)
+	{
+		int increment = 2 * (numRows - 1);
+		std::cout << "\t\t   ";
+
+		for (int j = i; j < s.length(); j += increment)
+		{
+			std::cout << s[j];
+
+			for (int x = 0; x < rows[i]; x++)
+				std::cout << " ";
+
+			// Only for inner rows
+			if (i > 0 && i < numRows - 1)
+			{
+				// And if it's within the bounds
+				if (j + increment - 2 * i < s.length())
+				{
+					std::cout << s[j + increment - 2 * i];
+
+					/*
+						1 : 1
+						2 : 3
+						3 : 5
+						4 : 7
+						5 : 9
+					*/
+					int after_space = 1;
+					for (int x = 0; x < i - 1; x++)
+						after_space += 2;
+
+					for (int x = 0; x < after_space; x++)
+						std::cout << " ";
+				}
+			}
+		}
+		std::cout << "\n";
+	}
+}
+
 
 int
 main()
 {
-	Solution sol_1;
 	Solution sol;
+	Solution_Efficient sol_eff;
 
 	/* Example 1 */
-	std::string s = "PAYPALISHIRING";
-	int numRows = 3;
+	// std::string s = "PAYPALISHIRING";
+	// int numRows = 3;
 
 	/* Example 2 */
 	// std::string s = "PAYPALISHIRING";
@@ -350,25 +480,32 @@ main()
 	// int numRows = 5;
 
 	/* Example 5 */
-	// std::string s = "LONGESTSENTENCEWRITTENEVER";
-	// int numRows = 6;
+	std::string s = "LONGESTSENTENCEWRITTENEVER";
+	int numRows = 6;
 
 	/* Example 6 */
 	// std::string s = "MANACHERALGORITHM";
 	// int numRows = 2;
 
-	std::string conv_1 = sol_1.convert(s, numRows);
-	std::string conv = sol.convert(s, numRows);
 
-	// Original String
-	std::cout << "\n\tOriginal  string is: " << s      << "\n\n";
+	std::cout << "\n\t=========================";
+	std::cout << "\n\t=== ZIGZAG CONVERSION ===";
+	std::cout << "\n\t=========================\n";
 
-	// Conv_1
-	std::cout << "\n\tConverted string is: " << conv_1;
 
-	// Conv
-	std::cout << "\n\tConverted string is: " << conv;
+	/* Write Input */
+	std::cout << "\n\tOriginal  string is: " << s      << "\n";
 
-	std::cout << "\n\n";
+	print_in_zigzag(s, numRows);
+
+
+	/* Solution */
+	// std::string conv = sol.convert(s, numRows);
+	std::string conv = sol_eff.convert(s, numRows);
+
+
+	/* Write Output */
+	std::cout << "\n\n\tConverted string is: " << conv << "\n\n";
+
 	return 0;
 }
