@@ -112,6 +112,8 @@ typedef struct ListNode {
 
 
 
+/* Time  Beats: 68.57% */
+/* Space Beats: 86.90% */
 /*	Time  Complexity: O(m + n)
 	Where m is the length of list1
 	and n is the length of list2
@@ -222,15 +224,20 @@ main()
 	std::cout << "\n\t=== MERGE TWO SORTED LISTS ===";
 	std::cout << "\n\t==============================\n";
 
+
+	/* Write Input */
 	std::cout << "\n\tList1:";
 	print_list(list1);
 
 	std::cout << "\n\tList2:";
 	print_list(list2);
 
+
 	// Solution
 	ListNode* head = sol.mergeTwoLists(list1, list2);
 
+
+	/* Write Input */
 	std::cout << "\n\tMerged Lists: List1 & List2:";
 	print_list(head);
 
