@@ -61,9 +61,9 @@
 	4Sum and 3Sum are very similar; the difference is that we are looking for
 	unique quadruplets instead of triplets.
 
-	As you see, 3Sum just wraps Two Sum in an outer loop. As it iterates
-	through each value 'v', it finds all pairs whose sum is equal to
-	"target - v" using one of these approaches:
+	As you see, 3Sum just wraps Two Sum(Two Sum II actually) in an outer loop.
+	As it iterates through each value 'v', it finds all pairs whose sum is
+	equal to "(target - v)" using one of these approaches:
 
 		1. "Two Sum" uses a hash set to check for a matching value.
 		2. "Two Sum II" uses the two pointers technique in a sorted array.
@@ -79,15 +79,15 @@
 
 	The two pointers technique requires the array to be sorted, so we do that
 	first. Also, it's easier to deal with duplicates if the array is sorted:
-	repeated values are next to each otehr and easy to skip.
+	Repeated values are next to each other and easy to skip.
 
-	For 3Sum, we enumarate each value in a single loop, and use the two
+	For 3Sum, we enumerate each value in a single loop, and use the two
 	pointers technique for the rest of the array. For kSum, we will have k - 2
 	nested loops to enumerate all combinations of k - 2 values.
 
-	rear  -----------------------------------
+	right -----------------------------------
 	                                        |
-	front -----------------                 |
+	left  -----------------                 |
 	                      |                 |
 	                      |                 |
 	                      v     Two Sum     v
@@ -120,36 +120,92 @@
 
 		- Iterate 'i' through the array from "start" :
 			- If the current value is the same as the one before, skip it.
+			    (That's why we've sorted at the beginning)
 			- Recursively call kSum with:
-				start = i + 1
-				k = k - 1
-				target - nums[i]
+				start  = i + 1
+				k      = k - 1
+				target = target - nums[i]
 			- For each returned "subset" of values:
 				- Include the current value nums[i] into "subset".
-				- Add "subset" to the result "vec_results".
+				- Add "subset" to the result "vec_results". Once we have a 4
+				    element "subset".
 
 			- Return the result "vec_results";
 
 	3. For twoSum function:
-		- Set the low pointer "front" to "start", and "rear" pointer to the
+		- Set the low pointer "left" to "start", and "right" pointer to the
 		  last index.
 
-		- While "front" pointer is smaller than "rear":
-			- If the sum of "nums[front]" and "nums[rear]" is less than
-			  "target", increment "front".
-				- Also increment "front" if the value is the same as front - 1
-			- If the sum is greater than "target", decrement "rear"
-				- Also decrement "rear" if the value is the same as rear + 1
+		- While "left" pointer is smaller than "right":
+			- If the sum of nums[left] and nums[right] is less than "target",
+			  increment "left".
+				- Also increment "left" if the value is the same as left - 1
+			- If the sum is greater than "target", decrement "right"
+				- Also decrement "right" if the value is the same as right + 1
 			- Otherwise, we found a pair:
 				- Add it to the result "vec_results"
-				- Decrement "rear" and increment "front".
+				- Decrement "right" and increment "left".
 
 		- Return the result "vec_results"
+
+
+~~~~~~~~~~~~~~~~~~~
+~~~ static_cast ~~~
+~~~~~~~~~~~~~~~~~~~
+
+Consider this example:
+	#include <iostream>
+
+	int main()
+	{
+		const int MAX_INT = 2147483647;
+		long long largeNum = MAX_INT * MAX_INT;
+		std::cout << "largeNum = " << largeNum << std::endl;
+
+		return 0;
+	}
+
+	This program attempts to compute the square of the maximum value of an
+	'int' datatype. However, because the result of the multiplication is
+	greater than the maximum value of a 'long long' data type, the result of
+	the program is undefined. On my system, the output of this program is:
+	
+		largeNum = -9223372036854775808
+	
+	Which is not the correct result.
+
+
+
+
+	If we instead use a 'static_cast' to convert 'MAX_INT' to 'long long'
+	before performing the multiplication, as in the following code:
+
+	#include <iostream>
+
+	int main()
+	{
+		const int MAX_INT = 2147483647;
+		long long largeNum = static_cast<long long>(MAX_INT) * static_cast<long long>(MAX_INT);
+		std::cout << "largeNum = " largeNum << std::endl;
+
+		return 0;
+	}
+
+	The program correctly computes the square of the maximum value of an 'int'
+	data type:
+
+		largeNum = 4611686014132420609
+
+	So, while a 'static_cast' may not always be necessary, it can be useful in
+	cases where the result of an operation might exceed the maximum value of
+	the data type being used.
 
 */
 
 
 
+/* Time  Beats: 99.50% */
+/* Space Beats: 42.89% */
 /*
 	Time  Complexity:
 	O(n^(k - 1)), or O(n^3) for 4Sum.
@@ -195,7 +251,20 @@ public:
 			{
 				for (std::vector<int>& subset : k_sum(nums, static_cast<long long>(target) - nums[i], i + 1, k - 1))
 				{
+					/*
+						{{...}, {...}, {nums[i]}};
+					*/
 					vec_results.push_back({nums[i]});
+
+					/*
+						We get the last vector of these vector of vectors and
+						then we specify arguments:
+						(
+						 At which position of the last vector should we start inserting,
+						 first position of the vector we want to insert,
+						 last  position of the vector we want to insert
+						)
+					*/
 					vec_results.back().insert(vec_results.back().end(), subset.begin(), subset.end());
 				}
 			}
@@ -207,19 +276,19 @@ public:
 	std::vector<std::vector<int>> two_sum(std::vector<int>& nums, long long target, int start)
 	{
 		std::vector<std::vector<int>> vec_results;
-		int front = start;
-		int rear  = nums.size() - 1;
+		int left = start;
+		int right  = nums.size() - 1;
 
-		while (front < rear)
+		while (left < right)
 		{
-			int sum = nums[front] + nums[rear];
+			int sum = nums[left] + nums[right];
 
-			if (sum < target || (front > start && nums[front] == nums[front - 1]))
-				front++;
-			else if (sum > target || (rear < nums.size() - 1 && nums[rear] == nums[rear + 1]))
-				rear--;
+			if (sum < target || (left > start && nums[left] == nums[left - 1]))
+				left++;
+			else if (sum > target || (right < nums.size() - 1 && nums[right] == nums[right + 1]))
+				right--;
 			else
-				vec_results.push_back({nums[front++], nums[rear--]});
+				vec_results.push_back({nums[left++], nums[right--]});
 		}
 
 		return vec_results;
@@ -241,16 +310,22 @@ main()
 	// int target = 8;
 
 	std::cout << "\n\t================";
-	std::cout << "\n\t=== Four Sum ===";
+	std::cout << "\n\t=== FOUR SUM ===";
 	std::cout << "\n\t================\n";
 
-	std::vector<std::vector<int>> vec_results = sol.fourSum(nums, target);
 
+	/* Write Input */
 	std::cout << "\n\tOriginal Vector: ";
 	for (const auto& x : nums)
 		std::cout << x << " ";
 	std::cout << "\n\tTarget: " << target << "\n";
 
+
+	/* Solution */
+	std::vector<std::vector<int>> vec_results = sol.fourSum(nums, target);
+
+
+	/* Write Output */
 	std::cout << "\n\tResults:";
 	std::vector<std::vector<int>> ::iterator it;
 	it = vec_results.begin();
