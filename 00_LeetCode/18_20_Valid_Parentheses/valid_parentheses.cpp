@@ -71,7 +71,7 @@
 
 	Iterate through each character in our string 's'.
 	If it is an open parenthesis/bracket/brace then push it onto the stack.
-	If it is not an open parenthesis/bracket/brace then:
+	If it is NOT an open(meaning it's closed) parenthesis/bracket/brace then:
 		1. Check if the stack is Empty
 			This check if the very first character in our string 's' is a
 			closing parenthesis/bracket/brace. If it is - return false
@@ -90,7 +90,7 @@
 			Check if a corresponding open brace is on the top of the stack with
 			a function: stack.top().
 			If at the top is anything other than '{' - return false.
-
+		
 		5. If it was a corresponding opened parenthesis/bracket/brace on the
 		   top, then just pop from the stack.
 
@@ -99,12 +99,14 @@
 
 		After we've processed the whole string 's', just check if the stack
 		is empty.
-		If it is Empty INDEED, then return TRUE, meaning a string 's' is VALID.
-		If it is Empty NOT, then return FALSE, meaning a string 's' is INVALID.
+		If it is INDEED Empty, then return TRUE,  meaning a string s is VALID
+		If it is NOT    Empty, then return FALSE, meaning a string s is INVALID
 
 */
 
 
+/* Time  Beats: 100% */
+/* Space Beats: 56.7% */
 /*	Time  Complexity: O(n) */
 /*
 	Space Complexity: O(n)
@@ -179,9 +181,16 @@ main()
 	std::cout << "\n\t=== VALID PARENTHESES ===";
 	std::cout << "\n\t=========================\n";
 
+
+	/* Write Input */
 	std::cout << "\n\tString: \"" << s << "\" ";
+
+
+	/* Solution */
 	bool valid = sol.isValid(s);
 
+
+	/* Write Output */
 	if (valid)
 		std::cout << "is INDEED valid!\n\n";
 	else
