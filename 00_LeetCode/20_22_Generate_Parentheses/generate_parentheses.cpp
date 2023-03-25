@@ -8,7 +8,7 @@
 	==============
 
 	===========================
-	22) Generate Parenthesis
+	22) Generate Parentheses
 	===========================
 
 	============
@@ -67,14 +67,18 @@
 	"curr_str" and backtrack with a newly formed string "curr_str" and
 	with a +1 value in variable "open".
 
-	If all the open parentheses were used, then check if a variable "open" is
-	less than "close" to indicate that 'there is indeed something to close', if
-	that is the case then append a "curr_str" with a closing parenthesis and
-	call this function with newly formed string "curr_str" and with a +1 in
-	variable "close".
+	If all the open parentheses were used, then check if a variable "close" is
+	less than "open"(not n, this is SUPER IMPORTANT to emphasize) to indicate
+	that 'there is indeed something to close', if that is the case then append
+	a "curr_str" with a closing parenthesis and call this function with newly
+	formed string "curr_str" and with a +1 in variable "close".
 
 	The best advice is to try and go through forming of first 3-4
 	valid_combinations to get a "feel" of how this works.
+
+	Again, second if:
+		if (close < open)
+	is REALLY important. It's not (close < n), but (close < open).
 
 */
 
@@ -90,6 +94,9 @@
 */
 
 
+
+/* Time  Beats: 80.29% */
+/* Space Beats: 22.11% */
 //                               (2n)
 /* n-th Catalan number 1/(n + 1) ( n)*/
 /* Time  Complexity: O(4^n/sqrt(n)) */
@@ -141,14 +148,29 @@ main()
 	/* Example 2 */
 	// int n = 1;
 
+	/* Example 3 */
+	// int n = 2;
+
+	/* Example 4 */
+	// int n = 4;
+
+	/* Example 5 */
+	// int n = 8; /* 1430 combinations */
+
 	std::cout << "\n\t============================";
-	std::cout << "\n\t=== GENERATE PARENTHESIS ===";
+	std::cout << "\n\t=== GENERATE PARENTHESES ===";
 	std::cout << "\n\t============================\n";
 
+
+	/* Write Input */
 	std::cout << "\n\tN = " << n << "\n";
 
+
+	/* Solution */
 	std::vector<std::string> valid_combinations = sol.generateParenthesis(n);
 
+
+	/* Write Output */
 	int i = 1;
 	for(const auto& x : valid_combinations)
 		std::cout << "\n\t" << i++ << ". \"" << x << "\"\n";
