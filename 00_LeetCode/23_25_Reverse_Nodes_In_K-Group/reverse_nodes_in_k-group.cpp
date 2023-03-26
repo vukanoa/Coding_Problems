@@ -128,7 +128,7 @@ print_list(struct ListNode* head)
 
 		1. "local_head" is the head of the sublist we're reversing.
 
-		2. "rem" should point the the first node of the rest of the list that
+		2. "rem" should point to the first node of the rest of the list that
 		has to been k-reversed. "rem" stands for Remainder(of the list).
 
 		3. 'k' is the length of the sublist we're reversing.
@@ -158,7 +158,7 @@ ultimate_head ---
         3 -> 2 -> 1
                   |
                   v
-		6 -> 5 -> 4 -> nullptr
+        6 -> 5 -> 4 -> nullptr
         ^         ^
         |___      |
             |     |
@@ -183,17 +183,17 @@ local_head --     |
 		Link current tail(in the first reversing), to the rest of the list.
 
 		If it was:
-        1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> nullptr
+                1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> nullptr
 
 		Now it's:
-		3 -> 2 -> 1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> nullptr
-        ^         ^    ^
-        |         |    |
-local_head        |    |
-                  |    |
-          tail ---     |
-                       |
-               rem ----
+                3 -> 2 -> 1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> nullptr
+                ^         ^    ^
+                |         |    |
+        local_head        |    |
+                          |    |
+                  tail ---     |
+                               |
+                       rem ----
 
 		We have linked tail's next to the rest of the list denotes with pointer
 		"rem".
@@ -218,6 +218,12 @@ local_head        |    |
 */
 
 
+
+/* Time  Beats: 54.58% */
+/* Space Beats: 77.57% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
 class Solution{
 public:
 	void reverse_list(struct ListNode** head, struct ListNode** rem, int k)
@@ -266,24 +272,24 @@ public:
 		bool first = true;
 		struct ListNode* tail_of_list_before_sublist;
 
-		/*
-            ultimate_head ---
-                            |
-            -----------------
-            |
-            v
-			3 -> 2 -> 1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
-			               ^
-						   |
-			   -------------
-			   |
-			local_head
-
-			It's the head of a sublist that we're trying to reverse.
-			Sublist:
-				4 -> 5 -> 6
-			in this case (k = 3)
-		*/
+                /*
+                    ultimate_head ---
+                                    |
+                    -----------------
+                    |
+                    v
+                    3 -> 2 -> 1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
+                                   ^
+                                   |
+                       -------------
+                       |
+                    local_head
+                    
+                    It's the head of a sublist that we're trying to reverse.
+                    Sublist:
+                    	4 -> 5 -> 6
+                    in this case (k = 3)
+                */
 
 		while (remaining_nodes >= k)
 		{
@@ -416,12 +422,18 @@ main()
 	std::cout << "\n\t=== REVERSE NODES IN K-GROUP ===";
 	std::cout << "\n\t================================\n\n";
 
+
+	/* Write Input */
 	std::cout << "\n\tOriginal List:";
 	print_list(head);
 
+	
+	/* Solution */
 	std::cout << "\n\t\t*** Reversing Nodes in K-Group (k = " << k << ") ***\n\n";
 	head = sol.reverseKGroup(head, k);
 
+
+	/* Write Output */
 	std::cout << "\n\tModified List:";
 	print_list(head);
 
