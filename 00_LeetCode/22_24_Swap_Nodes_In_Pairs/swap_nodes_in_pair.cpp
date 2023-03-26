@@ -157,6 +157,11 @@ print_list(struct ListNode* head)
 */
 
 
+/* Time  Beats: 100% */
+/* Space Beats: 93.43% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
 class Solution{
 public:
 	struct ListNode*
@@ -234,13 +239,19 @@ main()
 
 	std::cout << "\n\t===========================";
 	std::cout << "\n\t=== SWAP NODES IN PAIRS ===";
-	std::cout << "\n\t===========================\n\n";
+	std::cout << "\n\t===========================\n";
 
+
+	/* Write Input */
 	std::cout << "\n\tOriginal List:";
 	print_list(head);
 
+
+	/* Solution */
 	head = sol.swapPairs(head);
 
+
+	/* Write Output */
 	std::cout << "\n\tAfter Swapping:";
 	print_list(head);
 
