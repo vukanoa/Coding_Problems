@@ -103,6 +103,9 @@
 */
 
 
+
+/* Time  Beats: 83.61% */
+/* Space Beats: 42.13% */
 class Solution{
 public:
 	void nextPermutation(std::vector<int>& nums)
@@ -197,15 +200,20 @@ main()
 
 	std::cout << "\n\t========================";
 	std::cout << "\n\t=== NEXT PERMUTATION ===";
-	std::cout << "\n\t========================\n\n";
+	std::cout << "\n\t========================\n";
 
 
+	/* Write Input */
 	std::cout << "\n\tOriginal vector:  [";
 	print_vector(nums);
 
+
+	/* Solution */
 	sol.nextPermutation(nums);
 
-	std::cout << "\n\tNext Permutation: [";
+
+	/* Write Output */
+	std::cout << "\tNext Permutation: [";
 	print_vector(nums);
 
 	return 0;
