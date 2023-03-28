@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 
 /*
@@ -76,76 +77,99 @@
 	--- IDEA ---
 	------------
 
+	~~~ Base case ~~~
 	First we observe that if array is in descending order:
 	5 4 3 2 1
 
-	there is no next permutation. That has also been said in the Description
+	There is no next permutation. That has also been said in the Description
 	of a problem. In that case we should return the array in ascending order.
 	That is we should completely reverse the current array.
 
-	If the array is not in a descending order, in that case, all we have to do
-	is we have to do is to find the first element that is greater than its
-	very left element.
+	Note: We're not coverint the base case separately. It's only that after the
+	first while loop, 'i' is less than 0 and thus the whole vector will be
+	reversed.
 
-	nums[i + 1] > nums[i]
 
-	once we find that, then swap element nums[i] with nums[nums.legnth - 1]
+	~~~ Algorithm ~~~
+	It's actually not intuitive to find the pattern, but there is one.
 
-	and then reverse element starting from nums[i + 1](including itself)
-	onwards.
+	Start 'i' from the second element from the back, so that it has only 1
+	element to the right.
 
+		While num[i] > num[i + 1]
+			i--
+
+	Once we're on index 'i' where nums[i] < nums[i + 1] then assign 'j' to
+	point to the very last element and then:
+
+		while (nums[j] <= nums[i])
+			j--
+
+		swap(nums, i, j)
+
+		// Inclusive [nums[i+1], nums[nums.size()-1]]
+		reverse(nums, i + 1, n - 1)
+
+	Here, try it out:
+
+	// First 25 permutations of [1, 2, 3, 4, 5]
+	1 2 3 4 5
+	1 2 3 5 4
+	1 2 4 3 5
+	1 2 4 5 3
+	1 2 5 3 4
+	1 2 5 4 3
+	1 3 2 4 5
+	1 3 2 5 4
+	1 3 4 2 5
+	1 3 4 5 2
+	1 3 5 2 4
+	1 3 5 4 2
+	1 4 2 3 5
+	1 4 2 5 3
+	1 4 3 2 5
 	1 4 3 5 2
-	    i
-	
-1)	1 4 2 5 3 // Swapped nums[i] and nums[nums.length - 1]
-2)  1 4 2 3 5 // Reversed elements from i + 1 to nums.length - 1, inclusive
+	1 4 5 2 3
+	1 4 5 3 2
+	1 5 2 3 4
+	1 5 2 4 3
+	1 5 3 2 4
+	1 5 3 4 2
+	1 5 4 2 3
+	1 5 4 3 2
+	2 1 3 4 5
+	...
 	
 */
 
 
 
-/* Time  Beats: 83.61% */
+/* Time  Beats: 100% */
 /* Space Beats: 42.13% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
 class Solution{
 public:
 	void nextPermutation(std::vector<int>& nums)
 	{
 		int i = nums.size() - 2;
 
-		while (i >= 0 && nums[i + 1] <= nums[i])
+		while (i >= 0 && nums[i] >= nums[i + 1])
 			i--;
 
 		if (i >= 0)
 		{
 			int j = nums.size() - 1;
 
-			while (nums[j] <= nums[i])
+			while (nums[i] >= nums[j])
 				j--;
 
-			swap(nums, i, j);
+			std::swap(nums[i], nums[j]);
 		}
 
-		reverse(nums, i + 1);
-	}
-
-	void reverse(std::vector<int>& nums, int begin)
-	{
-		int i = begin;
-		int j = nums.size() - 1;
-		while (i < j)
-		{
-			swap(nums, i, j);
-
-			i++;
-			j--;
-		}
-	}
-
-	void swap(std::vector<int>& nums, int begin, int end)
-	{
-		int tmp = nums[begin];
-		nums[begin] = nums[end];
-		nums[end] = tmp;
+		// Ranges are both inclusive. reverse [i+1, nums.size()-1]
+        std::reverse(nums.begin() + i + 1, nums.end());
 	}
 };
 
@@ -172,13 +196,13 @@ main()
 	Solution sol;
 
 	/* Example 1 */
-	std::vector<int> nums = {1, 4, 3, 5, 2};
+	// std::vector<int> nums = {1, 4, 3, 5, 2};
 
 	/* Example 2 */
 	// std::vector<int> nums = {1, 4, 5, 3, 2};
 
 	/* Example 3 */
-	// std::vector<int> nums = {1, 5, 4, 3, 2};
+	std::vector<int> nums = {1, 5, 4, 3, 2};
 
 	/* Example 4 */
 	// std::vector<int> nums = {2, 5, 4, 3, 1};
