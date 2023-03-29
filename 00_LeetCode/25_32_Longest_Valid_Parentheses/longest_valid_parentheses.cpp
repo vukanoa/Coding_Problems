@@ -76,18 +76,21 @@
 			We do so because the ending "()" portion is a valid substring
 			anyhow and leads to an increment of 2 in the length of the just
 			previous valid substring's length.
+			We are adding to dp[i - 2] because dp[i - 1] is 0 if dp[i - 1] is
+			equal to '('.
+			So we have to "ask" what is dp[i - 2] and add to that.
 
 		2. s[i] == ')' and s[i - 1] == ')', i.e. string looks like "...))" then
 			if s[i - dp[i - 1] - 1] == '(' then
 				dp[i] = dp[i - 1] + dp[i - dp[i - 1] - 2] + 2;
 
-			The reason behind this is that if the 2nd last ')', the left one, 
-			was a part of a valid substring, for the last ')' to be a part of a
-			larger substring, there must be a corresposnding start '(' which
-			lies before the valid substring of which the 2nd lat ')' is a part.
-			Thus, if the character before this substring, happens to be '(', we
-			update the dp[i] as an addition of 2 in the length of this
-			substring which is dp[i - 1].
+			The reason behind this is that if the 2nd to last ')', the left
+			one, was a part of a valid substring, for the last ')' to be a part
+			of a larger substring, there must be a corresposnding start '('
+			which lies before the valid substring of which the 2nd last ')' is
+			a part of. Thus, if the character before this substring, happens to
+			be '(', we update the dp[i] as an addition of 2 in the length of
+			this substring which is dp[i - 1].
 
 			To this, we also add the length of the valid substring just before
 			the term "(,sub_s,)", i.e. dp[i - dp[i - 1] - 2]
@@ -95,6 +98,8 @@
 */
 
 
+/* Time  Beats: 100% */
+/* Space Beats: 92.45% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
@@ -135,29 +140,30 @@ public:
 
 	Using Stack
 
-	Instead of finding every possible strin and checking its validiy, we can
+	Instead of finding every possible string and checking its validity, we can
 	make use of a stack while scanning the given string to:
 		1. Check if the string scanned so far is valid.
-		2. Find the length of the longest valid string.
+		2. Find the length of the longest valid substring.
 	
 	In order to do so, we start by pushing -1 onto the stack. For every '('
 	encountered, we push its index onto the stack.
 
-	For every ')' encountered, we pop the topmost element. Then, the length of
-	the currently encountered valid string of parentheses will be the
-	difference between the current element's index and the top element of the
-	stack.
+	For every ')' encountered, we pop the top element. Then, the length of the
+	currently encountered valid string of parentheses will be the difference
+	between the current element's index and the top element of the stack.
 
 	If, while popping the element, the stack becomes empty, we will push the
-	current element's index onto the stack. In this way, we can continue to
-	calculate the length of the valid substrings and return the lengths of the
-	longest valid string at the end.
+	current element's index onto the stack representing the starting position
+	of the, next, possibly valid, substring.
 
 	( ) ) ( ( ( ) )
 	0 1 2 3 4 5 6 7
 
 */
 
+
+/* Time  Beats: 100% */
+/* Space Beats: 74.58% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
@@ -193,8 +199,8 @@ public:
 int
 main()
 {
-	// Solution_dp sol;
-	Solution_stack sol;
+	// Solution_dp sol_dp;
+	Solution_stack sol_stack;
 
 	/* Example 1 */
 	std::string s = "(()";
@@ -213,12 +219,16 @@ main()
 
 	std::cout << "\n\t=================================";
 	std::cout << "\n\t=== LONGEST VALID PARENTHESES ===";
-	std::cout << "\n\t=================================\n\n";
+	std::cout << "\n\t=================================\n";
 
-
-
-	int output = sol.longestValidParentheses(s);
+	/* Write Input */
 	std::cout << "\n\tString: \"" << s << "\"\n";
+
+	/* Solution */
+	// int output = sol_dp.longestValidParentheses(s);
+	int output = sol_stack.longestValidParentheses(s);
+
+	/* Write Output */
 	std::cout << "\n\tLongest Valid parentheses: " << output << "\n\n";
 
 	return 0;
