@@ -155,6 +155,8 @@
 */
 
 
+/* Time  Beats: 92.92% */
+/* Space Beats: 71.26% */
 
 /* Time  Complexity: O(log n) */
 /* Space Complexity: O(1) */
@@ -262,8 +264,9 @@ main()
 
 	std::cout << "\n\t===============================================================";
 	std::cout << "\n\t=== FIND FIRST AND LAST POSITION OF ELEMENT IN SORTED ARRAY ===";
-	std::cout << "\n\t===============================================================\n\n";
+	std::cout << "\n\t===============================================================\n";
 
+	/* Write Input */
 	bool first = true;
 	std::cout << "\n\tArray: [";
 	for (auto x: nums)
@@ -277,8 +280,12 @@ main()
 	std::cout << "]";
 	std::cout << "\n\tTarget: " << target << "\n";
 
+
+	/* Solution */
 	std::vector<int> result = sol.searchRange(nums, target);
 
+
+	/* Write Output */
 	first = true;
 	std::cout << "\n\tFIRST & LAST Index of Target:\n\t[";
 	for (auto x: result)
