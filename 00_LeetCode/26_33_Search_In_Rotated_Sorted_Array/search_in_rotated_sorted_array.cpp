@@ -257,7 +257,7 @@ public:
 	So we can basically say that these values are eliminated and thus let's run
 	binary search on the remaining part:
 		[4, 5, 6, 7, 0, 1, 2]
-               m  ~~~~~~~~~~
+		       m  ~~~~~~~~~~
 
 	So that's easy - If we know that we're in the Left sorted portion of the
 	array and that our target is greater than the nums[mid], that's what we
@@ -266,7 +266,7 @@ public:
 	Now, what if our target is less than the mid value? What if our target
 	was less than 6?
 	In our example:
-		[4, 5, 6, 7, 0, 1, 2]
+        [4, 5, 6, 7, 0, 1, 2]
          ~~~~        ~~~~~~~
            ^            ^
 these two _|            |
@@ -286,11 +286,11 @@ these three ____________|
 	Or looking at our graph:
 
 It's here:
-	|
-	|
-	|
-	|
-	|
+    |
+    |
+    |
+    |
+    |
     |   ^    ^
     |   |   /.
     |   |  / .
@@ -333,7 +333,7 @@ It's here:
 	Now, what happens if we're in the Right sorted portion of the array?
 	Let's say that at some point, our mid was at value 1:
 		[4, 5, 6, 7, 0, 1, 2]
-	                    m
+		                m
 	
 	And let's say that somehow we knew that we're in the Right sorted portion
 	of the array.
@@ -344,7 +344,7 @@ It's here:
 
 	So we're going to search the Left portion of this array:
 		[4, 5, 6, 7, 0, 1, 2]
-	    ~~~~~~~~~~~~~~
+		 ~~~~~~~~~~~~~~
 	
 	We're not going to look at: {1, 2}.
 	We don't even necessarily have to know where is the pivot, we only have to
@@ -354,7 +354,7 @@ It's here:
 
 	Then our solution could possibly be: 2 or any of these: {4, 5, 6, 7}
 		[4, 5, 6, 7, 0, 1, 2]
-	     ~~~~~~~~~~        ~~
+		 ~~~~~~~~~~        ~~
 	
 	So where do we go?
 	Again, we can use this right most value, or the edge basically of our
@@ -363,14 +363,14 @@ It's here:
 	So if our target is greater than 1 and it's also greater than 2, then that
 	means that we have to search this Left portion.
 		[4, 5, 6, 7, 0, 1, 2]
-	     ~~~~~~~~~~~~~
+		 ~~~~~~~~~~~~~
 
 	But what if the opposite is true? What if our target is greater than 1, but
 	it's less than or equal to 2?
 
 	In that case we only have to run Binary Search on the right portion:
 		[4, 5, 6, 7, 0, 1, 2]
-	                       ~~
+		                   ~~
 	Every value to the right of one. Meaning we can remove all these elements
 	from consideration: {4, 5, 6, 7, 0, 1}
 
