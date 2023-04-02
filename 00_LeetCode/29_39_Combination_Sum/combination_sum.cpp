@@ -104,14 +104,29 @@
 
 using std::vector; // Names would be way to long if I were to user std::vector everytime in this Problem
 
+
+/* Time  Beats: 29.40% */
+/* Space Beats: 34.11% */
+
+/*
+	Time  Complexity: O(2^n)
+
+	The worst-case scenario is when all combinations of "candidates" sum up to
+	"target".
+*/
+/*
+	Space Complexity: O(2^n)
+
+	The worst-case scenario is when all combinations of "candidates" sum up to
+	"target".
+*/
 class Solution{
 public:
 	vector<vector<int>> combinationSum(vector<int>& candidates, int target)
 	{
 		vector<vector<int>> results;
-		vector<int> curr_combination;
 
-		backtrack_combination(candidates, target, curr_combination, 0, 0, results);
+		backtrack_combination(candidates, target, {}, 0, 0, results);
 
 		return results;
 	}
@@ -133,12 +148,10 @@ private:
 		for (int i = curr_index; i < candidates.size(); i++)
 		{
 			curr_combination.push_back(candidates[i]);
-			curr_sum += candidates[i];
 
-			backtrack_combination(candidates, target, curr_combination, curr_sum, i, results);
+			backtrack_combination(candidates, target, curr_combination, curr_sum + candidates[i], i, results);
 
 			curr_combination.pop_back();
-			curr_sum -= candidates[i];
 		}
 	}
 };
@@ -182,7 +195,7 @@ main()
 
 	std::cout << "\n\t=======================";
 	std::cout << "\n\t=== COMBINATION SUM ===";
-	std::cout << "\n\t=======================\n\n";
+	std::cout << "\n\t=======================\n";
 
 
 	/* Write Input */
