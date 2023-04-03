@@ -184,31 +184,31 @@
 	is exactly what is required.
 
 	So let's see how this works:
-	        nums = [3, -3, 6, 3]
+	        nums = [3, 0, 6, 3]
 	                i
 	
 	I)
-	i = 0
-	x = nums[i] - 1
-	Mark nums[x] to a negative value of that number if it's not 0 or negative
-	value, since we're going to have negative values again because in this
-	iteration we're the ones that are going to make it, but they will represent
-	something else and they won't be useless.
-	(Remember that we changed this Input array to have 0's in the place where
-	negative numbers existed)
+		i = 0
+		x = nums[i] - 1
+		Mark nums[x] to a negative value of that number if it's not 0 or
+		negative value, since we're going to have negative values again because
+		in this iteration we're the ones that are going to make it, but they
+		will represent something else and they won't be useless.
+		(Remember that we changed this Input array to have 0's in the place
+		where negative numbers existed)
 
-	So:
-		x = nums[0]
-		x = 3 - 1 = 2
-	
-	if (nums[2] > 0)
-		nums[2] = -nums[2];
-	
-	So, once we get to i == 2, we will try to index a negative index, so in
-	this whole for loop, we're actually going to use std::abs(nums[i]) every
-	single time, to avoid that Segmentation Fault.
+		So:
+			x = nums[0]
+			x = 3 - 1 = 2
+		
+		if (nums[2] > 0)
+			nums[2] = -nums[2];
+		
+		So, once we get to i == 2, we will try to index a negative index, so in
+		this whole "for loop" we're actually going to use abs(nums[i]), every
+		single time, to avoid "undefined ubehavior".
 
-	Next:
+
 	II)
 		i = 1
 		x = abs(nums[i]) - 1 => x = 0 - 1 = -1 => nums[-1] => Out of Bounds
@@ -229,10 +229,104 @@
 		i = 3
 		x = abs(nums[i]) - 1 = 3 - 1 = 2 => nums[2] == negative value, so it
 		means that value 3 does already exist in the array nums. If it's
-		already negative, we don't want to change it back to a positive number.
+		already negative, we don't want to change it back to a positive number,
+		because, remember, 3 does appear in our array and we still want to know
+		in Constant time O(1), that 3 exists in this array nums.
 
-		
+	
+	So, for our 3rd loop, we're actually going to be iterating not through the
+	Input array nums, but through:
+		[1, ..., nums.size()]        // Not [1, ..., nums.size() + 1]
+	So that's also O(n).
 
+	Modified Input array:
+	        nums = [3, 0, -6, 3]
+	
+	Loop i [1 ... nums.size()] // Inclusive both sides
+
+	Is nums[i] a NEGATIVE value? No.
+		If (Yes) then that means that:
+			value: (i + 1) exist in the Input array, so we continue
+			iterating with n.
+
+		Else // (No) then we've found our Solution
+			return i + 1
+
+	Loop:
+		for n from [1..n]
+		I)
+			n = 1
+			i = n - 1 = 1 - 1 = 0
+
+			Is nums[0] a NEGATIVE value? No!
+				If (No) then we've found our Solution
+					return i + 1
+
+			It means that (i + 1) is the smallest positive integer that is
+			absent in out Input array, thus we're returning it.
+
+
+
+	There's one edge case:
+	        nums = [3, 0, -6, 3]
+	
+	Notice how -6 was originally 6, but we've changed it to -6, because we
+	still wanted to know which value was originally stored. But we also wanted
+	it negative so that we could see if 3 existed in our Input array.
+
+	But the Question is - What if the value that we're changing to a negative
+	value, to indicated that certain number does appear in the Input array, was
+	0?
+
+	What if we had:
+	        nums = [3, 0, -6, 3, 2]
+	
+	We would have to mark that 2 does appear in the Input array. But once we
+	try to invert a number on index 1(2 - 1), then we would try to invert a 0.
+
+	What do we do in that case?
+
+	Can we change it to a, say, -1? No! We can't do that because that would,
+	again, make a difference on the end result, which is forbidden.
+
+	We would eventually take abs(-1) which is 1 and at index[1] and thus we
+	would assume that value of 1 exists in the Input array, which is NOT true.
+	Originally, there never existed a positive 1 in the original Input array
+	they gave to us.
+
+	So we can't do that since it would change the Solution of the given
+	example, which is absurd.
+
+	So, then... How do we get around this?
+	We have to change it to a negative value that DOES NOT affect the Solution.
+
+	Remember THE SOLUTION SET COULD ONLY BE form this Set:
+		{1, 2, ..., nums.size() + 1}
+	
+	So if we change it to, say, -(nums.size() + 1), then we're not changing the
+	Solution Set.
+
+	Well, technically, abs(-(nums.size() + 1)) could exist in the Solution Set,
+	but indexing it would be Out of Bounds:
+		abs(-(nums.size() + 1)) = (nums.size() + 1) - 1 = nums.size() =>
+		=> nums[nums.size()] Out of Bounds.
+	
+	So that is a good default value to give it.
+
+	**********************
+	*** Maybe we could ***
+	**********************
+	For the edge case where the original value is 0, in addition to setting
+	something out of bounds, could we also just set it to the actual value its
+	representing?
+	Example:
+		when 2 exists in [-1 , 0, ... ], could we set it to -2?
+		That way we dont change the values in our input array since 2 is marked
+		as existing already at some other place.]
+	
+	We could, but maybe it would be more confusing for reading.
+
+	So I'm going to leave it like this.
 
 */
 
