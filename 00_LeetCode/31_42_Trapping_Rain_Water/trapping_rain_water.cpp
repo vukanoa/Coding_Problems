@@ -29,10 +29,36 @@
 	==========================================================================
 
 	--- Example 1 ---
+        ^
+        |
+        |
+        |
+        |
+        |                 |
+        |       |```````| |```|
+        |   |```| |   | | | | | |
+        ---------------------------------
+          0 1 0 2 1 0 1 3 2 1 2 1
+
+	                  0  1  2  3  4  5  6  7  8  9 10 11
 	Input:  height = [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]
 	Output: 6
 
+
+
+
 	--- Example 2 ---
+        ^
+        |
+        |
+        |           |
+        | |`````````|
+        | |     |   |
+        | | |   | | |
+        | | |   | | |
+        ---------------------------------
+          4 2 0 3 2 5
+
 	Input:  height = [4, 2, 0, 3, 2, 5]
 	Output: 9
 
@@ -69,9 +95,10 @@
 		total_amount_of_water += min_max;
 
 	The key takeaway from here is that every iteration we are just calculating
-	the number of "squares" of water juct above the current block. Even if
+	the number of "squares" of water just above the current block. Even if
 	that means that "it cannot be like that". We will see in subsequent
-	iterations that the range will "close", therefore the rain will be trapped.
+	iterations that the range will "close", therefore the rain will be trapped
+	and redundant part will be ignored.
 
 
 	============
@@ -149,7 +176,7 @@
 
 */
 
-
+// TLE
 /* Time  Complexity: O(n^2) */
 /* Space Complexity: O(1) */
 class Solution_brute{
@@ -193,6 +220,9 @@ public:
 
 
 
+/* Time  Beats: 86.9% */
+/* Space Beats: 27.8% */
+
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
 class Solution_dp{
@@ -225,6 +255,8 @@ public:
 };
 
 
+/* Time  Beats: 78.91% */
+/* Space Beats: 38.74% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
@@ -266,6 +298,9 @@ public:
 };
 
 
+
+/* Time  Beats: 46.73% */
+/* Space Beats: 97.61% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -312,7 +347,6 @@ public:
 };
 
 
-
 int
 main()
 {
@@ -320,17 +354,109 @@ main()
 	// Solution_dp sol_dp;
 	// Solution_stack sol_stack;
 	Solution_two_pointers sol_two_pointers;
+	/*
+		Compact:
+
+        ^
+        |
+        |
+        |
+        |
+        |         |
+        |    |```||`|
+        |  |`|| ||||||
+        ----------------------
+
+	*/
 
 	/* Example 1 */
-	std::vector<int> height = {0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1};
+	/*
+		Wide: (There is 1 <Space> on the x axis)
+
+        ^
+        |
+        |
+        |
+        |
+        |                 |
+        |       |```````| |```|
+        |   |```| |   | | | | | |
+        ---------------------------------
+          0 1 0 2 1 0 1 3 2 1 2 1
+
+        ^
+        |
+        |
+        |
+        |
+        |                 |
+        |       |`2`3`5`| |`6`|
+        |   |`1`| | 4 | | | | | |
+        ---------------------------------
+          0 1 0 2 1 0 1 3 2 1 2 1
+
+		  Result: 6
+		  Going from left to right: 
+		  From bar height - bar height There is x squares of water
+		  From     1      -      2     There is 1
+		  From     2      -      3     There is 4
+		  From     2      -      2     There is 1
+
+	*/
+	// std::vector<int> height = {0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1};
 
 	/* Example 2 */
-	// std::vector<int> height = {4, 2, 0, 3, 2, 5};
+	/*
+		Compact:
+        ^
+        |
+        |
+        |     |
+        ||````|
+        ||  | |
+        ||| |||
+        ||| |||
+        ------------
+         420325
+
+
+		Wide: (There is 1 <Space> on the x axis)
+
+        ^
+        |
+        |
+        |           |
+        | |`````````|
+        | |     |   |
+        | | |   | | |
+        | | |   | | |
+        ---------------------------------
+          4 2 0 3 2 5
+
+        ^
+        |
+        |
+        |           |
+        | |`1`3`7`8`|
+        | | 2 4 | 9 |
+        | | | 5 | | |
+        | | | 6 | | |
+        ---------------------------------
+          4 2 0 3 2 5
+
+		  Result: 9
+		  Going from left to right: 
+		  From bar height - bar height There is x squares of water
+		  From     4      -      5     There is 9
+
+	*/
+	std::vector<int> height = {4, 2, 0, 3, 2, 5};
 
 	std::cout << "\n\t===========================";
 	std::cout << "\n\t=== TRAPPING RAIN WATER ===";
-	std::cout << "\n\t===========================\n\n";
+	std::cout << "\n\t===========================\n";
 
+	/* Write Input */
 	bool first = true;
 	std::cout << "\n\tHeights: [";
 	for (auto x: height)
@@ -343,11 +469,13 @@ main()
 	}
 	std::cout << "]\n";
 
+	/* Solution */
 	// int total = sol_brute.trap(height);
 	// int total = sol_dp.trap(height);
 	// int total = sol_stack.trap(height);
 	int total = sol_two_pointers.trap(height);
 
+	/* Write Output */
 	std::cout << "\n\tTotal: " << total << "\n\n";
 
 
