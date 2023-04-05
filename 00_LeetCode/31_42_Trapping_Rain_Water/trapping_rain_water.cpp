@@ -75,32 +75,6 @@
 	--- IDEA ---
 	------------
 
-	==============
-	=== O(n^2) ===
-	==============
-	(Brute Force)
-
-	total_amount_of_water = 0;
-
-	Iterating through an entire array and for each element find:
-	1. Its left max  (including itself)
-		left_max = std::max(left_max, height[i])
-	2. Its right max (including itself)
-		right_max = std::max(right_max, height[i])
-
-
-	min_max = std::min(left_max, right_max);
-
-	if (min_max - height[i] > 0)
-		total_amount_of_water += min_max;
-
-	The key takeaway from here is that every iteration we are just calculating
-	the number of "squares" of water just above the current block. Even if
-	that means that "it cannot be like that". We will see in subsequent
-	iterations that the range will "close", therefore the rain will be trapped
-	and redundant part will be ignored.
-
-
 	============
 	=== O(n) ===
 	============
@@ -175,49 +149,6 @@
 		while (left < right)
 
 */
-
-// TLE
-/* Time  Complexity: O(n^2) */
-/* Space Complexity: O(1) */
-class Solution_brute{
-public:
-	int trap(std::vector<int>& height)
-	{
-		// Since the very left "margin" (coordinate system) cannot hold water
-		if (height.size() < 3)
-			return 0;
-
-		int left_max  = INT_MIN;
-		int right_max = INT_MIN;
-
-		int total = 0;
-
-		for (int i = 0; i < height.size(); i++)
-		{
-			left_max = height[i];
-			for (int j = i; j >= 0; j--)
-			{
-				if (height[j] > left_max)
-					left_max = height[j];
-			}
-
-			right_max = height[i];
-			for (int j = i; j < height.size(); j++)
-			{
-				if (height[j] > right_max)
-					right_max = height[j];
-			}
-
-			int min_max = std::min(left_max, right_max);
-
-			if (min_max - height[i] > 0)
-				total += min_max - height[i];
-		}
-
-		return total;
-	}
-};
-
 
 
 /* Time  Beats: 86.9% */
