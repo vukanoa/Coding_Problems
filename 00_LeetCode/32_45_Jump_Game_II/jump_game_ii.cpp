@@ -19,8 +19,8 @@
 	initially positioned at "nums[0]".
 
 	Each element "nums[i]" represents the maximum length of a forward jump from
-	index "i". In other words, if you are at "nums[i]", you can jump to any
-	"nums[i + j] where:
+	index "i". In other words, if you are at nums[i], you can jump to any
+	nums[i + j] where:
 		0 <= j <= nums[i]
 			and
 		i + j < n
@@ -123,6 +123,8 @@
 */
 
 
+/* Time  Beats: 94.84% */
+/* Space Beats: 83.18% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -185,8 +187,10 @@ main()
 
 	std::cout << "\n\t====================";
 	std::cout << "\n\t=== JUMP GAME II ===";
-	std::cout << "\n\t====================\n\n";
+	std::cout << "\n\t====================\n";
 
+
+	/* Write Input */
 	bool first = true;
 	std::cout << "\n\tArray: [";
 	for (auto x: nums)
@@ -199,9 +203,12 @@ main()
 	}
 	std::cout << "]\n";
 
+
 	/* Solution */
 	int output = sol.jump(nums);
 
+	
+	/* Write Output */
 	std::cout << "\n\tOutput: " << output << "\n\n";
 
 	return 0;
