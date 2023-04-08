@@ -63,13 +63,13 @@
 	- We begin from permutation:
 	  A = {A[0] A[1] ... A[n - 1]}
 
-	- Find biggest "left" (0 <= left < n - 1)
-	  so that A[left] < A[left + 1]
+	- Find the biggest index "left" (0 <= left < n - 1)
+	  such that A[left] < A[left + 1]
 
-	- Find biggest "right" (right > left && right <= n - 1)
-	  so that A[right] > A[left]
+	- Find the biggest index "right" (left < right && right <= n - 1)
+	  such that A[left] < A[right]
 
-	- Swap A[right] and A[left]
+	- Swap A[left] and A[right]
 
 	- Reverse the order of elements
 	  A[left + 1] A[left + 2] ... A[n - 1]
@@ -97,9 +97,14 @@
 
 	1 3 2 4 5 --> 1 3 2 5 | 4 --> 1 3 2 5 4
 	      ^ #
+	...
+
 */
 
 
+
+/* Time  Beats: 100% */
+/* Space Beats: 30.17% */
 
 /* Time  Complexity: O(n!) */
 /* Space Complexity: O(1) */
@@ -109,16 +114,16 @@ public:
 	{
 		int n = nums.size();
 
-		int* first = &nums[0];
-		int* last  = &nums[n - 1];
+		int first = 0;
+		int last  = n - 1;
 
-		int* left  = last - 1;
-		int* right = last;
+		int left  = last - 1;
+		int right = last;
 
 		// Find the largest "left" so that nums[left] < nums[left + 1]
 		while (left > first)
 		{
-			if (*(left) < *(left + 1))
+			if (nums[left] < nums[left + 1])
 				break;
 
 			left--;
@@ -128,31 +133,31 @@ public:
 		   If no nums[left] < nums[left + 1], "nums" is the last permutation
 		   in lexicographic order
 		 */
-		if (*(left) > *(left + 1))
+		if (nums[left] > nums[left + 1])
 			return 0;
 
 		// Find largest "right" so that nums[left] < nums[right]
-		while (right > left)
+		while (left < right)
 		{
-			if (*(right) > *(left))
+			if (nums[left] < nums[right])
 				break;
 
 			right--;
 		}
 
 		// Swap nums[right] and nums[left]
-		int tmp = *left;
-		*left = *right;
-		*right = tmp;
+		int tmp     = nums[left];
+		nums[left]  = nums[right];
+		nums[right] = tmp;
 
 		// Reverse the remaining nums[left + 1] ... nums[n - 1]
 		first = left + 1;
 
 		while (first < last)
 		{
-			tmp = *first;
-			*first = *last;
-			*last = tmp;
+			tmp         = nums[first];
+			nums[first] = nums[last];
+			nums[last]  = tmp;
 
 			first++;
 			last--;
@@ -164,6 +169,8 @@ public:
 	std::vector<std::vector<int>> permute(std::vector<int>& nums)
 	{
 		std::vector<std::vector<int>> results;
+
+		/* Base case */
 		if (nums.size() == 1)
 		{
 			results.push_back(nums);
@@ -171,7 +178,10 @@ public:
 			return results;
 		}
 
+		/* Sort */
 		std::sort(nums.begin(), nums.end());
+
+		/* Push the current permutation and permute nums again */
 		do
 		{
 			std::vector<int> vec_tmp;
@@ -248,7 +258,6 @@ main()
 		first = false;
 	}
 	std::cout << "]\n\n";
-
 
 	return 0;
 }
