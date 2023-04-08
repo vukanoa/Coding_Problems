@@ -44,6 +44,7 @@
 	-1000 <= matrix[i][j] <= 1000
 */
 
+
 /*
 	------------
 	--- IDEA ---
@@ -103,6 +104,9 @@
 */
 
 
+/* Time  Beats: 100% */
+/* Space Beats: 94.26% */
+
 /* Time  Complexity: O(n^2) */
 /* Space Complexity: O(1) */
 class Solution{
@@ -119,7 +123,8 @@ public:
 
 			while (y < (n - 1 - i))
 			{
-				int counter = 3;
+				int counter = 3; // Because it's always a square
+
 				while (counter--)
 				{
 					switch(counter)
@@ -177,12 +182,17 @@ main()
 	std::cout << "\n\t=== ROTATE IMAGE ===";
 	std::cout << "\n\t====================\n";
 
+
+	/* Write Input */
 	std::cout << "\n\tOriginal Matrix:";
 	print_matrix(matrix);
+
 
 	/* Solution */
 	sol.rotate(matrix);
 
+
+	/* Write Output */
 	std::cout << "\n\tRotated Matrix:";
 	print_matrix(matrix);
 
