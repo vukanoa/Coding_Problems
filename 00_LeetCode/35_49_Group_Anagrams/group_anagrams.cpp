@@ -20,7 +20,7 @@
 	Given an array of strings 'strs', group the anagrams together. You can
 	return the answer in any order.
 
-	An Anagram is a wrod or phrase formed by rearranging the letters of a
+	An Anagram is a word or phrase formed by rearranging the letters of a
 	different word or phrase, typically using all the original letters exactly
 	once.
 
@@ -53,6 +53,26 @@
 
 
 /*
+
+	**************************************************************************
+	***************************** IMPORTANT NOTE *****************************
+	**************************************************************************
+
+	Theoretical Time Complexity is better in 2nd Solution, however due to many
+	optimizations of C++, in practice, 1st code runs faster on Leetcode.
+
+	There are various factors for that. One thing is that when we're using a
+	small to mid sized array, it's better to use vector.
+
+	Also, sort() is highly highly optimized, and thus, for these small examples
+	it works faster than going each time(i.e. for each string) through 26
+	characters and incrementing values of correct letters.
+
+	But, overall, Time Complexity of 2nd Solution is indeed better.
+*/
+
+
+/*
 	------------
 	--- IDEA ---
 	------------
@@ -63,6 +83,9 @@
 	original strings(in a vector) as "values"
 */
 
+
+/* Time  Beats: 86.53% */
+/* Space Beats: 82.3% */
 
 /* Time  Complexity: O(n * k * logk)
    Where 'n' is the length of "strs", and 'k' is the maximum length of a string
@@ -115,6 +138,9 @@ public:
 */
 
 
+/* Time  Beats: 60.19% */
+/* Space Beats: 24.28% */
+
 /* Time  Complexity: O(n * k)
    Where 'n' is the length of "strs", and 'k' is the maximum length of a string
    in "strs". Counting each string is linear in the size of the string, and we
@@ -131,11 +157,11 @@ public:
 
 		int counter[26];
 
-		for (std::string& str : strs)
+		for (const std::string& str : strs)
 		{
 			memset(counter, 0, sizeof(counter));
 
-			for (char c : str)
+			for (const char& c : str)
 				counter[c - 'a']++;
 
 			std::string key;
@@ -184,6 +210,7 @@ main()
 	std::cout << "\n\t=== GROUP ANAGRAMS ===";
 	std::cout << "\n\t======================\n";
 
+
 	/* Write Input */
 	bool first = true;
 	std::cout << "\n\tCandidates: [";
@@ -197,9 +224,11 @@ main()
 	}
 	std::cout << "]\n";
 
+
 	/* Solution */
 	// std::vector<std::vector<std::string>> results = sol.groupAnagrams(strs);
 	std::vector<std::vector<std::string>> results = sol_improved.groupAnagrams(strs);
+
 
 	/* Write Output */
 	first = true;
@@ -227,3 +256,5 @@ main()
 
 	return 0;
 }
+
+
