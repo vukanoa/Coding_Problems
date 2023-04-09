@@ -85,7 +85,7 @@
 	of a problem. In that case we should return the array in ascending order.
 	That is we should completely reverse the current array.
 
-	Note: We're not coverint the base case separately. It's only that after the
+	Note: We're not covering the base case separately. It's only that after the
 	first while loop, 'i' is less than 0 and thus the whole vector will be
 	reversed.
 
@@ -96,13 +96,13 @@
 	Start 'i' from the second element from the back, so that it has only 1
 	element to the right.
 
-		While num[i] > num[i + 1]
+		while (i >= 0 && nums[i] >= nums[i + 1])
 			i--
 
 	Once we're on index 'i' where nums[i] < nums[i + 1] then assign 'j' to
 	point to the very last element and then:
 
-		while (nums[j] <= nums[i])
+		while (nums[i] >= nums[j])
 			j--
 
 		swap(nums, i, j)
