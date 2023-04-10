@@ -235,7 +235,7 @@ public:
 	In a binary search we have:
 		- Left  pointer
 		- Mid   pointer
-		- Right pointero
+		- Right pointer
 	
 	The left is always going to be <= right, since we can have a single element
 	in the entire array and thus this will cover that case too.
@@ -271,7 +271,7 @@ public:
            ^            ^
 these two _|            |
                         |
-	and             |
+    and                 |
                         |
 these three ____________|
 		 
@@ -338,7 +338,7 @@ It's here:
 	And let's say that somehow we knew that we're in the Right sorted portion
 	of the array.
 
-	What if out target was less than 1?
+	What if our target was less than 1?
 	Well then we know we have to search the only left value that is less than
 	1, which is 0.
 
@@ -358,7 +358,7 @@ It's here:
 	
 	So where do we go?
 	Again, we can use this right most value, or the edge basically of our
-	array, to out advantage.
+	array, to our advantage.
 
 	So if our target is greater than 1 and it's also greater than 2, then that
 	means that we have to search this Left portion.
@@ -482,7 +482,8 @@ main()
 		std::cout << x;
 		first = false;
 	}
-	std::cout << "]\n";
+	std::cout << "]";
+	std::cout << "\n\tTarget: " << target << "\n";
 
 
 	/* Solution */
@@ -491,7 +492,7 @@ main()
 
 
 	/* Write Output */
-	std::cout << "\n\tIndex od solution is: " << index << "\n\n";
+	std::cout << "\n\tIndex of target is: " << index << "\n\n";
 
 	return 0;
 }
