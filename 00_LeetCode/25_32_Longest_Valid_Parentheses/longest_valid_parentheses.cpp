@@ -68,7 +68,7 @@
 
 	Thus, we update the dp array only when ')' is encountered.
 
-	To fill dp array we will check every two consecutive characters of the
+	To fill the dp array we will check every two consecutive characters of the
 	string and if:
 		1. s[i] == ')' and s[i - 1] == '(', i.e. string looks like "...()" then
 			dp[i] = dp[i - 2] + 2;
@@ -92,8 +92,51 @@
 			be '(', we update the dp[i] as an addition of 2 in the length of
 			this substring which is dp[i - 1].
 
-			To this, we also add the length of the valid substring just before
-			the term "(,sub_s,)", i.e. dp[i - dp[i - 1] - 2]
+                     dp [ . . x 0 0 . . . y ? ]
+                        " . . . ( ( . . . ) ) "
+                                ^ ^       ^ ^
+                                | |       | |_____ s[i]
+s[i - dp[i - 1] - 1] ___________| |       |
+                                  |       |
+s[i - dp[i - 1]] _________________|       |
+                                          |
+                                          |
+s[i - 1] _________________________________|
+
+			What does dp[i - 1] represent?
+			Also, what do 'x', 'y' values, in the dp array, represent?
+
+			Since every '(' has a value of 0 in the corresponding dp array,
+			if s[i - 1] is ')' then dp[i - 1] represents the longest valid
+			length of parentheses.
+
+			Example:
+			     0 1 2 3 4 5 6 7 8 9
+			dp [ 0 0 2 0 0 0 0 2 4 ? ]
+			s  " ) ( ) ) ( ( ( ) ) ) "
+			                       i
+
+			if s[i] == ')' && s[i - 1] == ')'
+				if s[i - dp[i - 1] - 1]) == '('
+					dp[i] = dp[i - 1] + dp[i - dp[i - 1] - 2] + 2;
+
+			Thus, dp[i] = 4 + 0 + 2 = 6
+
+			dp[i] = dp[i - 2] + 2 is explained above.
+			It's equivalent idea to:
+				dp[i] = dp[i - 1] + dp[i - dp[i - 1] - 2] + 2
+
+			dp[i - dp[i - 1] - 2] + 2
+			We have to add to this, since at s[i - dp[i - 1] - 2] could be a
+			')' which is a part of a valid substring. Say "()".
+			In that case we need to add our current substring to that number
+			since it is contiguous valid substring of parentheses.
+
+			And what about 'x' and 'y'?
+
+			'x' is dp[i - dp[i - 1] - 2]
+			'y' is dp[i - 1]
+
 
 */
 
@@ -110,6 +153,16 @@ public:
 	{
 		int longest = 0;
 
+		/*
+		   Could've used a vector, however, using a plain array gives a better
+		   Space Complexity.
+		   Vectors use dynamic memory allocation to manage their sotrage.
+		   The "std::vector" object requires additional space to store its
+		   internal state, such as the size of the vector, the capacity of the
+		   allocated storage, and a pointer to the dynamically allocated
+		   memory.
+		   Time Complexity is unchanged.
+		*/
 		int dp[s.length()];
 		for (int i = 0; i < s.length(); i++)
 			dp[i] = 0;
@@ -203,10 +256,10 @@ main()
 	Solution_stack sol_stack;
 
 	/* Example 1 */
-	std::string s = "(()";
+	// std::string s = "(()";
 
 	/* Example 2 */
-	// std::string s = ")()())";
+	std::string s = ")()())";
 
 	/* Example 3 */
 	// std::string s = "";
@@ -221,12 +274,15 @@ main()
 	std::cout << "\n\t=== LONGEST VALID PARENTHESES ===";
 	std::cout << "\n\t=================================\n";
 
+
 	/* Write Input */
 	std::cout << "\n\tString: \"" << s << "\"\n";
+
 
 	/* Solution */
 	// int output = sol_dp.longestValidParentheses(s);
 	int output = sol_stack.longestValidParentheses(s);
+
 
 	/* Write Output */
 	std::cout << "\n\tLongest Valid parentheses: " << output << "\n\n";
