@@ -162,15 +162,25 @@
 	and replace every negative number with 0.
 
 	Why 0?
-	Well, because 0 is also a USELESS number in the Input array. If we were to
-	replace it with, say, 1 that wouldn't not be correct since we would change
-	the Input array in the way that matters and that could give us different
-	result in the end. Which is, obviously, forbidden.
+	Well, because 0 is also a USELESS number in the Input array and it's not a
+	negative number, which we will use.
+	If we were to replace it with, say, 1 that wouldn't not be correct since we
+	would change the Input array in the way that matters and that could give us
+	different result in the end. Which is, obviously, forbidden.
+	And we, obviously, cannot leave a negative value since that would mix with
+	the indicators we're trying to devise to help us solve this problem.
+
+	So we only have two options:
+		1) 0's
+		2) Positive Integers
+	
+	Since positive integers would change the end result, 0's are the only
+	option.
 
 	Look at our example:
 		nums = [3, -3, 6, 3]
 	if we were to change negative values to, say, 1
-		nums = [3, -3, 6, 3]
+		nums = [3, 1, 6, 3]
 	
 	Now the smallest wouldn't be 1, but 2. Which shows that we would change the
 	end result of a given example of that specific Input array which isn't
@@ -179,7 +189,7 @@
 	Anyway, after we "scan" through the array and replace it with 0's, we're
 	actually going to have to "scan" 2 more times.
 
-	So it's going to be O(3 * n), but that still O(n). And since we're using
+	So it's going to be O(3 * n), but that's still O(n). And since we're using
 	Input array as the "extra memory", that makes Space Complexity O(1), which
 	is exactly what is required.
 
@@ -192,7 +202,7 @@
 		x = nums[i] - 1
 		Mark nums[x] to a negative value of that number if it's not 0 or
 		negative value, since we're going to have negative values again because
-		in this iteration we're the ones that are going to make it, but they
+		in this iteration we're the ones that are going to make them, but they
 		will represent something else and they won't be useless.
 		(Remember that we changed this Input array to have 0's in the place
 		where negative numbers existed)
@@ -300,7 +310,7 @@
 	So, then... How do we get around this?
 	We have to change it to a negative value that DOES NOT affect the Solution.
 
-	Remember THE SOLUTION SET COULD ONLY BE form this Set:
+	Remember THE SOLUTION SET COULD ONLY BE from this Set:
 		{1, 2, ..., nums.size() + 1}
 	
 	So if we change it to, say, -(nums.size() + 1), then we're not changing the
