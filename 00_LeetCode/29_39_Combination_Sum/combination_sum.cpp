@@ -105,8 +105,8 @@
 using std::vector; // Names would be way to long if I were to user std::vector everytime in this Problem
 
 
-/* Time  Beats: 29.40% */
-/* Space Beats: 34.11% */
+/* Time  Beats: 32.51% */
+/* Space Beats: 35.80% */
 
 /*
 	Time  Complexity: O(2^n)
