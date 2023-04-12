@@ -47,8 +47,51 @@
 */
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	We're trying to "fit" the Queen column by column, that's why we only need
+	to check if the current Queen attacks any:
+		1. Left upper    diagonal
+		2. Left(meaning the same row, but left)
+		3. Left downward diagonal
+	
+	If it doens't return false(false means it does indeed attack a Queen on
+	the board) then return true and place a Queen on that spot and continue
+	until we've placed all of the Queens on the board.
+
+	If at any point we figure out that at a certain row we're attacking any
+	Queen on the board - Backtrack and try some other "layout".
+	
+*/
+
+
+/* Time  Beats:   100% */
+/* Space Beats: 67.67% */
+
+/* Time  Complexity: O(n!) */
+/* Space Complexity: O(n^2) */
 class Solution{
 public:
+	std::vector<std::vector<std::string>>
+	solveNQueens(int n)
+	{
+		std::vector<std::vector<std::string>> results;
+		std::vector<std::string> board(n);
+
+		std::string str(n, '.');
+
+		for (int i = 0; i < n; i++)
+			board[i] = str;
+
+		backtracking(0, board, results, n);
+
+		return results;
+	}
+
+private:
 	bool not_attacking(int row, int col, std::vector<std::string>& board, int n)
 	{
 		int tmp_row = row;
@@ -113,23 +156,30 @@ public:
 			}
 		}
 	}
-
-	std::vector<std::vector<std::string>>
-	solveNQueens(int n)
-	{
-		std::vector<std::vector<std::string>> results;
-		std::vector<std::string> board(n);
-
-		std::string str(n, '.');
-
-		for (int i = 0; i < n; i++)
-			board[i] = str;
-
-		backtracking(0, board, results, n);
-
-		return results;
-	}
 };
+
+
+void
+print_queens(std::vector<std::vector<std::string>>& results, int n)
+{
+	for (int i = 0; i < results.size(); i++)
+	{
+		std::cout << "\n\t" << i+1 << ")";
+		for (int j = 0; j < n; j++)
+		{
+			std::cout << "\n\t\t";
+
+			for (int k = 0; k < n; k++)
+			{
+				std::cout << results[i][j][k] << " ";
+			}
+		}
+
+		std::cout << "\n\n\t";
+	}
+
+	std::cout << "\n";
+}
 
 
 int
@@ -145,11 +195,16 @@ main()
 
 	std::cout << "\n\t================";
 	std::cout << "\n\t=== N-QUEENS ===";
-	std::cout << "\n\t================\n\n";
+	std::cout << "\n\t================\n";
 
+
+	/* Write Input */
 	std::cout << "\n\tBoard: " << n << " x " << n << "\n";
 
+	
+	/* Solution */
 	std::vector<std::vector<std::string>> results = sol.solveNQueens(n);
+
 
 	/* Write Output */
 	bool first = true;
@@ -173,7 +228,11 @@ main()
 
 		first = false;
 	}
-	std::cout << "]\n\n";
+	std::cout << "]\n";
+
+	/* Print Queens on Board in ASCII */
+	print_queens(results, n);
+
 
 	return 0;
 }
