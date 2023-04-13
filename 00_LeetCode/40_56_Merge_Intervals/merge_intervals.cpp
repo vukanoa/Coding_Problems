@@ -51,10 +51,9 @@
 	------------
 
 	Since intervals can be unsorted inside "intervals" vector(but 0th one is
-	always smaller than 1st within the interval itself).
-
-	So we make a "indexes" array which sorts initial indexes of intervals
-	by every interval's first element(the smaller one).
+	always smaller than 1st within the interval itself) we make a "indexes"
+	array which sorts initial indexes of intervals by every interval's first
+	element(the smaller one).
 
 	We iterate until we get to "n - 2nd" element since we are always checking
 	one interval next to the current.
@@ -78,12 +77,48 @@
 	However if certain interval don't overlap with its very next, just push
 	that whole interval in the results vector.
 
+	
+	************************
+	*** LAMBDA EXPLAINED ***
+	************************
+	std::sort(indexes, indexes + n, [&](int n1, int n2){ return intervals[n1][0] < intervals[n2][0]; });
+
+	This line uses the 'std::sort' function to sort the "indexes" array based
+	on the values of the first element of the subarrays in the "intervals"
+	vector.
+
+	The 'std::sort' function takes three arguments:
+		
+		1. The beginning of the array to sort(in this case, "indexes").
+		
+		2. One past the end of the array to sort(in this case, "indexes + n")
+
+		3. A function object that compares two elements of the array and
+		   returns 'true' if the first element should come before the second
+		   element in the sorted array.
+
+		The third argument is a lambda function that takes two integer
+		arguments "n1" and "n2" representing indices into the "intervals"
+		vector. The lambda function compares the first element of the subarray
+		at index "n1" is less than the first element of the subarray at index
+		"n2", the lambda function returns "true", indicating that "n1" should
+		come before "n2" in the sorted array.
+
+		By sorting the "indexes" array based on the values of the first element
+		of the subarrays in the "intervals" vector, we can loop through the
+		"indexes" array and access the corresponding subarrays in the
+		"intervals" vector in sorted order of their start times. This makes it
+		easier to merge overlapping intervals.
+
+
 */
 
 
+/* Time  Beats: 97.66% */
+/* Space Beats: 50.77% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n)        */
 class Solution{
 public:
 	std::vector<std::vector<int>> merge(std::vector<std::vector<int>>& intervals)
@@ -141,6 +176,7 @@ public:
 	}
 };
 
+
 int
 main()
 {
@@ -181,7 +217,7 @@ main()
 	std::cout << "\n\t=======================\n\n";
 
 
-	/* Write Output */
+	/* Write Input */
 	bool first = true;
 	std::cout << "\n\tIntervals: [";
 	for (auto x: intervals)
@@ -206,8 +242,11 @@ main()
 	std::cout << "]\n\n";
 
 
+	/* Solution */
 	std::vector<std::vector<int>> results = sol.merge(intervals);
 
+	
+	/* Write Output */
 	first = true;
 	std::cout << "\n\tIntervals: [";
 	for (auto x: results)
@@ -230,6 +269,7 @@ main()
 		first = false;
 	}
 	std::cout << "]\n\n";
+
 
 	return 0;
 }
