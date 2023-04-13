@@ -110,6 +110,9 @@
 */
 
 
+/* Time  Beats: 100% */
+/* Space Beats: 34.40% */
+
 /* Time  Complexity: O(n^2) */
 /* Space Complexity: O(n * m) */
 class Solution{
@@ -199,6 +202,7 @@ public:
 
 
 
+
 /*
 	------------
 	--- IDEA ---
@@ -270,6 +274,11 @@ public:
 */
 
 
+/* Time  Beats: 100% */
+/* Space Beats: 74.41% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(n * m) */
 class Solution_improved{
 public:
 	std::vector<int> spiralOrder(std::vector<std::vector<int>>& matrix)
@@ -364,10 +373,16 @@ main()
 	std::cout << "\n\t=====================\n\n";
 
 
+	/* Write Input */
 	print_matrix(matrix);
+
+
+	/* Solution */
 	// std::vector<int> order = sol.spiralOrder(matrix);
 	std::vector<int> order = sol_improved.spiralOrder(matrix);
 
+
+	/* Write Output */
 	std::cout << "\n\tSpiral order:\n\t\t ";
 	for(const auto& x : order)
 		std::cout << x << " ";
