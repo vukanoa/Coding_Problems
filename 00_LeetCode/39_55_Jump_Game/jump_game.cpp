@@ -57,7 +57,7 @@
 
 	Consider this Example:
 	[2, 3, 1, 1, 2, 4, 1, 2, 1, 3]
-     0  1  2  3  4  5  6  7  8  9
+	 0  1  2  3  4  5  6  7  8  9
 
 	We begin by putting both "start" and "end" variables at 0.
 
@@ -80,6 +80,9 @@
 
 */
 
+
+/* Time  Beats: 99.94% */
+/* Space Beats: 51.60% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -141,9 +144,10 @@ main()
 
 	std::cout << "\n\t=================";
 	std::cout << "\n\t=== JUMP GAME ===";
-	std::cout << "\n\t=================\n\n";
+	std::cout << "\n\t=================\n";
 
 
+	/* Write Input */
 	bool first = true;
 	std::cout << "\n\tArray: [";
 	for (auto x: nums)
@@ -156,10 +160,16 @@ main()
 	}
 	std::cout << "]\n";
 
-	if (sol.canJump(nums))
-		std::cout << "\n\tOutput: Possible to reach the very last element!";
+
+	/* Solution */
+	bool possible = sol.canJump(nums);
+
+
+	/* Write Output */
+	if (possible)
+		std::cout << "\n\tOutput: POSSIBLE to reach the very last element!";
 	else
-		std::cout << "\n\tOutput: Impossible to reach the very last element!";
+		std::cout << "\n\tOutput: IMPOSSIBLE to reach the very last element!";
 
 	std::cout << "\n\n";
 
