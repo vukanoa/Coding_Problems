@@ -75,6 +75,9 @@
 */
 
 
+/* Time  Beats: 94.91% */
+/* Space Beats: 29.52% */
+
 /* Time  Complexity: O(m * n) */
 /* Space Complexity: O(m * n) */
 class Solution {
@@ -94,9 +97,9 @@ public:
 
                 if (i > 0 && j > 0)
                     dp[i][j] += std::min(dp[i - 1][j], dp[i][j - 1]);
-                else if (i > 0 && j == 0)
+                else if (i > 0 && j == 0)     // 0-th Column
                     dp[i][j] += dp[i - 1][j];
-                else if (i == 0 && j > 0)
+                else if (i == 0 && j > 0)     // 0-th Row
                     dp[i][j] += dp[i][j - 1];
             }
         }
@@ -139,12 +142,18 @@ main()
 	std::cout << "\n\t=== MINIMUM PATH SUM ===";
 	std::cout << "\n\t========================\n\n";
 
+
+	/* Write Input */
 	print_matrix(grid);
+
 
 	/* Solution */
 	int result = sol.minPathSum(grid);
 
+
+	/* Write Output */
 	std::cout << "\n\tMinimum Path Sum: " << result << "\n\n";
+
 
 	return 0;
 }
