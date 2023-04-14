@@ -97,6 +97,9 @@
 */
 
 
+/* Time  Beats: 100%   */
+/* Space Beats: 77.44% */
+
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
 class Solution{
@@ -116,16 +119,42 @@ public:
 };
 
 
+void
+print_stairs(int n)
+{
+	std::cout << "\n\tStairs:\n";
+	for (int i = n-1; i >= 0; i--)
+	{
+		// Horizontal part
+		std::cout << "\t";
+		int tmp = i;
+		while (tmp--)
+			std::cout << "   ";
+
+		std::cout << "---\n";
+
+		// Vertical part
+		std::cout << "\t";
+		tmp = i;
+		while (tmp--)
+			std::cout << "   ";
+
+		std::cout << "|\n";
+	}
+	std::cout << "\n";
+}
+
+
 int
 main()
 {
 	Solution sol;
 
 	/* Example 1 */
-	int n = 2;
+	// int n = 2;
 
 	/* Example 2 */
-	// int n = 3;
+	 int n = 3;
 
 	/* Example 3 */
 	// int n = 4;
@@ -146,8 +175,18 @@ main()
 	std::cout << "\n\t=== CLIMBING STAIRS ===";
 	std::cout << "\n\t=======================\n";
 
+	/* Write Input */
 	std::cout << "\n\tN = " << n << "\n";
-	std::cout << "\n\tTotal ways: " << sol.climbStairs(n) << "\n\n";
+	print_stairs(n);
+
+	
+	/* Solution */
+	int ways = sol.climbStairs(n);
+
+
+	/* Write Output */
+	std::cout << "\n\tTotal ways: " << ways << "\n\n";
+
 
 	return 0;
 }
