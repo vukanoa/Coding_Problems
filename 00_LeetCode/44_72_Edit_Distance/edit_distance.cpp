@@ -1,9 +1,6 @@
 #include <iostream>
 #include <vector>
 
-void print_matrix(std::vector<std::vector<int>>& matrix);
-
-
 /*
 	============
 	=== HARD ===
@@ -101,7 +98,7 @@ void print_matrix(std::vector<std::vector<int>>& matrix);
 
 	Word_1[0, 5] -> Word_2[0, 5]
 	"benyam"        "ephrem"
-          ^               ^
+	      ^               ^
 
 	Imagine that we're trying to transform a substring "benyam" into "ephrem".
 
@@ -119,8 +116,8 @@ void print_matrix(std::vector<std::vector<int>>& matrix);
 	The 'm' characeters are the SAME. They will NOT contribute to our edit
 	distance because they are the same thing.
 
-	Therefore we do NOT have to take an action.
-	No operations happens, no comparison happens. We do NOTHING.
+	Therefore we do not have to take an action.
+	No operations happens, no comparison happens. We do nothing.
 
 	Answer to this problem:
 		Word_1[0, 5] -> Word_2[0, 5]
@@ -137,7 +134,7 @@ void print_matrix(std::vector<std::vector<int>>& matrix);
 	"beny"           "eph"
 	    ^               ^
 
-	We're interestedin the LAST character. In this case 'y' does NOT match 'h'.
+	We're interested in the LAST character. In this case 'y' does NOT match 'h'
 	We have 3 options:
 		1. Replace
 		2. Insert
@@ -146,7 +143,7 @@ void print_matrix(std::vector<std::vector<int>>& matrix);
 	Let's look it from this perspective.
 	We can transform:
 		Word_1[0, 2] -> Word_2[0, 1]
-	    "ben"           "ep"
+		"ben"           "ep"
 
 	We're taking one off of each of the substrings. Just look at the
 	subproblem:
@@ -171,15 +168,15 @@ void print_matrix(std::vector<std::vector<int>>& matrix);
 
 	Word_1[0, 3] -> Word_2[0, 2]
 	"beny"           "eph"
-		^               ^
+	    ^               ^
 
 	But now what we do is - We subtract one from Word_2 and then transform:
 		Word_1[0, 3] -> Word_2[0, 1]
 		"beny"           "ep"
 
-	So what we do is - We transform whole original string(subtring), into the
-	substring of the previous string(substring), which is "ep" and then after
-	that transformation I perform an insertion.
+	So what we do is - We transform whole original subtring, into the substring
+	of the previous substring, which is "ep" and then after that transformation
+	we perform an insertion.
 
 	We insert 'h' at the end of the transformation result "ep" and then we have
 	what we wanted.
@@ -194,7 +191,7 @@ void print_matrix(std::vector<std::vector<int>>& matrix);
 
 	Word_1[0, 3] -> Word_2[0, 2]
 	"beny"           "eph"
-		^               ^
+	    ^               ^
 
 	Let's try deletion. Let's tranform:
 		Word_1[0, 2] -> Word_2[0, 2]
@@ -273,12 +270,11 @@ void print_matrix(std::vector<std::vector<int>>& matrix);
 	Index 'i' is the substring we take from the original string Word_1.
 	Index 'j' is the substring we take from the orignal string Word_2.
 
-	So each of the cells represents us with cross-sections of substring,
+	So each of the cells represent us with cross-sections of substring,
 	finding the end distance for them and building up for our final answer at
 	'F' (dp[m][n]).
 
-
-	So first of all - If we need to transform an empty string into a any one of
+	So first of all - If we need to transform an empty string into any one of
 	Word_2 substring or the Word_2 itself
 
 	If I need to transform an empty string to "e"
@@ -310,13 +306,13 @@ void print_matrix(std::vector<std::vector<int>>& matrix);
 
 	Looking at this table, it's obvious now that the edit distance between
 	the empty string and a string "ep"(right above the X) is 2. That means
-	we have to do 2 Insertions. 'e' and a 'p'. That is the answer to our
+	we have to do 2 Insertions. 'e' and 'p'. That is the answer to our
 	subproblem.
 
 	Each of these 'boxes' is a subproblem.
 
 
-	Let's got the other way.
+	Let's go the other way.
 	If we just have the character 'b', and we're transforming it into an empty
 	string, that means we just need 1 Deletion.
 
@@ -350,8 +346,8 @@ void print_matrix(std::vector<std::vector<int>>& matrix);
 	We just need to understand what these subproblems mean and then we can
 	implement it in any way that we like.
 
-	So now let's get to work:
-	Look at a position 'X' in each step:
+	
+	Now look at a position 'X' in each step:
 
            ""  "e" "p" "h" "r" "e" "m"
             0   1   2   3   4   5   6
@@ -425,17 +421,16 @@ void print_matrix(std::vector<std::vector<int>>& matrix);
 
 	Matching characters mean we do NOTHING. (Situation 1)
 
-	So the answer to our subproblem is these two string WITHOUT THAT MATCHING
+	So the answer to our subproblem is these two strings WITHOUT THAT MATCHING
 	CHARACTER.
 
-	So what we do for this position X (at 2, 1), we take it from (1, 0).
-	We don't just magically take it from that sell for no reason. It's not just
-	a random pattern.
+	So what we do for this position X (at 2, 1)? We take it from (1, 0).
 
-	We're taking it because we do not need to factor this character in. It is
-	NOT going to add to our Edit Distance.
+	We don't just magically take it from that cell for no reason. It's not just
+	a random pattern. We're taking it because we do not need to factor this
+	character in. It is NOT going to add to our Edit Distance.
 
-	So our answer that goes into the cell is going to be the Edit Distanc
+	So our answer that goes into the cell is going to be the Edit Distance
 	without this character. Which is exactly like transforming:
 		"b" -> ""
 	That's why we're taking the diagonal value. It's the minimum number of
@@ -487,78 +482,15 @@ void print_matrix(std::vector<std::vector<int>>& matrix);
 		2. dp[i - 1][  j  ]
 		3. dp[  i  ][j - 1]
 
-	We could optimize our space Complexity to two vectors.
-	Code:
-===============================================================================
-
-	std::vector<int> previous(n + 1, 0);
-	std::vector<int> current (n + 1, 0);
-
-	for (int j = 0; j <= n; j++)
-		previous[j] = j;
-
-	for (int i = 1; i <= m; i++)
-	{
-		current[0] = i;
-
-		for (int j = 1; j <= n; j++)
-		{
-			if (word1[i - 1] == word2[j - 1])
-				current[j] = previous[j - 1];
-			else
-				current[j] = std::min(previous[j - 1], std::min(current[j - 1], previous[j])) + 1;
-		}
-
-		std::fill(previous.begin(), previous.end(), 0);
-		std::swap(previous, current);
-	}
-
-	return previous[n];
-===============================================================================
-
-
-
-	We could also use only one vector:
-	Code:
-===============================================================================
-
-	int previous;
-	std::vector<int> current (n + 1, 0);
-
-	for (int j = 0; j <= n; j++)
-		current[j] = j;
-
-	for (int i = 1; i <= m; i++)
-	{
-		previous = current[0];
-		current[0] = i;
-
-		for (int j = 1; j <= n; j++)
-		{
-			int tmp = current[j];
-
-			if (word1[i - 1] == word2[j - 1])
-				current[j] = previous;
-			else
-				current[j] = std::min(previous, std::min(current[j - 1], current[j])) + 1;
-
-			previous = tmp;
-		}
-	}
-
-	return current[n];
-===============================================================================
-
 */
 
+
+/* Time  Beats: 77.15% */
+/* Space Beats: 39.97% */
 
 /* Time  Complexity: O(m * n) */
-/* Space Complexity: O(n)
-   But for purposes of readability and ease of understanding, I will leave
-   the core with O(m * n) Space Complexity. Better Complexity is right above
-   in the IDEA section
-*/
-class Solution {
+/* Space Complexity: O(m * n) */
+class Solution_1 {
 public:
     int minDistance(std::string word1, std::string word2)
 	{
@@ -583,10 +515,112 @@ public:
             }
         }
 
-		// print_matrix(dp);
-
         return dp[m][n];
     }
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	We could optimize our space Complexity to two vectors, instead of the whole
+	matrix.
+	
+*/
+
+
+/* Time  Beats: 99.17% */
+/* Space Beats: 97.90% */
+
+/* Time  Complexity: O(m * n)         */
+/* Space Complexity: O(2 * n) -> O(n) */
+class Solution_2{
+public:
+    int minDistance(std::string word1, std::string word2)
+	{
+        int m = word1.size();
+		int n = word2.size();
+		std::vector<int> previous(n + 1, 0);
+		std::vector<int> current (n + 1, 0);
+
+		for (int j = 0; j <= n; j++)
+			previous[j] = j;
+
+		for (int i = 1; i <= m; i++)
+		{
+			current[0] = i;
+
+			for (int j = 1; j <= n; j++)
+			{
+				if (word1[i - 1] == word2[j - 1])
+					current[j] = previous[j - 1];
+				else
+					current[j] = std::min(previous[j - 1], std::min(current[j - 1], previous[j])) + 1;
+			}
+
+			std::fill(previous.begin(), previous.end(), 0);
+			std::swap(previous, current);
+		}
+
+		return previous[n];
+	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	We could also use only one vector.
+	
+*/
+
+
+/* Time  Beats: 92.74% */
+/* Space Beats: 97.90% */
+
+/* Time  Complexity: O(m * n)         */
+/* Space Complexity: O(1 * n) -> O(n) */
+class Solution_3 {
+public:
+    int minDistance(std::string word1, std::string word2)
+	{
+        int m = word1.size();
+		int n = word2.size();
+
+		int previous;
+		std::vector<int> current (n + 1, 0);
+
+		for (int j = 0; j <= n; j++)
+			current[j] = j;
+
+		for (int i = 1; i <= m; i++)
+		{
+			previous = current[0];
+			current[0] = i;
+
+			for (int j = 1; j <= n; j++)
+			{
+				int tmp = current[j];
+
+				if (word1[i - 1] == word2[j - 1])
+					current[j] = previous;
+				else
+					current[j] = std::min(previous, std::min(current[j - 1], current[j])) + 1;
+
+				previous = tmp;
+			}
+		}
+
+		return current[n];
+	}
 };
 
 
@@ -606,7 +640,9 @@ print_matrix(std::vector<std::vector<int>>& matrix)
 int
 main()
 {
-	Solution sol;
+	Solution_1 sol_1;
+	Solution_2 sol_2;
+	Solution_3 sol_3;
 
 	/* Example 1 */
 	// std::string word1 = "horse";
@@ -645,13 +681,21 @@ main()
 	std::cout << "\n\t=== EDIT DISTANCE ===";
 	std::cout << "\n\t=====================\n";
 
+
+	/* Write Input */
 	std::cout << "\n\tWord 1: \"" << word1 << "\"";
 	std::cout << "\n\tWord 2: \"" << word2 << "\"\n";
 
-	/* Solution */
-	int result = sol.minDistance(word1, word2);
 
+	/* Solution */
+	// int result = sol_1.minDistance(word1, word2);
+	// int result = sol_2.minDistance(word1, word2);
+	int result = sol_3.minDistance(word1, word2);
+
+
+	/* Write Output */
 	std::cout << "\n\tOperations: " << result << "\n\n";
+
 
 	return 0;
 }
