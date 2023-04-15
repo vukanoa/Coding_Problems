@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 
-
 /*
 	==============
 	=== MEDIUM ===
@@ -99,6 +98,9 @@
 
 */
 
+
+/* Time  Beats: 91.63% */
+/* Space Beats: 99.74% */
 
 /* Time  Complexity: O(m * n) */
 /* Space Complexity: O(1) */
@@ -214,10 +216,6 @@ main()
 {
 	Solution sol;
 
-	std::cout << "\n\t=========================";
-	std::cout << "\n\t=== SET MATRIX ZEROES ===";
-	std::cout << "\n\t=========================\n\n";
-
 	/* Example 1 */
 	// std::vector<std::vector<int>> matrix = {{1, 1, 1}, {1, 0, 1}, {1, 1, 1}};
 
@@ -230,17 +228,24 @@ main()
 	/* Example 4 */
 	std::vector<std::vector<int>> matrix = {{7, 2, 3, 1, 2}, {3, 1, 8, 4, 0}, {6, 3, 2, 7, 4}, {8, 0, 2, 2, 5}};
 
+	std::cout << "\n\t=========================";
+	std::cout << "\n\t=== SET MATRIX ZEROES ===";
+	std::cout << "\n\t=========================\n\n";
 
-	// Before
+
+	/* Write Input */
 	std::cout << "\n\tOriginal Matrix:";
 	print_matrix(matrix);
+
 
 	/* Solution */
 	sol.setZeroes(matrix);
 
-	// After
+
+	/* Write Output */
 	std::cout << "\n\n\n\tZeroed Matrix:";
 	print_matrix(matrix);
+
 
 	return 0;
 }
