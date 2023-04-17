@@ -167,6 +167,11 @@
 */
 
 
+/* Time  Beats: 100% */
+/* Space Beats: 31.29% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
 class Solution{
 public:
 	void sortColors(std::vector<int>& nums)
@@ -217,11 +222,634 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	This idea has worse Time Complexity than the previous, above, Solution.
+	However, it's much much more readable and much more easier to grasp in my
+	opinion.
+
+	We wouldn't be able to solve this problem if it wasn't said that: 0, 1, & 2
+	are the ONLY colors we're able to find in vector "nums".
+
+	If it was possible to have 'm' different colors inside of vector "nums",
+	then we would be able to solve this problem using almost the same approach
+	but in O(m * n) time instead of O(n).
+
+	We would have 'm' for loops. But for this problem we always have only 2 and
+	since that is a constant, the Time Complexity is O(2 * n) => O(n).
+
+	Anyway, let's break this Solution down:
+
+	It's super easy and intuitive.
+
+	Bases cases:
+		If there is only 1 color inside the vector "nums", return immediately
+		since we're sure that it is already sorted.
+
+		If there are only 2 colors inside the vector "nums" and if the first
+		one is greater than the second one - Swap and return.
+
+	We will have 2 for loops.
+	First we're trying to sort all the 0's at the beginning.
+	After we're trying to sort 1's and 2's.
+
+	First we want to place 0's at the beginning.
+	To do that, we will have an additional, helper vector, named:
+		index_buffer
+	
+	It will store contiugous indexes of non-zero elements(colors) in vector
+	"nums".
+	
+	Once we stumble upon non-zero color:
+		push_back in vector "index_buffer".
+
+	Once we stumble upon zero color:
+		swap with the left-most index from vector "index_buffer", pop that
+		index from the front and push_back the index of just swapped zero.
+	
+
+	After we've finished that first for loop, where we've sorted 0's at the
+	beginning:
+		1. Clear index_buffer
+		2. Now do the same, but start from the "last sorted zero + 1"'s index.
+	
+	But now push indices of 2's in index_buffer and swap once you stumble upon
+	1's.
+
+	Here is a simulation:
+	[2, 0, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 0]
+
+
+	1)
+		BEFORE:
+			nums:
+				[2, 0, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				 i
+
+			index_buffer:
+				[]
+
+		AFTER:
+			nums:
+				[2, 0, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				    i
+
+			index_buffer:
+				[0]
+
+
+	2)
+		BEFORE:
+			nums:
+				[2, 0, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				    i
+
+			index_buffer:
+				[0]
+
+		AFTER:
+			nums:
+				[0, 2, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 0] ***SWAP***
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				       i
+
+			index_buffer:
+				[1]
+
+
+	3)
+		BEFORE:
+			nums:
+				[0, 2, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				       i
+
+			index_buffer:
+				[1]
+
+		AFTER:
+			nums:
+				[0, 2, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				          i
+
+			index_buffer:
+				[1, 2]
+
+
+	4)
+		BEFORE:
+			nums:
+				[0, 2, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				          i
+
+			index_buffer:
+				[1, 2]
+
+		AFTER:
+			nums:
+				[0, 2, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				             i
+
+			index_buffer:
+				[1, 2, 3]
+
+
+	5)
+		BEFORE:
+			nums:
+				[0, 2, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				             i
+
+			index_buffer:
+				[1, 2, 3]
+
+		AFTER:
+			nums:
+				[0, 0, 1, 2, 2, 2, 2, 1, 0, 2, 1, 1, 2, 0] ***SWAP***
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                i
+
+			index_buffer:
+				[2, 3, 4]
+
+
+	6)
+		BEFORE:
+			nums:
+				[0, 0, 1, 2, 2, 2, 2, 1, 0, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                i
+
+			index_buffer:
+				[2, 3, 4]
+
+		AFTER:
+			nums:
+				[0, 0, 1, 2, 2, 2, 2, 1, 0, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                   i
+
+			index_buffer:
+				[2, 3, 4, 5]
+
+
+	7)
+		BEFORE:
+			nums:
+				[0, 0, 1, 2, 2, 2, 2, 1, 0, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                   i
+
+			index_buffer:
+				[2, 3, 4, 5]
+
+		AFTER:
+			nums:
+				[0, 0, 1, 2, 2, 2, 2, 1, 0, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                      i
+
+			index_buffer:
+				[2, 3, 4, 5, 6]
+
+
+	8)
+		BEFORE:
+			nums:
+				[0, 0, 1, 2, 2, 2, 2, 1, 0, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                      i
+
+			index_buffer:
+				[2, 3, 4, 5, 6]
+
+		AFTER:
+			nums:
+				[0, 0, 1, 2, 2, 2, 2, 1, 0, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                         i
+
+			index_buffer:
+				[2, 3, 4, 5, 6, 7]
+
+
+	9)
+		BEFORE:
+			nums:
+				[0, 0, 1, 2, 2, 2, 2, 1, 0, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                         i
+
+			index_buffer:
+				[2, 3, 4, 5, 6, 7]
+
+		AFTER:
+			nums:
+				[0, 0, 0, 2, 2, 2, 2, 1, 1, 2, 1, 1, 2, 0] ***SWAP***
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                            i
+
+			index_buffer:
+				[3, 4, 5, 6, 7, 8]
+
+
+	10)
+		BEFORE:
+			nums:
+				[0, 0, 0, 2, 2, 2, 2, 1, 1, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                            i
+
+			index_buffer:
+				[3, 4, 5, 6, 7, 8]
+
+		AFTER:
+			nums:
+				[0, 0, 0, 2, 2, 2, 2, 1, 1, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                               i
+
+			index_buffer:
+				[3, 4, 5, 6, 7, 8, 9]
+
+
+	11)
+		BEFORE:
+			nums:
+				[0, 0, 0, 2, 2, 2, 2, 1, 1, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                               i
+
+			index_buffer:
+				[3, 4, 5, 6, 7, 8, 9]
+
+		AFTER:
+			nums:
+				[0, 0, 0, 2, 2, 2, 2, 1, 1, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                                  i
+
+			index_buffer:
+				[3, 4, 5, 6, 7, 8, 9, 10]
+
+
+	12)
+		BEFORE:
+			nums:
+				[0, 0, 0, 2, 2, 2, 2, 1, 1, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                                  i
+
+			index_buffer:
+				[3, 4, 5, 6, 7, 8, 9, 10]
+
+		AFTER:
+			nums:
+				[0, 0, 0, 2, 2, 2, 2, 1, 1, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                                     i
+
+			index_buffer:
+				[3, 4, 5, 6, 7, 8, 9, 10, 11]
+
+
+	13)
+		BEFORE:
+			nums:
+				[0, 0, 0, 2, 2, 2, 2, 1, 1, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                                     i
+
+			index_buffer:
+				[3, 4, 5, 6, 7, 8, 9, 10, 11]
+
+		AFTER:
+			nums:
+				[0, 0, 0, 2, 2, 2, 2, 1, 1, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                                        i
+
+			index_buffer:
+				[3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
+
+	14)
+		BEFORE:
+			nums:
+				[0, 0, 0, 2, 2, 2, 2, 1, 1, 2, 1, 1, 2, 0]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                                        i
+
+			index_buffer:
+				[3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
+		AFTER:
+			nums:
+				[0, 0, 0, 0, 2, 2, 2, 1, 1, 2, 1, 1, 2, 2] ***SWAP***
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                                           i // Out of Bounds
+
+			index_buffer:
+				[4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+
+
+		*** END OF FIRST FOR LOOP***
+		Clear "index_buffer".
+
+
+	15)
+		BEFORE:
+			nums:
+				[0, 0, 0, 0, 2, 2, 2, 1, 1, 2, 1, 1, 2, 2]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				             i
+
+			index_buffer:
+				[]
+
+		AFTER:
+			nums:
+				[0, 0, 0, 0, 2, 2, 2, 1, 1, 2, 1, 1, 2, 2]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                i
+
+			index_buffer:
+				[4]
+	
+
+
+	16)
+		BEFORE:
+			nums:
+				[0, 0, 0, 0, 2, 2, 2, 1, 1, 2, 1, 1, 2, 2]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                i
+
+			index_buffer:
+				[4]
+
+		AFTER:
+			nums:
+				[0, 0, 0, 0, 2, 2, 2, 1, 1, 2, 1, 1, 2, 2]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                   i
+
+			index_buffer:
+				[4, 5]
+	
+
+
+	17)
+		BEFORE:
+			nums:
+				[0, 0, 0, 0, 2, 2, 2, 1, 1, 2, 1, 1, 2, 2]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                   i
+
+			index_buffer:
+				[4, 5]
+
+		AFTER:
+			nums:
+				[0, 0, 0, 0, 2, 2, 2, 1, 1, 2, 1, 1, 2, 2]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                      i
+
+			index_buffer:
+				[4, 5, 6]
+	
+
+
+	17)
+		BEFORE:
+			nums:
+				[0, 0, 0, 0, 2, 2, 2, 1, 1, 2, 1, 1, 2, 2]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                      i
+
+			index_buffer:
+				[4, 5, 6]
+
+		AFTER:
+			nums:
+				[0, 0, 0, 0, 1, 2, 2, 2, 1, 2, 1, 1, 2, 2] ***SWAP***
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                         i
+
+			index_buffer:
+				[5, 6, 7]
+	
+
+
+	18)
+		BEFORE:
+			nums:
+				[0, 0, 0, 0, 1, 2, 2, 2, 1, 2, 1, 1, 2, 2]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                         i
+
+			index_buffer:
+				[5, 6, 7]
+
+		AFTER:
+			nums:
+				[0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2] ***SWAP***
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                            i
+
+			index_buffer:
+				[6, 7, 8]
+	
+
+
+	19)
+		BEFORE:
+			nums:
+				[0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                            i
+
+			index_buffer:
+				[6, 7, 8]
+
+		AFTER:
+			nums:
+				[0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                               i
+
+			index_buffer:
+				[6, 7, 8, 9]
+	
+
+
+	20)
+		BEFORE:
+			nums:
+				[0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                               i
+
+			index_buffer:
+				[6, 7, 8, 9]
+
+		AFTER:
+			nums:
+				[0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 1, 2, 2] ***SWAP***
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                                  i
+
+			index_buffer:
+				[7, 8, 9, 10]
+	
+
+
+	21)
+		BEFORE:
+			nums:
+				[0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 1, 2, 2]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                                  i
+
+			index_buffer:
+				[7, 8, 9, 10]
+
+		AFTER:
+			nums:
+				[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                                     i
+
+			index_buffer:
+				[8, 9, 10, 11]
+	
+
+
+	22)
+			nums:
+				[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                                     i
+
+			index_buffer:
+				[8, 9, 10, 11]
+
+		AFTER:
+			nums:
+				[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                                        i
+
+			index_buffer:
+				[8, 9, 10, 11, 12]
+	
+
+
+	23)
+			nums:
+				[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                                        i
+
+			index_buffer:
+				[8, 9, 10, 11, 12]
+
+		AFTER:
+			nums:
+				[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2]
+				 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+				                                           i // Out of Bounds
+
+			index_buffer:
+				[8, 9, 10, 11, 12, 13]
+
+*/
+
+
+/* Time  Beats: 100% */
+/* Space Beats: 31.29% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Readable{
+public:
+	void sortColors(std::vector<int>& nums)
+	{
+		int n = nums.size();
+		if (n == 1)
+			return;
+		else if (n == 2 && nums[0] > nums[1])
+		{
+			std::swap(nums[0], nums[1]);
+			return;
+		}
+
+		std::vector<int> index_buffer;	
+		int last_sorted_zero_index = -1;
+
+		/* Sort 0's */
+		for (int i = 0; i < n; i++)
+		{
+			if (nums[i] == 0 && index_buffer.empty())
+			{
+				last_sorted_zero_index = i;
+				continue;
+			}
+
+			if (nums[i] != 0)
+				index_buffer.push_back(i);
+			else
+			{
+				int tmp = index_buffer.front();
+
+				index_buffer.erase(index_buffer.begin());
+				std::swap(nums[tmp], nums[i]);
+				index_buffer.push_back(i);
+
+				last_sorted_zero_index = tmp;
+			}
+		}
+
+		index_buffer.clear();
+
+		/* Sort 1's and 2's */
+		for (int i = last_sorted_zero_index + 1; i < n; i++)
+		{
+			if (nums[i] == 1 && index_buffer.empty())
+				continue;
+
+			if (nums[i] == 2) // nums[i] != 1
+				index_buffer.push_back(i);
+			else
+			{
+				int tmp = index_buffer.front();
+
+				index_buffer.erase(index_buffer.begin());
+				std::swap(nums[tmp], nums[i]);
+				index_buffer.push_back(i);
+			}
+		}
+	}
+};
+
+
 void
-print_array(std::vector<int>& nums, std::string str)
+print_array(std::vector<int>& nums)
 {
 	bool first = true;
-	std::cout << "\n\t" << str << ": [";
+	std::cout << ": [";
 	for (auto x: nums)
 	{
 		if (!first)
@@ -230,7 +858,7 @@ print_array(std::vector<int>& nums, std::string str)
 		std::cout << x;
 		first = false;
 	}
-	std::cout << "]\n\n";
+	std::cout << "]\n";
 }
 
 
@@ -238,10 +866,7 @@ int
 main()
 {
 	Solution sol;
-
-	std::cout << "\n\t===================";
-	std::cout << "\n\t=== SORT COLORS ===";
-	std::cout << "\n\t===================\n\n";
+	Solution_Readable sol_r;
 
 	/* Example 1 */
 	// std::vector<int> nums = {2, 0, 2, 1, 1, 0};
@@ -256,13 +881,31 @@ main()
 	// std::vector<int> nums = {1, 2, 0};
 
 	/* Example 5 */
+	// std::vector<int> nums = {1, 2, 1};
+
+	/* Example 6 */
 	std::vector<int> nums = {2, 0, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 0};
 
-	print_array(nums, "Array");
+	std::cout << "\n\t===================";
+	std::cout << "\n\t=== SORT COLORS ===";
+	std::cout << "\n\t===================\n";
+
+
+	/* Write Input */
+	std::cout << "\n\tArray ";
+	print_array(nums);
+
 
 	/* Solution */
-	sol.sortColors(nums);
+	// sol.sortColors(nums);
+	sol_r.sortColors(nums);
 
-	print_array(nums, "Sorted");
+
+	/* Write Output */
+	std::cout << "\n\tSorted";
+	print_array(nums);
+	std::cout << "\n";
+
+
 	return 0;
 }
