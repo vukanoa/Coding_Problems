@@ -25,7 +25,7 @@
 	=====
 
 	================================================
-	FUNCTION: string minWindow(string, s, string t);
+	FUNCTION: string minWindow(string s, string t);
 	================================================
 
 	==========================================================================
@@ -58,16 +58,16 @@
 	--- IDEA ---
 	------------
 
-	We can use the simple sliding window approach to solve this problem.
+	We can use basic "Sliding Window" approach to solve this problem.
 
 	In any sliding window based problem we have two pointers. One "right"
-	pointer whose job is to expand the current window and then we have the
-	"left" pointer whose job is to contract a given window. At any point in
-	time only one of these pointers move and the other one remains fixed.
+	pointer,  whose job is to expand the current window, and we have the "left"
+	pointer whose job is to contract a given window. At any point in time only
+	one of these pointers move and the other one remains fixed.
 
 	We keep expanding the window by moving the right pointer. When the window
-	has all the desired character(remaining == 0), we contract(if possible) and
-	save the smallest window till now.
+	has all the desired characters(remaining == 0), we contract(if possible)
+	and save the smallest window up to this point.
 
 	The answer is the smallest desirable window.
 
@@ -95,43 +95,73 @@
 
 	1)
 		A B A A C B A B
+		0 1 2 3 4 5 6 7
 		l
 		r
 
 
 	2)
 		A B A A C B A B
-		l       r
+		0 1 2 3 4 5 6 7
+		l r
 
 
 	3)
 		A B A A C B A B
-		  l     r
+		0 1 2 3 4 5 6 7
+		l   r
 
 
 	4)
 		A B A A C B A B
-		    l   r
+		0 1 2 3 4 5 6 7
+		l     r
 
 
 	5)
-		A B A A C B A B
-		    l     r
+		A B A A C B A B   // min_length = 5
+		0 1 2 3 4 5 6 7
+		l       r
 
 
 	6)
+		A B A A C B A B   // min_length = 4
+		0 1 2 3 4 5 6 7
+		    l     r
+
+
+	7)
+		A B A A C B A B   // min_length = 3
+		0 1 2 3 4 5 6 7
+		        l   r
+
+
+	8)
 		A B A A C B A B
-		      l   r
+		0 1 2 3 4 5 6 7
+		          l   r
+
+
+	9)
+		A B A A C B A B
+		0 1 2 3 4 5 6 7
+		          l     r
+                        ^
+		                |
+		                |_______ Out Of Bounds
+
 */
 
+
+/* Time  Beats: 97.70% */
+/* Space Beats: 45.37% */
 
 /* Time  Complexity: O(s + t)
    In the worst case we might end up visiting every element of string 's'
    twice, once by left pointer and once by right pointer.
 */
-/* Space Complexity: O(s + t)
-   s when the window size is equal to the entire string s.
-   t when t has all unique characters.
+/*
+	Space Complexity: O(1)
 */
 class Solution{
 public:
@@ -139,15 +169,15 @@ public:
 	{
 		std::vector<int> occurrences(128, 0);
 
-		for (char& c : t)
+		for (const char& c : t)
 			occurrences[c]++;
 
 		int remaining = t.length();
 
 		int left  = 0;
 		int right = 0;
-		int min_start = 0;
-		int min_end = INT_MAX;
+		int min_start  = 0;
+		int min_length = INT_MAX;
 
 		while (right < s.length())
 		{
@@ -156,9 +186,9 @@ public:
 
 			while (remaining == 0)
 			{
-				if (right - left < min_end)
+				if (right - left < min_length)
 				{
-					min_end   = right - left;
+					min_length   = right - left;
 					min_start = left;
 				}
 
@@ -167,7 +197,75 @@ public:
 			}
 		}
 
-		return min_end < INT_MAX ? s.substr(min_start, min_end) : "";
+		return min_length < INT_MAX ? s.substr(min_start, min_length) : "";
+	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Absolutely equivalent to the above Solution, just a bit more readable.
+	
+*/
+
+
+/* Time  Beats: 97.70% */
+/* Space Beats: 45.37% */
+
+/* Time  Complexity: O(s + t)
+   In the worst case we might end up visiting every element of string 's'
+   twice, once by left pointer and once by right pointer.
+*/
+/*
+	Space Complexity: O(1)
+*/
+class Solution_readable{
+public:
+	std::string minWindow(std::string s, std::string t)
+	{
+		std::vector<int> occurrences(128, 0);
+
+		for (const char& c : t)
+			occurrences[c]++;
+
+		int remaining = t.length();
+
+		int left  = 0;
+		int right = 0;
+		int min_start  = 0;
+		int min_length = INT_MAX;
+
+		while (right < s.length())
+		{
+			if (occurrences[s[right]] > 0)
+				remaining--;
+
+			occurrences[s[right]]--;
+
+			while (remaining == 0)
+			{
+				if (right - left + 1 < min_length)
+				{
+					min_start  = left;
+					min_length = right - left + 1;
+				}
+
+				if (occurrences[s[left]] >= 0)
+					remaining++;
+
+				occurrences[s[left]]++;
+				left++;
+			}
+
+			right++;
+		}
+
+		return min_length < INT_MAX ? s.substr(min_start, min_length) : "";
 	}
 };
 
@@ -176,10 +274,6 @@ int
 main()
 {
 	Solution sol;
-
-	std::cout << "\n\t================================";
-	std::cout << "\n\t=== MINIMUM WINDOW SUBSTRING ===";
-	std::cout << "\n\t================================\n\n";
 
 	/* Example 1 */
 	std::string s = "ADOBECODEBANC";
@@ -201,14 +295,23 @@ main()
 	// std::string s = "CBAEBBSSBECCA";
 	// std::string t = "SEC";
 
+	std::cout << "\n\t================================";
+	std::cout << "\n\t=== MINIMUM WINDOW SUBSTRING ===";
+	std::cout << "\n\t================================\n";
 
-	std::cout << "\n\tString S: \"" << s << "\"";
-	std::cout << "\n\tString T: \"" << t << "\"";
+
+	/* Write Input */
+	std::cout << "\n\tString s: \"" << s << "\"";
+	std::cout << "\n\tString t: \"" << t << "\"";
+
 
 	/* Solution */
 	std::string str = sol.minWindow(s, t);
 
+
+	/* Write Output */
 	std::cout << "\n\n\tMinimum Substring: \"" << str << "\"\n\n";
+
 
 	return 0;
 }
