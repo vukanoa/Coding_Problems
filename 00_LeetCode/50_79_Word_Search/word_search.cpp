@@ -59,7 +59,136 @@
 	--- IDEA ---
 	------------
 
-	As the name of the helper function is says: We are doing a DFS using
+	It's the same idea as in Solution_Efficient(2nd one down below), but
+	unoptimized. It uses another m * n matrix named "flags".
+
+	However, it's a bit easier for reading in my opinion, so I'll leave it.
+	
+*/
+
+
+/* Time  Beats: 51.81% */
+/* Space Beats: 85.30% */
+
+/*
+	Time  Complexity: O(N * 4^L)
+	
+	The Time Complexity of the "backtracking" function is O(4^L), where L is
+	the length of the input "word". This is because for each call to
+	"backtracking", there are up to four recursive calls
+	(up, right, down, left), and this recursion depth can go up to L.
+	Therefore, the Time Complexity of the "exist" function is O(N * 4^L), where
+	N is the total number of cells in the "board".
+*/
+/*
+	Space Complexity: O(L)
+	
+	Since the maximum depth of recursion is L, and each recursion depth
+	requires O(1) extra space. Additionally, the "flags" vector has a Space
+	Complexity of O(N), where N is the total number of cells in the "board".
+*/
+class Solution_Messy{
+private:
+	bool backtracking(std::vector<std::vector<char>>& board, std::string word,
+	                  std::vector<std::vector<bool>>& flags, std::string current,
+					  int i, int j, int w)
+	{
+		int m = board.size();
+		int n = board[0].size();
+
+		if (current == word)
+			return true;
+
+		for (int x = 0; x < 4; x++)
+		{
+			switch(x)
+			{
+				case 0:
+					if (i-1 >= 0 && board[i-1][j] == word[w] && flags[i-1][j] == true)
+					{
+						flags[i][j] = false;
+						if (backtracking(board, word, flags, current + word[w], i-1, j, w+1))
+							return true;
+
+						flags[i][j] = true;
+					}
+					break;
+
+				case 1:
+					if (j + 1 < n && board[i][j+1] == word[w] && flags[i][j+1] == true)
+					{
+						flags[i][j] = false;
+						if (backtracking(board, word, flags, current + word[w], i, j+1, w+1))
+							return true;
+
+						flags[i][j] = true;
+					}
+					break;
+
+				case 2:
+					if (i + 1 < m && board[i+1][j] == word[w] && flags[i+1][j] == true)
+					{
+						flags[i][j] = false;
+						if (backtracking(board, word, flags, current + word[w], i+1, j, w+1))
+							return true;
+
+						flags[i][j] = true;
+					}
+					break;
+
+				case 3:
+					if (j - 1 >= 0 && board[i][j - 1] == word[w] && flags[i][j-1] == true)
+					{
+						flags[i][j] = false;
+						if (backtracking(board, word, flags, current + word[w], i, j-1, w+1))
+							return true;
+
+						flags[i][j] = true;
+					}
+					break;
+			}
+		}
+
+		return false;
+	}
+
+public:
+	bool exist(std::vector<std::vector<char>>& board, std::string word)
+	{
+		int m = board.size();
+		int n = board[0].size();
+
+		std::vector<std::vector<bool>> flags(m, std::vector<bool>(n, true));
+		for (int i = 0; i < m; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				if (board[i][j] == word[0])
+				{
+					std::string str = "";
+					str.push_back(board[i][j]);
+
+					if (backtracking(board, word, flags, str, i, j, 1))
+						return true;
+
+					str.pop_back();
+				}
+			}
+		}
+
+		return false;
+	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	As the name of the helper function says: We are doing a DFS using
 	Backtracking.
 
 	In the description it says that the same letter cell may not be used twice.
@@ -77,7 +206,25 @@
 */
 
 
-class Solution{
+/* Time  Beats: 91.61% */
+/* Space Beats: 86.30% */
+
+
+/*
+	Time  Complexity: O(n * 4^L)
+
+	Where N is the number of cells in the board and L is the length of the
+	given word. This is because for each cell, the algorithm can potentially
+	explore 4 adjacent cells(up, down, left, and right) and it explores up to L
+	characters for each starting position.
+*/
+/*
+	Space Complexity: O(L)
+	
+	Where L is the length of the given word. This is because the recursive
+	stack will have at most L frames for each call to dfs_backtracking.
+*/
+class Solution_Efficient{
 public:
 	bool dfs_backtracking(std::vector<std::vector<char>>& board, std::string& word, int w, int i, int j)
 	{
@@ -90,10 +237,10 @@ public:
 		{
 			board[i][j] = ' '; // So that we don't use the same element twice
 
-			if (dfs_backtracking(board, word, w+1, i+1, j)) return true;
-			if (dfs_backtracking(board, word, w+1, i-1, j)) return true;
-			if (dfs_backtracking(board, word, w+1, i, j+1)) return true;
-			if (dfs_backtracking(board, word, w+1, i, j-1)) return true;
+			if (dfs_backtracking(board, word, w+1, i+1, j  )) return true;
+			if (dfs_backtracking(board, word, w+1, i-1, j  )) return true;
+			if (dfs_backtracking(board, word, w+1, i  , j+1)) return true;
+			if (dfs_backtracking(board, word, w+1, i  , j-1)) return true;
 
 			board[i][j] = word[w]; // Return used element so that we can use it again since we haven't found it yet
 		}
@@ -117,6 +264,7 @@ public:
 };
 
 
+
 void
 print_matrix(std::vector<std::vector<char>>& matrix)
 {
@@ -135,7 +283,8 @@ print_matrix(std::vector<std::vector<char>>& matrix)
 int
 main()
 {
-	Solution sol;
+	Solution_Messy sol_mess;
+	Solution_Efficient sol_eff;
 
 	/* Example 1 */
 	std::vector<std::vector<char>> board = {{'A', 'B', 'C', 'E'}, {'S', 'F', 'C', 'S'}, {'A', 'D', 'E', 'E'}, {'A', 'D', 'E', 'E'}};
@@ -149,21 +298,28 @@ main()
 	// std::vector<std::vector<char>> board = {{'A', 'B', 'C', 'E'}, {'S', 'F', 'C', 'S'}, {'A', 'D', 'E', 'E'}};
 	// std::string word = "ABCB";
 
-
 	std::cout << "\n\t===================";
 	std::cout << "\n\t=== WORD SEARCH ===";
-	std::cout << "\n\t===================\n\n";
+	std::cout << "\n\t===================\n";
 
+
+	/* Write Input */
 	std::cout << "\n\tBoard:";
 	print_matrix(board);
-
 	std::cout << "\n\tWord: \"" << word << "\"\n";
 
+
 	/* Solution */
-	if (sol.exist(board, word))
+	// bool found = sol_mess.exist(board, word);
+	bool found = sol_eff.exist(board, word);
+
+
+	/* Write Output */
+	if (found)
 		std::cout << "\n\n\tOuput: True\n\n";
 	else
 		std::cout << "\n\n\tOuput: False\n\n";
+
 
 	return 0;
 }
