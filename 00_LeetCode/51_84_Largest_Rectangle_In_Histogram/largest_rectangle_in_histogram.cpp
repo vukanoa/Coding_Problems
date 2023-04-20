@@ -69,13 +69,13 @@
 	Consider this example:
 		[2, 1, 5, 6, 2, 3]
 
-	What's the idea behind the stack?
 	If the stack is empty, that means the left most bar that has to be included
 	in calculating the max area of the current bar is the bar at index 0, that
 	is why we say:
 		left[i] = 0;
 
-	and we push current index's in the stack. Why? Let's see.
+	and we push current index's in the stack.
+	Why?
 
 	If the stack isn't empty then while the stack is not empty and while
 	the bar under the index at the top of the stack is greater than or equals
@@ -188,6 +188,9 @@
 */
 
 
+/* Time  Beats: 66.90% */
+/* Space Beats: 60.71% */
+
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
 class Solution{
@@ -252,13 +255,67 @@ public:
 };
 
 
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	TODO: Detailed Explanation
+	
+*/
+
+
+
+/* Time  Beats: 89.17% */
+/* Space Beats: 63.46% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Neat{
+public:
+	int largestRectangleArea(std::vector<int>& heights)
+	{
+		int max_area = 0;
+		std::stack<std::pair<int , int>> stack; // pair: (index, height)
+
+			for (int i = 0; i < heights.size(); i++)
+			{
+				int start = i;
+
+				while (!stack.empty() && stack.top().second > heights[i])
+				{
+					std::pair<int, int> top = stack.top();
+					stack.pop();
+
+					max_area = std::max(max_area, top.second * (i - top.first));
+					start = top.first;
+				}
+
+				stack.push({start, heights[i]});
+			}
+
+			while (!stack.empty())
+			{
+				std::pair<int, int> top = stack.top();
+				stack.pop();
+
+				max_area = std::max(max_area, top.second * (int)(heights.size() - top.first));
+			}
+
+		return max_area;
+	}
+};
+
+
 int
 main()
 {
 	Solution sol;
+	Solution_Neat sol_neat;
 
 	/* Example 1 */
-	std::vector<int> heights = {2, 1, 5, 6, 2, 3};
+	// std::vector<int> heights = {2, 1, 5, 6, 2, 3};
 
 	/* Example 2 */
 	// std::vector<int> heights = {2, 4};
@@ -267,15 +324,23 @@ main()
 	// std::vector<int> heights = {5, 2, 4, 7, 9, 3, 2, 6};
 
 	/* Example 4 */
-	// std::vector<int> heights = {1, 1, 1, 1, 1, 1};
+	// std::vector<int> heights = {5, 2, 8, 7, 9, 3, 2, 9};
 
 	/* Example 5 */
-	// std::vector<int> heights = {3, 5, 5, 4, 0, 1, 7};
+	// std::vector<int> heights = {1, 1, 1, 1, 1, 1};
+
+	/* Example 6 */
+	// std::vector<int> heights = {1, 2, 9, 8, 1, 1};
+
+	/* Example 7 */
+	std::vector<int> heights = {3, 5, 5, 4, 0, 1, 7};
 
 	std::cout << "\n\t======================================";
 	std::cout << "\n\t=== LARGEST RECTANGLE IN HISTOGRAM ===";
 	std::cout << "\n\t======================================\n";
 
+
+	/* Write Input */
 	bool first = true;
 	std::cout << "\n\tHeights: [";
 	for (auto x: heights)
@@ -288,10 +353,15 @@ main()
 	}
 	std::cout << "]\n";
 
-	/* Solution */
-	int max_area = sol.largestRectangleArea(heights);
 
+	/* Solution */
+	// int max_area = sol.largestRectangleArea(heights);
+	int max_area = sol_neat.largestRectangleArea(heights);
+
+	
+	/* Write Output */
 	std::cout << "\n\tMax Area: " << max_area << "\n\n";
+
 
 	return 0;
 }
