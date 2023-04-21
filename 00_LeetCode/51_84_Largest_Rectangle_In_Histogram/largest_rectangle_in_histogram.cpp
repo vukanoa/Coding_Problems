@@ -261,8 +261,410 @@ public:
 	--- IDEA ---
 	------------
 
-	TODO: Detailed Explanation
+	Let's see if we can notice some patterns. There are a few different
+	situations.
+
+	1)
+	    #
+	    # #
+	    2 1
 	
+	    The first one is the bigger than the second one. We cannot extend the
+		first one any farther. There is a little "hole" above the bar 1.
+		So, the biggest rectangle we can get is just this bar 2 * width=1
+
+		However, for the bar 1, we can extend it, but to the left.
+		We cannot extend bar 2 to the right, but we can extend bar left,
+		potentially, to the right. There's nothing comming to stop us just yet.
+
+		Let's look at the opposite scenario.
+	
+
+	2)
+	      #
+	    # #
+	    1 2
+
+		In this case we can keep extending bar 1 to the right, there's nothing
+		stopping us.
+		And for the bar 2, there is nothing coming to stop us just yet.
+	
+
+	3)
+	    # #
+	    # #
+	    2 2
+
+		In this case, we can also keep extending it. There's no smaller
+		rectangle stopping us to be extended farther to the right.
+
+	
+	This tells us that current heights are going to be increasing.
+	If heights aren't in increasing order, they will be popped.
+
+	Now let's look at the scenario where all the heights are indeed in
+	increasing order.
+
+	4)
+	         #
+	       # #
+	     # # #
+	   # # # #
+	   1 2 3 4
+
+	   1 can keep extending all the way to 4.
+	   2 can keep extending all the way to 4.
+	   3 can keep extending all the wya to 4.
+	   4 can keep extending because there's nothing coming to stop us just yet.
+
+	   However, none of them can be extended to the left, because the height
+	   to the left is smaller, so they cannot be extended.
+
+	   But what would happen if we would introduce a smaller height after?
+
+	5)
+	         #
+	       # # #
+	     # # # #
+	   # # # # #
+	   1 2 3 4 3
+	         ^
+	        pop
+
+
+	   That would mean that 4 cannot be extended any farther. So all we can do
+	   is say:"Okay, these are the boundaries of height 4, let's compute the
+	   area which is going to be 1 * 4 in this case", and then we have to
+	   remove this from being considered, so we pop it.
+
+	6)
+	         #
+	       # #
+	     # # # #
+	   # # # # #
+	   1 2 3 4 2
+	       ^^^
+	       pop
+
+	   Similar thing would happen. We cannot extend the 4, however we cannot
+	   extend 3 either(we cannot extend it past bar 4), but we can extend
+	   previous bars, which are 2 and 1(from right to left, respectively).
+	
+	7)
+	         #
+	       # #
+	     # # # 
+	   # # # # #
+	   1 2 3 4 1
+	     ^^^^^
+	      pop
+
+	   Let's look out last exampe to drive this point on.
+	   Neither 4, nor 3, nor 2 can be extended to the right past 4.
+	   Only bar 1(the left one) can be extended past 4 and potentially further.
+
+	   So first we compute the rectangle of width=1 and height 4 and remove it
+	   from consideration.
+
+	   Then we compute the rectangle of widht=2 and height 3 and remove it from
+	   consideration.
+
+	   Lastly, we compute the rectangle of width=3 and heights 2 and remove it
+	   from consideration.
+
+	   In this case we had a 1 and we popped 3 elements from consideration.
+
+	   Notice how we're only popping the most recent elements. We're not
+	   popping an element that's in the middle. We're only popping them from
+	   the "top" to the "bottom".
+
+	   So that tells us that we should se a Stack for this problem.
+	   The Stack will contain the current heights that we're considering and
+	   will pop them from the top when we're no longer considering them.
+
+	Now let's look at the Algorithm:	
+		                        __________________                
+		      6                 |     STACK      |                
+		    5 #                 | index | height |                
+		    # #                 |       |        |                
+		    # #   3             |       |        |     Max Area: 0
+		2   # # 2 #             |       |        |                
+		# 1 # # # #             |       |        |                
+		# # # # # #             |       |        |                
+		0 1 2 3 4 5             |       |        |                
+		
+		I'm going to be maintaining what's the max_area so far.
+		
+		Let's do a Simulation:
+		
+	1)
+		                        __________________                
+		      6                 |     STACK      |                
+		    5 #                 | index | height |                
+		    # #             --> |   0   |   2    |                
+		    # #   3             |       |        |     Max Area: 0
+		2   # # 2 #             |       |        |                
+		# 1 # # # #             |       |        |                
+		# # # # # #             |       |        |                
+		0 1 2 3 4 5             |       |        |                
+		i
+		
+		Since there's nothing in the Stack, we can't pop anything, let's just
+		add it.
+		
+		
+	2)
+		                        __________________                
+		      6                 |     STACK      |                
+		    5 #                 | index | height |                
+		    # #             --> |   0   |   1    |                
+		    # #   3             |       |        |     Max Area: 2
+		2   # # 2 #             |       |        |                
+		# 1 # # # #             |       |        |                
+		# # # # # #             |       |        |                
+		0 1 2 3 4 5             |       |        |                
+		  i
+		
+		Next we get to height=1 and since it is smaller than the top of the
+		stack we're going to pop the top(2) from the stack, but before we pop
+		it let's just see what's the max area that we could've gotten with this
+		2 height.
+		
+		So, starting at index 0, and we've just reach the index 1 before which
+		we have to stop since 2 > 1. So that's the range of the width:
+		From 0 to 1 => Width is 1, Height is 2 => Area = 2
+		So far, our Max Area is 2 now.
+		
+		And now we pop the 2 from the Stack and we push 1 to the Stack. But,
+		what's the index of this new height=1 that we're trying to push?
+		Well, we're currently on the index 1 so we could say that the index is
+		indeed 1, but we're going to do it a litle differently.
+		
+		If you look at this height=2 and height=1 you can see that we can
+		extend this height=1 to back, all the way back.
+		
+		So instead of saying that the index of this height=1 starts at index 1,
+		we're going to say that it starts at index 0, because we can extend it
+		all the way back to the index 0(inclusive).
+		
+		
+		
+	3)
+		                        __________________                
+		      6                 |     STACK      |                
+		    5 #                 | index | height |                
+		    # #                 |   0   |   1    |                
+		    # #   3         --> |   2   |   5    |     Max Area: 2
+		2   # # 2 #             |       |        |                
+		# 1 # # # #             |       |        |                
+		# # # # # #             |       |        |                
+		0 1 2 3 4 5             |       |        |                
+		    i
+		
+		It's the height=5, there's no restriction. The height=1 that is on the
+		top of the Stack can be extended because 5 > 1, so just push height=5
+		onto the Stack alongside his corresponding index=2.
+		
+		
+		
+	4)
+		                        __________________                
+		      6                 |     STACK      |                
+		    5 #                 | index | height |                
+		    # #                 |   0   |   1    |                
+		    # #   3             |   2   |   5    |     Max Area: 2
+		2   # # 2 #         --> |   3   |   6    |                
+		# 1 # # # #             |       |        |                
+		# # # # # #             |       |        |                
+		0 1 2 3 4 5             |       |        |                
+		      i
+		
+		Same as in previous step. Height=6 is greater than the height that is
+		on the top of the Stack, thus just push height=6 with its corresponding
+		index=3.
+		
+		Heights are in increasing order so that means we don't have to pop
+		anything. The 5 can be extended to the right, that's why we don't have
+		to pop it.
+		
+		
+		
+	5)
+		                        __________________                
+		      6                 |     STACK      |                
+		    5 #                 | index | height |                
+		    # #                 |   0   |   1    |                
+		    # #   3         --> |   2   |   2    |     Max Area: 6, then 10
+		2   # # 2 #             |       |        |                
+		# 1 # # # #             |       |        |                
+		# # # # # #             |       |        |                
+		0 1 2 3 4 5             |       |        |                
+		        i
+		
+		Here is where the interesting things happen.
+		Since the height=6 that is on the Top of the Stack can't go any
+		farther, because we've reach the height=2, this height=6, which started
+		at index 3, stopped at index 4, that means its width is only 1.
+		
+		We have to pop it now, but before we pop it, let's get the area that it
+		could've made.
+		
+		Width=1 * Height=6 => Area = 6 => Area > Max Area => Max Area = Area
+		And now we pop the height=6 from the Stack.
+		
+		Now the Top of our Stack if 5. But height=5 is also greater than the
+		height=2 as well, that means this 5 can't be extended any farther than
+		index 4.
+		
+		So before we pop it we have to compute the Area.
+		
+		We look at the starting index of this 5 which is index 2, and we
+		stopped it at index 4, so that means its width is 2, and the height=5,
+		so the Area is creates is 10.
+		
+		Thus, again, we update the Max Area:
+			10 > Max Area => Max Area = 10
+		
+		And now we pop this height=5 from the Top of our Stack.
+		
+		Now we look at the new Top of our Stack. It's height=1.
+			1 < height[i]
+		
+		So we don't have to pop this height=1 from the Stack, because it can
+		continue to be extended through index=4 and potentially farther.
+		
+		Now we can finally push this height=2 on the Top of the Stack. But what
+		will be the starting index of this height of 2?
+		
+		We could put index=4, but we can notice that we've just popped two
+		elements: 6 and 5, respectively, so that means that this height=2 can
+		be extended backwards up to the last popped index(which was index=2 of
+		the bar height=5).
+		
+		So since our heights[i] can be extended backwards all the way back to
+		the index=2(inclusive), that's the index we're going to put alongside
+		height=2, on the Top of the Stack.
+		
+		
+		
+	6)
+		                        __________________                
+		      6                 |     STACK      |                
+		    5 #                 | index | height |                
+		    # #                 |   0   |   1    |                
+		    # #   3             |   2   |   2    |     Max Area: 10
+		2   # # 2 #         --> |   5   |   3    |                
+		# 1 # # # #             |       |        |                
+		# # # # # #             |       |        |                
+		0 1 2 3 4 5             |       |        |                
+		          i
+		
+		And lastly, we reach index=5 height=3.
+		
+		Height=3 is greater than the height=2 that is currently on the Top of
+		the Stack, that means height=2 can be extended so there's no reason to
+		pop anything.
+		
+		Since we don't have to pop anything, we just push height=3 with its
+		corresponding index=5 on Top of the Stack.
+		
+		
+		
+		
+	7)
+		      __________________                
+		      |     STACK      |                
+		      | index | height |                
+		      |   0   |   1    |                
+		      |   2   |   2    |     Max Area: 10
+		  --> |   5   |   3    |                
+		      |       |        |                
+		      |       |        |                
+		      |       |        |                
+		
+		Now since we have 3 elements that we didn't end up popping from the
+		Stack, what that tells us is that we're able to extend them all the way
+		to the end of the Histogram, so we still need to compute the Areas we
+		could've created from these heights.
+		
+		So let's iterate through them and figure that out.
+		We're "iterate" from the Top of the Stack to the bottom, popping each
+		time, so essentially we'll just work with what's on the Top of the
+		Stack.
+		
+		Index=5 and Height=3 and it went all the way to the end of the
+		Histogram.
+		That means the width of it is just 1(index 5 is the very last index in
+		the Histogram).
+		
+		So: Width=1 * Height=3 => Area = 3 // But it's not bigger than Max Area
+		
+		Now we pop that element from the Stack.
+		
+		
+		
+		
+	8)
+		      __________________                
+		      |     STACK      |                
+		      | index | height |                
+		      |   0   |   1    |                
+		  --> |   2   |   2    |     Max Area: 10
+		      |       |        |                
+		      |       |        |                
+		      |       |        |                
+		      |       |        |                
+		
+		Index=2 and Height=2 and it went all the way to the end of the
+		Histogram.
+		That means the width of it is:
+			Index=5 - Index=2 + 1
+		which is 4.
+		
+		So: Widht=4 * Height=2 => Area = 8 // But it's not bigger than Max Area
+		
+		Now we pop that element from the Stack.
+		
+		
+		
+		
+	9)
+		      __________________                
+		      |     STACK      |                
+		      | index | height |                
+		  --> |   0   |   1    |                
+		      |       |        |     Max Area: 10
+		      |       |        |                
+		      |       |        |                
+		      |       |        |                
+		      |       |        |                
+		
+		Index=0 and Height=1 and it went all the way to the end of the
+		Histogram.
+		That means the width of it is:
+			Index=5 - Index=0 + 1
+		which is 6.
+		
+		So: Widht=6 * Height=1 => Area = 6 // But it's not bigger than Max Area
+		
+		Now we pop that element from the Stack.
+		
+		
+		
+		
+	10)
+		      __________________                
+		      |     STACK      |                
+		      | index | height |                
+		      |       |        |                
+		      |       |        |     Max Area: 10
+		      |       |        |                
+		      |       |        |                
+		      |       |        |                
+		      |       |        |                
+
+		Our Stack is Empty at the very end.
+
 */
 
 
