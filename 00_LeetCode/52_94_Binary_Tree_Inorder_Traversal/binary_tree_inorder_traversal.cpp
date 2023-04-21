@@ -54,6 +54,25 @@ struct TreeNode {
 };
 
 
+/* Time  Beats:   100% */
+/* Space Beats: 98.93% */
+
+
+/*
+	Time  Complexity: O(n)
+	
+	Each node is visited only once.
+*/
+/*
+	Space Complexity: O(n)
+	
+	Recursive calls of "inorder" function create a call stack which requires
+	O(n) space in the worst case.
+
+	Also, using the vector "vec" requires O(n) space.
+
+	So O(n) + O(n) => O(n + n) => O(2 * n) => O(n)
+*/
 class Solution{
 	void inorder(std::vector<int>& vec, TreeNode* root)
 	{
@@ -92,17 +111,20 @@ main()
 	/* Example 3 */
 	// TreeNode* one = new TreeNode(1);
 
-
 	std::cout << "\n\t=====================================";
 	std::cout << "\n\t=== BINARY TREE INORDER TRAVERSAL ===";
-	std::cout << "\n\t=====================================\n\n";
+	std::cout << "\n\t=====================================\n";
 
+
+	/* Write Input */
 	std::cout << "\n\tTODO: Visual print of a binary Tree\n";
+
 
 	/* Solution */
 	std::vector<int> result = sol.inorderTraversal(one);
 
 
+	/* Write Output */
 	bool first = true;
 	std::cout << "\n\tInorder: [";
 	for (auto x: result)
