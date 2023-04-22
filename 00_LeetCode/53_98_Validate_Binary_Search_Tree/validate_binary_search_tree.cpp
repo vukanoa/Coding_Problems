@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stack>
+#include <queue>
 
 /*
 	==============
@@ -55,6 +56,14 @@
 
 	It's self-explanatory.
 
+	"return" at Line 97 is the most important thing.
+
+	1) If you are checking the Left subtree, you have to pass current node as
+	   the right bound.
+
+	2) If you are checking the Right subtree, you have to pass current node as
+	   the left bound.
+
 */
 
 
@@ -68,6 +77,9 @@ struct TreeNode {
     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
+
+/* Time  Beats: 95.81% */
+/* Space Beats: 83.78% */
 
 /* Recursive Traversal with Valid Range */
 /* Time  Complexity: O(n) */
@@ -96,6 +108,20 @@ public:
 	}
 };
 
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Essentially the same Idea, just implemented Iteratively.
+	
+*/
+
+/* Time  Beats: 95.81% */
+/* Space Beats: 14.13% */
 
 /* Iterative Traversal with Valid Range */
 /* Time  Complexity: O(n) */
@@ -147,6 +173,22 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Do an inorder traversal and check if at any point order is not valid.
+	You have to go through the code a few times to "get it". It's not intuitive
+	to write this. At least it wasn't intuitive to me.
+	
+*/
+
+/* Time  Beats: 86.47% */
+/* Space Beats: 56.36% */
+
 /* Recursive Inorder Traversal */
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
@@ -176,28 +218,65 @@ public:
 };
 
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_4{
-	TreeNode* prev = nullptr;
-public:
-	bool isValidBST(TreeNode* root)
+
+
+/*
+	=============================
+	=== This is just printing ===
+	=============================
+*/
+
+void
+print_array(std::vector<int>& nums)
+{
+	bool first = true;
+	std::cout << "\n\t*** Level Order ***";
+	std::cout << "\n\tTree: [";
+	for (auto x: nums)
 	{
-		if (root != nullptr)
-		{
-			if (!isValidBST(root->left))
-				return false;
+		if (!first)
+			std::cout << ", ";
 
-			if (prev != nullptr && prev->val >= root->val)
-				return false;
-
-			prev = root;
-			return isValidBST(root->right);
-		}
-
-		return true;
+		std::cout << x;
+		first = false;
 	}
-};
+	std::cout << "]\n";
+}
+
+
+void
+print_levelorder(TreeNode* root)
+{
+	if (root == nullptr)
+		return;
+	
+	std::queue<TreeNode*> queue;
+	queue.push(root);
+
+	std::vector<int> vector_print;
+
+	while (!queue.empty())
+	{
+		int size = queue.size();
+
+		for (int i = 0; i < size; i++)
+		{
+			TreeNode* node = queue.front();
+			queue.pop();
+
+			// std::cout << node->val << ", ";
+			vector_print.push_back(node->val);
+
+			if (node->left != nullptr)
+				queue.push(node->left);
+
+			if (node->right != nullptr)
+				queue.push(node->right);
+		}
+	}
+
+	print_array(vector_print);
+}
 
 
 int
@@ -206,7 +285,6 @@ main()
 	Solution sol;
 	// Solution_2 sol_2;
 	// Solution_3 sol_3;
-	// Solution_4 sol_4;
 
 	/* Example 1 */
 	TreeNode three(3);
@@ -228,21 +306,28 @@ main()
 	// TreeNode one(1, nullptr, &two);
 	// TreeNode *root = &one;
 
-
 	std::cout << "\n\t===================================";
 	std::cout << "\n\t=== VALIDATE BINARY SEARCH TREE ===";
 	std::cout << "\n\t===================================\n";
 
-	std::cout << "\n\tTODO: Write a visual print of BST\n";
 
+	/* Write Input */
+	std::cout << "\n\t\t\t~~~ TODO: Write a visual print of BST ~~~\n";
+	print_levelorder(root);
+
+	
 	/* Solution */
-	if (sol.isValidBST(root))
-	// if (sol_2.isValidBST(root))
-	// if (sol_3.isValidBST(root))
-	// if (sol_4.isValidBST(root))
+	bool valid = sol.isValidBST(root);
+	// bool valid = sol_2.isValidBST(root);
+	// bool valid = sol_3.isValidBST(root);
+
+
+	/* Write Output */
+	if (valid)
 		std::cout << "\n\tValid BST: True\n\n";
 	else
 		std::cout << "\n\tValid BST: False\n\n";
+
 
 	return 0;
 }
