@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stack>
 #include <queue>
+#include <string>
 
 /*
 	==============
@@ -227,7 +228,7 @@ public:
 */
 
 void
-print_array(std::vector<int>& nums)
+print_array(std::vector<std::string>& nums)
 {
 	bool first = true;
 	std::cout << "\n\t*** Level Order ***";
@@ -253,7 +254,7 @@ print_levelorder(TreeNode* root)
 	std::queue<TreeNode*> queue;
 	queue.push(root);
 
-	std::vector<int> vector_print;
+	std::vector<std::string> vector_print;
 
 	while (!queue.empty())
 	{
@@ -264,14 +265,23 @@ print_levelorder(TreeNode* root)
 			TreeNode* node = queue.front();
 			queue.pop();
 
-			// std::cout << node->val << ", ";
-			vector_print.push_back(node->val);
+			if (node == nullptr)
+			{
+				vector_print.push_back("null");
+				continue;
+			}
+			else
+				vector_print.push_back(std::to_string(node->val));
 
 			if (node->left != nullptr)
 				queue.push(node->left);
+			else
+				queue.push(nullptr);
 
 			if (node->right != nullptr)
 				queue.push(node->right);
+			else
+				queue.push(nullptr);
 		}
 	}
 
