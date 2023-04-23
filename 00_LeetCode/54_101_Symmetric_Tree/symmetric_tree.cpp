@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <stack>
+#include <queue>
 
 
 /*
@@ -59,7 +60,7 @@ struct TreeNode {
 
 	Idea is the same for both Recursive and Iterative Approach.
 
-	Postorder is a mirror order of Preorder.
+	Postorder is a mirror order of Preorder and vice versa.
 
 	We push preorder values in vector "left" along with null-nodes which are
 	of value -101.
@@ -85,6 +86,9 @@ struct TreeNode {
 
 */
 
+
+/* Time  Beats: 67.15% */
+/* Space Beats:  5.18% */
 
 /*	Time  Complexity: O(n) */
 /*
@@ -127,7 +131,7 @@ public:
 		std::vector<int> left;
 		std::vector<int> right;
 
-		preorder(root->left, left);
+		preorder (root->left,  left);
 		postorder(root->right, right);
 
 		if (left.size() != right.size())
@@ -144,6 +148,26 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Same idea, implemented Iteratively.
+	
+*/
+
+
+/* Time  Beats: 67.15% */
+/* Space Beats:  5.18% */
+
+/*	Time  Complexity: O(n) */
+/*
+	Space Complexity: O(h)
+	Where 'h' is the the height of tree
+*/
 class Solution_iter{
 	void preorder_iter(TreeNode* root, std::vector<int>& left)
 	{
@@ -169,14 +193,15 @@ class Solution_iter{
 						stack.push(root->right);
 					else
 					{
-						TreeNode null_node(-101);
-						stack.push(&null_node);
+						TreeNode* null_node = new TreeNode(-101);
+						stack.push(null_node);
 					}
 
 					root = root->left;
 				}
 				else
 				{
+					delete root;
 					if (!stack.empty())
 					{
 						root = stack.top();
@@ -210,17 +235,19 @@ class Solution_iter{
 			{
 				if (!stack_1.empty())
 				{
-					TreeNode null_node(-101);
-					stack_1.push(&null_node);
+					TreeNode* null_node = new TreeNode(-101);
+					stack_1.push(null_node);
 
 					root = stack_1.top();
 					stack_1.pop();
+
+					delete root; // For preventing Memory Leak
 					continue;
 				}
 				else
 				{
-					TreeNode null_node(-101);
-					stack_1.push(&null_node);
+					TreeNode* null_node = new TreeNode(-101);
+					stack_1.push(null_node);
 					break;
 				}
 			}
@@ -229,17 +256,26 @@ class Solution_iter{
 				stack_1.push(root->left);
 			else
 			{
-				TreeNode null_node(-101);
-				stack_1.push(&null_node);
+				TreeNode* null_node = new TreeNode(-101);
+				stack_1.push(null_node);
 			}
 
 			if (root->right != nullptr)
 				stack_1.push(root->right);
 			else
 			{
-				TreeNode null_node(-101);
-				stack_1.push(&null_node);
+				TreeNode* null_node = new TreeNode(-101);
+				stack_1.push(null_node);
 			}
+		}
+
+		// For preventing Memory Leak
+		while (!stack_1.empty())
+		{
+			TreeNode* node = stack_1.top();
+			stack_1.pop();
+			if (node->val == -101)
+				delete node;
 		}
 
 		while (!stack_2.empty())
@@ -248,6 +284,10 @@ class Solution_iter{
 			stack_2.pop();
 
 			right.push_back(root->val);
+
+			// For preventing Memory Leak
+			if (root->val == -101)
+				delete root;
 		}
 	}
 
@@ -260,7 +300,7 @@ public:
 		std::vector<int> left;
 		std::vector<int> right;
 
-		preorder_iter(root->left, left);
+		preorder_iter (root->left, left);
 		postorder_iter(root->right, right);
 
 		if (left.size() != right.size())
@@ -277,10 +317,87 @@ public:
 };
 
 
+
+
+/*
+	=============================
+	=== This is just printing ===
+	=============================
+*/
+
+void
+print_array(std::vector<std::string>& nums)
+{
+	bool first = true;
+	std::cout << "\n\t*** Level Order ***";
+	std::cout << "\n\tTree: [";
+	for (auto x: nums)
+	{
+		if (!first)
+			std::cout << ", ";
+
+		std::cout << x;
+		first = false;
+	}
+	std::cout << "]\n";
+}
+
+
+void
+print_levelorder(TreeNode* root)
+{
+	if (root == nullptr)
+		return;
+	
+	std::queue<TreeNode*> queue;
+	queue.push(root);
+
+	std::vector<std::string> vector_print;
+
+	while (!queue.empty())
+	{
+		int size = queue.size();
+
+		for (int i = 0; i < size; i++)
+		{
+			TreeNode* node = queue.front();
+			queue.pop();
+
+			if (node == nullptr)
+			{
+				vector_print.push_back("null");
+				continue;
+			}
+			else
+				vector_print.push_back(std::to_string(node->val));
+
+			if (node->left != nullptr)
+				queue.push(node->left);
+			else
+				queue.push(nullptr);
+
+			if (node->right != nullptr)
+				queue.push(node->right);
+			else
+				queue.push(nullptr);
+		}
+	}
+
+	int x = vector_print.size() - 1;
+	while (vector_print[x] == "null")
+	{
+		vector_print.pop_back();
+		x--;
+	}
+
+	print_array(vector_print);
+}
+
+
 int
 main()
 {
-	// Solution sol;
+	Solution sol;
 	Solution_iter sol_iter;
 
 	/* Example 1 */
@@ -304,6 +421,7 @@ main()
 
 	// TreeNode* root = &one;
 
+
 	/* Example 3 */
 	// TreeNode* root = nullptr;
 
@@ -313,6 +431,7 @@ main()
 	// TreeNode one(1, &two1, &two2);
 
 	// TreeNode* root = &one;
+
 
 	/* Example 5 */
 	// TreeNode five1(5);
@@ -327,15 +446,23 @@ main()
 	std::cout << "\n\t=== SYMMETRIC TREE ===";
 	std::cout << "\n\t======================\n";
 
+
+	/* Write Input */
+	std::cout << "\n\t\t\t~~~ TODO: Write a visual print of BST ~~~\n";
+	print_levelorder(root);
+
+
 	/* Solution */
-	// if (sol.isSymmetric(root))
-	if (sol_iter.isSymmetric(root))
+	// bool symmetric = sol.isSymmetric(root);
+	bool symmetric = sol_iter.isSymmetric(root);
+
+
+	/* Write Output */
+	if (symmetric)
 		std::cout << "\n\tTree is INDEED Symmetric!\n\n";
 	else
 		std::cout << "\n\tTree is NOT Symmetric!\n\n";
 
+
 	return 0;
-
 }
-
-
