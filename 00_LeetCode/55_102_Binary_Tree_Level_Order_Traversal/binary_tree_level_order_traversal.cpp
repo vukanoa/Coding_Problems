@@ -2,7 +2,6 @@
 #include <vector>
 #include <queue>
 
-
 /*
 	==============
 	=== MEDIUM ===
@@ -62,88 +61,151 @@ struct TreeNode {
 	--- IDEA ---
 	------------
 
-	Vector "results" will contain multiple vectors, each representing its own
-	level.
+	It's just BFS. The only "tricky" part is to know when the current level
+	ends and the next one begins.
 
-	"vec_level" will be a temporary vector which will store all of the values
-	in the current level.
+	We do that but calculating the number of nodes in the queue before we enter
+	the "for" loop.
 
-	Queue is a data structure needed to implement this level order traversal.
+	We don't push null nodes in the queue.
 
-	First check if the "root" is nullptr, if it is return an empty vector.
+	Also, we don't push empty vector "level" into the "results" vector.
+	That happens only in the last level.
 
-	"num_of_nodes" represents the size of a queue, if it is null break the
-	infinite while loop and return the "results" vector.
-
-	While "num_of_nodes" is greater than 0:
-		pop from "queue" to a pointer "node"
-		push node->val to a vec_level
-
-		If node->left isn't nullptr
-			push to a "queue"
-
-		If node->right isn't nullptr
-			push to a "queue"
-
-		decrement "num_of_nodes"
-
-	After the while loop ended, push "vec_level" to "results" and clear
-	"vec_level".
-
-	Return results.
+	___________
+	_____1_____
+	__2_____3__
+	4___5_6___7
 
 */
 
 
+/* Time  Beats:  100% */
+/* Space Beats: 15.35% */
 
-/*	Time  Complexity: O(n) */
 /*
-	Space Complexity: O(max(B, W))
-	Where 'B' is depth of the tree and 'W' is the width of the tree.
+	Time  Complexity: O(n)
+*/
+/*
+	Space Complexity: O(n)
+
+	The biggest level of the tree could be n/2, that's how Trees work. At least
+	Binary Trees.
 */
 class Solution{
 public:
 	std::vector<std::vector<int>> levelOrder(TreeNode* root)
 	{
-		// Base case
-		if (root == nullptr)
-			return {};
-
 		std::vector<std::vector<int>> results;
-		std::vector<int> vec_level;
-		std::queue<TreeNode *> queue;
-
+		std::queue<TreeNode*> queue;
+		
 		queue.push(root);
 
-		for(;;)
+		/* BFS */
+		while (!queue.empty())
 		{
-			int num_of_nodes = queue.size();
+			int queue_length = queue.size();
+			std::vector<int> level;
 
-			if (num_of_nodes == 0)
-				break;
-
-			while (num_of_nodes > 0)
+			for (int i = 0; i < queue_length; i++)
 			{
 				TreeNode* node = queue.front();
-				vec_level.push_back(node->val);
 				queue.pop();
 
-				if (node->left != nullptr)
+				if (node)
+				{
+					level.push_back(node->val);
+
 					queue.push(node->left);
-
-				if (node->right != nullptr)
 					queue.push(node->right);
-
-				num_of_nodes--;
+				}
 			}
 
-			results.push_back(vec_level);
-			vec_level.clear();
+			if (!level.empty())
+				results.push_back(level);
 		}
 
 		return results;
 	}
 };
+
+
+
+
+/*
+	=============================
+	=== This is just printing ===
+	=============================
+*/
+
+void
+print_array(std::vector<std::string>& nums)
+{
+	bool first = true;
+	std::cout << "\n\t*** Level Order ***";
+	std::cout << "\n\tTree: [";
+	for (auto x: nums)
+	{
+		if (!first)
+			std::cout << ", ";
+
+		std::cout << x;
+		first = false;
+	}
+	std::cout << "]\n";
+}
+
+
+void
+print_levelorder(TreeNode* root)
+{
+	if (root == nullptr)
+		return;
+	
+	std::queue<TreeNode*> queue;
+	queue.push(root);
+
+	std::vector<std::string> vector_print;
+
+	while (!queue.empty())
+	{
+		int size = queue.size();
+
+		for (int i = 0; i < size; i++)
+		{
+			TreeNode* node = queue.front();
+			queue.pop();
+
+			if (node == nullptr)
+			{
+				vector_print.push_back("null");
+				continue;
+			}
+			else
+				vector_print.push_back(std::to_string(node->val));
+
+			if (node->left != nullptr)
+				queue.push(node->left);
+			else
+				queue.push(nullptr);
+
+			if (node->right != nullptr)
+				queue.push(node->right);
+			else
+				queue.push(nullptr);
+		}
+	}
+
+	int x = vector_print.size() - 1;
+	while (vector_print[x] == "null")
+	{
+		vector_print.pop_back();
+		x--;
+	}
+
+	print_array(vector_print);
+}
+
 
 int
 main()
@@ -189,10 +251,16 @@ main()
 
 	std::cout << "\n\t=========================================";
 	std::cout << "\n\t=== BINARY TREE LEVEL ORDER TRAVERSAL ===";
-	std::cout << "\n\t=========================================\n\n";
+	std::cout << "\n\t=========================================\n";
+
+
+	/* Write Input */
+	print_levelorder(root);
+
 
 	/* Solution */
 	std::vector<std::vector<int>> results = sol.levelOrder(root);
+
 
 	/* Write Output */
 	bool first = true;
@@ -217,6 +285,7 @@ main()
 		first = false;
 	}
 	std::cout << "]\n\n";
+
 
 	return 0;
 }
