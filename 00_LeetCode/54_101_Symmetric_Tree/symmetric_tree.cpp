@@ -93,7 +93,7 @@ struct TreeNode {
 /*	Time  Complexity: O(n) */
 /*
 	Space Complexity: O(h)
-	Where 'h' is the the height of tree
+	Where 'h' is the height of tree
 */
 class Solution{
 	void preorder(TreeNode* root, std::vector<int>& left)
@@ -166,9 +166,9 @@ public:
 /*	Time  Complexity: O(n) */
 /*
 	Space Complexity: O(h)
-	Where 'h' is the the height of tree
+	Where 'h' is the height of tree
 */
-class Solution_iter{
+class Solution_Iter{
 	void preorder_iter(TreeNode* root, std::vector<int>& left)
 	{
 		std::stack<TreeNode*> stack;
@@ -320,6 +320,64 @@ public:
 
 
 /*
+	------------
+	--- IDEA ---
+	------------
+
+	It's a similar problem to LeetCode: 100_Same_Tree with one difference.
+	Instead of checking:
+		p->left  subtree with q->left  subtree
+			and
+		p->right subtree with q->right subtree
+	
+	We check the exact opposite. We check:
+		p->left  subtree with q->right subtree
+			and
+		p->right subtree with q->left  subtree
+	
+	Because that's how you properly check if two trees are mirrors.
+
+	Look at a Visual representation of a Tree and go through the code and it'll
+	be super obvious and easy to understand.
+	
+*/
+
+
+/* Time  Beats: 88.40% */
+/* Space Beats: 58.50% */
+
+/*	Time  Complexity: O(n) */
+/*
+	Space Complexity: O(h)
+	Where 'h' is the height of tree
+*/
+class Solution_Neat{
+private:
+	bool dfs(TreeNode* p, TreeNode* q)
+	{
+		if (!p && !q)
+			return true;
+
+		if (!p || !q) // Only one is null
+			return false;
+
+		if (p->val != q->val)
+			return false;
+
+		return (dfs(p->left, q->right) && dfs(p->right, q->left));
+	}
+
+public:
+	bool isSymmetric(TreeNode* root)
+	{
+		return dfs(root->left, root->right);
+	}
+};
+
+
+
+
+/*
 	=============================
 	=== This is just printing ===
 	=============================
@@ -398,7 +456,8 @@ int
 main()
 {
 	Solution sol;
-	Solution_iter sol_iter;
+	Solution_Iter sol_iter;
+	Solution_Neat sol_neat;
 
 	/* Example 1 */
 	TreeNode three1(3);
@@ -454,7 +513,8 @@ main()
 
 	/* Solution */
 	// bool symmetric = sol.isSymmetric(root);
-	bool symmetric = sol_iter.isSymmetric(root);
+	// bool symmetric = sol_iter.isSymmetric(root);
+	bool symmetric = sol_neat.isSymmetric(root);
 
 
 	/* Write Output */
