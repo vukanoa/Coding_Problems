@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
-
+#include <queue>
 
 /*
 	==============
@@ -64,6 +64,69 @@ struct TreeNode {
 	--- IDEA ---
 	------------
 
+	I don't know why but this IDEA is more readable to me. Though it is a lot
+	less efficient than the Solution_efficient, so it's important to
+	understand both.
+
+	IDEAs are almost equivalent, but the first one "shows you how it's done",
+	since it uses both vector and recursion, while the Solution_efficient
+	uses only recursion and is more compact.
+	
+*/
+
+
+/* Time  Beats:  7.42% */
+/* Space Beats: 10.22% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_readable{
+private:
+	int i = 0;
+
+public:
+	TreeNode* buildTree(std::vector<int>& preorder, std::vector<int>& inorder)
+	{
+		if (inorder.empty())
+			return nullptr;
+
+		TreeNode *root = new TreeNode(preorder[i++]);
+		int tmp = root->val;
+
+		/* inorder for the left subtree */
+		int x = 0;
+		std::vector<int> left_inorder;
+		while(inorder[x] != tmp)
+		{
+			left_inorder.push_back(inorder[x]);
+			x++;
+		}
+
+		x++; // Skip the root; So it points at first node of the right subtree
+
+		/* inorder for the right subtree */
+		std::vector<int> right_inorder;
+		while (x < inorder.size())
+		{
+			right_inorder.push_back(inorder[x]);
+			x++;
+		}
+
+		root->left  = buildTree(preorder,  left_inorder);
+		root->right = buildTree(preorder, right_inorder);
+
+		return root;
+	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
 	Two key observations are:
 		1. Preorder traversal follows:
 			Root -> Left -> Right
@@ -75,8 +138,8 @@ struct TreeNode {
 		   therefore if we know the position of "Root", we can recursively
 		   split the entire array into two subtrees.
 
-	Now the idea should be clear enough. We will design a recursion functions:
-	it will set the first element of "preorder" as the root, and then construct
+	Now the idea should be clear enough. We will design a recursive function:
+	It will set the first element of "preorder" as the root, and then construct
 	the entire tree. To find the left and right subtrees, it will look for the
 	root in "inorder", so that everything on the left should be the left
 	subtree. Both subtrees can be constructed by making another recursion call.
@@ -120,7 +183,8 @@ struct TreeNode {
 	              ^
 	              |
 	  root --------
-
+	             |
+	             v
 	inorder: [1, 9, 2]
 	          ~     #
 	          ^     ^
@@ -132,6 +196,7 @@ struct TreeNode {
 	...
 	...
 	etc.
+	...
 	...
 
 
@@ -153,16 +218,18 @@ struct TreeNode {
 		  "inorder".
 
 	// Since I didn't implement a visual representation of BST, print the
-	// preorder of the just contructed BST.
+	// preorder of the just constructed BST.
 */
 
+/* Time  Beats: 98.46% */
+/* Space Beats: 33.34% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution{
+class Solution_efficient {
 private:
 	int preorder_index;
-	std::unordered_map<int, int> inorder_index_hashmap;
+	std::unordered_map<int, int> inorder_value_index_hashmap;
 public:
 	TreeNode* buildTree(std::vector<int>& preorder, std::vector<int>& inorder)
 	{
@@ -170,120 +237,195 @@ public:
 
 		// Build a hashmap to store {value, its index}
 		for (int i = 0; i < inorder.size(); i++)
-			inorder_index_hashmap.insert({inorder[i], i});
+			inorder_value_index_hashmap.insert({inorder[i], i});
 
 		return array_to_tree(preorder, 0, preorder.size() - 1);
 	}
 
-	TreeNode* array_to_tree(std::vector<int>& preorder, int left, int right)
+	TreeNode* array_to_tree(std::vector<int>& preorder, int first_index, int last_index)
 	{
 		// If there are no elements to construct the tree
-		if (left > right)
+		if (first_index > last_index)
 			return nullptr;
 
 		// Select the preorder_index element as the root and increment it
 		int root_value = preorder[preorder_index++];
 		TreeNode* root = new TreeNode(root_value);
 
-
 		/* Build left and right subtree */
-		// Excluding inorder_index_hashmap[root_value] element because it's the root
-		root->left  = array_to_tree(preorder, left, inorder_index_hashmap.at(root_value) - 1);
-		root->right = array_to_tree(preorder, inorder_index_hashmap.at(root_value) + 1, right);
+		// Excluding inorder_value_index_hashmap[root_value] element because that's the root
+		root->left  = array_to_tree(preorder,               first_index                     , inorder_value_index_hashmap.at(root_value) - 1);
+		root->right = array_to_tree(preorder, inorder_value_index_hashmap.at(root_value) + 1,              last_index                       );
 
 		return root;
 	}
 };
 
 
-void
-print_preorder(TreeNode* root)
-{
-	if (root == nullptr)
-		return;
 
-	std::cout << root->val << " ";
-	print_preorder(root->left);
-	print_preorder(root->right);
+
+/*
+	=============================
+	=== This is just printing ===
+	=============================
+*/
+
+void
+print_array(std::vector<std::string>& nums)
+{
+	bool first = true;
+	std::cout << "\n\t(TODO: Implement a Visual representation of a Binary Tree)";
+	std::cout << "\n\t*** Level Order ***";
+	std::cout << "\n\tTree: [";
+	for (auto x: nums)
+	{
+		if (!first)
+			std::cout << ", ";
+
+		std::cout << x;
+		first = false;
+	}
+	std::cout << "]\n\n";
 }
 
 
 void
-fill_preorder(TreeNode* root, std::vector<int>& preorder)
+print_levelorder(TreeNode* root)
 {
 	if (root == nullptr)
 		return;
+	
+	std::queue<TreeNode*> queue;
+	queue.push(root);
 
-	preorder.push_back(root->val);
-	fill_preorder(root->left, preorder);
-	fill_preorder(root->right, preorder);
+	std::vector<std::string> vector_print;
+
+	while (!queue.empty())
+	{
+		int size = queue.size();
+
+		for (int i = 0; i < size; i++)
+		{
+			TreeNode* node = queue.front();
+			queue.pop();
+
+			if (node == nullptr)
+			{
+				vector_print.push_back("null");
+				continue;
+			}
+			else
+				vector_print.push_back(std::to_string(node->val));
+
+			if (node->left != nullptr)
+				queue.push(node->left);
+			else
+				queue.push(nullptr);
+
+			if (node->right != nullptr)
+				queue.push(node->right);
+			else
+				queue.push(nullptr);
+		}
+	}
+
+	int x = vector_print.size() - 1;
+	while (vector_print[x] == "null")
+	{
+		vector_print.pop_back();
+		x--;
+	}
+
+	print_array(vector_print);
 }
 
 
 void
-fill_inorder(TreeNode* root, std::vector<int>& inorder)
+print_preorder(std::vector<int>& preorder)
 {
-	if (root == nullptr)
-		return;
+	bool first = true;
+	std::cout << "\n\tPreorder: [";
+	for (auto x: preorder)
+	{
+		if (!first)
+			std::cout << ", ";
 
-	fill_inorder(root->left, inorder);
-	inorder.push_back(root->val);
-	fill_inorder(root->right, inorder);
+		std::cout << x;
+		first = false;
+	}
+	std::cout << "]";
+}
+
+
+void
+print_inorder(std::vector<int>& inorder)
+{
+	bool first = true;
+	std::cout << "\n\tInorder:  [";
+	for (auto x: inorder)
+	{
+		if (!first)
+			std::cout << ", ";
+
+		std::cout << x;
+		first = false;
+	}
+	std::cout << "]\n\n";
 }
 
 
 int
 main()
 {
-	Solution sol;
+	Solution_readable sol_read;
+	Solution_efficient sol_eff;
 
 	/* Example 1 */
-	TreeNode fifteen(15);
-	TreeNode seven(7);
-	TreeNode twenty(20, &fifteen, &seven);
-	TreeNode nine(9);
-	TreeNode three(3, &nine, &twenty);
-	TreeNode* root = &three;
 	/*
 		___________
 		_____3_____
 		__9_____20_
 		1___2_15__7
 	*/
+	std::vector<int> preorder = {3, 9, 1, 2, 20, 15, 7};
+	std::vector<int> inorder  = {1, 9, 2, 3, 15, 20, 7};
 
 
 	/* Example 2 */
-	// TreeNode one(-1);
-	// TreeNode* root = &one;
+	/*
+		___-1___
+	*/
+	// std::vector<int> preorder = {-1};
+	// std::vector<int> inorder  = {-1};
 
 
 	/* Example 3 */
-	// TreeNode one(1);
-	// TreeNode* root = &one;
+	/*
+		___1___
+	*/
+	// std::vector<int> preorder = {1};
+	// std::vector<int> inorder  = {1};
 
 
 	/* Example 4 */
-	// TreeNode* root = nullptr;
+	/*
+		Empty
+	*/
+	// std::vector<int> preorder;
+	// std::vector<int> inorder;
 
 
 	/* Example 5 */
-	// TreeNode two(2);
-	// TreeNode one(1, &two, nullptr);
-	// TreeNode* root = &one;
 	/*
 		_____
 		__1__
 		2____
 	*/
+	// std::vector<int> preorder = {1, 2};
+	// std::vector<int> inorder  = {2, 1};
 
 
 	/* Example 6 */
-	// TreeNode five(5);
-	// TreeNode four(4, &five, nullptr);
-	// TreeNode three(3, &four, nullptr);
-	// TreeNode two(2, &three, nullptr);
-	// TreeNode one(1, &two, nullptr);
-	// TreeNode* root = &one;
 	/*
 		_______________________1_______________________
 		___________2___________________________________
@@ -291,17 +433,11 @@ main()
 		__4____________________________________________
 		5______________________________________________
 	*/
+	// std::vector<int> preorder = {1, 2, 3, 4, 5};
+	// std::vector<int> inorder  = {5, 4, 3, 2, 1};
 
 
 	/* Example 7 */
-	// TreeNode seven(7);
-	// TreeNode five(5, &seven, nullptr);
-	// TreeNode four(4);
-	// TreeNode two(2, &four, &five);
-	// TreeNode six(6);
-	// TreeNode three(3, nullptr, &six);
-	// TreeNode one(1, &two, &three);
-	// TreeNode* root = &one;
 	/*
 		_______________________
 		___________1___________
@@ -309,25 +445,29 @@ main()
 		__4_____5___________6__
 		______7________________
 	*/
-
-
-	/* This is the same for every Example (do not comment this)*/
-	std::vector<int> preorder;
-	std::vector<int> inorder;
-	fill_preorder(root, preorder);
-	fill_inorder(root, inorder);
+	// std::vector<int> preorder = {1, 2, 4, 5, 7, 3, 6};
+	// std::vector<int> inorder  = {4, 2, 7, 5, 1, 3, 6};
 
 
 	std::cout << "\n\t=================================================================";
 	std::cout << "\n\t=== CONSTRUCT BINARY TREE FROM PREORDER AND INORDER TRAVERSAL ===";
 	std::cout << "\n\t=================================================================\n";
 
-	std::cout << "\n\tPreorder of the Constructed Binary Tree:\n\t";
+
+	/* Write Input */
+	print_preorder(preorder);
+	print_inorder(inorder);
+
 
 	/* Solution */
-	print_preorder(sol.buildTree(preorder, inorder));
+	// TreeNode* root = sol_read.buildTree(preorder, inorder);
+	TreeNode* root = sol_eff.buildTree(preorder, inorder);
 
-	std::cout << "\n\n";
+
+	/* Write Output */
+	std::cout << "\n\t\t=== Constructed Binary Tree ===\n\n";
+	print_levelorder(root);
+
 
 	return 0;
 }
