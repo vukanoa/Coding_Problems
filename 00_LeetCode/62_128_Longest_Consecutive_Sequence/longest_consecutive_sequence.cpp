@@ -4,7 +4,7 @@
 
 /*
 	==============
-	=== MEDIUM ===
+	=== MEDIUM === (Previously was under HARD)
 	==============
 
 	=================================
@@ -142,7 +142,7 @@
 	element indeed represents the start of a sequence.
 
 	So how can we know if an element is a starting element if, in this example,
-	we see '1' AFTER we see 4, and we have to do it in O(n).
+	we see '1' AFTER we see 4, and we have to do it in O(n)?
 
 	The answer is - Starting element is the smallest in the sequence.
 	Starting element minus 1 does NOT exist in the array, or rather, in Set.
@@ -152,7 +152,7 @@
 	forward.
 
 	99  does NOT    exist so 100 is INDEED a starting element
-	4   does INDEED exist so 4   is NOT    a starting element
+	3   does INDEED exist so 4   is NOT    a starting element
 	199 does NOT    exist so 200 is INDEED a starting element
 	0   does NOT    exist so 1   is INDEED a starting element
 	2   does INDEED exist so 3   is NOT    a starting element
@@ -164,8 +164,24 @@
 
 	Thus we keep Time Complexity to O(n).
 
+
+	1 2 3 4       100     200
+
+	You can clearly observe that to know that a single element is a starting
+	one, it must NOT have a left neighbor.
+
+	  1 doesn't have left neighbor, i.e. 0
+	100 doesn't have left neighbor i.e. 99
+	200 doesn't have left neighbor i.e. 199
+
+	So each element will be processed twice. Once when creating a set at the
+	beginning. And once when iterating through sequence from each starting
+	element, thus this makes it O(n).
+
 */
 
+/* Time  Beats: 32.64% */
+/* Space Beats: 57.57% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
@@ -245,8 +261,10 @@ main()
 	/* Solution */
 	int max = sol.longestConsecutive(nums);
 
+
 	/* Write Output */
 	std::cout << "\n\tLongest Consecutive Sequence: " << max << "\n\n";
+
 
 	return 0;
 }
