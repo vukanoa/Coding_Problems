@@ -57,8 +57,14 @@
 
 	Just XOR all the elements.
 
+	If you XOR something twice with the same value it's as if you haven't done
+	anything, thus if we XOR all the elements in the array, we will end up with
+	one that doesn't repeat.
+
 */
 
+/* Time  Beats: 82.89% */
+/* Space Beats: 99.12% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -74,16 +80,17 @@ public:
 	}
 };
 
+
 int
 main()
 {
 	Solution sol;
 
 	/* Example 1 */
-	std::vector<int> nums = {2, 2, 1};
+	// std::vector<int> nums = {2, 2, 1};
 
 	/* Example 2 */
-	// std::vector<int> nums = {4, 1, 2, 1, 2};
+	std::vector<int> nums = {4, 1, 2, 1, 2};
 
 	/* Example 3 */
 	// std::vector<int> nums = {1};
@@ -117,8 +124,10 @@ main()
 	/* Solution */
 	int result = sol.singleNumber(nums);
 
+
 	/* Write Output */
 	std::cout << "\n\tOutput: " << result << "\n\n";
+
 
 	return 0;
 }
