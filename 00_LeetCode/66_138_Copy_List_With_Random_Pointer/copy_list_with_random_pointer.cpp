@@ -137,11 +137,59 @@ public:
 
 	Return the corresponding copy of the Original List's head, from our
 	Hashmap.
+*/
+
+/* Time  Beats: 83.26% */
+/* Space Beats: 18.83% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution{
+public:
+	Node* copyRandomList(Node* head)
+	{
+		if (head == nullptr)
+			return nullptr;
+
+		std::unordered_map<Node*, Node*> umap;
+		umap.insert({nullptr, nullptr});
+
+		Node* curr_original = head;
+
+		while (curr_original)
+		{
+			Node* curr_copy = new Node(curr_original->val);
+			umap.insert({curr_original, curr_copy});
+
+			curr_original = curr_original->next;
+		}
+
+		curr_original = head;
+		while (curr_original)
+		{
+			Node* curr_copy = umap.at(curr_original);;
+
+			curr_copy->next   = umap.at(curr_original->next);
+			curr_copy->random = umap.at(curr_original->random);
+
+			curr_original = curr_original->next;
+		}
+
+		return umap.at(head);
+	}
+};
 
 
 
 
-    --- Solution_DNA ---
+/* This doesn't pass LeetCode tests since it modifies the original list */
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+    *** Solution_DNA ***
 
     Why am I calling it "DNA"? It is reminiscent of DNA replication. At least
     it reminds me of it.
@@ -166,36 +214,37 @@ public:
 		   (right arrows represent "next" pointer, while the ones that go
 		   up and down, in this drawing, represent "random" pointers)
 
-Original List: (Before the while loop)
-    head -----
-             |
---------------
-|
-|
-|
-|   ----------------------------
-|   |                          |
-|   v                          |
-|   ---------------------------|--------
-|   |             -------      |       |
-|   |             v     |      |       v
-|-> 7 ==> 13 ==> 11 ==> 10 ==> 1 ==> nullptr
-    ^      |      |            ^
-    |      |      |            |
-    -------       --------------
+	Original List: (Before the while loop)
 
-
-Original List: (Before the while loop)
-
-    head -----
-             |
-    ----------
-    |
-    v
-  ->7     ->13     ->11     ->10     ->1                 (Original List)
-  | |     |  |     |  |     |  |     | |
-  | v     |  v     |  v     |  v     | v
-  --7 ==> --13 ==> --11 ==> --10 ==> --1 ==> nullptr     (Copied List)
+      head -----
+               |
+  --------------
+  |
+  |
+  |
+  |   ----------------------------
+  |   |                          |
+  |   v                          |
+  |   ---------------------------|--------
+  |   |             -------      |       |
+  |   |             v     |      |       v
+  |-> 7 ==> 13 ==> 11 ==> 10 ==> 1 ==> nullptr
+      ^      |      |            ^
+      |      |      |            |
+      -------       --------------
+  
+  
+  Original List: (Before the while loop)
+  
+      head -----
+               |
+      ----------
+      |
+      v
+    ->7     ->13     ->11     ->10     ->1                 (Original List)
+    | |     |  |     |  |     |  |     | |
+    | v     |  v     |  v     |  v     | v
+    --7 ==> --13 ==> --11 ==> --10 ==> --1 ==> nullptr     (Copied List)
 
 // From up (Origian List) downards is the "next" pointer of Original List.
 // From down(Copied List) upwards is the "random" pointer of the Copied List.
@@ -247,47 +296,8 @@ Original List: (Before the while loop)
           left Original List modified in terms of its "next" pointers, that
           means that head->next is pointing to the head of our copied list
           which we're asked to return.
+
 */
-
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution{
-public:
-	Node* copyRandomList(Node* head)
-	{
-		if (head == nullptr)
-			return nullptr;
-
-		std::unordered_map<Node*, Node*> umap;
-		umap.insert({nullptr, nullptr});
-
-		Node* curr_original = head;
-
-		while (curr_original)
-		{
-			Node* curr_copy = new Node(curr_original->val);
-			umap.insert({curr_original, curr_copy});
-
-			curr_original = curr_original->next;
-		}
-
-		curr_original = head;
-		while (curr_original)
-		{
-			Node* curr_copy = umap.at(curr_original);;
-
-			curr_copy->next   = umap.at(curr_original->next);
-			curr_copy->random = umap.at(curr_original->random);
-
-			curr_original = curr_original->next;
-		}
-
-		return umap.at(head);
-	}
-};
-
-
 
 /*	Time  Complexity: O(n) */
 /*
@@ -511,12 +521,21 @@ main()
 	std::cout << "\n\t=== COPY LIST WITH RANDOM POINTER ===";
 	std::cout << "\n\t=====================================\n";
 
+
+	/* Write Input */
+	std::cout << "\n\t\t*** ORIGINAL LIST ***\n";
+	print_list(head);
+
+
 	/* Solution */
 	Node* ret = sol.copyRandomList(head);
 	// Node* ret = sol_dna.copyRandomList(head);
 
+
 	/* Write Output */
+	std::cout << "\n\n\n\t\t*** COPIED LIST ***\n";
 	print_list(ret);
+
 
 	return 0;
 }
