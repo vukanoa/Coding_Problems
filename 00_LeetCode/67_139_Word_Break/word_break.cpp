@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include <unordered_set>
 
 /*
 	==============
@@ -52,6 +53,42 @@
 
 */
 
+
+
+
+/* TLE (Time Limit Exceeded) */
+
+/* Time  Complexity: O(2^n) */
+/* Space Complexity: O(n) */
+class Solution_Brute{
+private:
+	bool backtracking(std::string& s, std::unordered_set<std::string>& dict_uset, int start)
+	{
+		if (start == s.length())
+			return true;
+
+		for (int i = start; i < s.length(); i++)
+		{
+			std::string current_str = s.substr(start, i - start + 1);
+
+			if (dict_uset.find(current_str) != dict_uset.end())
+			{
+				if (backtracking( s, dict_uset, i + 1))
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+public:
+	bool wordBreak(std::string s, std::vector<std::string>& wordDict)
+	{
+		std::unordered_set<std::string> dict_uset(wordDict.begin(), wordDict.end());
+
+		return backtracking(s, dict_uset, 0);
+	}
+};
 
 /*
 	------------
@@ -134,22 +171,22 @@
 
 
 	1.
-		'e' // Index: 7
+		'e' // start: 7
 	i = 7   "e"
 
 	2.
-		'd' // Index: 6
+		'd' // start: 6
 	i = 6   "d"
 	i = 7   "de"
 
 	3.
-		'o' // Index: 5
+		'o' // start: 5
 	i = 5   "o"
 	i = 6   "od"
 	i = 7   "ode"
 
 	4.
-		'c' //Index: 4       index + 1 ----
+		'c' //start: 4       start --------
 	i = 4   "c"                           |
 	i = 5   "co"                          |
 	i = 6   "cod"                         v
@@ -159,14 +196,14 @@
 		i + 1 ------------
 
 
-	5. 't' // Index: 3
+	5. 't' // start: 3
 	i = 3   "t"
 	i = 4   "tc"
 	i = 5   "tco"
 	i = 6   "tcod"
 	i = 7   "tcode"
 
-	6. 'e' // Index: 2
+	6. 'e' // start: 2
 	i = 2   "e"
 	i = 3   "et"
 	i = 4   "etc"
@@ -174,7 +211,7 @@
 	i = 6   "etcod"
 	i = 7   "etcode"
 
-	7. 'e' // Index: 1
+	7. 'e' // start: 1
 	i = 1   "e"
 	i = 2   "ee"
 	i = 3   "eet"
@@ -183,7 +220,7 @@
 	i = 6   "eetcod"
 	i = 7   "eetcode"
 
-	8. 'l' // Index: 0       index + 1 ----
+	8. 'l' // start: 0       start --------
 	i = 0   "l"                           |
 	i = 1   "le"                          |
 	i = 2   "lee"                         v
@@ -209,14 +246,15 @@
 
 */
 
-
+/* Time  Beats: 41.70% */
+/* Space Beats: 33.68% */
 
 /*
 	Time  Complexity: O(n^2 * n) => O(n^3)
 
 */
 /* Space Complexity: O(n) */
-class Solution{
+class Solution_DP {
 public:
 	bool wordBreak(std::string s, std::vector<std::string>& wordDict)
 	{
@@ -225,14 +263,15 @@ public:
 
 		dp[s.length()] = true;
 
-		for (int index = s.length() - 1; index >= 0; index--)
+		for (int start = s.length() - 1; start >= 0; start--)
 		{
-			for (int i = index; i < s.length(); i++)
+			for (int i = start; i < s.length(); i++)
 			{
-				std::string current_str = s.substr(index, i - index + 1);
-				if (dict.find(current_str) != dict.end() && dp[i + 1])
+				std::string current_substr = s.substr(start, i - start + 1);
+
+				if (dict.find(current_substr) != dict.end() && dp[i + 1])
 				{
-					dp[index] = true;
+					dp[start] = true;
 					break;
 				}
 			}
@@ -243,54 +282,89 @@ public:
 };
 
 
-/* Time  Complexity: O(2^n) */
-/* Space Complexity: O(n) */
-// TLE (Time Limit Exceeded)
-class Solution_brute{
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Almost equivalent IDEA to the the one above. The only difference is that
+	we're iterating through wordDict instead of every possible substring.
+	
+*/
+
+/* Time  Beats:   100% */
+/* Space Beats: 89.60% */
+
+/*
+	Time  Complexity: O(n * m * n) => O(n^2 * m)
+	Where 'm' is the size of wordDict.
+
+	I'm confused why is this faster if in the Description it says:
+		*** Constraints ***
+		1 <= s.length <= 300
+		1 <= wordDict.length <= 1000
+	
+	Since wordDict.length is greater than s.length, i.e. m > n, then:
+		O(n^3) should preffered over O(n^ * m)
+	although that is the exact opposite of what I find.
+*/
+/*
+	Space Complexity: O(n)
+*/
+class Solution_DP_Neat {
 public:
-	bool wordBreak(std::string s, std::vector<std::string>& wordDict)
+	bool wordBreak(std::string& s, std::vector<std::string> wordDict)
 	{
-		std::set<std::string> dictionary_set(wordDict.begin(), wordDict.end());
+		std::vector<bool> dp(s.length() + 1, false);
+		dp[s.length()] = true;
 
-		return recursion(0, s, dictionary_set);
-	}
-
-	bool recursion(int index, std::string& s, std::set<std::string>& dictionary_set)
-	{
-		if (index == s.length())
-			return true;
-
-		for (int i = index; i < s.length(); i++)
+		int last = s.length();
+		for (int i = s.length() - 1; i >= 0; i--)
 		{
-			std::string current_str = s.substr(index, i - index + 1);
-
-			if (dictionary_set.find(current_str) != dictionary_set.end())
+			for (int j = 0; j < wordDict.size(); j++)
 			{
-				if (recursion(i + 1, s, dictionary_set))
-					return true;
+				int substr_size = wordDict[j].size();
+
+				if (
+					substr_size + i <= s.length()
+					&& 
+					s.substr(i, substr_size) == wordDict[j] // O(n)
+					&&
+					dp[i + substr_size] == true
+					)
+				{
+					dp[i] = true;
+					break;
+				}
+
 			}
 		}
 
-		return false;
+		return dp[0];
 	}
 };
+
 
 int
 main()
 {
-	Solution sol;
+	Solution_Brute   sol_brute;
+	Solution_DP      sol_dp;
+	Solution_DP_Neat sol_dp_neat;
 
 	/* Example 1 */
-	std::string s = "leetcode";
-	std::vector<std::string> wordDict = {"leet", "code"};
+	// std::string s = "leetcode";
+	// std::vector<std::string> wordDict = {"leet", "code"};
 
 	/* Example 2 */
 	// std::string s = "applepenapple";
 	// std::vector<std::string> wordDict = {"apple", "pen"};
 
 	/* Example 3 */
-	// std::string s = "catsandog";
-	// std::vector<std::string> wordDict = {"cats", "dog", "and", "sand", "cat"};
+	std::string s = "catsandog";
+	std::vector<std::string> wordDict = {"cats", "dog", "and", "sand", "cat"};
 
 	/* Example 4 */
 	// std::string s = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab";
@@ -300,10 +374,17 @@ main()
 	// std::string s = "a";
 	// std::vector<std::string> wordDict = {"b"};
 
+	/* Example 6 */
+	// std::string s = "ttttttt"; // 7
+	// std::vector<std::string> wordDict = {"tttt", "ttt"};
+
+
 	std::cout << "\n\t==================";
 	std::cout << "\n\t=== WORD BREAK ===";
 	std::cout << "\n\t==================\n\n";
 
+	
+	/* Write Input */
 	std::cout << "\tString     = \"";
 	for (const char& x : s)
 		std::cout << x;
@@ -326,8 +407,12 @@ main()
 
 
 	/* Solution */
-	bool possible = sol.wordBreak(s, wordDict);
+	// bool possible = sol_brute.wordBreak(s, wordDict);
+	// bool possible = sol_dp.wordBreak(s, wordDict);
+	bool possible = sol_dp_neat.wordBreak(s, wordDict);
 
+	
+	/* Write Output */
 	if (possible)
 		std::cout << "\n\tIt is INDEED possible to create a word out of those in the dictionary!\n\n";
 	else
