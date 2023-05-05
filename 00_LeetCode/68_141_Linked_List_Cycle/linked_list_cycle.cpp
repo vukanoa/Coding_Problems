@@ -34,15 +34,33 @@
 	================================ EXAMPLES ================================
 	==========================================================================
 
+
 	--- Example 1 ---
+
+		3 -> 2 -> 0 -> -4
+		     ^          |
+		     |__________|
+	
 	Input:  head = [3, 2, 0, -4], pos = 1
 	Output: true
 
+
+
 	--- Example 2 ---
+
+		1 -> 2
+		^    |
+		|____|
+
 	Input:  head = [1, 2], pos = 0
 	Output: true
 
+
+
 	--- Example 3 ---
+
+		1
+
 	Input:  head = [1], pos = -1
 	Output: false
 
@@ -61,10 +79,30 @@ struct ListNode{
 };
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Tortoise and the Hare Technique(Floyd's algorithm).
+
+	Assign Slow pointer to head and Fast pointer to head->next at the
+	beginning.
+	At each iteration in while loop, move Slow pointer by one node forward and
+	move Fast pointer by two nodes forward.
+	If they point to the same node at some point, then that certainly means
+	that there is a cycle.
+
+	Solutions are almost equivalent, it's a matter of personal preference.
+	
+*/
+
+/* Time  Beats: 95.15% */
+/* Space Beats: 47.62% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution{
+class Solution_1 {
 public:
 	bool hasCycle(ListNode *head)
 	{
@@ -88,10 +126,137 @@ public:
 };
 
 
+
+
+/* Time  Beats: 95.15% */
+/* Space Beats: 47.62% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+	bool hasCycle(ListNode *head)
+	{
+		if (head == nullptr)
+			return false;
+
+		ListNode* slow = head;
+		ListNode* fast = head->next;
+
+		while (fast && fast->next)
+		{
+			slow = slow->next;
+			fast = fast->next->next;
+
+			if (slow == fast)
+				return true;
+		}
+
+		return false;
+	}
+};
+
+
+
+
+/*
+	=============================
+	=== This is just Printing ===
+	=============================
+
+*/
+
+void
+print_list(ListNode *head)
+{
+    ListNode* cur = head;
+	printf("\n\t\t");
+
+	if (head == nullptr)
+		printf("Empty");
+
+    while (cur)
+    {
+		if (cur->next == nullptr)
+			printf("%d ", cur->val);
+		else
+			printf("%d -> ", cur->val);
+
+        cur = cur->next;
+    }
+    printf("\n\n");
+}
+
+
+void
+print_loop_list(ListNode* head)
+{
+	ListNode* slow = head;
+	ListNode* fast = head;
+
+	// For printing
+	ListNode* out  = head;
+
+	while (fast != NULL && fast->next != NULL)
+	{
+		slow = slow->next;
+		fast = fast->next->next;
+
+		if (slow == fast)
+			break;
+	}
+
+	// There is no Loop in the List
+	if (fast == NULL || fast->next == NULL)
+	{
+		print_list(head);
+		return;
+	}
+
+	// Find the Loop
+	slow = head;
+	while (slow != fast)
+	{
+		slow = slow->next;
+		fast = fast->next;
+	}
+
+	/* PRINTING */
+	printf("\n\t\t");
+	// printf("\n\t\tLoop List:");
+	// printf("\n\t");
+
+	// Printing before Loop
+	while (out != slow)
+	{
+		printf("%d -> ", out->val);
+		out = out->next;
+	}
+
+	// Print the Looping Node
+	printf("|%d| -> ", out->val);
+
+	fast = fast->next;
+	// Printing the Loop
+	while (slow != fast)
+	{
+		printf("%d -> ", fast->val);
+		fast = fast->next;
+	}
+
+	// Print the Looping Node
+	if (slow->next == slow)
+		printf("|%d| -> |%d| -> |%d| -> ... \n\n", slow->val, slow->val, slow->val);
+	else
+		printf("|%d| -> %d -> %d -> ... \n\n", slow->val, slow->next->val, slow->next->next->val);
+}
+
+
 int
 main()
 {
-	Solution sol;
+	Solution_1 sol_1;
+	Solution_2 sol_2;
 
 	/* Example 1 */
 	/*
@@ -106,7 +271,7 @@ main()
 	zero.next       = &minus_four;
 	two.next        = &zero;
 	three.next      = &two;
-	struct ListNode* head = &minus_four;
+	struct ListNode* head = &three;
 
 
 
@@ -134,10 +299,10 @@ main()
 
 	/* Example 4 */
 	/*
-								 -----
-								 v   |
+		                         -----
+		                         v   |
 		1 -> 2 -> 3 -> 4 -> 5 -> 6   |
-								 -----
+		                         -----
 	*/
 	// struct ListNode six(6);
 	// struct ListNode five(5);
@@ -259,18 +424,41 @@ main()
 	// struct ListNode* head = &one;
 
 
+	/* Example 10 */
+	/*
+		3 -> 2 -> 0 -> -4
+	*/
+	// struct ListNode minus_four(-4);
+	// struct ListNode zero(0);
+	// struct ListNode two(2);
+	// struct ListNode three(3);
+	// zero.next       = &minus_four;
+	// two.next        = &zero;
+	// three.next      = &two;
+	// struct ListNode* head = &three;
+
+
 	std::cout << "\n\t=========================";
 	std::cout << "\n\t=== LINKED LIST CYCLE ===";
 	std::cout << "\n\t=========================\n\n";
 
+	
+	/* Write Input */
+	std::cout << "\n\tList:";
+	print_loop_list(head);
+
 
 	/* Solution */
-	bool has_cycle = sol.hasCycle(head);
+	bool has_cycle = sol_1.hasCycle(head);
+	// bool has_cycle = sol_2.hasCycle(head);
 
+	
+	/* Write Output */
+	std::cout << "\n\tOutput:";
 	if (has_cycle)
-		std::cout << "\n\tThere is INDEED a Cycle in this Linked List!\n\n";
+		std::cout << "\n\t\tThere is INDEED a Cycle in this Linked List!\n\n";
 	else
-		std::cout << "\n\tThere is NOT a Cycle in this Linked List!\n\n";
+		std::cout << "\n\t\tThere is NOT a Cycle in this Linked List!\n\n";
 
 	return 0;
 }
