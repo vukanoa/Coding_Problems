@@ -179,6 +179,8 @@ struct ListNode {
 
 */
 
+/* Time  Beats: 89.40% */
+/* Space Beats: 66.28% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -186,10 +188,10 @@ class Solution{
 public:
 	ListNode *detectCycle(ListNode *head)
 	{
-		struct ListNode* slow = head;
-		struct ListNode* fast = head;
+		ListNode* slow = head;
+		ListNode* fast = head;
 
-		while (fast != NULL && fast->next != NULL)
+		while (fast != nullptr && fast->next != nullptr)
 		{
 			slow = slow->next;
 			fast = fast->next->next;
@@ -198,8 +200,8 @@ public:
 				break;
 		}
 
-		if (fast == NULL || fast->next == NULL)
-			return NULL;
+		if (fast == nullptr || fast->next == nullptr)
+			return nullptr;
 
 		slow = head;
 		while (slow != fast)
@@ -211,6 +213,101 @@ public:
 		return slow;
 	}
 };
+
+
+
+
+/*
+	=============================
+	=== This is just Printing ===
+	=============================
+
+*/
+
+void
+print_list(ListNode *head)
+{
+    ListNode* cur = head;
+	printf("\n\t\t");
+
+	if (head == nullptr)
+		printf("Empty");
+
+    while (cur)
+    {
+		if (cur->next == nullptr)
+			printf("%d ", cur->val);
+		else
+			printf("%d -> ", cur->val);
+
+        cur = cur->next;
+    }
+    printf("\n\n");
+}
+
+
+void
+print_loop_list(ListNode* head)
+{
+	ListNode* slow = head;
+	ListNode* fast = head;
+
+	// For printing
+	ListNode* out  = head;
+
+	while (fast != NULL && fast->next != NULL)
+	{
+		slow = slow->next;
+		fast = fast->next->next;
+
+		if (slow == fast)
+			break;
+	}
+
+	// There is no Loop in the List
+	if (fast == NULL || fast->next == NULL)
+	{
+		print_list(head);
+		return;
+	}
+
+	// Find the Loop
+	slow = head;
+	while (slow != fast)
+	{
+		slow = slow->next;
+		fast = fast->next;
+	}
+
+	/* PRINTING */
+	printf("\n\t\t");
+
+	// Printing before Loop
+	while (out != slow)
+	{
+		printf("%d -> ", out->val);
+		out = out->next;
+	}
+
+	// Print the Looping Node
+	printf("|%d| -> ", out->val);
+
+	fast = fast->next;
+	// Printing the Loop
+	while (slow != fast)
+	{
+		printf("%d -> ", fast->val);
+		fast = fast->next;
+	}
+
+	// Print the Looping Node
+	if (slow->next == slow)
+		printf("|%d| -> |%d| -> |%d| -> ... \n\n", slow->val, slow->val, slow->val);
+	else
+		printf("|%d| -> %d -> %d -> ... \n\n", slow->val, slow->next->val, slow->next->next->val);
+}
+
+
 
 
 int
@@ -384,19 +481,46 @@ main()
 	// struct ListNode* head = &one;
 
 
+	/* Example 10 */
+	/*
+
+		1 -> 2 -> 3 -> 4 -> 5 -> 6
+	*/
+	// struct ListNode six(6);
+	// struct ListNode five(5);
+	// struct ListNode four(4);
+	// struct ListNode three(3);
+	// struct ListNode two(2);
+	// struct ListNode one(1);
+	// five.next  = &six;
+	// four.next  = &five;
+	// three.next = &four;
+	// two.next   = &three;
+	// one.next   = &two;
+	// struct ListNode* head = &one;
+
+
 	std::cout << "\n\t=========================";
 	std::cout << "\n\t=== LINKED LIST CYCLE ===";
-	std::cout << "\n\t=========================\n\n";
+	std::cout << "\n\t=========================\n";
+
+	
+	/* Write Input */
+	std::cout << "\n\tList:";
+	print_loop_list(head);
 
 
 	/* Solution */
 	struct ListNode* cycle = sol.detectCycle(head);
 
+	
+	/* Write Output */
+	std::cout << "\n\tOutput:";
 	if (cycle)
-		std::cout << "\n\tCycle begins at node: " << cycle->val << "\n\n";
+		std::cout << "\n\t\tCycle begins at node: " << cycle->val << "\n\n";
 	else
-		std::cout << "\n\tThere is NO Cycle in this Linked List!\n\n";
+		std::cout << "\n\t\tThere is NO Cycle in this Linked List!\n\n";
+
 
 	return 0;
-
 }
