@@ -78,18 +78,6 @@
 
 */
 
-// Definition for doubly-linked list.
-struct Node {
-	int key;
-    int val;
-    Node *prev;
-    Node *next;
-
-    Node(int k, int v): key(k), val(v), prev(nullptr), next(nullptr) {}
-};
-
-void print_list(Node* head);
-
 
 /*
 	------------
@@ -156,22 +144,35 @@ void print_list(Node* head);
 
 */
 
+/* Time  Beats: 50.58% */
+/* Space Beats: 56.45% */
 
 /* Time  Complexity: O(1) */
 /* Space Complexity: O(n) */
 class LRUCache{
-public:
-	struct Node* head;
-	struct Node* tail;
-	int cache_capacity;
-	std::unordered_map<int, struct Node*> cache;
+private:
+	// Definition for doubly-linked list.
+	struct Node {
+		int key;
+		int val;
+		Node *prev;
+		Node *next;
 
+		Node(int k, int v): key(k), val(v), prev(nullptr), next(nullptr) {}
+	};
+
+	Node* head;
+	Node* tail;
+	int cache_capacity;
+	std::unordered_map<int, Node*> cache;
+
+public:
 	LRUCache(int capacity)
 	{
 		cache_capacity = capacity;
 
-		head = new Node(0, 0); // dummy node
-		tail = new Node(0, 0); // dummy node
+		head = new Node(0, 0); // Left  Dummy node
+		tail = new Node(0, 0); // Right Dummy node
 		head->next = tail;
 		tail->prev = head;
 	}
@@ -183,13 +184,13 @@ public:
 		if (cache.find(key) != cache.end())
 		{
 			remove_from_list(cache.at(key));
-			insert_in_list(cache.at(key));
+			append_to_list(cache.at(key));
 
-			print_list(head);
+			print_list(false);
 			return cache.at(key)->val;
 		}
 
-		print_list(head);
+			print_list(false);
 		return -1;
 	}
 
@@ -201,22 +202,25 @@ public:
 			remove_from_list(cache.at(key));
 
 		cache[key] = new Node(key, value);
-		insert_in_list(cache.at(key));
+		append_to_list(cache.at(key));
 
 		if (cache.size() > cache_capacity)
 		{
 			// Remove from the list and delete the LRU from the hashmap
-			struct Node* lru = head->next;
+			Node* lru = head->next;
 			remove_from_list(lru);
 			cache.erase(lru->key);
 		}
-		print_list(head);
+
+			print_list(false);
 	}
 
-	void remove_from_list(struct Node* node)
+	void remove_from_list(Node* node)
 	{
-		struct Node* prev_node = node->prev;
-		struct Node* next_node = node->next;
+		/* This works even if "node" == head or "node" == tail */
+		/* because of Dummy nodes */
+		Node* prev_node = node->prev;
+		Node* next_node = node->next;
 
 		prev_node->next = next_node;
 		next_node->prev = prev_node;
@@ -224,10 +228,10 @@ public:
 		// delete node;
 	}
 
-	void insert_in_list(struct Node* node)
+	void append_to_list(Node* node)
 	{
-		struct Node* prev_node = tail->prev;
-		struct Node* next_node = tail;
+		Node* prev_node = tail->prev;
+		Node* next_node = tail; // Dummy node
 
 		prev_node->next = node;
 		next_node->prev = node;
@@ -235,40 +239,44 @@ public:
 		node->next = next_node;
 		node->prev = prev_node;
 	}
-};
 
-bool final_output = false;
+public:
+	/*
+		=============================
+		=== This is just printing ===
+		=============================
+	*/
 
-void
-print_list(Node* head)
-{
-	if (head->next == nullptr)
+	void print_list(bool final_output)
 	{
-		std::cout << "\n\tEmpty!\n\n";
-		return;
-	}
-
-	struct Node* tmp = head->next;
-
-	if (final_output)
-		std::cout << "\n\tList:\n\t\t";
-	else
-		std::cout << "\n\t\tList:\n\t\t\t";
-
-	while (tmp->next)
-	{
-		if (tmp->next->next == nullptr) // Last element
+		if (head->next == nullptr)
 		{
-			std::cout << "[key: " << tmp->key << ", value: " << tmp->val << "]";
-			break;
+			std::cout << "\n\tEmpty!\n\n";
+			return;
 		}
-		else
-			std::cout << "[key: " << tmp->key << ", value: " << tmp->val << "] -> ";
 
-		tmp = tmp->next;
+		struct Node* tmp = head->next;
+
+		if (final_output)
+			std::cout << "\n\tList:\n\t\t";
+		else
+			std::cout << "\n\t\tList:\n\t\t\t";
+
+		while (tmp->next)
+		{
+			if (tmp->next->next == nullptr) // Last element
+			{
+				std::cout << "[key: " << tmp->key << ", value: " << tmp->val << "]";
+				break;
+			}
+			else
+				std::cout << "[key: " << tmp->key << ", value: " << tmp->val << "] -> ";
+
+			tmp = tmp->next;
+		}
+		std::cout << "\n\n";
 	}
-	std::cout << "\n\n";
-}
+};
 
 
 int
@@ -291,11 +299,10 @@ main()
 	lRUCache.get(4);    // return 4
 
 	/* Final Output */
-	final_output = true;
 	std::cout << "\n\t\t --------------------";
 	std::cout << "\n\t\t *** FINAL OUTPUT ***";
 	std::cout << "\n\t\t --------------------";
-	print_list(lRUCache.head);
+	lRUCache.print_list(true);
 
 	return 0;
 }
