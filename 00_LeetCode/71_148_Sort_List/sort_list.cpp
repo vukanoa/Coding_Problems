@@ -56,16 +56,19 @@ struct ListNode {
 };
 
 
+
+
+
 /*
 	------------
 	--- IDEA ---
 	------------
-
-	--- Solution_wose ---
-	classic Merge Sort on Linked List.
+	
 	Top-Down Approach:
 		Time:  O(n * logn)
-		Space: O(1)
+		Space: O(logn)
+
+	Classic Merge Sort on Linked List. (There is a better Solution down)
 
 
                                           ^
@@ -87,75 +90,19 @@ struct ListNode {
    1  ->  5  -> 10  -> 30  -> 60
 
 
-
-
-
-	--- Solution ---
-	Bottom-Up Approach:
-		Time:  O(n * logn)
-		Space: O(1)
-	The idea is simple.
-	Go through the list and merge sorted lists.
-
-	How do you do that is you have an unsorted list? Well in any list, a single
-	element is always sorted - one element in the list, array or any other
-	data structure, is considered sorted.
-
-	So what we're doing here is:
-		Merge Two Sorted Lists:
-			1. 1st List is a single element
-			2. 2nd List is a single element
-
-	consider this example:
-
-	15 -> 7 -> 32 -> 1 -> 10 -> 11 -> 3 -> 4 -> 12 -> 8
-
-	Now sort every two elements:
-
-	Size = 2
-	7 -> 15 -> 1 -> 32 -> 10 -> 11 -> 3 -> 4 -> 8 -> 12
-    ~~~~~~~    ~~~~~~~    ~~~~~~~~    ~~~~~~~   ~~~~~~~~
-
-	Now when we have sublists of 2 elements sorted, now we do the same, but
-	for 4 elements. (Always the power of 2).
-
-	Now we have:
-
-	Size = 4
-	1 -> 7 -> 15 -> 32 -> 3 -> 4 -> 10 -> 11 -> 8 -> 12
-	~~~~~~~~~~~~~~~~~~    ~~~~~~~~~~~~~~~~~~
-
-	The rest is left untouched sinced we know that part is sorted.
-
-	Now size is not 4, but 8.
-
-	Size = 8
-	1 -> 3 -> 4 -> 7 -> 10 -> 11 -> 15 -> 32 -> 8 -> 12
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-	And finally, do it for 16.
-
-	Size = 16
-	1 -> 3 -> 4 -> 7 -> 8 -> 10 -> 11 -> 12 -> 15 -> 32
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-	So we're passing the list logn times. For sizes: 2, 4, 8 and 16
-	But each time we're doing "Merge Two Sorted Lists" which is O(n).
-
-	Thus the overall Time Complexity is O(n * logn);
-	But the Space Complexity is O(1) since we do not need the Stack for
-	recursion for we are doing it iteratively.
+	
 */
 
-
+/* Time  Beats: 81.24% */
+/* Space Beats: 81.64% */
 
 /* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(logn) */
-class Solution_worse{
+class Solution_Merge_Sort_Classic{
 public:
 	struct ListNode* sortList(struct ListNode* head)
 	{
-		if (!head || !head->next)
+		if (head == nullptr || head->next == nullptr)
 			return head;
 
 		struct ListNode* mid   = mid_node(head);
@@ -212,16 +159,83 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Bottom-Up Approach:
+		Time:  O(n * logn)
+		Space: O(1)
+
+	The idea is simple.
+	Go through the list and merge sorted lists.
+
+	How do you do that if you have an unsorted list?
+	Well in any list, a single element is always sorted - one element in the
+	list, array or any other data structure, is considered sorted.
+
+	So what we're doing here is:
+		Merge Two Sorted Lists:
+			1. 1st List is a single element
+			2. 2nd List is a single element
+
+	Consider this example:
+
+	15 -> 7 -> 32 -> 1 -> 10 -> 11 -> 3 -> 4 -> 12 -> 8
+
+	Now sort every two elements:
+
+	Size = 2
+	7 -> 15 -> 1 -> 32 -> 10 -> 11 -> 3 -> 4 -> 8 -> 12
+    ~~~~~~~    ~~~~~~~    ~~~~~~~~    ~~~~~~~   ~~~~~~~~
+
+	Now when we have sublists of 2 elements sorted, now we do the same, but
+	for 4 elements. (Always the power of 2).
+
+	Now we have:
+
+	Size = 4
+	1 -> 7 -> 15 -> 32 -> 3 -> 4 -> 10 -> 11 -> 8 -> 12
+	~~~~~~~~~~~~~~~~~~    ~~~~~~~~~~~~~~~~~~
+
+	The rest is left untouched sinced we know that part is sorted.
+
+	Now size is not 4, but 8.
+
+	Size = 8
+	1 -> 3 -> 4 -> 7 -> 10 -> 11 -> 15 -> 32 -> 8 -> 12
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	And finally, do it for 16.
+
+	Size = 16
+	1 -> 3 -> 4 -> 7 -> 8 -> 10 -> 11 -> 12 -> 15 -> 32
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	So we're passing the list logn times. For sizes: 2, 4, 8 and 16(in this ex)
+	But each time we're doing "Merge Two Sorted Lists" which is O(n).
+
+	Thus the overall Time Complexity is O(n * logn);
+	But the Space Complexity is O(1) since we do not need the Stack for
+	recursion since we are doing it iteratively.
+*/
+
+/* Time  Beats: 84.50% */
+/* Space Beats: 97.86% */
+
 /* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(1) */
-class Solution{
+class Solution_Merge_Sort_Improved{
 public:
 	ListNode* tail = new ListNode();
 	ListNode* next_sublist = new ListNode();
 
 	ListNode* sortList(ListNode* head)
 	{
-		if (!head || !head->next)
+		if (head == nullptr || head->next == nullptr)
 			return head;
 
 		int n = get_count(head);
@@ -235,7 +249,7 @@ public:
 
 			while (start)
 			{
-				if (!start->next)
+				if (start->next == nullptr)
 				{
 					tail->next = start;
 					break;
@@ -331,6 +345,88 @@ public:
 };
 
 
+
+
+/* Quick Sort */
+/* This Solution Gives TLE */
+
+/*
+	Time  Complexity: O(n^2)
+	The average Time Complexity is O(n * logn), however the absolute worst Time
+	Complexity is O(n^2) and that happens when the chosen pivot in each
+	partitioning step is either the smallest or the lagest element in the
+	subarray, which causes the partition function to split the array into two
+	subarrays of size 1 and n-1. This leads to n recursive calls, each with a
+	subarray of size n-1, resulting in a worst-case Time Complexity of O(n^2).
+
+	The worst case scenario for Quick Sort:
+	[50000, 49999, 49998, 49997, ..., 3, 2, 1]
+
+*/
+/* Space Complexity: O(n) */
+class Solution_Quick_Sort{
+private:
+	void
+	swap(ListNode *a, ListNode *b)
+	{
+		int tmp = a->val;
+		a->val = b->val;
+		b->val = tmp;
+	}
+
+	ListNode*
+	partition(ListNode* left, ListNode* right)
+	{
+		ListNode* front = NULL;
+		ListNode* first_node = left;
+
+		while(left != right)
+		{
+			if (left->val < right->val)
+			{
+				front = front ? front->next : first_node;
+
+				if (front != left)
+					swap(front, left);
+			}
+			left = left->next;
+		}
+		swap(front ? front->next : first_node, right);
+
+		return front ? front : first_node;
+	}
+
+	ListNode*
+	quick_sort(ListNode* head, ListNode* tail)
+	{
+		if (head == NULL || tail == NULL || head == tail)
+			return head;
+
+		ListNode* pivot = partition(head, tail);
+
+		quick_sort(head, pivot);
+		quick_sort(pivot->next, tail);
+
+		return head;
+	}
+
+public:
+	ListNode* sortList(ListNode* head)
+	{
+		if (head == nullptr)
+			return nullptr;
+
+		ListNode *tmp = head;
+		while (tmp->next)
+			tmp = tmp->next;
+
+		ListNode *tail = tmp;
+
+		return quick_sort(head, tail);
+	}
+};
+
+
 void
 print_list(struct ListNode* head)
 {
@@ -355,8 +451,11 @@ print_list(struct ListNode* head)
 int
 main()
 {
-	Solution sol;
+	Solution_Merge_Sort_Classic  sol_merge_classic;
+	Solution_Merge_Sort_Improved sol_merge_improved;
+	Solution_Quick_Sort          sol_quick;
 
+	
 	/* Example 1 */
 	/*
 		4 -> 2 -> 3 -> 1
@@ -395,16 +494,22 @@ main()
 	std::cout << "\n\t=== SORT LIST ===";
 	std::cout << "\n\t=================\n\n";
 
+
 	/* Before */
 	std::cout << "\n\tBefore:";
 	print_list(head);
 
+
 	/* Solution */
-	head = sol.sortList(head);
+	// head = sol_merge_classic.sortList(head);
+	head = sol_merge_improved.sortList(head);
+	// head = sol_quick.sortList(head);
+
 
 	/* After */
 	std::cout << "\n\tAfter:";
 	print_list(head);
+
 
 	return 0;
 }
