@@ -229,6 +229,8 @@
 
 */
 
+/* Time  Beats: 96.99% */
+/* Space Beats: 99.47% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -275,7 +277,7 @@ main()
 	Solution sol;
 
 	/* Example 1 */
-	std::vector<int> nums = {2, 3, -2, 4};
+	// std::vector<int> nums = {2, 3, -2, 4};
 
 	/* Example 2 */
 	// std::vector<int> nums = {-2, 0, 1};
@@ -296,7 +298,7 @@ main()
 	// std::vector<int> nums = {0, 2};
 
 	/* Example 8 */
-	// std::vector<int> nums = {-2, 3, -4};
+	std::vector<int> nums = {-2, 3, -4};
 
 	/* Example 9 */
 	// std::vector<int> nums = {-1, -2, -9, -6};
@@ -327,8 +329,10 @@ main()
 	/* Solution */
 	int product = sol.maxProduct(nums);
 
+
 	/* Write Output */
 	std::cout << "\n\tMax Product is: " << product << "\n\n";
+
 
 	return 0;
 }
