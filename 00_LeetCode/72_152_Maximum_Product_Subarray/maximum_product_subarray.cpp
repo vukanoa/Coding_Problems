@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <climits>
 
 /*
 	==============
@@ -234,7 +235,7 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution{
+class Solution_DP {
 public:
 	int maxProduct(std::vector<int>& nums)
 	{
@@ -271,10 +272,96 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	The above explanation is too much.
+
+	Consider only these Examples:
+
+	[-2, 3, 4] => 24
+
+	[2, -5, -2, -4, 3] => 24
+
+	[-1, -2, -3] => 6
+	~~~ ~~~
+	   v
+	max +2
+	min -2
+
+	[-1, -2, -3] => 6
+	 ~~~~ ~~~~~
+	     v
+	max  6
+	min -6
+
+
+	There is one Edge case:
+	[-1, -2, -3, 0, 3, 5]
+
+	Once we get to 0:
+		 6 * 0 = 0
+		-6 * 0 = 0
+
+		x * 0 = 0
+	
+	0 kill any further product, thus once we get to element 0, reset max and
+	min to 1. (Since 1 is a "neutral element" for multiplying in Mathematics)
+
+	However since we're checking it like this:
+		dp_max = max(dp_max * nums[i], dp_min * nums[i], nums[i]);
+		dp_min = min(dp_max * nums[i], dp_min * nums[i], nums[i]);
+	
+	We don't need to cover the Edge case specifically. This will get care of
+	that.
+	
+*/
+
+/* Time  Beats: 100% */
+/* Space Beats: 86.21% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Neat_DP {
+public:
+	int maxProduct(std::vector<int>& nums)
+	{
+		int n = nums.size();
+
+		int result = INT_MIN;
+		int dp_min = 1;
+		int dp_max = 1;
+
+		for (int i = 0; i < n; i++)
+		{
+			int mul_low  = dp_min * nums[i];
+			int mul_high = dp_max * nums[i];
+
+			/* dp_max = max(dp_max * nums[i], dp_min * nums[i], nums[i]); */
+			dp_max = std::max(mul_low, mul_high);
+			dp_max = std::max(dp_max, nums[i]);
+
+			/* dp_min = min(dp_max * nums[i], dp_min * nums[i], nums[i]); */
+			dp_min = std::min(mul_low, mul_high);
+			dp_min = std::min(dp_min, nums[i]);
+
+			result = std::max(result, dp_max);
+		}
+
+		return result;
+	}
+};
+
+
 int
 main()
 {
-	Solution sol;
+	Solution_DP sol_dp;
+	Solution_Neat_DP sol_neat_dp;
 
 	/* Example 1 */
 	// std::vector<int> nums = {2, 3, -2, 4};
@@ -306,6 +393,12 @@ main()
 	/* Example 10 */
 	// std::vector<int> nums = {2, -1, 1, 1};
 
+	/* Example 11 */
+	// std::vector<int> nums = {2, -5, -2, -4, 3};
+
+	/* Example 12 */
+	// std::vector<int> nums = {-1, -2, -3, 0, 3, 5};
+
 
 	std::cout << "\n\t================================";
 	std::cout << "\n\t=== MAXIMUM PRODUCT SUBARRAY ===";
@@ -327,7 +420,8 @@ main()
 
 
 	/* Solution */
-	int product = sol.maxProduct(nums);
+	// int product = sol_dp.maxProduct(nums);
+	int product = sol_neat_dp.maxProduct(nums);
 
 
 	/* Write Output */
