@@ -104,7 +104,11 @@
 	--- IDEA ---
 	------------
 
-	--- Solution 1 ---
+	============
+	=== NOTE ===
+	============
+	This is the best Solution out of all three in this file.
+
 
 	The whole idea is to have two stacks so that you can implement getMin in
 	O(1) as well.
@@ -117,10 +121,10 @@
 	in worse than O(1). So the Problem becomes - How to implement a stack with
 	a "getMin" function in O(1) Time Complexity.
 
-	As I've said - We need two stacks.
+	As we've said - We need two stacks.
 	Why?
 
-	In the main stach everytime we push, we ask if that element is the lowest
+	In the main stack every time we push, we ask if that element is the lowest
 	value in the other, stack_minimum(if it exists, of course), stack.
 
 	If it is, then push this current value in stack_min, that way the minimum
@@ -190,7 +194,7 @@
 	-------               -------
 	 stack             stack_minimums
 
-	 Which is obviously erronous since our stack is NOT Empty, but our
+	 Which is obviously erroneous since our stack is NOT Empty, but our
 	 stack_minimums IS which should be impossible. Thus, if we push an element
 	 that is equal to our current global minimum(at the top of the
 	 stack_minimums) then push that value in stack_minimums again.
@@ -199,7 +203,7 @@
 
 	However I'd like to note a few things:
 		1. "sp" stands for "Stack Pointer" since compiler on LeetCode did not
-		   give me to name it "top" since we have a funciton with that name
+		   give me to name it "top" since we have a function with that name
 		   already
 
 		2. "min" is "Stack Pointer" for stack_minimums
@@ -207,30 +211,25 @@
 		3. I often check if (sp >= 0) or if (min >= 0) to prevent underflow and
 		   overflow, since both "sp" and "min" are set to -1 in the constructor
 
-
-
-	--- Solution 2 ---
-
-	It's the same idea, but we're just using Singly Linked List instead of
-	vectors/arrays.
-
 */
 
+/* Time  Beats: 91.83% */
+/* Space Beats: 58.58% */
 
 /* Time  Complexity: O(1) */
 /* Space Complexity: O(n) */
-class MinStack {
+class MinStack_1 {
 private:
 	int sp;
-	int min;
+	int sp_min;
 	std::vector<int> stack;
 	std::vector<int> stack_minimums;
 
 public:
-	MinStack()
+	MinStack_1()
 	{
 	    sp = -1;
-	    min = -1;
+	    sp_min = -1;
 	}
 
 	void push(int val)
@@ -238,19 +237,21 @@ public:
 		stack.push_back(val);
 		sp++;
 
-		if (min == -1 || val <= stack_minimums[min])
+		if (sp_min == -1 || val <= stack_minimums[sp_min])
 		{
 			stack_minimums.push_back(val);
-			min++;
+			sp_min++;
 		}
 	}
 
 	void pop()
 	{
-	    if (min >= 0 && sp >= 0 && stack_minimums[min] == stack[sp])
+		/* Though, we're told that "Method pop, top and getMin operations will
+		always be called on non-empty stacks", so this checkup is redundant */
+	    if (sp_min >= 0 && sp >= 0 && stack_minimums[sp_min] == stack[sp])
 	    {
 	        stack_minimums.pop_back();
-	        min--;
+	        sp_min--;
 	    }
 
 	    if (sp >= 0)
@@ -276,11 +277,29 @@ public:
 
     int getMin()
 	{
-        return stack_minimums[min];
+        return stack_minimums[sp_min];
     }
 };
 
-class MinStack_2{
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	It's the same idea, but we're just using Singly Linked List instead of
+	vectors/arrays.
+
+*/
+
+/* Time  Beats: 74.85% */
+/* Space Beats: 11.13% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(n) */
+class MinStack_2 {
 private:
 	struct Node{
 		int val;
@@ -325,6 +344,100 @@ private:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	It's almost equivalent to the First Solution, however, here, we have the
+	same amount of elements in "stack" and "min" at every point.
+	
+	Instead of this:
+
+		|     |               |     |
+		|     |               |     |
+		|     |               |     |
+		|  0  |               |     |
+		|  1  |               |  0  |
+		|  0  |               |  0  |
+		-------               -------
+		 stack             stack_minimums
+
+
+	We have this:
+
+		|     |               |     |
+		|     |               |     |
+		|     |               |     |
+		|  0  |               |  0  |
+		|  1  |               |  1  |
+		|  0  |               |  0  |
+		-------               -------
+		 stack             stack_minimums
+	
+	Thus, every time we push onto "stack", we push onto "mins" as well.
+	Also, every time we pop  from "stack", we pop  from "mins" as well.
+*/
+
+/* Time  Beats: 67.20% */
+/* Space Beats: 58.58% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(n) */
+class MinStack_3 {
+public:
+	MinStack_3()
+	{
+		sp = -1;
+		sp_min = -1;
+	}
+
+	void push(int val)
+	{
+		stack.push_back(val);
+		sp++;
+
+		if (mins.size() == 0 || (sp_min >= 0 && val < mins[sp_min]))
+		{
+			mins.push_back(val);
+			sp_min++;
+		}
+		else
+		{
+			mins.push_back(mins[sp_min]);
+			sp_min++;
+		}
+	}
+
+	void pop()
+	{
+		mins.pop_back();
+		sp_min--;
+
+		stack.pop_back();
+		sp--;
+	}
+
+	int top()
+	{
+		return stack[sp];
+	}
+
+	int getMin()
+	{
+		return mins[sp_min];
+	}
+
+private:
+	std::vector<int> stack;
+	std::vector<int> mins;
+	int sp;
+	int sp_min;
+};
+
+
 int
 main()
 {
@@ -333,8 +446,10 @@ main()
 	std::cout << "\n\t=================\n\n";
 
 	/* Example 1 */
-	// MinStack* obj = new MinStack();
-	MinStack_2* obj = new MinStack_2();
+	MinStack_1* obj = new MinStack_1();
+	// MinStack_2* obj = new MinStack_2();
+	// MinStack_3* obj = new MinStack_3();
+
  	obj->push(-2);
 	std::cout << "\tpush: -2\n";
  	obj->push(0);
@@ -359,8 +474,10 @@ main()
 
 
 	/* Example 2 */
-	// // MinStack* obj = new MinStack();
-	// MinStack_2* obj = new MinStack_2();
+	// MinStack_1* obj = new MinStack_1();
+	// // MinStack_2* obj = new MinStack_2();
+	// // MinStack_3* obj = new MinStack_3();
+
  	// obj->push(4);
 	// std::cout << "\tpush: 4\n";
  	// obj->push(3);
@@ -392,6 +509,32 @@ main()
 	// std::cout << "\tCurrent min: " << min << "\n";
 
 	// std::cout << "\n";
+
+
+
+	/* Example 3 */
+	// MinStack_1* obj = new MinStack_1();
+	// // MinStack_2* obj = new MinStack_2();
+	// // MinStack_3* obj = new MinStack_3();
+
+ 	// obj->push(0);
+	// std::cout << "\tpush: 0\n";
+ 	// obj->push(1);
+	// std::cout << "\tpush: 1\n";
+ 	// obj->push(0);
+	// std::cout << "\tpush: 0\n";
+
+ 	// int min = obj->getMin();
+	// std::cout << "\tCurrent min: " << min << "\n";
+
+ 	// obj->pop();
+	// std::cout << "\tPop!\n";
+ 	// int top = obj->top();
+	// std::cout << "\tCurrent top: " << top << "\n";
+
+ 	// min = obj->getMin();
+	// std::cout << "\tCurrent min: " << min << "\n";
+
 
 	return 0;
 }
