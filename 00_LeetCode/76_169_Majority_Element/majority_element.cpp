@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 
 /*
 	============
@@ -45,6 +46,53 @@
 */
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Self-explanatory Brute Force Solution.
+	
+*/
+
+/* Time  Beats: 44.58% */
+/* Space Beats: 33.33% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Brute {
+public:
+	int majorityElement(std::vector<int>& nums)
+	{
+		std::unordered_map<int, int> umap;
+		int majority_element;
+		int max_occurrence = 0;
+
+		for (int i = 0; i < nums.size(); i++)
+		{
+			auto it = umap.find(nums[i]);
+
+			if (it != umap.end()) 
+				it->second++;
+			else
+				umap.insert({nums[i], 1});
+
+			if (umap.at(nums[i]) > max_occurrence)
+			{
+				max_occurrence   = umap.at(nums[i]);
+				majority_element = nums[i];
+			}
+		}
+
+		return majority_element;
+	}
+};
+
+
+
+
 /*
 	------------
 	--- IDEA ---
@@ -65,7 +113,7 @@
 	Starting from the least significant bit, we enumerate each bit to determine
 	which value is the majority at this bit, 0 or 1, and put this value to the
 	corresponding bit of the result. Finally, we end up with the most least
-	significant bit of all elements and reutnr the result.
+	significant bit of all elements and return the result.
 
 
 	Implementation
@@ -75,14 +123,16 @@
 
 */
 
+/* Time  Beats: 49.55% */
+/* Space Beats: 76.13% */
 
 /*
-	Time  Complexity: O(n * logC)
-	C is the max absolute value in "nums", i.e., 10^5 in this problem. We
-	enumerate all logC bits for each number in "nums".
+	Time  Complexity: O(n * logC) => O(n * 32) => O(n)
+	C is the max absolute value in "nums", i.e., 10^5 in this problem.
+	We enumerate all logC bits for each number in "nums".
 */
 /* Space Complexity: O(1) */
-class Solution_Bit_Manipulation{
+class Solution_Bit_Manipulation {
 public:
 	int majorityElement(std::vector<int>& nums)
 	{
@@ -112,6 +162,8 @@ public:
 };
 
 
+
+
 /*
 	------------
 	--- IDEA ---
@@ -138,22 +190,25 @@ public:
 	the following examples (pipes are inserted to separate runs of nonzero
 	"count").
 
+	Example 1:
 	[7, 7, 5, 7, 5, 1 | 5, 7, | 5, 5, 7, 7 | 7, 7, 7, 7]
 
 	Here, the 7 at index 0 is selected to be the first candidate for majority
 	element. "count" will eventually reach 0 after index 5 is processed, so the
-	5 at index 6 will be the next candidate. In this case, 7 is the true
-	majority element, so by disregarding this prefix, we are ignoring an equal
-	number of majority and minority elements - therefore, 7 will still be the
-	majority element in the suffix formed by throwing away the first prefix.
+	5 at index 6 will be the next candidate.
+	In this case, 7 is the true majority element, so by disregarding this
+	prefix, we are ignoring an equal number of majority and minority
+	elements - therefore, 7 will still be the majority element in the suffix
+	formed by throwing away the first prefix.
 
+	Example 2:
 	[7, 7, 5, 7, 5, 1 | 5, 7 | 5, 5, 7, 7 | 5, 5, 5, 5]
 
 	Now, the majority element is 5 (we changed the last run of the array from
 	7s to 5s), but our first candidate is still 7. In this case, our candidate
 	is not the true majority element, but we still cannot discard more majority
 	elements than minority elements (this would imply that "count" could reach
-	-1 before we reassign "candidate", which is obivously false).
+	-1 before we reassign "candidate", which is obviously false).
 
 	Therefore, given that it is impossible (in both cases) to discard more
 	majority elements than minority elements, we are safe in discarding the
@@ -164,10 +219,15 @@ public:
 
 */
 
+/* Time  Beats: 99.84% */
+/* Space Beats: 33.33% */ // I don't know how is this possible
+
+/* Time  Beats: 71.72% */
+/* Space Beats: 96.74% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution{
+class Solution_Boyer_Moore_Voting {
 public:
 	int majorityElement(std::vector<int>& nums)
 	{
@@ -187,11 +247,67 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	************************************
+	*** Boyer-Moore Voting Algorithm ***
+	************************************
+
+	It's the same algorithm as the above, just written in a more verbose way.
+	I think it's much easier to read and graps from the code down below.
+	
+*/
+
+
+/* Time  Beats: 93.70% */
+/* Space Beats: 33.33% */ // I don't know how is this possible
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Boyer_Moore_Voting_Verbose {
+public:
+	int majorityElement(std::vector<int>& nums)
+	{
+		int n = nums.size();
+
+		int candidate = nums[0];
+		int majority = 1;
+		int minority = 0;
+
+		// Starting from the 2nd element, i.e. Element at index 1
+		for (const int& num : std::vector<int>(nums.begin() + 1, nums.end()))
+		{
+			if (majority == minority)
+			{
+				candidate = num;
+				majority = 0;
+				minority = 0;
+			}
+
+			if (num == candidate)
+				majority++;
+			else
+				minority++;
+		}
+
+		return candidate;
+	}
+};
+
+
 int
 main()
 {
-	Solution_Bit_Manipulation sol_bin_manipulation;
-	Solution sol;
+	Solution_Brute                      sol_brute;
+	Solution_Bit_Manipulation           sol_bit_manipulation;
+	Solution_Boyer_Moore_Voting         sol_boyer_moore_voting;
+	Solution_Boyer_Moore_Voting_Verbose sol_boyer_moore_voting_verbose;
+
 
 	/* Example 1 */
 	// std::vector<int> nums = {3, 2, 3};
@@ -203,7 +319,18 @@ main()
 	// std::vector<int> nums = {7, 7, 5, 7, 5, 1, 5, 7, 5, 5, 7, 7, 7, 7, 7, 7};
 
 	/* Example 4 */
-	std::vector<int> nums = {7, 7, 5, 7, 5, 1, 5, 7, 5, 5, 7, 7, 5, 5, 5, 5};
+	// std::vector<int> nums = {7, 7, 5, 7, 5, 1, 5, 7, 5, 5, 7, 7, 5, 5, 5, 5};
+
+	/* Example 5 */
+	// std::vector<int> nums = {1, 2, 2, 3, 3, 1, 1};
+
+	/* Example 6 */
+	// std::vector<int> nums = {1, 2, 2, 3, 3, 3, 3};
+
+	/* Example 7 */
+	std::vector<int> nums = {1, 1, 2, 1, 2, 3, 3, 4, 3, 3};
+
+
 
 	std::cout << "\n\t========================";
 	std::cout << "\n\t=== MAJORITY ELEMENT ===";
@@ -225,11 +352,15 @@ main()
 
 
 	/* Solution */
+	// int majority_element = sol_brute.majorityElement(nums);
 	// int majority_element = sol_bit_manipulation.majorityElement(nums);
-	int majority_element = sol.majorityElement(nums);
+	// int majority_element = sol_boyer_moore_voting.majorityElement(nums);
+	int majority_element = sol_boyer_moore_voting_verbose.majorityElement(nums);
+
 
 	/* Write Output */
 	std::cout << "\n\tMajority Element: " << majority_element << "\n\n";
+
 
 	return 0;
 }
