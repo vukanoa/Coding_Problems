@@ -34,7 +34,7 @@
 
 	Custom Judge:
 
-	THe input to the judge are given as follows(your program is not given these
+	The input to the judge are given as follows(your program is not given these
 	inputs):
 		- "intersectVal"
 			The value of the node where the intersection occurs.
@@ -216,71 +216,84 @@ struct ListNode {
 
 */
 
+/* Time  Beats: 68.78% */
+/* Space Beats: 75.61% */
 
 /* Time  Complexity: O(m + n) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution{
 public:
-	ListNode *getIntersectionNode(ListNode *headA, ListNode *headB)
+	ListNode* getIntersectionNode(ListNode *headA, ListNode *headB)
 	{
-		int m = 0; // Number of nodes in listA
-		int n = 0; // Number of nodes in listB
+		int cnt_A = 0;
+		for (ListNode *tmp = headA; tmp; tmp = tmp->next)
+			cnt_A++;
 
-		ListNode *tmpA = headA;
-		while (tmpA != NULL)
+		int cnt_B = 0;
+		for (ListNode *tmp = headB; tmp; tmp = tmp->next)
+			cnt_B++;
+
+		ListNode *shorter;
+		ListNode *longer;
+
+		if (cnt_A < cnt_B)
 		{
-			m++;
-			tmpA = tmpA->next;
+			int difference = cnt_B - cnt_A;
+
+			shorter = headA;
+			longer = headB;
+
+			while(difference--)
+				longer = longer->next;
+		}
+		else
+		{
+			int difference = cnt_A - cnt_B;
+
+			shorter = headB;
+			longer = headA;
+
+			while(difference--)
+				longer = longer->next;
 		}
 
-		ListNode* tmpB = headB;
-		while (tmpB != NULL)
+		while (shorter != longer)
 		{
-			n++;
-			tmpB = tmpB->next;
+			shorter = shorter->next;
+			longer = longer->next;
 		}
 
-		tmpA = headA;
-		tmpB = headB;
-
-		if (m > n)
-		{
-			int diff = m - n;
-
-			while (diff--)
-				tmpA = tmpA->next;
-
-		}
-		else if (n > m)
-		{
-			int diff = n - m;
-
-			while (diff--)
-				tmpB = tmpB->next;
-		}
-
-		ListNode* intersect = NULL;
-		while (tmpA && tmpB)
-		{
-			// Comparing the addresses, not values
-			if (tmpA == tmpB)
-			{
-				intersect = tmpA;
-				break;
-			}
-
-			tmpA = tmpA->next;
-			tmpB = tmpB->next;
-		}
-
-		return intersect;
+		return shorter; // Or longer, it's the same one
 	}
 };
+
+
+void
+print_list(struct ListNode* head)
+{
+	std::cout << "\n\t\t[";
+
+	bool first = true;
+	while (head)
+	{
+		if (!first)
+			std::cout << " -> ";
+		else
+			first = false;
+
+		std::cout << head->val;
+		head = head->next;
+	}
+
+	std::cout << "]\n\n";
+}
+
 
 int
 main()
 {
 	Solution sol;
+
 
 	/* Example 1 */
 	/*
@@ -322,6 +335,7 @@ main()
 
 
 
+
 	/* Example 2 */
 	/*
 		A:    1 -> 9 -> 1 --\
@@ -357,13 +371,15 @@ main()
 	// ListNode *headB = &three_B;
 
 
+
+
 	/* Example 3 */
 	/*
 		A:    2 -> 6 -> 4
 
 		B:         1 -> 5
 	*/
-	// // Nodes in listA before the Intesection
+	// Nodes in listA before the Intesection
 	// ListNode two_A(2);
 	// ListNode six_A(6);
 	// ListNode four_A(4);
@@ -389,15 +405,26 @@ main()
 	std::cout << "\n\t=== INTERSECTION OF TWO LINKED LISTS ===";
 	std::cout << "\n\t========================================\n";
 
+
+	/* Write Input */
+	std::cout << "\n\tList A:";
+	print_list(headA);
+	std::cout << "\tList B:";
+	print_list(headB);
+
+
 	/* Solution */
 	ListNode* intersection = sol.getIntersectionNode(headA, headB);
 
+
+	/* Write Output */
 	if (intersection)
 		std::cout << "\n\tIntersection at Node: " << intersection->val;
 	else
 		std::cout << "\n\tThese two lists do NOT Intersect!";
 
 	std::cout << "\n\n";
+
 
 	return 0;
 }
