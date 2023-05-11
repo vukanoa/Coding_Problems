@@ -17,6 +17,12 @@
 	Given an integer array "nums", rotate the array to the right by "k" steps,
 	where "k" is non-negative.
 
+	Follow up:
+		- Try to come up with as many solution as you can. There are at least
+		  three different ways to solve this problem.
+
+		- Could you do it in-place with O(1) extra space?
+
 	================================================
 	FUNCTION: void rotate(vector<int>& nums, int k);
 	================================================
@@ -38,12 +44,6 @@
 	-2^31 <= nums[i] <= 2^31 - 1
 	0 <= k <= 10^5
 
-	Follow up:
-		- Try to come up with as many solution as you can. There are at least
-		  three different ways to solve this problem.
-
-		- Could you do it in-place with O(1) extra space?
-
 */
 
 
@@ -52,16 +52,7 @@
 	--- IDEA ---
 	------------
 
-	--- Solution obivous ---
-
-	It's self-explanatory.
-
-
-
-
-	--- Solution ---
-
-	This approach is based on the fact that when we rotate the array k times,
+	This Solution is based on the fact that when we rotate the array k times,
 	k elements from the back end of the array come to the root and the rest
 	of the elements from the front shift backwards.
 
@@ -78,43 +69,8 @@
 
 */
 
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_obvious{
-public:
-	void rotate(std::vector<int>& nums, int k)
-	{
-		if (k == 0 || nums.size() == 1)
-			return;
-
-		if (k > nums.size())
-			k = k % nums.size();
-
-		int slow = 0;
-		int fast = k;
-
-		while (fast < nums.size())
-		{
-			slow++;
-			fast++;
-		}
-
-		std::vector<int> rotated_vec;
-
-		int n = nums.size();
-		while (n--)
-		{
-			rotated_vec.push_back(nums[slow]);
-			slow = (slow + 1) % nums.size();
-		}
-
-		for (int i = 0; i < nums.size(); i++)
-			nums[i] = rotated_vec[i];
-	}
-};
-
-
+/* Time  Beats: 83.64% */
+/* Space Beats: 99.75% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -122,23 +78,19 @@ class Solution{
 public:
 	void rotate(std::vector<int>& nums, int k)
 	{
-		k = k % nums.size();
-		reverse(nums, 0, nums.size() - 1);
+		int n = nums.size();
+
+		k = k % n;
+		reverse(nums, 0, n - 1);
 		reverse(nums, 0, k - 1);
-		reverse(nums, k, nums.size() - 1);
+		reverse(nums, k, n - 1);
 	}
 
+private:
 	void reverse(std::vector<int>& nums, int start, int end)
 	{
 		while (start < end)
-		{
-			int tmp = nums[start];
-			nums[start] = nums[end];
-			nums[end] = tmp;
-
-			start++;
-			end--;
-		}
+			std::swap(nums[start++], nums[end--]);
 	}
 };
 
@@ -149,8 +101,8 @@ main()
 	Solution sol;
 
 	/* Example 1 */
-	std::vector<int> nums = {1, 2, 3, 4, 5, 6, 7};
-	int k = 3;
+	// std::vector<int> nums = {1, 2, 3, 4, 5, 6, 7};
+	// int k = 3;
 
 	/* Example 2 */
 	// std::vector<int> nums = {-1, -100, 3, 99};
@@ -168,11 +120,21 @@ main()
 	// std::vector<int> nums = {1, 2};
 	// int k = 3;
 
+	/* Example 6 */
+	// std::vector<int> nums = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+	// int k = 5;
+
+	/* Example 7 */
+	std::vector<int> nums = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+	int k = 2;
+
+
 	std::cout << "\n\t====================";
 	std::cout << "\n\t=== ROTATE ARRAY ===";
 	std::cout << "\n\t====================\n";
 
 
+	/* Write Input */
 	std::cout << "\n\t=== BEFORE ===";
 	bool first = true;
 	std::cout << "\n\tArray: [";
@@ -195,6 +157,8 @@ main()
 	else
 		std::cout << "\n\t\tRotated " << k << " places to the right!\n";
 
+
+	/* Write Output */
 	std::cout << "\n\t=== AFTER ===";
 	first = true;
 	std::cout << "\n\tArray: [";
@@ -206,9 +170,8 @@ main()
 		std::cout << x;
 		first = false;
 	}
-	std::cout << "]\n";
+	std::cout << "]\n\n\n";
 
-	std::cout << "\n\n";
 
 	return 0;
 }
