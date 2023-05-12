@@ -1,6 +1,9 @@
 #include <iostream>
 #include <vector>
 
+// For printing
+#include <queue>
+
 /*
 	==============
 	=== MEDIUM ===
@@ -66,54 +69,145 @@ struct TreeNode {
 };
 
 
-class Solution {
-private:
-    // Find height of a tree, defined by the root node
-    int tree_height(TreeNode* root)
-    {
-        if (root == nullptr)
-            return 0;
+/*
+	------------
+	--- IDEA ---
+	------------
 
-        // Find the height of left, right subtrees
-        int left_height = tree_height(root->left);
-        int right_height = tree_height(root->right);
+	Basic DFS.
 
-        // Find max(subtree_height) + 1 to get the height of the tree
-        return std::max(left_height, right_height) + 1;
-    }
+	The only important thing here is that we must do right subtree, i.e. right
+	elements, first and that we have to keep track of max_depth.
 
+	Because once we put certain node's value in side view, i.e. "results"
+	vector, then only the subtree that is one level deeper than the current
+	max_depth can be seen.
+
+	That's why we have to keep track of "level" at each node locally and keep
+	track of "max_depth" globally.
+
+	Now the Solution is self-explanatory.
+	
+*/
+
+/* Time  Beats:   100% */
+/* Space Beats: 88.57% */
+
+/*
+	Time  Complexity: O(n)
+*/
+/*
+	Space Complexity: O(n)
+	Because of the call Stack.
+*/
+class Solution{
 public:
 	std::vector<int> rightSideView(TreeNode* root)
 	{
-		std::vector<int> side_view;
-		const int height = tree_height(root);
-        int filled = 0;
+		std::vector<int> results;
+		int level = 0;
+		int max_depth = -1;
 
-		recursion(root, side_view, height, filled, 1);
+		dfs(root, results, level, max_depth);
 
-        return side_view;
+		return results;
 	}
 
-	// Current level starting from 1
-	void recursion(TreeNode* root, std::vector<int>& side_view, const int& height, int& filled, int current_level)
+private:
+	void
+	dfs(TreeNode* root, std::vector<int>& results, int level, int& max_depth)
 	{
-		if (filled == height)
+		if (root == nullptr)
 			return;
-
-		if (current_level > side_view.size())
+		
+		if (level > max_depth)
 		{
-			side_view.push_back(root->val);
-			filled++;
+			results.push_back(root->val);
+			max_depth = level;
 		}
 
-		if (root->right)
-			recursion(root->right, side_view, height, filled, current_level + 1);
-
-		if (root->left)
-			recursion(root->left, side_view, height, filled, current_level + 1);
+		dfs(root->right, results, level+1, max_depth); // Right elements first
+		dfs(root->left,  results, level+1, max_depth);
 	}
 };
 
+
+
+
+/*
+	=============================
+	=== This is just printing ===
+	=============================
+*/
+
+void
+print_array(std::vector<std::string>& nums)
+{
+	bool first = true;
+	std::cout << "\n\t\t\t(TODO: Implement a Visual representation of a Binary Tree)\n\n";
+	std::cout << "\n\t*** Level Order ***";
+	std::cout << "\n\tTree: [";
+	for (auto x: nums)
+	{
+		if (!first)
+			std::cout << ", ";
+
+		std::cout << x;
+		first = false;
+	}
+	std::cout << "]\n\n";
+}
+
+
+void
+print_levelorder(TreeNode* root)
+{
+	if (root == nullptr)
+		return;
+	
+	std::queue<TreeNode*> queue;
+	queue.push(root);
+
+	std::vector<std::string> vector_print;
+
+	while (!queue.empty())
+	{
+		int size = queue.size();
+
+		for (int i = 0; i < size; i++)
+		{
+			TreeNode* node = queue.front();
+			queue.pop();
+
+			if (node == nullptr)
+			{
+				vector_print.push_back("null");
+				continue;
+			}
+			else
+				vector_print.push_back(std::to_string(node->val));
+
+			if (node->left != nullptr)
+				queue.push(node->left);
+			else
+				queue.push(nullptr);
+
+			if (node->right != nullptr)
+				queue.push(node->right);
+			else
+				queue.push(nullptr);
+		}
+	}
+
+	int x = vector_print.size() - 1;
+	while (vector_print[x] == "null")
+	{
+		vector_print.pop_back();
+		x--;
+	}
+
+	print_array(vector_print);
+}
 
 
 int
@@ -194,13 +288,17 @@ main()
 
 	std::cout << "\n\t===================================";
 	std::cout << "\n\t=== BINARY TREE RIGHT SIDE VIEW ===";
-	std::cout << "\n\t===================================\n\n";
+	std::cout << "\n\t===================================\n";
+
+
+	/* Write Input */
+	print_levelorder(root);
+
 
 	/* Solution */
 	std::vector<int> side_view = sol.rightSideView(root);
 
 	/* Write Output */
-
 	bool first = true;
 	std::cout << "\n\tSide View: [";
 	for (auto x: side_view)
