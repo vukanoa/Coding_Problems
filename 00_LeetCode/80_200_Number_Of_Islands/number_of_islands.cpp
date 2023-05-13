@@ -18,7 +18,7 @@
 	and '0's(water), return the number of islands.
 
 	An island is surrounded by water and is formed by connecting adjacent lands
-	horizontally or vertically. You may asuem all four edges of the grid are
+	horizontally or vertically. You may assume all four edges of the grid are
 	all surrounded by water.
 
 	=====================================================
@@ -56,7 +56,6 @@
 */
 
 
-
 /*
 	------------
 	--- IDEA ---
@@ -64,9 +63,16 @@
 
 	A simple self-explanatory DFS.
 
+	The only important thing here is that we're somehow allowed to modify our
+	"grid" matrix.
+
+	If that wasn't the case then we would've had to use an unordered_set and/or
+	we could implement a BFS Solution instead of DFS.
+
 */
 
-
+/* Time  Beats: 98.84% */
+/* Space Beats: 85.21% */
 
 /* Time  Complexity:
 	O(n) or O(row * columns) or O(V) 'V' for Vertices in Graph
@@ -78,36 +84,41 @@ class Solution{
 public:
 	int numIslands(std::vector<std::vector<char>>& grid)
 	{
-		int count = 0;
+		int islands = 0;
+		int m = grid.size();
+		int n = grid[0].size();
 
-		for (int i = 0; i < grid.size(); i++)
+		for (int i = 0; i < m; i++)
 		{
-			for (int j = 0; j < grid[0].size(); j++)
+			for (int j = 0; j < n; j++)
 			{
 				if (grid[i][j] == '1')
 				{
-					DFS(grid, i, j);
-					count++;
+					dfs(grid, i, j);
+					islands++;
 				}
 			}
 		}
 
-		return count;
+		return islands;
 	}
 
-	void DFS(std::vector<std::vector<char>>& grid, int i, int j)
+private:
+	void dfs(std::vector<std::vector<char>>& grid, int i, int j)
 	{
-		if (i < 0 || j < 0 || i >= grid.size() || j>= grid[0].size())
+		if (i < 0 || j < 0 || i >= grid.size() || j >= grid[0].size())
 			return;
 
 		if (grid[i][j] != '1')
 			return;
 
-		grid[i][j] = 'v'; // 'v' for visited
-		DFS(grid, i + 1, j    ); // Down
-		DFS(grid, i - 1, j    ); // Up
-		DFS(grid, i    , j + 1); // Right
-		DFS(grid, i    , j - 1); // Left
+		grid[i][j] = 'x'; // visited
+
+		/* Clockwise */
+		dfs(grid, i - 1, j    ); // Up
+		dfs(grid, i    , j + 1); // Right
+		dfs(grid, i + 1, j    ); // Down
+		dfs(grid, i    , j - 1); // Left
 	}
 };
 
@@ -141,11 +152,11 @@ main()
 
 	/* Write Input */
 	bool first = true;
-	std::cout << "\n\tGrid: \n\t[\n\t";
+	std::cout << "\n\tGrid: \n\t[\n\t\t";
 	for (auto x: grid)
 	{
 		if (!first)
-			std::cout << ", \n\t";
+			std::cout << ", \n\t\t";
 
 		bool first_first = true;
 		std::cout << "[";
@@ -170,6 +181,7 @@ main()
 
 	/* Write Output */
 	std::cout << "\n\tNumber of Islands: " << islands << "\n\n";
+
 
 	return 0;
 }
