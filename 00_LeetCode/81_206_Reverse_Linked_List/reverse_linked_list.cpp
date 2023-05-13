@@ -56,6 +56,20 @@ struct ListNode {
 };
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Self-explanatory.
+	
+*/
+
+/* Time  Beats: 95.21% */
+/* Space Beats: 98.47% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
 class Solution{
 public:
 	ListNode* reverseList(ListNode* head)
@@ -64,9 +78,9 @@ public:
 		ListNode* curr = head;
 		ListNode* next = head;
 
-		while (curr != nullptr)
+		while (curr)
 		{
-			next = curr->next;
+			next = curr->next; // next = next->next;
 
 			curr->next = prev;
 			prev = curr;
@@ -78,6 +92,22 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Same but using Recursion.
+	
+*/
+
+/* Time  Beats: 70.42% */
+/* Space Beats: 81.7% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
 class Solution_Recursion{
 public:
 	ListNode* reverseList(ListNode* head)
@@ -130,6 +160,8 @@ int
 main()
 {
 	Solution sol;
+	Solution_Recursion sol_rec;
+
 
 	/* Example 1 */
 	ListNode one(1);
@@ -170,12 +202,16 @@ main()
 	std::cout << "\n\tBefore:";
 	print_list(head);
 
+
 	/* Solution */
 	head = sol.reverseList(head);
+	// head = sol_rec.reverseList(head);
 
-	/* Write Outpu */
+
+	/* Write Output */
 	std::cout << "\n\tAfter:";
 	print_list(head);
+
 
 	return 0;
 }
