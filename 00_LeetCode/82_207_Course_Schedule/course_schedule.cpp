@@ -147,6 +147,8 @@
 
 */
 
+/* Time  Beats: 66.10% */
+/* Space Beats: 90.15% */
 
 /* Time  Complexity: O(V + E) */
 /* Space Complexity: O(V) */
@@ -197,6 +199,7 @@ public:
 
 
 
+
 /*
 	------------
 	--- IDEA ---
@@ -215,12 +218,15 @@ public:
 	   |  / |  / |
 	   | /  | /  |
 	   v    |/   v
-	   3----/--  4
-	   | \ /| |  |
-	   |  \ | |__|
-	   | / \|    |
-	   v    v    v
-	   5    7    6
+	---3    /    4
+	|  | \ /|    |
+	|  |  \ |    |
+	|  | / \|    |
+	|  v    v    v
+	|  5    7    6
+	|            ^
+	|____________|
+
 
 	Valid Topological Orders for this Graph would be:
 		1)
@@ -263,6 +269,8 @@ public:
 
 */
 
+/* Time  Beats:  5.11% */
+/* Space Beats: 99.54% */
 
 /* This one is slower than DFS Solution*/
 /* Time  Complexity: O(V + E) */
@@ -318,6 +326,11 @@ public:
 	}
 };
 
+
+
+
+/* Time  Beats: 99.18% */
+/* Space Beats: 90.15% */
 
 /* Using Queue */
 /* This Topological Sort is a lot faster than the above one */
