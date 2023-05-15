@@ -2,6 +2,7 @@
 #include <vector>
 #include <unordered_set>
 #include <queue>
+#include <map>
 
 /*
 	==============
@@ -54,6 +55,86 @@
 	All the pairs prerequisites[i] are unique.
 
 */
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	This is by far the easiest to grasp, but it is also the least efficient.
+
+	TODO
+	
+*/
+
+/* Time  Beats: 5.61% */
+/* Space Beats: 5.10% */
+
+/*
+	Time  Complexity: O(n + p)
+	where n is numCourses and p is prerequisites.size()
+*/
+/* Space Complexity: O(n) */
+class Solution_Neat_DFS {
+public:
+	bool canFinish(int numCourses, std::vector<std::vector<int>>& prerequisites)
+	{
+		/* Course___Prerequisites */
+		std::map<int, std::vector<int>> pre_map;
+
+		/* Fill the Hash Map with Courses */
+		for (int i = 0; i < numCourses; i++)
+			pre_map.emplace(i, std::vector<int>());
+
+		/* Fill the Hash Map with Prerequisites */
+		for (int i = 0; i < prerequisites.size(); i++)
+			pre_map[prerequisites[i][0]].push_back(prerequisites[i][1]);
+
+		/* All courses along the current DFS path */
+		std::vector<bool> visited(numCourses, false);
+
+		for(auto& m : pre_map)
+		{
+			if (!dfs(m.first, pre_map, visited))
+				return false;
+		}
+
+		return true;
+	}
+
+private:
+	bool
+	dfs(
+	    int course, 
+	    std::map<int, std::vector<int>>& pre_map,
+		std::vector<bool> visited
+	   )
+	{
+		if (visited[course])
+			return false; // Loop detected
+
+		visited[course] = true;
+
+		for (auto& pre : pre_map[course])
+		{
+			if (!dfs(pre, pre_map, visited))
+				return false;
+		}
+
+		// Remove this course from unordered set
+		visited[course] = false;
+
+		/* So that we don't have to do it more than once */
+		pre_map[course].clear();
+
+		return true;
+	}
+};
+
+
 
 
 /*
@@ -373,9 +454,11 @@ public:
 int
 main()
 {
-	// Solution sol;
-	// Solution_Topological sol_topo;
+	Solution_Neat_DFS sol_dfs;
+	Solution sol;
+	Solution_Topological sol_topo;
 	Solution_Topological_2 sol_topo_2;
+
 
 	/* Example 1 */
 	// int numCourses = 2;
@@ -403,6 +486,7 @@ main()
 	std::cout << "\n\t=== COURSE SCHEDULE ===";
 	std::cout << "\n\t=======================\n";
 
+
 	/* Write Output */
 	bool first = true;
 	std::cout << "\n\tPrerequisites: [";
@@ -428,6 +512,7 @@ main()
 	std::cout << "]\n";
 
 	/* Solution */
+	// if (sol_dfs.canFinish(numCourses, prerequisites))
 	// if (sol.canFinish(numCourses, prerequisites))
 	// if (sol_topo.canFinish(numCourses, prerequisites))
 	if (sol_topo_2.canFinish(numCourses, prerequisites))
