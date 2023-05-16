@@ -66,8 +66,296 @@
 
 	This is by far the easiest to grasp, but it is also the least efficient.
 
-	TODO
+	(We could also implement a BFS Solution)
+
+	Consider this example:
+		numCourses = 5
+		prerequisites = [[0, 1], [0, 2], [1, 3], [1, 4], [3, 4]]
 	
+	Let's visualize it:
+
+
+	0 --------> 1 -----------> 3
+	|           \              |
+	|            \             |
+	v             -------> 4 <--
+	2
+
+	For each of this classes(courses) we want to know if we can complete it
+	or not.
+
+	And how can we know if some course can be completed?
+	Well, just looking at this picture, it's obvious. For example: 0 has a
+	prerequisites of 2, but 2 does NOT have any prerequisites, which is great
+	because it means that it can be completed.
+
+	0 also has a prerequisite of 1 and 1 has two prerequisites: 3 and 4.
+	3 has one prerequisite of 4. And 4 luckily for us, does NOT have any
+	prerequisites.
+
+	So simply looking at this ASCII drawing, it's obvious that we can complete
+	all these courses.
+
+	So how should the Algorithm work?
+	We can notice that nodes 2 and 4 are our base cases because they have no
+	prerequisites.
+	But we don't need a graph to tell us that, we can use a data structure
+	called adjacency list. But for ease of reading, let's call it "pre_map",
+	because we are going to use a Hash map to represent this.
+	(pre_map -> Prerequisites Map)
+
+	+---------+---------------+
+	|      Pre_Map            |
+	+---------+---------------+
+	| courses | prerequisites |
+	+---------+---------------+
+	|    0    |    [1, 2]     |
+	+---------+---------------+
+	|    1    |    [3, 4]     |
+	+---------+---------------+
+	|    2    |    []         |
+	+---------+---------------+
+	|    3    |    [4]        |
+	+---------+---------------+
+	|    4    |    []         |
+	+---------+---------------+
+
+
+	So the Algorithm should work something like this:
+	Start from 0 and then check all the neighbors of it recursively.
+
+	===========================================================================
+	0) DFS on Node 0
+	===========================================================================
+
+	    +---------+---------------+
+	    |      Pre_Map            |
+	    +---------+---------------+
+	    | courses | prerequisites |
+	    +---------+---------------+
+	 -> |    0    |    [1, 2]     | (Now let's check 1)
+	    +---------+---------------+
+	    |    1    |    [3, 4]     |
+	    +---------+---------------+
+	    |    2    |    []         |
+	    +---------+---------------+
+	    |    3    |    [4]        |
+	    +---------+---------------+
+	    |    4    |    []         |
+	    +---------+---------------+
+
+
+	    +---------+---------------+
+	    |      Pre_Map            |
+	    +---------+---------------+
+	    | courses | prerequisites |
+	    +---------+---------------+
+	    |    0    |    [1, 2]     | 
+	    +---------+---------------+
+	 -> |    1    |    [3, 4]     | (Now let's check 3)
+	    +---------+---------------+
+	    |    2    |    []         |
+	    +---------+---------------+
+	    |    3    |    [4]        |
+	    +---------+---------------+
+	    |    4    |    []         |
+	    +---------+---------------+
+
+	    +---------+---------------+
+	    |      Pre_Map            |
+	    +---------+---------------+
+	    | courses | prerequisites |
+	    +---------+---------------+
+	    |    0    |    [1, 2]     | 
+	    +---------+---------------+
+	    |    1    |    [3, 4]     | 
+	    +---------+---------------+
+	    |    2    |    []         |
+	    +---------+---------------+
+	 -> |    3    |    [4]        | (Now let's check 4)
+	    +---------+---------------+
+	    |    4    |    []         |
+	    +---------+---------------+
+
+	    +---------+---------------+
+	    |      Pre_Map            |
+	    +---------+---------------+
+	    | courses | prerequisites |
+	    +---------+---------------+
+	    |    0    |    [1, 2]     | 
+	    +---------+---------------+
+	    |    1    |    [3, 4]     | 
+	    +---------+---------------+
+	    |    2    |    []         |
+	    +---------+---------------+
+	    |    3    |    [4]        |
+	    +---------+---------------+
+	 -> |    4    |    []         | (This course can be completed! Return to 3)
+	    +---------+---------------+
+
+	    +---------+---------------+
+	    |      Pre_Map            |
+	    +---------+---------------+
+	    | courses | prerequisites |
+	    +---------+---------------+
+	    |    0    |    [1, 2]     | 
+	    +---------+---------------+
+	    |    1    |    [3, 4]     | 
+	    +---------+---------------+
+	    |    2    |    []         |
+	    +---------+---------------+
+	 -> |    3    |    [4] => []  | (Since 4 can be completed and there is no)
+	    +---------+---------------+  more prereqs, 3 can be completed. Empty 3)
+	    |    4    |    []         |
+	    +---------+---------------+
+
+		We're doing this do that later when we start from course 1, and we
+		stumble upon 3, so that we don't do this whole process again. Thus, we
+		can "mark" 3 as "being able to complete". We do that by emptying his
+		prerequisites vector.
+
+	    +---------+---------------+
+	    |      Pre_Map            |
+	    +---------+---------------+
+	    | courses | prerequisites |
+	    +---------+---------------+
+	    |    0    |    [1, 2]     | 
+	    +---------+---------------+
+	 -> |    1    |    [3, 4]     | (Now let's check 4) 
+	    +---------+---------------+
+	    |    2    |    []         |
+	    +---------+---------------+
+	    |    3    |    [4] => []  |
+	    +---------+---------------+
+	    |    4    |    []         |
+	    +---------+---------------+
+
+	    +---------+---------------+
+	    |      Pre_Map            |
+	    +---------+---------------+
+	    | courses | prerequisites |
+	    +---------+---------------+
+	    |    0    |    [1, 2]     | 
+	    +---------+---------------+
+	    |    1    |    [3, 4]     |
+	    +---------+---------------+
+	    |    2    |    []         |
+	    +---------+---------------+
+	    |    3    |    [4] => []  |
+	    +---------+---------------+
+	 -> |    4    |    []         | (This course can be completed! Return)
+	    +---------+---------------+
+
+	    +---------+---------------+
+	    |      Pre_Map            |
+	    +---------+---------------+
+	    | courses | prerequisites |
+	    +---------+---------------+
+	    |    0    |    [1, 2]     | 
+	    +---------+---------------+
+	 -> |    1    |  [3, 4] => [] | (Both 3 and 4 can be completed. Mark 1 too)
+	    +---------+---------------+
+	    |    2    |    []         |
+	    +---------+---------------+
+	    |    3    |    []         |
+	    +---------+---------------+
+	    |    4    |    []         |
+	    +---------+---------------+
+
+	    +---------+---------------+
+	    |      Pre_Map            |
+	    +---------+---------------+
+	    | courses | prerequisites |
+	    +---------+---------------+
+	    |    0    |    [1, 2]     | 
+	    +---------+---------------+
+	 -> |    1    |  [3, 4] => [] | (Both 3 and 4 can be completed. Mark 1 as
+	    +---------+---------------+ "being able to complete by emptying prereq
+	    |    2    |    []         |  list and return)
+	    +---------+---------------+
+	    |    3    |    []         |
+	    +---------+---------------+
+	    |    4    |    []         |
+	    +---------+---------------+
+
+	    +---------+---------------+
+	    |      Pre_Map            |
+	    +---------+---------------+
+	    | courses | prerequisites |
+	    +---------+---------------+
+	 -> |    0    |    [1, 2]     | (Now let's check 2)
+	    +---------+---------------+
+	    |    1    |    []         |
+	    +---------+---------------+
+	    |    2    |    []         |
+	    +---------+---------------+
+	    |    3    |    []         |
+	    +---------+---------------+
+	    |    4    |    []         |
+	    +---------+---------------+
+
+	    +---------+---------------+
+	    |      Pre_Map            |
+	    +---------+---------------+
+	    | courses | prerequisites |
+	    +---------+---------------+
+	    |    0    |    [1, 2]     |
+	    +---------+---------------+
+	    |    1    |    []         |
+	    +---------+---------------+
+	 -> |    2    |    []         | (This course can be completed! Return)
+	    +---------+---------------+
+	    |    3    |    []         |
+	    +---------+---------------+
+	    |    4    |    []         |
+	    +---------+---------------+
+
+	    +---------+---------------+
+	    |      Pre_Map            |
+	    +---------+---------------+
+	    | courses | prerequisites |
+	    +---------+---------------+
+	 -> |    0    |    [1, 2]     |(Both 3 and 4 can be completed. Mark 0 as 
+	    +---------+---------------+ "being able to complete by emptying prereq
+	    |    1    |    []         |  list and return)
+	    +---------+---------------+
+	    |    2    |    []         |
+	    +---------+---------------+
+	    |    3    |    []         |
+	    +---------+---------------+
+	    |    4    |    []         |
+	    +---------+---------------+
+
+	
+		Course 0 has been depth first searched, now proceed to course 1 and
+		do the same.
+		In this example further "big" iterations are trivial, however that does
+		not have to be the case. This is more of an exception than a rule.
+	
+
+
+	===========================================================================
+	1) DFS on Node 1
+	===========================================================================
+
+
+	    +---------+---------------+
+	    |      Pre_Map            |
+	    +---------+---------------+
+	    | courses | prerequisites |
+	    +---------+---------------+
+	    |    0    |    [1, 2]     |
+	    +---------+---------------+
+	 -> |    1    |    []         |
+	    +---------+---------------+
+	    |    2    |    []         |
+	    +---------+---------------+
+	    |    3    |    []         |
+	    +---------+---------------+
+	    |    4    |    []         |
+	    +---------+---------------+
+
+		etc.
 */
 
 /* Time  Beats: 5.61% */
@@ -169,7 +457,7 @@ private:
 
 	Now the Graph would look like this:
 
-     --> 1 ----> 2
+	 --> 1 ----> 2
 	 |   ^       |
 	 |    \      |
 	 |     \     |
