@@ -427,91 +427,96 @@
 
 */
 
+/* Time  Beats: 95.61% */
+/* Space Beats: 27.43% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
 class Trie {
 public:
 
-    struct TrieNode{
-        TrieNode* child[26];
-        bool is_leaf_node;
-    };
+	struct TrieNode{
+		TrieNode* child[26];
+		bool is_leaf_node;
+	};
 
-    TrieNode* root = NULL;
+	TrieNode* root = NULL;
 
-    TrieNode* get_trie_node()
+	TrieNode* get_trie_node()
 	{
-        TrieNode* node = new TrieNode();
-        for (int i = 0; i < 26; i++)
-            node->child[i] = nullptr;
+		TrieNode* node = new TrieNode();
+		for (int i = 0; i < 26; i++)
+			node->child[i] = nullptr;
 
-        node->is_leaf_node = false;
+		node->is_leaf_node = false;
 
-        return node;
-    }
+		return node;
+	}
 
 
-    void insert(std::string word)
+	void insert(std::string word)
 	{
-        // Already inserted then return
-        if (search(word))
-            return;
+		// Already inserted then return
+		if (search(word))
+			return;
 
-        // If inserting for first time then create root node first
-        if (!root)
-            root = get_trie_node();
+		// If inserting for first time then create root node first
+		if (!root)
+			root = get_trie_node();
 
-        TrieNode* node = root;
+		TrieNode* node = root;
 
-        // Iterate over all characters of the word
-        for (int i = 0; i <word.length(); i++)
+		// Iterate over all characters of the word
+		for (int i = 0; i <word.length(); i++)
 		{
-            int idx = word[i] - 'a';
-            if (!node->child[idx])
-                node->child[idx] = get_trie_node();
+			int idx = word[i] - 'a';
+			if (!node->child[idx])
+				node->child[idx] = get_trie_node();
 
-            node = node->child[idx];
-        }
+			node = node->child[idx];
+		}
 
-        node->is_leaf_node = true;
-    }
+		node->is_leaf_node = true;
+	}
 
 
-    bool search(std::string word)
+	bool search(std::string word)
 	{
-        TrieNode* node = root;
-        if (!root)
+		TrieNode* node = root;
+		if (!root)
 		{
-            //std::cout << "root is null" << "\n";
-            return false;
-        }
+			// std::cout << "root is null" << "\n";
+			return false;
+		}
 
-        for(int i = 0; (i < word.length()) && node; i++)
+		for(int i = 0; i < word.length() && node; i++)
 		{
-            int idx = word[i] - 'a';
-            node = node->child[idx];
-        }
+			int idx = word[i] - 'a';
+			node = node->child[idx];
+		}
 
-        if (node)
+		if (node)
 			return node->is_leaf_node;
 
-        return false;
-    }
+		return false;
+	}
 
 
-    bool startsWith(std::string prefix)
+	bool startsWith(std::string prefix)
 	{
-        TrieNode* node = root;
+		TrieNode* node = root;
 
-        if (!root)
+		if (!root)
 			return false;
 
-        for (int i = 0; (i < prefix.length()) && node; i++)
+		for (int i = 0; (i < prefix.length()) && node; i++)
 		{
-            int idx = prefix[i] - 'a';
-            node = node->child[idx];
-        }
+			int idx = prefix[i] - 'a';
+			node = node->child[idx];
+		}
 
-        return (node != NULL);
-    }
+		return (node != nullptr);
+	}
 };
 
 
