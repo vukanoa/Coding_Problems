@@ -120,12 +120,20 @@
 	However both Algorithms have the Worst Time Complexity: O(n^2)
 	Though that happens rarely. That happens if the array is already sorted.
 
+	===========================================================================
 	(Couldn't we check if the array is already sorted and if it is then just
 	return nums.size() - k, and if at any point of checking if it is sorted
-	we find out that it's not, then and only then, perform a Quick-Select. That
-	way we're certain that we're going to have an O(n) Time complexity.
+	we find out that it's not, then and only then, perform a Quick-Select)
+	
+	(That way we're certain that we're going to have an O(n) Time complexity.
 	Check up if it is sorted is alway O(1 * n) therefore it won't worsen the
-	Time Complexity, yet it will protect us from doing a O(n^2) ever).
+	Time Complexity, yet it will protect us from doing a O(n^2) ever, thus it
+	means that it will actually substantially improve our Time Complexity in
+	the worst case-scenario.)
+
+	Yes, we could. That's actually the way to optimize Quick-Select algorithm
+	Solution_Efficient implements that on top of the Quick-select.
+	===========================================================================
 
 	Consider this first example:
 		3 2 1 5 6 4
@@ -429,6 +437,90 @@ public:
 	--- IDEA ---
 	------------
 
+	This is it. To optimize Quick-Select, we should:
+
+	===========================================================================
+	Check if the array is already sorted and if it is then just
+	return nums.size() - k, and if at any point of checking if it is sorted
+	we find out that it's not, then and only then, perform a Quick-Select.
+
+	That way we're certain that we're going to have an O(n) Time complexity.
+	Check up if it is sorted is alway O(1 * n) therefore it won't worsen the
+	Time Complexity, yet it will protect us from doing a O(n^2) ever, thus it
+	means that it will actually substantially improve our Time Complexity in
+	the worst case-scenario.)
+	===========================================================================
+	
+*/
+
+
+/* Time  Beats: 91.69% */
+/* Space Beats: 72.98% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Efficient {
+private:
+	int quick_select(std::vector<int>& nums, int k, int left, int right)
+	{
+		int j = left;
+		int i = left;
+		int pivot_index = right;
+
+		while (j < pivot_index)
+		{
+			if (nums[j] <= nums[pivot_index])
+			{
+				std::swap(nums[i], nums[j]);
+				i++;
+			}
+
+			j++;
+		}
+		std::swap(nums[i], nums[right]);
+
+		if (k == i)
+			return nums[i];
+		else if (k < i)
+			return quick_select(nums, k, left, i - 1);
+		else // (k > i)
+			return quick_select(nums, k, i + 1, right);
+	}
+
+public:
+	int findKthLargest(std::vector<int>& nums, int k)
+	{
+		if (nums.size() == 1)
+			return nums[0]; // Since we're certain that k is also 1
+
+		auto sorted = [&](){
+			for (int i = 1; i < nums.size(); i++)
+			{
+				if (nums[i - 1] > nums[i])
+					return false;
+			}
+
+			return true;
+		};
+
+		/* This prevents O(n^2) for Quick-Select */
+		if (sorted())
+			return nums[nums.size() - k];
+
+		k = nums.size() - k; // Index in the array as if it was sorted.
+		int kth = quick_select(nums, k, 0, nums.size() - 1);
+
+		return kth;
+	}
+};
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
 	Same as above, just did NOT use the trick:
 		k = nums.size() - k;
 	
@@ -484,6 +576,7 @@ main()
 {
 	Solution           sol;
 	Solution_Readable  sol_readable;
+	Solution_Efficient sol_efficient;
 	Solution_Difficult sol_difficult;
 
 
@@ -525,7 +618,8 @@ main()
 	/* Solution */
 	// int kth = sol.findKthLargest(nums, k);
 	// int kth = sol_readable.findKthLargest(nums, k);
-	int kth = sol_difficult.findKthLargest(nums, k);
+	int kth = sol_efficient.findKthLargest(nums, k);
+	// int kth = sol_difficult.findKthLargest(nums, k);
 
 
 	/* Write Output */
