@@ -50,26 +50,6 @@
 	--- IDEA ---
 	------------
 
-	--- Trivial Solution ---
-	Sort the initial array "nums" and return [nums.size() - k]th element.
-
-	=============
-	=== CODE ====
-	=============
-
-	class Solution{
-	public:
-		int findKthLargest(std::vector<int>& nums, int k)
-		{
-			std::sort(nums.begin(), nums.end());
-
-			return nums[nums.size() - k];
-		}
-	};
-
-
-
-
 	--- Heapify Solution ---
 	We can use the method "heapify" of the Heap Sort implementation to solve
 	this problem.
@@ -139,6 +119,13 @@
 
 	However both Algorithms have the Worst Time Complexity: O(n^2)
 	Though that happens rarely. That happens if the array is already sorted.
+
+	(Couldn't we check if the array is already sorted and if it is then just
+	return nums.size() - k, and if at any point of checking if it is sorted
+	we find out that it's not, then and only then, perform a Quick-Select. That
+	way we're certain that we're going to have an O(n) Time complexity.
+	Check up if it is sorted is alway O(1 * n) therefore it won't worsen the
+	Time Complexity, yet it will protect us from doing a O(n^2) ever).
 
 	Consider this first example:
 		3 2 1 5 6 4
@@ -272,7 +259,7 @@
 	elements right of it are greater than the pivot element and all the
 	elements left of it are less than or equal to the pivot element.
 
-	So what does that tells us?
+	So what does that tell us?
 	It tells us that our pivot is:
 		$$$ = nums.size() - index_of_our_pivot(after swapping with nums[i])
 
@@ -290,7 +277,7 @@
 		continue in the left's portion of our pivot
 
 	Or to simplify the above conditions, we can also check:
-	if (k == i)
+	if (k == i) // 'i' is the index of our pivot after the last swap
 		We've found the k-th largest element. Return the pivot.
 	else if(k < i)
 		we should continue in the right's portion of our pivot
@@ -314,7 +301,7 @@
 			is equals to
 		nums.size() - k
 
-	That is, until:
+	i.e., until:
 		(### === $$$)
 
 	Or simpler, until:
@@ -324,8 +311,8 @@
 	Return that and it's done.
 
 	With Quick-Select, we don't care about the other "half". We just keep going
-	on the side we need to process and partition it further until we get to a
-	the above stated condition.
+	on the side we need to process and partition it further until we get to the
+	above stated condition.
 
 */
 
@@ -379,10 +366,126 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Same as above, just implemented a bit differently.
+	
+*/
+
+
+/* Time  Beats: 6.44% */
+/* Space Beats: 99.47% */
+class Solution_Readable{
+private:
+	int quick_select(std::vector<int>& nums, int k, int left, int right)
+	{
+		int j = left;
+		int i = left;
+		int pivot_index = right;
+
+		while (j < pivot_index)
+		{
+			if (nums[j] <= nums[pivot_index])
+			{
+				std::swap(nums[i], nums[j]);
+				i++;
+			}
+
+			j++;
+		}
+		std::swap(nums[i], nums[right]);
+
+		if (k == i)
+			return nums[i];
+		else if (k < i)
+			return quick_select(nums, k, left, i - 1);
+		else // (k > i)
+			return quick_select(nums, k, i + 1, right);
+	}
+
+public:
+	int findKthLargest(std::vector<int>& nums, int k)
+	{
+		if (nums.size() == 1)
+			return nums[0]; // Since we're certain that k is also 1
+
+		k = nums.size() - k; // Index in the array as if it was sorted.
+		int kth = quick_select(nums, k, 0, nums.size() - 1);
+
+		return kth;
+	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Same as above, just did NOT use the trick:
+		k = nums.size() - k;
+	
+	So I wanted to put this here to emphasize how important that part is. If
+	we leave that part out, then we have to do all of this "nonsense" with if
+	statements and all these arguments.
+	
+*/
+
+
+/* Time  Beats:  5.10% */
+/* Space Beats: 99.47% */
+class Solution_Difficult {
+public:
+	int findKthLargest(std::vector<int>& nums, int k)
+	{
+		/* Quick Select */
+		return quick_select(nums, k, 0, nums.size() - 1);
+	}
+
+private:
+	int quick_select(std::vector<int>& nums, int k, int start, int end)
+	{
+		int i = start;
+		int j = start;
+		int pivot_index = end;
+
+		while (j < pivot_index)
+		{
+			if (nums[j] <= nums[pivot_index])
+			{
+				std::swap(nums[i], nums[j]);
+				i++;
+				j++;
+			}
+			else
+				j++;
+		}
+		std::swap(nums[i], nums[pivot_index]);
+
+		if (end - k + 1 == i)
+			return nums[i];
+		else if (end - k + 1 < i)
+			return quick_select(nums, k-(pivot_index-i + 1), start, i-1);
+		else // if (end - k + 1 > i)
+			return quick_select(nums,   k, i+1,   end);
+	}
+};
+
+
 int
 main()
 {
-	Solution sol;
+	Solution           sol;
+	Solution_Readable  sol_readable;
+	Solution_Difficult sol_difficult;
+
 
 	/* Example 1 */
 	std::vector<int> nums {3, 2, 1, 5, 4, 6};
@@ -418,8 +521,12 @@ main()
 	}
 	std::cout << "]\n";
 
+
 	/* Solution */
-	int kth = sol.findKthLargest(nums, k);
+	// int kth = sol.findKthLargest(nums, k);
+	// int kth = sol_readable.findKthLargest(nums, k);
+	int kth = sol_difficult.findKthLargest(nums, k);
+
 
 	/* Write Output */
 	if (k == 1)
@@ -430,6 +537,7 @@ main()
 		std::cout << "\n\t" << k << "rd Largest: " << kth << "\n\n";
 	else
 		std::cout << "\n\t" << k << "th Largest: " << kth << "\n\n";
+
 
 	return 0;
 }
