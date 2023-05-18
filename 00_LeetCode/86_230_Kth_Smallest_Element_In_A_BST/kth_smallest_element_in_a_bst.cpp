@@ -2,6 +2,9 @@
 #include <vector>
 #include <stack>
 
+// For printing
+#include <queue>
+
 /*
 	==============
 	=== MEDIUM ===
@@ -31,7 +34,7 @@
 	==========================================================================
 
 	--- Example 1 ---
-	Input:  root = [3, 1, , null, 2], k = 1
+	Input:  root = [3, 1, 4, null, 2], k = 1
 	Output: 1
 
 	--- Example 2 ---
@@ -80,7 +83,7 @@ struct TreeNode {
 	return the smallest element.
 	Or if k = 2 we need to return the 2nd smallest element in the tree.
 
-	Thus, previoulsy stated, if number of nodes in the left subtree + 1 = k
+	Thus, previously stated, if number of nodes in the left subtree + 1 = k
 	we've found it! Return the root and that's it.
 
 	Else if k <= number of nodes in the left subtree
@@ -98,9 +101,10 @@ struct TreeNode {
 		with this new 'k' value.
 */
 
-
-
 /* It's similar to Quick Select */
+
+/* Time  Beats: 64.78% */
+/* Space Beats: 85.90% */
 
 /*	Average Time  Complexity: O(n) */
 /*
@@ -150,12 +154,13 @@ public:
 	------------
 
 	It's a very straightforward approach with O(N) time complexity. The idea is
-	to bulid an inorder traversal of BST which is an array sorted in the
+	to build an inorder traversal of BST which is an array sorted in the
 	ascending order. now the answer is the "k - 1"th element of this array.
 
 */
 
-
+/* Time  Beats: 90.30% */
+/* Space Beats: 19.42% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
@@ -181,6 +186,185 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	We have to go through several examples to prove why this has to be
+	implemented this way.
+
+	First, let's ask an obvious question: How can we know what is the smallest
+	element in a BST?
+
+	It's the first leftmost node that has no left subtree.
+
+	Example 1: (k = 1)
+	___________
+	_____3_____
+	__1_____4__
+	____2______
+
+	Once we get to the first node that node->left == nullptr, then that's the
+	smallest. It's important not to count the nodes while we still haven't find
+	the absolute smallest.
+
+	We're making sure that's the case by having a "ith" variable as a reference
+	argument in each call of "dfs" function.
+
+	At the beginning ith is set to -1.
+	Once we get to the first node that doesn't have a left subtree AND ith == -1
+	then we should set ith to 0. (That indicates that from this point onwards
+	we're going to count nodes until we get to kth smallest)
+
+	Now that we have ith set to 0, we have to check:
+		if ith + 1 == k
+			if it is then return this current node.
+
+	However we cannot write the "if statement" in this way because if it turns
+	out that k > 1 then this statement won't be correct. Thus, we have to write
+	it like this:
+
+		if (ith + 1 == k && root->left == nullptr)
+			return root;
+	
+	Okay, we're having an additional statement:
+		root->left == nulltr
+	
+	Which prevents one particular case. Consider this example:
+
+	Example 3: (k = 3)
+	_______________________________________________10______________________________________________
+	_______________________6_______________________________________________11______________________
+	___________1_______________________8___________________________________________________________
+	_________________2___________7___________9_____________________________________________________
+	____________________5__________________________________________________________________________
+	__________________3____________________________________________________________________________
+	
+	Once we get to 1, we see that there is no left subtree, thus we're setting
+	variable "ith" to 0 and we're starting to count nodes.
+
+	We're accounting the current node only right before we go in current node's
+	right subtree.
+
+	So we account 1 and we go to the right.
+	Once we're in the node 2, there is no left subtree, but before we go to its
+	right subtree, we account 2, as well. (Now variable "ith" is 2)
+
+	Now we're at node 5 which has the left subtree, thus we FIRST have to go
+	left and only afterwards we account the 5 and go right.
+
+	This is the crux of this problem. Why are we doing this?
+	Once we're at the node 5, variable "ith" is equal to 2, and k == 3, so if
+	were had an if statement like this:
+		
+		if (ith + 1 == k)
+			return root;
+
+	We would've returned node 5 as the k=3(i.e. 3rd smallest) element in this
+	BST which is not true.
+
+	That's why we have to have this additional statement:
+		if (ith + 1 == k && root->left == nullptr)
+			return root;
+	
+	Okay, but do we have an additonal check up immediately after returning from
+	dfs on current node's left subtree?
+
+	This is very important. This is the part that is necessary when:
+		k > count_nodes(smallest_node->right) + 1
+	
+	i.e. when the number of nodes of the smallest's right subtree(left tree is,
+	as we've already concluded, nullptr) + 1 because we take into account the
+	current one as well, then that means that we have to go BACK to find the
+	kth smallest.
+
+	Consider this example:
+
+	Example 3: (k = 4)
+	_______________________________________________10______________________________________________
+	_______________________6_______________________________________________11______________________
+	___________1_______________________8___________________________________________________________
+	_________________2___________7___________9_____________________________________________________
+	____________________5__________________________________________________________________________
+	__________________3____________________________________________________________________________
+
+
+	Once we return from the left subtree of node 5, variable "ith" is going to
+	be 3. So we have to check if "ith" + 1(meaning we've accounted the current
+	node as well) is equal to k.
+
+	If we were to omit this "if statement" we would've gone into its right
+	subtree(which is nullptr in this case) we would propagate upward to node 6
+	where we would've taken 6 into account and go right and then we'd always
+	"jump over" k, which would result in a Segmentation Fault at the end.
+
+	Also consider the same example for k = 6
+	After processing both left and right subtrees of node 5, we would now have
+	to go UPWARDS to find the kth smallest.
+
+	That's why that additional "if statement" is absolutely necessary.
+
+*/
+
+/* Time  Beats: 99.78% */
+/* Space Beats: 85.90% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_My_Invention {
+public:
+	int kthSmallest(TreeNode* root, int k)
+	{
+		int ith = -1;
+		TreeNode* kth = dfs(root, k, ith);
+
+		return kth->val;
+	}
+
+private:
+	TreeNode* dfs(TreeNode* root, int k, int& ith)
+	{
+		if (root == nullptr)
+			return nullptr;
+
+		/* Smallest in a BST */
+		if (ith == -1 && root->left == nullptr)
+			ith = 0;
+
+		/* This is the crux */
+		if (ith + 1 == k && root->left == nullptr)
+			return root;
+
+
+		/* Left */
+		TreeNode* left = dfs(root->left, k, ith); 
+		if (left != nullptr)
+			return left;
+
+
+		/* This is the crux also */
+		if (ith + 1 == k)
+			return root;
+
+		ith++; // Account the current one
+
+
+		/* Right */
+		TreeNode* right = dfs(root->right, k, ith);
+		if (right != nullptr)
+			return right;
+
+		return nullptr;
+	}
+};
+
+
+
+
+
 /*
 	------------
 	--- IDEA ---
@@ -195,12 +379,14 @@ public:
 
 */
 
+/* Time  Beats: 97.17% */
+/* Space Beats: 85.90% */
 
 /*
 	Time  Complexity: O(H + k)
 	where H is a tree height. This complexity is defined by the stack, which
-	contains at leat H + k elements, since before starting to pop out one has
-	to go down to a leaf. This results in O(logN + k) for the balaced tree and
+	contains at least H + k elements, since before starting to pop out one has
+	to go down to a leaf. This results in O(logN + k) for the balanced tree and
 	O(N + k) for completely unbalanced tree with all the nodes in the left
 	subtree.
 */
@@ -236,16 +422,77 @@ public:
 };
 
 
+/*
+	=============================
+	=== This is just printing ===
+	=============================
+*/
 
 void
-inorder(TreeNode* root)
+print_array(std::vector<std::string>& nums)
+{
+	bool first = true;
+	std::cout << "\n\t\t[";
+	for (auto x: nums)
+	{
+		if (!first)
+			std::cout << ", ";
+
+		std::cout << x;
+		first = false;
+	}
+	std::cout << "]\n";
+}
+
+
+void
+print_levelorder(TreeNode* root)
 {
 	if (root == nullptr)
 		return;
+	
+	std::queue<TreeNode*> queue;
+	queue.push(root);
 
-	inorder(root->left);
-	std::cout << root->val << " ";
-	inorder(root->right);
+	std::vector<std::string> vector_print;
+
+	while (!queue.empty())
+	{
+		int size = queue.size();
+
+		for (int i = 0; i < size; i++)
+		{
+			TreeNode* node = queue.front();
+			queue.pop();
+
+			if (node == nullptr)
+			{
+				vector_print.push_back("null");
+				continue;
+			}
+			else
+				vector_print.push_back(std::to_string(node->val));
+
+			if (node->left != nullptr)
+				queue.push(node->left);
+			else
+				queue.push(nullptr);
+
+			if (node->right != nullptr)
+				queue.push(node->right);
+			else
+				queue.push(nullptr);
+		}
+	}
+
+	int x = vector_print.size() - 1;
+	while (vector_print[x] == "null")
+	{
+		vector_print.pop_back();
+		x--;
+	}
+
+	print_array(vector_print);
 }
 
 
@@ -254,6 +501,7 @@ main()
 {
 	Solution sol;
 	Solution_inorder sol_ino;
+	Solution_My_Invention sol_my_invention;
 	Solution_follow_up sol_follow;
 
 	/* Example 1 */
@@ -293,15 +541,20 @@ main()
 	std::cout << "\n\t=== KTH SMALLEST ELEMENT IN A BST ===";
 	std::cout << "\n\t=====================================\n\n";
 
+
 	/* Write Input */
+	std::cout << "\n\t\t\t(TODO: Implement a Visual representation of a Binary Tree)\n\n";
 	std::cout << "\n\tTree: ";
-	inorder(root);
+	print_levelorder(root);
 	std::cout << "\n";
+
 
 	/* Solution */
 	// int kth = sol.kthSmallest(root, k);
 	// int kth = sol_ino.kthSmallest(root, k);
+	// int kth = sol_my_invention.kthSmallest(root, k);
 	int kth = sol_follow.kthSmallest(root, k);
+
 
 	/* Write Output */
 	if (k == 1)
@@ -312,6 +565,7 @@ main()
 		std::cout << "\n\t" << k << "rd Smallest: " << kth << "\n\n";
 	else
 		std::cout << "\n\t" << k << "th Smallest: " << kth << "\n\n";
+
 
 	return 0;
 }
