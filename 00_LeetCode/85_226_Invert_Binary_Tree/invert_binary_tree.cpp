@@ -69,11 +69,13 @@ struct TreeNode {
 */
 
 
+/* Time  Beats:   100% */
+/* Space Beats: 77.34% */
 
 /*	Time  Complexity: O(n) */
 /*
 	Space Complexity: O(h)
-	where 'h' is the height of the tree. At wrost 'h' can be 'n' and that makes
+	where 'h' is the height of the tree. At worst 'h' can be 'n' and that makes
 	it O(n)
 */
 class Solution{
@@ -93,41 +95,52 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	The same as above, but implemented on another occasion so I wanted to have
+	another implementation of it.
+	
+*/
+
+/* Time  Beats:  100% */
+/* Space Beats: 77.34% */
+
 /*	Time  Complexity: O(n) */
 /*
 	Space Complexity: O(h)
-	where 'h' is the height of the tree. At wrost 'h' can be 'n' and that makes
-	it O(n)
+	In the worst case the queue will contain all nodes in one level of the
+	binary tree. For a full binary tree, the leaf level has ceil(n / 2) = O(n)
+	leaves.
 */
-class Solution_initial{
+class Solution_Another{
 public:
-    TreeNode* invertTree(TreeNode* root)
+	TreeNode* invertTree(TreeNode* root)
 	{
-        if (root == nullptr)
-            return nullptr;
-        else if (root->left && root->right == nullptr)
-        {
-            root->right = root->left;
-            root->left = nullptr;
-        }
-        else if (root->left == nullptr && root->right)
-        {
-            root->left = root->right;
-            root->right = nullptr;
-        }
-        else
-        {
-            TreeNode* tmp = root->left;
-            root->left = root->right;
-            root->right = tmp;
-        }
+		if (root == nullptr)
+			return nullptr;
 
-        invertTree(root->left);
-        invertTree(root->right);
+		/* Leaf node */
+		if (root->left == nullptr && root->right == nullptr)
+			return root;
 
-        return root;
-    }
+		/* Invert (Swap) */
+		TreeNode* tmp = root->left;
+		root->left = root->right;
+		root->right = tmp;
+
+		invertTree(root->left);
+		invertTree(root->right);
+		
+		return root;
+	}
 };
+
+
 
 
 /*
@@ -147,8 +160,12 @@ public:
 	to the queue. Eventually, the queue will be empty and all the children
 	swapped, and we return the original root.
 
+	Though, this Solution is a lot less Space efficient.
+
 */
 
+/* Time  Beats:  100% */
+/* Space Beats: 5.27% */
 
 /*	Time  Complexity: O(n) */
 /*
@@ -188,15 +205,77 @@ public:
 };
 
 
+/*
+	=============================
+	=== This is just printing ===
+	=============================
+*/
+
 void
-inorder(TreeNode* root)
+print_array(std::vector<std::string>& nums)
+{
+	bool first = true;
+	std::cout << "\n\t\tTree: [";
+	for (auto x: nums)
+	{
+		if (!first)
+			std::cout << ", ";
+
+		std::cout << x;
+		first = false;
+	}
+	std::cout << "]";
+}
+
+
+void
+print_levelorder(TreeNode* root)
 {
 	if (root == nullptr)
 		return;
+	
+	std::queue<TreeNode*> queue;
+	queue.push(root);
 
-	inorder(root->left);
-	std::cout << root->val << " ";
-	inorder(root->right);
+	std::vector<std::string> vector_print;
+
+	while (!queue.empty())
+	{
+		int size = queue.size();
+
+		for (int i = 0; i < size; i++)
+		{
+			TreeNode* node = queue.front();
+			queue.pop();
+
+			if (node == nullptr)
+			{
+				vector_print.push_back("null");
+				continue;
+			}
+			else
+				vector_print.push_back(std::to_string(node->val));
+
+			if (node->left != nullptr)
+				queue.push(node->left);
+			else
+				queue.push(nullptr);
+
+			if (node->right != nullptr)
+				queue.push(node->right);
+			else
+				queue.push(nullptr);
+		}
+	}
+
+	int x = vector_print.size() - 1;
+	while (vector_print[x] == "null")
+	{
+		vector_print.pop_back();
+		x--;
+	}
+
+	print_array(vector_print);
 }
 
 
@@ -204,8 +283,8 @@ int
 main()
 {
 	Solution sol;
-	// Solution_initial sol_in;
-	// Solution_iterative sol_iter;
+	Solution_Another sol_another;
+	Solution_iterative sol_iter;
 
 	/* Example 1 */
 	TreeNode four(4);
@@ -246,20 +325,25 @@ main()
 	std::cout << "\n\t=== INVERT BINARY TREE ===";
 	std::cout << "\n\t==========================\n";
 
+
 	/* Write Input */
+	std::cout << "\n\t\t\t(TODO: Implement a Visual representation of a Binary Tree)\n\n";
 	std::cout << "\n\tBefore: ";
-	inorder(root);
+	print_levelorder(root);
 	std::cout << "\n";
 
+
 	/* Solution */
-	sol.invertTree(root);
-	// sol_in.invertTree(root);
+	// sol.invertTree(root);
+	sol_another.invertTree(root);
 	// sol_iter.invertTree(root);
+
 
 	/* Write Output */
 	std::cout << "\n\tAfter:  ";
-	inorder(root);
-	std::cout << "\n\n";
+	print_levelorder(root);
+	std::cout << "\n\n\n";
+
 
 	return 0;
 }
