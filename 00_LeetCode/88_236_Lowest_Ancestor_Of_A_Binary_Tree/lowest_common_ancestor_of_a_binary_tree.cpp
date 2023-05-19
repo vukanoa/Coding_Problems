@@ -1,5 +1,9 @@
 #include <iostream>
 #include <stack>
+#include <vector>
+
+// Printing
+#include <queue>
 
 /*
 	==============
@@ -23,7 +27,7 @@
 	descendant of itself)
 
 	=====
-	Node: *We allow a node to be a descendant of itself*
+	Note: *We allow a node to be a descendant of itself*
 	=====
 
 	===================================================================================
@@ -100,10 +104,11 @@ struct TreeNode {
 		*We allow a node to be a descendant of itself*
 
 	Consider 2nd Example:
-             3
-      5              1
-   6     2        0     8
-       7   4
+	_______________________
+	___________3___________
+	_____5___________1_____
+	__6_____2_____0_____8__
+	______7___4____________
 
 	Input:  root = [3, 5, 1, 6, 2, 0, 8, null, null, 7, 4], p = 5, q = 4
 	Output: 5
@@ -128,6 +133,8 @@ struct TreeNode {
 	That way we covered that case as well and the problem is resolved.
 */
 
+/* Time  Beats: 74.13% */
+/* Space Beats: 13.40% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
@@ -203,6 +210,8 @@ public:
 
 */
 
+/* Time  Beats: 96.11% */
+/* Space Beats: 57.80% */
 
 /* Faster */
 /* Time  Complexity: O(n) */
@@ -228,59 +237,194 @@ public:
 };
 
 
-int
-tree_height(TreeNode* root)
-{
-    if (root == NULL)
-        return 0;
-    else
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Same IDEA, just implemented on another occasion so I wanted to have it here
+	as well.
+
+	It can also be divided into 3 parts:
+		1)  Since we're told that both 'p' and 'q' exist in the Tree, we do an
+			inorder search where we push nodes as we go down, until we find our
+			'p' or 'q'.
+			Also, if we end up going down the wrong path, at the end we pop
+			that node since it does not represent the path to our 'p' or 'q'.
+
+		2) Intersection of Two Linked Lists
+
+		3) Find LCA iterating from the back of each vector until they match
+			
+
+	It uses preorder instead of inorder so it's a bit less Space efficient,
+	however it turns out that it's a lot more Time efficient for some reason.
+
+	At least on LeetCode.
+	
+*/
+
+/* Time  Beats: 99.99% */
+/* Space Beats: 6.31% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Another {
+public:
+	TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
 	{
-		// Compute the height of each subtree
-        int left_height  = tree_height(root->left);
-        int right_height = tree_height(root->right);
+		std::vector<TreeNode*> p_vec;
+		std::vector<TreeNode*> q_vec;
 
-		// Use the larger one
-        if (left_height > right_height)
-            return (left_height + 1);
-        else
-            return (right_height + 1);
-    }
-}
+		/* Fill p_vec and q_vec with preorder_dfs*/
+		dfs(root, p, p_vec);
+		dfs(root, q, q_vec);
 
+		int p_cnt = p_vec.size();
+		int q_cnt = q_vec.size();
+
+		/* Intersection of Two Linked Lists */
+		if (p_vec.size() > q_vec.size())
+		{
+			while (p_cnt > q_cnt)
+				p_cnt--;
+		}
+		else if (p_vec.size() < q_vec.size())
+		{
+			while (p_cnt < q_cnt)
+				q_cnt--;
+		}
+
+		/* Find LCA */
+		while(p_vec[p_cnt - 1]->val != q_vec[q_cnt - 1]->val)
+		{
+			p_cnt--;
+			q_cnt--;
+		}
+
+		return p_vec[p_cnt - 1];
+	}
+
+private:
+	/* Preorder */
+	bool dfs(TreeNode* root, TreeNode* x, std::vector<TreeNode*>& x_vec)
+	{
+		if (root == nullptr)
+			return false;
+
+		x_vec.push_back(root);
+
+		if (root == x)
+			return true;
+
+		/* Go Left */
+		if (dfs(root->left , x, x_vec))
+			return true;
+
+		/* Pop all the nodes up to this one */
+		while (x_vec[x_vec.size() - 1] != root)
+			x_vec.pop_back();
+
+		/* Go Right */
+		if(dfs(root->right, x, x_vec))
+			return true;
+
+		/* Pop all the nodes up to this one */
+		while (x_vec[x_vec.size() - 1] != root)
+			x_vec.pop_back();
+
+		return false;
+	}
+};
+
+
+
+
+/*
+	=============================
+	=== This is just printing ===
+	=============================
+*/
 
 void
-print_current_level(TreeNode* root, int level)
+print_array(std::vector<std::string>& nums)
 {
-    if (root == nullptr)
+	bool first = true;
+	std::cout << "\n\t\t\t(TODO: Implement a Visual representation of a Binary Tree)\n\n";
+	std::cout << "\n\t*** Level Order ***";
+	std::cout << "\n\tTree: [";
+	for (auto x: nums)
 	{
-        std::cout << "null ";
-        return;
+		if (!first)
+			std::cout << ", ";
+
+		std::cout << x;
+		first = false;
 	}
-    if (level == 1)
-        std::cout << root->val << " ";
-    else if (level > 1)
-	{
-        print_current_level(root->left,  level - 1);
-        print_current_level(root->right, level - 1);
-    }
+	std::cout << "]\n\n";
 }
 
 
 void
 print_levelorder(TreeNode* root)
 {
-    int h = tree_height(root);
+	if (root == nullptr)
+		return;
+	
+	std::queue<TreeNode*> queue;
+	queue.push(root);
 
-    for (int i = 1; i <= h; i++)
-        print_current_level(root, i);
+	std::vector<std::string> vector_print;
+
+	while (!queue.empty())
+	{
+		int size = queue.size();
+
+		for (int i = 0; i < size; i++)
+		{
+			TreeNode* node = queue.front();
+			queue.pop();
+
+			if (node == nullptr)
+			{
+				vector_print.push_back("null");
+				continue;
+			}
+			else
+				vector_print.push_back(std::to_string(node->val));
+
+			if (node->left != nullptr)
+				queue.push(node->left);
+			else
+				queue.push(nullptr);
+
+			if (node->right != nullptr)
+				queue.push(node->right);
+			else
+				queue.push(nullptr);
+		}
+	}
+
+	int x = vector_print.size() - 1;
+	while (vector_print[x] == "null")
+	{
+		vector_print.pop_back();
+		x--;
+	}
+
+	print_array(vector_print);
 }
 
 
 int
 main()
 {
-	Solution sol;
-	Solution_2 sol_2;
+	Solution         sol;
+	Solution_2       sol_2;
+	Solution_Another sol_another;
+
 
 	/* Example 1 */
 	// TreeNode three(3);
@@ -351,19 +495,21 @@ main()
 	std::cout << "\n\t=== LOWEST COMMON ANCESTOR OF A BINARY TREE ===";
 	std::cout << "\n\t===============================================\n\n";
 
+
 	/* Write Input */
-	std::cout << "\n\tTree: ";
 	print_levelorder(root);
-	std::cout << "\n";
 	std::cout << "\tp: " << p->val << "\n";
 	std::cout << "\tq: " << q->val << "\n";
+
 
 	/* Solution */
 	// TreeNode* ancestor = sol.lowestCommonAncestor(root, p, q);
 	TreeNode* ancestor = sol_2.lowestCommonAncestor(root, p, q);
+	// TreeNode* ancestor = sol_another.lowestCommonAncestor(root, p, q);
+
 
 	/* Write Output */
-	std::cout << "\n\tLCA is: " << ancestor->val << "\n\n";
+	std::cout << "\n\n\tLCA is: " << ancestor->val << "\n\n";
 
 
 	return 0;
