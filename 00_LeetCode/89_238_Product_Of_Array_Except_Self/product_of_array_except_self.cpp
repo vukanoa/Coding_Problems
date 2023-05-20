@@ -69,16 +69,16 @@
 	Now, at any index 'i' our final answer "answer[i]" would be given by:
 		answer[i] = prefix[i] * suffix[i]
 
-	Why? Because the "prefix[i] * suffix[i]" contains product of every element
+	Why? Because "prefix[i] * suffix[i]" contains product of every element
 	before 'i' and every element after 'i' but not the element at index 'i'
-	(and that is the reson why we excluded a[i] in our prefix and suffix
+	(and that is the reason why we excluded a[i] in our prefix and suffix
 	product).
 
 	Follow-Up:
-	Directly store the product of prefix and suffix into the finan "answer"
+	Directly store the product of prefix and suffix into the final "answer"
 	array.
 
-	The logic is, we don't actually need seperate array to store prefix product
+	The logic is, we don't actually need separate array to store prefix product
 	and suffix products, we can do all the approach discussed in method 3
 	directly onto our final answer array.
 
@@ -87,6 +87,8 @@
 */
 
 
+/* Time  Beats: 54.36% */
+/* Space Beats: 20.88% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
@@ -96,7 +98,7 @@ public:
 	{
 		int n = nums.size();
 		std::vector<int> prefix(n, 1);
-		std::vector<int>  suffix(n, 1);
+		std::vector<int> suffix(n, 1);
 
 		for (int i = 1; i < n; i++)
 			prefix[i] = prefix[i - 1] * nums[i - 1];
@@ -138,7 +140,8 @@ public:
 	variable which is "remaining_product" and multiply with the "answer" array.
 */
 
-
+/* Time  Beats: 91.57% */
+/* Space Beats: 85.95% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
