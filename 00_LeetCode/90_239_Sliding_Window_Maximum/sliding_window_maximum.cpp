@@ -35,12 +35,12 @@
 	Output: [3, 3, 5, 5, 6, 7]
 	Window position                     Max
 	---------------                    -----
-   [1   3  -1] -3   5   3   6   7        3
-    1  [3  -1  -3]  5   3   6   7        3
-    1   3 [-1  -3   5]  4   6   7        5
-    1   3  -1 [-3   5   4]  6   7        5
-    1   3  -1  -3  [5   4   6]  7        6
-    1   3  -1  -3   5  [4   6   7]       7
+	[1   3  -1] -3   5   3   6   7        3
+	 1  [3  -1  -3]  5   3   6   7        3
+	 1   3 [-1  -3   5]  4   6   7        5
+	 1   3  -1 [-3   5   4]  6   7        5
+	 1   3  -1  -3  [5   4   6]  7        6
+	 1   3  -1  -3   5  [4   6   7]       7
 
 	--- Example 2 ---
 	Input:  nums = [1], k = 1
@@ -69,7 +69,8 @@
 
 	We can write a nested loop, the outer loop goes through each window and
 	the inner loop finds the max within the window. This is O(N^2) time
-	complexity.
+	complexity. Since at worst k == n. If k was always smaller than n, it would
+	be O(n * k).
 
 	To optimize on brute force, we can either reduce outer or inner loop
 	complexity. Since we have toe examine each element at least once(there's no
@@ -97,11 +98,13 @@
 
 	One way to achieve this goal is to save the window elements in a
 	self-balancing binary tree. Because it's self-balancing, the depth of the
-	tree is guaranteed to be O(logN) so lookup, getting max, insert and delete
-	are all O(logN) operations.
+	tree is guaranteed to be O(logN), so find max, insert and delete are all:
+		O(logN) operations.
+
 	Every time we slide the window, we remove the node that's out of the window
 	and add the one that comes into the window to the tree. Overall, this gives
-	us O(N * logK) since the number of tree nodes is K and we slide max N times
+	us O(N * logK) since the number of tree nodes is K and we slide max N
+	times. (actually we slide (n - k) times, but at worst we slide N).
 
 	This is pretty good already, but can we do better?
 
@@ -128,7 +131,7 @@
 	decreasing order (hence the name monotonic)
 
 	To achieve this property, we modify the push operation so that:
-		*Before we push an element into the deque, we first pop everything
+		Before we push an element into the deque, we first pop everything
 		smaller than it out of the deque.
 
 	This enfroces the decreasing order.
@@ -139,8 +142,239 @@
 	The key why monotonic deque works is it stores both magnitude and position
 	information. From head to tail, the elements get smaller and further to the
 	right of the array.
+
+	Consider this Example:
+		[1, 3, -1, -3, 5, 3, 6, 7], k = 4;
+	
+
+	0)
+		        i
+		nums = [1] 3  -1  -3  5  3  6  7
+		        0  1   2   3  4  5  6  7
+
+		Deque: (It stores INDICES, not values)
+              
+    front ----
+             |
+             v
+           ------------------------
+           | 0
+           ------------------------
+             ^
+             |
+             ------ back
+
+		results = Empty
+
+		// Once we expand the window to its size k, start pushing front onwards
+		if (i >= k-1) // if (0 >= 4-1) 
+			false
+
+
+
+
+
+	1)
+		           i
+		nums = [1  3] -1  -3  5  3  6  7
+		        0  1   2   3  4  5  6  7
+
+		Deque: (It stores INDICES, not values)
+              
+    front ----
+             |
+             v
+           ------------------------
+           | 1
+           ------------------------
+             ^
+             |
+             ------ back
+
+		results = Empty
+
+		// Once we expand the window to its size k, start pushing front onwards
+		if 2i >= k-1) // if (1 >= 4-1) 
+			false
+
+
+
+
+
+	2)
+		               i
+		nums = [1  3  -1] -3  5  3  6  7
+		        0  1   2   3  4  5  6  7
+
+		Deque: (It stores INDICES, not values)
+              
+    front ----
+             |
+             v
+           ------------------------
+           | 1 | 2
+           ------------------------
+                 ^
+                 |
+                 --- back
+
+		results = Empty
+
+		// Once we expand the window to its size k, start pushing front onwards
+		if (i >= k-1) // if (2 >= 4-1) 
+			false
+
+
+
+
+
+	3)
+		                   i
+		nums = [1  3  -1  -3] 5  3  6  7
+		        0  1   2   3  4  5  6  7
+
+		Deque: (It stores INDICES, not values)
+              
+    front ----
+             |
+             v
+           ------------------------
+           | 1 | 2 | 3
+           ------------------------
+                     ^
+                     |
+                     --- back
+
+		// Once we expand the window to its size k, start pushing front onwards
+		if (i >= k-1) // if (3 >= 4-1) 
+			true
+
+			results.add(nums[front]) => Resuls = {3};
+
+
+
+
+
+
+	4)
+		                      i
+		nums =  1 [3  -1  -3  5] 3  6  7
+		        0  1   2   3  4  5  6  7
+
+		Deque: (It stores INDICES, not values)
+              
+    front ----
+             |
+             v
+           ------------------------
+           | 4
+           ------------------------
+             ^
+             |
+             --- back
+
+		// Once we expand the window to its size k, start pushing onwards
+		if (i >= k-1) // if (4 >= 4-1) 
+			true
+
+			results.add(nums[front]) => Resuls = {3, 5};
+
+
+
+
+
+
+
+
+	5)
+		                         i
+		nums =  1  3 [-1  -3  5  3] 6  7
+		        0  1   2   3  4  5  6  7
+
+		Deque: (It stores INDICES, not values)
+              
+    front ----
+             |
+             v
+           ------------------------
+           | 4 | 5
+           ------------------------
+                 ^
+                 |
+                 --- back
+
+		// Once we expand the window to its size k, start pushing front onwards
+		if (i >= k-1) // if (5 >= 4-1) 
+			true
+
+			results.add(nums[front]) => Resuls = {3, 5, 5};
+
+
+
+
+
+	6)
+		                            i
+		nums =  1  3  -1 [-3  5  3  6] 7
+		        0  1   2   3  4  5  6  7
+
+		Deque: (It stores INDICES, not values)
+              
+    front ----
+             |
+             v
+           ------------------------
+           | 6
+           ------------------------
+             ^
+             |
+             --- back
+
+		// Once we expand the window to its size k, start pushing front onwards
+		if (i >= k-1) // if (6 >= 4-1) 
+			true
+
+			results.add(nums[front]) => Resuls = {3, 5, 5, 6};
+
+
+
+
+
+	7)
+		                               i
+		nums =  1  3  -1  -3 [5  3  6  7]
+		        0  1   2   3  4  5  6  7
+
+		Deque: (It stores INDICES, not values)
+              
+    front ----
+             |
+             v
+           ------------------------
+           | 7
+           ------------------------
+             ^
+             |
+             --- back
+
+		// Once we expand the window to its size k, start pushing front onwards
+		if (i >= k-1) // if (7 >= 4-1) 
+			true
+
+			results.add(nums[front]) => Resuls = {3, 5, 5, 6, 7};
+
+
+
+	==================
+	=== End Result ===
+	==================
+
+		Resuls = {3, 5, 5, 6, 7};
+
 */
 
+/* Time  Beats: 39.67% */
+/* Space Beats: 97.79% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(k) */
@@ -148,30 +382,26 @@ class Solution{
 public:
 	std::vector<int> maxSlidingWindow(std::vector<int>& nums, int k)
 	{
-		std::deque<int> deque; // Stores indices
-		std::vector<int> output;   // Stores result
+		std::deque<int>  deque;   // Stores indices
+		std::vector<int> results;
 
 		for (int i = 0; i < nums.size(); i++)
 		{
 			while (!deque.empty() && nums[deque.back()] <= nums[i])
 				deque.pop_back();
 
-            deque.push_back(i);
+			deque.push_back(i);
 
-            // Remove first element if it's outside the window
-            if (deque.front() == i - k)
-                deque.pop_front();
+			// Remove first element if it's outside the window
+			if (deque.front() == i - k)
+				deque.pop_front();
 
-			/*
-				If window has 'k' elements add to results
-				(first k-1 windows have < k elements because we start from
-				 empty window and add 1 element each iteration)
-			*/
-            if (i >= k - 1)
-                output.push_back(nums[deque.front()]);
+			/* If window has 'k' elements, add front of the deque to results */
+			if (i >= k - 1)
+				results.push_back(nums[deque.front()]);
 		}
 
-        return output;
+		return results;
 	}
 };
 
@@ -182,16 +412,17 @@ main()
 	Solution sol;
 
 	/* Example 1 */
-	std::vector<int> nums {1, 3, -1, -3, 5, 3, 6, 7};
-	int k = 3;
+	// std::vector<int> nums {1, 3, -1, -3, 5, 3, 6, 7};
+	// int k = 3;
 
 	/* Example 2 */
 	// std::vector<int> nums {1};
 	// int k = 1;
 
 	/* Example 3 */
-	// std::vector<int> nums {1, 3, -1, -3, 5, 3, 6, 7};
-	// int k = 4;
+	std::vector<int> nums {1, 3, -1, -3, 5, 3, 6, 7};
+	int k = 4;
+
 
 	std::cout << "\n\t==============================";
 	std::cout << "\n\t=== SLIDING WINDOW MAXIMUM ===";
