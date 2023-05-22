@@ -76,6 +76,9 @@
 	It passes all the tests, though it beats only 5%.
 */
 
+/* Time  Beats:  5.10% */
+/* Space Beats: 81.93% */
+
 /* Time  Complexity: O(n^2) */
 /* Space Complexity: O(1) */
 class Solution_inefficient {
@@ -130,6 +133,8 @@ public:
 	next Optimal Solution.
 */
 
+/* Time  Beats: 76.14% */
+/* Space Beats:  5.19% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
@@ -194,10 +199,12 @@ public:
 	"lastNonZeroFoundAt" index with 0.
 */
 
+/* Time  Beats: 92.16% */
+/* Space Beats: 51.63% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_Leet_2{
+class Solution_Efficient_1{
 public:
 	void moveZeroes(std::vector<int>& nums)
 	{
@@ -253,7 +260,8 @@ public:
 
 */
 
-
+/* Time  Beats: 76.14% */
+/* Space Beats: 51.63% */
 /*
 	Time  Complexity: O(n)
 	However, the total number of operations are optimal. The total operations
@@ -266,7 +274,7 @@ public:
 /*
 	Space Complexity: O(1)
 */
-class Solution_Leet_3{
+class Solution_Efficient_2{
 public:
 	void moveZeroes(std::vector<int>& nums)
 	{
@@ -345,6 +353,11 @@ public:
 
 */
 
+/* Time  Beats: 85.64% */
+/* Space Beats: 81.93% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
 class Solution{
 public:
 	void moveZeroes(std::vector<int>& nums)
@@ -369,11 +382,12 @@ public:
 int
 main()
 {
-	Solution_inefficient sol_ineff;
-	Solution sol;
+	Solution_inefficient       sol_ineff;
 	Solution_Space_Inefficient sol_space;
-	Solution_Leet_2 sol_leet_2;
-	Solution_Leet_3 sol_leet_3;
+	Solution_Efficient_1       sol_eff_1;
+	Solution_Efficient_2       sol_eff_2;
+	Solution                   sol;
+
 
 	/* Example 1 */
 	// std::vector<int> nums = {0, 1, 0, 3, 12};
@@ -406,14 +420,16 @@ main()
 	}
 	std::cout << "]\n\n";
 
+
 	/* Solution */
 	// sol_ineff.moveZeroes(nums);
-	// sol.moveZeroes(nums);
 	// sol_space.moveZeroes(nums);
-	// sol_leet_2.moveZeroes(nums);
-	sol_leet_3.moveZeroes(nums);
+	// sol_eff_1.moveZeroes(nums);
+	// sol_eff_2.moveZeroes(nums);
+	sol.moveZeroes(nums);
 
 	std::cout << "\t\t*** MOVE ZEROES ***\n";
+
 
 	/* Write Output */
 	first = true;
@@ -427,6 +443,7 @@ main()
 		first = false;
 	}
 	std::cout << "]\n\n";
+
 
 	return 0;
 }
