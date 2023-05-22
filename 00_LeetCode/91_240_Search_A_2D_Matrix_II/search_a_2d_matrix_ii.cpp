@@ -53,11 +53,28 @@
 
 
 /*
+
+	Yes, you can solve it using two Binary Searches, but that's the idea of the
+	first part of this problem. This second, II), part have two different
+	important properties:
+
+		- The first integer of each row is NOT necessarily greater than the
+		  last integer of the previous row.
+
+		- Integers in each column are NOT necessarily in ascending from top to
+		  bottom.
+	
+	So, while you can solve it in Time: O(logM * logN) and Space: O(1), there
+	is an infinitely more elegant and superior Solution to that one given these
+	two new properties of this problem.
+
+*/
+
+
+/*
 	------------
 	--- IDEA ---
 	------------
-
-	It's the same solution, the other one has neat little optimizations.
 
 	Since elements are sorted in each row and each column, start from the
 	top-right element.
@@ -73,10 +90,12 @@
 
 */
 
+/* Time  Beats: 20.54% */
+/* Space Beats: 88.18% */
 
 /* Time  Complexity: O(m + n) */
 /* Space Complexity: O(1) */
-class Solution_readable{
+class Solution_Readable{
 public:
 	bool searchMatrix(std::vector<std::vector<int>>& matrix, int target)
 	{
@@ -104,7 +123,20 @@ public:
 };
 
 
-// Beats 99%
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	It's the same solution, but with neat little optimizations.
+	
+*/
+
+/* Time  Beats: 99.69% */
+/* Space Beats: 98.74% */
+
 /* Time  Complexity: O(m + n) */
 /* Space Complexity: O(1) */
 class Solution {
@@ -140,7 +172,9 @@ public:
 int
 main()
 {
-	Solution sol;
+	Solution_Readable sol_readable;
+	Solution          sol;
+
 
 	/* Example 1 */
 	// int target = 5;
@@ -167,7 +201,6 @@ main()
 	std::cout << "\n\t=============================\n";
 
 
-
 	/* Write Input */
 	std::cout << "\n\tTarget: " << target << "\n";
 
@@ -183,7 +216,7 @@ main()
 		for (const auto& xx : x)
 		{
 			if (!first_first)
-				std::cout << ", ";
+				std::cout << "  ";
 
 			// std::cout << xx;
 			printf("%2d", xx);
@@ -197,10 +230,16 @@ main()
 
 
 	/* Solution */
-	if (sol.searchMatrix(matrix, target))
+	// bool exist = sol_readable.searchMatrix(matrix, target);
+	bool exist = sol.searchMatrix(matrix, target);
+
+
+	/* Write Output */
+	if (exist)
 		std::cout << "\n\tOutput: True\n\n";
 	else
 		std::cout << "\n\tOutput: False\n\n";
+
 
 	return 0;
 }
