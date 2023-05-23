@@ -70,7 +70,7 @@
 	zero is less than n - 1st position.
 
 	We do that for every zero. If we were to go from the very left, we would've
-	had much more operations. So that's a tiny otpimization, though this is
+	had much more operations. So that's a tiny optimization, though this is
 	still very inefficient. It's just an interesting approach.
 
 	It passes all the tests, though it beats only 5%.
@@ -83,28 +83,27 @@
 /* Space Complexity: O(1) */
 class Solution_inefficient {
 public:
-    void moveZeroes(std::vector<int>& nums)
-    {
-        int n = nums.size();
+	void moveZeroes(std::vector<int>& nums)
+	{
+		int n = nums.size();
 
-        for (int i = n - 2; i >= 0; i--)
-        {
-            if (nums[i] == 0)
-            {
-                int x = i;
-                int prev = x + 1;
+		for (int i = n - 2; i >= 0; i--)
+		{
+			if (nums[i] == 0)
+			{
+				int x = i;
+				int prev = x + 1;
 
-                while (prev < n && nums[prev] != 0)
-                {
-                    std::swap(nums[x], nums[prev]);
-                    x++;
-                    prev = x + 1;
-                }
-            }
-        }
-    }
+				while (prev < n && nums[prev] != 0)
+				{
+					std::swap(nums[x], nums[prev]);
+					x++;
+					prev = x + 1;
+				}
+			}
+		}
+	}
 };
-
 
 
 
@@ -118,11 +117,11 @@ public:
 	category is the meat of tech interviews. Mostly because arrays are such a
 	simple and easy to use data structure. Traversal or representation doesn't
 	require any boilerplate code and most of your code will look like the
-	Pseudocode itself.
+	Pseudo code itself.
 
 	The 2 requirements of the question are:
 		1. Move all the 0's to the end of array.
-		2. All the non-zero elelments must retian their original order.
+		2. All the non-zero elements must retain their original order.
 
 	It's good to realize here that both the requirements are mutually exclusive
 	i.e you can solve the individual sub-problems and then combine them for the
@@ -183,7 +182,7 @@ public:
 	elements to the front of array keeping their relative order same".
 
 	This is a 2 pointer approach. The fast pointer which is denoted by variable
-	"cur" does the job of processing new elements. If the newly found element
+	"curr" does the job of processing new elements. If the newly found element
 	is not a 0, we record it just after the last found non-0 element. The
 	position of last found non-0 element is denoted by the slow pointer
 	"lastNonZeroFoundAt" variable. As we keep finding new non-0 elements, we
@@ -231,20 +230,22 @@ public:
 	------------
 
 	Approach #3 (Optimal)
-	The total number of opeartions of the previous approach is sub-optimal. For
-	example, the array which has all (except last) leading zeroes:
+	The total number of operations of the previous approach is sub-optimal.
+	For example, the array which has all (except last) leading zeroes:
 		[0, 0, 0, 0, ..., 1]
+
 	How many write operations to the array? For the previous approach, it's
 	0's n - 1 times, which is not necessary. We could have instead written just
-	once. How? ... By only fixing the non-0 element, i.e., 1.
+	once. How? ... By only fixing the non-0 element, i.e., once.
 
-	The optimal approach is again a subtle extension of above solution. A
+	The optimal approach is again a subtle extension of the above solution. A
 	simple realization is if the current element is non-0, its correct position
-	can at best be its current position or a position earlier. If it's the
-	latter, the current position will be eventually occupied by a non-0, or a
-	0, which lies at a index greater than "cur" index. We fill the current
-	position by 0 right away, so tha tunlike the previous solution, we don't
-	need to come back here in next iteration.
+	can at best be its current position or a position earlier.
+
+	If it's the latter, the current position will be eventually occupied by a
+	non-0, or a 0, which lies at a index greater than "cur" index.
+	We fill the current position by 0 right away, so that unlike the previous
+	solution, we don't need to come back here in next iteration.
 
 	In other words, the code will maintain the following invariant:
 		1. All elements before the slow pointer (lastNonZeroFoundAt) are
@@ -254,13 +255,118 @@ public:
 
 	Therefore, when we encounter a non-zero element, we need to swap elements
 	pointed by current and slow pointer, then advance both pointers. If it's
-	zero element, we justadvance current pointer.
+	zero element, we just advance current pointer.
 
 	With this invariant in-place, it's easy to see that the algorithm will work
 
+	==================
+	=== Simulation === (N = non_zero, Z = zero)
+	==================
+
+	 Z
+	 N
+	[13, 0, 0, 5, 1, 0, 3, 12, 0, 7, 0]
+	 0   1  2  3  4  5  6  7   8  9  10
+
+
+	nums[N] != 0
+		 ~~~~~~ Swap ~~~~~~ and then Increment both Z and N.
+		 (Nothing happens)
+
+
+	     Z
+	     N
+	[13, 0, 0, 5, 1, 0, 3, 12, 0, 7, 0]
+	 0   1  2  3  4  5  6  7   8  9  10
+	 
+
+	nums[N] == 0, so Increment N only;
+
+
+	     Z  N
+	[13, 0, 0, 5, 1, 0, 3, 12, 0, 7, 0]
+	 0   1  2  3  4  5  6  7   8  9  10
+
+
+	nums[N] == 0, so Increment N only;
+
+
+	     Z     N
+	[13, 5, 0, 0, 1, 0, 3, 12, 0, 7, 0]
+	 0   1  2  3  4  5  6  7   8  9  10
+
+
+	nums[N] == 0, so Increment N only;
+
+
+	        Z     N
+	[13, 5, 0, 0, 1, 0, 3, 12, 0, 7, 0]
+	 0   1  2  3  4  5  6  7   8  9  10
+
+
+	nums[N] != 0
+		 ~~~~~~ Swap ~~~~~~ and then Increment both Z and N.
+
+
+	           Z     N
+	[13, 5, 1, 0, 0, 0, 3, 12, 0, 7, 0]
+	 0   1  2  3  4  5  6  7   8  9  10
+
+
+	nums[N] == 0, so Increment N only;
+
+
+	           Z        N
+	[13, 5, 1, 0, 0, 0, 3, 12, 0, 7, 0]
+	 0   1  2  3  4  5  6  7   8  9  10
+
+
+	nums[N] != 0
+		 ~~~~~~ Swap ~~~~~~ and then Increment both Z and N.
+
+
+	              Z        N
+	[13, 5, 1, 3, 0, 0, 0, 12, 0, 7, 0]
+	 0   1  2  3  4  5  6  7   8  9  10
+
+
+	nums[N] != 0
+		 ~~~~~~ Swap ~~~~~~ and then Increment both Z and N.
+
+
+	                  Z        N
+	[13, 5, 1, 3, 12, 0, 0, 0, 0, 7, 0]
+	 0   1  2  3  4   5  6  7  8  9  10
+
+
+	nums[N] == 0, so Increment N only;
+
+
+	                  Z           N
+	[13, 5, 1, 3, 12, 0, 0, 0, 0, 7, 0]
+	 0   1  2  3  4   5  6  7  8  9  10
+
+
+	nums[N] != 0
+		 ~~~~~~ Swap ~~~~~~ and then Increment both Z and N.
+
+
+	                     Z           N
+	[13, 5, 1, 3, 12, 7, 0, 0, 0, 0, 0]
+	 0   1  2  3  4   5  6  7  8  9  10
+
+
+	nums[N] == 0, so Increment N only;
+
+
+	                     Z              N <--- Out of Bounds
+	[13, 5, 1, 3, 12, 7, 0, 0, 0, 0, 0]
+	 0   1  2  3  4   5  6  7  8  9  10
+
+
 */
 
-/* Time  Beats: 76.14% */
+/* Time  Beats: 95.77% */
 /* Space Beats: 51.63% */
 /*
 	Time  Complexity: O(n)
@@ -278,14 +384,204 @@ class Solution_Efficient_2{
 public:
 	void moveZeroes(std::vector<int>& nums)
 	{
-		for (int lastNonZeroFoundAt = 0, curr = 0; curr < nums.size(); curr++)
+		int lastNonZeroFoundAt = 0;
+		for (int i = 0; i < nums.size(); i++)
 		{
-			if (nums[curr] != 0)
-				std::swap(nums[lastNonZeroFoundAt++], nums[curr]);
+			if (nums[i] != 0)
+				std::swap(nums[lastNonZeroFoundAt++], nums[i]);
 		}
 	}
 };
 
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	It's the same IDEA as the one above, just written on another occasion so I
+	wanted to have both here. It is a LOT less elegant, but wanted to save it
+	so that I can show how many edge cases you have to cover if you don't see
+	that index of zero can, at worst, be at the same index as a non_zero
+	element, but usually it's to the right.
+
+	That's why, the above solution can do swaps if nums[curr] != 0.
+	We're guaranteed that:
+		"lastNonZeroFoundAt" is equal to "curr" at worst, thus the swap just
+		won't do anything.
+	
+	However this Solution is as Efficient as the above one, so I wanted to list
+	it here.
+
+	In my own words:
+	Start both "non_zero_index" and "zero_index" from index 0.
+
+	The idea is to find the first non_zero and first zero and then swap them.
+	However, swap only if non_zero_index is greater than zero, otherwise we
+	don't have to swap since that would mean we are bringing zero element to
+	the beginning of the array and we, obviously, don't want that.
+
+	So if non_zero_index is at index that is less than first zero, then find
+	next non_zero element and check if index of that element is less than the
+	leftmost zero in the array.
+	Repeat the process until the condition is fulfilled.
+
+	Once it is fulfilled, swap non_zero element with a zero element, that will
+	keep the relative order and bring the non_zero element to the front while
+	simultaneously bringing zeroes to the back.
+
+	==================
+	=== Simulation === (N = non_zero, Z = zero)
+	==================
+	
+	 Z
+	 N
+	[13, 0, 0, 5, 1, 0, 3, 12, 0, 7, 0]
+	 0   1  2  3  4  5  6  7   8  9  10
+
+
+	Z = Find index of leftmost zero
+	N = Find index of leftmost non_zero
+
+	 N   Z
+	[13, 0, 0, 5, 1, 0, 3, 12, 0, 7, 0]
+	 0   1  2  3  4  5  6  7   8  9  10
+	 
+	 Since N < Z, find closest new non_zero element such that its index < Z
+
+
+	     Z     N
+	[13, 0, 0, 5, 1, 0, 3, 12, 0, 7, 0]
+	 0   1  2  3  4  5  6  7   8  9  10
+
+	 ~~~ Swap ~~~
+
+	     Z     N
+	[13, 5, 0, 0, 1, 0, 3, 12, 0, 7, 0]
+	 0   1  2  3  4  5  6  7   8  9  10
+
+	Z = Find index of leftmost zero
+	N = Find index of leftmost non_zero
+
+	        Z     N
+	[13, 5, 0, 0, 1, 0, 3, 12, 0, 7, 0]
+	 0   1  2  3  4  5  6  7   8  9  10
+
+	 ~~~ Swap ~~~
+
+	        Z     N
+	[13, 5, 1, 0, 0, 0, 3, 12, 0, 7, 0]
+	 0   1  2  3  4  5  6  7   8  9  10
+
+	Z = Find index of leftmost zero
+	N = Find index of leftmost non_zero
+
+	           Z        N
+	[13, 5, 1, 0, 0, 0, 3, 12, 0, 7, 0]
+	 0   1  2  3  4  5  6  7   8  9  10
+
+	 ~~~ Swap ~~~
+
+	           Z        N
+	[13, 5, 1, 3, 0, 0, 0, 12, 0, 7, 0]
+	 0   1  2  3  4  5  6  7   8  9  10
+
+	Z = Find index of leftmost zero
+	N = Find index of leftmost non_zero
+
+	              Z        N
+	[13, 5, 1, 3, 0, 0, 0, 12, 0, 7, 0]
+	 0   1  2  3  4  5  6  7   8  9  10
+
+	 ~~~ Swap ~~~
+
+	               Z        N
+	[13, 5, 1, 3, 12, 0, 0, 0, 0, 7, 0]
+	 0   1  2  3  4   5  6  7  8  9  10
+
+	Z = Find index of leftmost zero
+	N = Find index of leftmost non_zero
+
+	                  Z           N
+	[13, 5, 1, 3, 12, 0, 0, 0, 0, 7, 0]
+	 0   1  2  3  4   5  6  7  8  9  10
+
+	 ~~~ Swap ~~~
+
+	                  Z           N
+	[13, 5, 1, 3, 12, 7, 0, 0, 0, 0, 0]
+	 0   1  2  3  4   5  6  7  8  9  10
+
+	Z = Find index of leftmost zero
+	N = Find index of leftmost non_zero
+
+	N becomes -1 since it cannot find a non_zero elements within the array nums
+	Thus, this is the end.
+
+*/
+
+/* Time  Beats: 93.25% */
+/* Space Beats: 81.93% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Efficient_3 {
+public:
+	void moveZeroes(std::vector<int>& nums)
+	{
+		/* Lambda */
+		auto index_of_first_zero = [&](int zero){
+			int i = zero;
+			while (nums[i] != 0 && i < nums.size() - 1)
+				i++;
+
+			return nums[i] == 0 ? i : -1;
+		};
+
+		/* Lambda */
+		auto index_of_first_non_zero = [&](int non_zero){
+			int i = non_zero;
+			while (nums[i] == 0 && i < nums.size() - 1)
+				i++;
+			
+			return nums[i] != 0 ? i : -1;
+		};
+
+		int zero     = 0; // Index
+		int non_zero = 0; // Index
+
+		for(;;)
+		{
+			zero     = index_of_first_zero(zero);
+			non_zero = index_of_first_non_zero(non_zero);
+
+			if (zero == -1 || non_zero == -1)
+				return;
+
+			/*
+			   We can put this "while" and next "if" above "for" because this
+			   is only relevant until we find first non_zero_index > zero_index
+
+			   But for some reason it's a bit more readable to me in this way.
+			*/
+			while (
+				   non_zero != -1 &&
+				   non_zero < zero &&
+				   non_zero + 1 < nums.size() - 1
+				  )
+			{
+				non_zero = index_of_first_non_zero(non_zero + 1);
+			}
+
+			if (non_zero == -1 || non_zero < zero)
+				return;
+
+			std::swap(nums[zero], nums[non_zero]);
+		}
+	}
+};
 
 
 
@@ -308,13 +604,13 @@ public:
 	Next step - We encounter 1. Swap the most left 0 of our snowball with
 	element 1.
 
-	-----
-	|   |
-	|   v
-	[0, 1, 0, 3, 12]
-	 #  |
-	 ^  |
-	 |---
+         ----
+         |  |
+         |  v
+        [0, 1, 0, 3, 12]
+         #  |
+         ^  |
+         |__|
 
 
 	Next step - We encounter 0 again! (Our ball gets bigger, now its size = 2)
@@ -323,33 +619,34 @@ public:
 
 	Next Step - 3. Swap again with the most left zero.
 
-		-------
-		|     |
-	    |     v
-	[1, 0, 0, 3, 12]
-	    #  #  |
-		^     |
-	    |------
+            -------
+            |     |
+            |     v
+        [1, 0, 0, 3, 12]
+            #  #  |
+            ^     |
+            |_____|
 
 	Looks like our zeros roll all the time
+
 
 	[1, 3, 0, 0, 12]
 	       #  #
 
 	Next Step - 12. Swap again.
 
-		   --------
-		   |      |
-	       |      v
-	[1, 3, 0, 0, 12]
-	       #  #   |
-	       ^      |
-	       |-------
+               --------
+               |      |
+               |      v
+        [1, 3, 0, 0, 12]
+               #  #   |
+               ^      |
+               |______|
 
 
 	We reach the end:
 
-	[1, 3, 12, 0, 0]
+        [1, 3, 12, 0, 0]
 
 */
 
@@ -358,7 +655,7 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution{
+class Solution_Snowball{
 public:
 	void moveZeroes(std::vector<int>& nums)
 	{
@@ -369,11 +666,7 @@ public:
 			if (nums[i] == 0)
 				snowball_size++;
 			else if (snowball_size > 0)
-			{
-				int tmp = nums[i];
-				nums[i] = 0;
-				nums[i - snowball_size] = tmp;
-			}
+				std::swap(nums[i], nums[i - snowball_size]);
 		}
 	}
 };
@@ -386,7 +679,8 @@ main()
 	Solution_Space_Inefficient sol_space;
 	Solution_Efficient_1       sol_eff_1;
 	Solution_Efficient_2       sol_eff_2;
-	Solution                   sol;
+	Solution_Efficient_3       sol_eff_3;
+	Solution_Snowball          sol_snowball;
 
 
 	/* Example 1 */
@@ -425,8 +719,9 @@ main()
 	// sol_ineff.moveZeroes(nums);
 	// sol_space.moveZeroes(nums);
 	// sol_eff_1.moveZeroes(nums);
-	// sol_eff_2.moveZeroes(nums);
-	sol.moveZeroes(nums);
+	sol_eff_2.moveZeroes(nums);
+	// sol_eff_3.moveZeroes(nums);
+	// sol_snowball.moveZeroes(nums);
 
 	std::cout << "\t\t*** MOVE ZEROES ***\n";
 
