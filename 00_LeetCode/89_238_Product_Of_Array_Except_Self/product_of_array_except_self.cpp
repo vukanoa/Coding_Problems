@@ -66,26 +66,15 @@
 	similarly:
 		suffix[i] = suffix[i + 1] * nums[i + 1]
 
-	Now, at any index 'i' our final answer "answer[i]" would be given by:
-		answer[i] = prefix[i] * suffix[i]
+	Now, at any index 'i' our final results "results[i]" would be given by:
+		results[i] = prefix[i] * suffix[i]
 
 	Why? Because "prefix[i] * suffix[i]" contains product of every element
 	before 'i' and every element after 'i' but not the element at index 'i'
 	(and that is the reason why we excluded a[i] in our prefix and suffix
 	product).
 
-	Follow-Up:
-	Directly store the product of prefix and suffix into the final "answer"
-	array.
-
-	The logic is, we don't actually need separate array to store prefix product
-	and suffix products, we can do all the approach discussed in method 3
-	directly onto our final answer array.
-
-	Now the Time Complexity reduces from O(n) to O(1)
-
 */
-
 
 /* Time  Beats: 54.36% */
 /* Space Beats: 20.88% */
@@ -106,19 +95,32 @@ public:
 		for (int i = n - 2; i >= 0; i--)
 			suffix[i] = suffix[i + 1] * nums[i + 1];
 
-		std::vector<int> answer(n, 1);
+		std::vector<int> results(n, 1);
 		for (int i = 0; i < n; i++)
-			answer[i] = prefix[i] * suffix[i];
+			results[i] = prefix[i] * suffix[i];
 
-		return answer;
+		return results;
 	}
 };
+
+
 
 
 /*
 	------------
 	--- IDEA ---
 	------------
+
+	Follow-Up:
+	Directly store the product of prefix and suffix into the final "results"
+	array(vector).
+
+	The logic is, we don't actually need separate arrays to store prefix
+	product and suffix products, we can store directly into our final "results"
+	array(vector).
+
+	Now the Time Complexity reduces from O(n) to O(1)
+
 
 	Let's look at an example:
 	[2, 3, 4, 5]
@@ -135,13 +137,29 @@ public:
 
 	We can calculate prefixes and suffixes in 2 loops.
 
-	We store prefixes in "answer". If we allocate a new array for suffixes the
-	space complexity is O(n). To make it O(1), we just need to store it in a
-	variable which is "remaining_product" and multiply with the "answer" array.
+	We store prefixes in "answer".
+	If we were to allocate a new array for suffixes the Space complexity would
+	be O(n).
+
+	To make it O(1), we just need to store it in a variable which is "suffix"
+	and multiply with the "results" array.
+
+
+	The *Suffix* part could be written like this as well:
+	(It's maaybe easier to read, I dont know)
+
+	// Suffix
+	int suffix = 1;
+	for (int i = n - 2; i >= 0; i--)
+	{
+		results[i] *= nums[i + 1] * suffix;
+		suffix     *= nums[i + 1];
+	}
+
 */
 
-/* Time  Beats: 91.57% */
-/* Space Beats: 85.95% */
+/* Time  Beats: 92.10% */
+/* Space Beats: 85.19% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -150,19 +168,21 @@ public:
 	std::vector<int> productExceptSelf(std::vector<int>& nums)
 	{
 		int n = nums.size();
-		std::vector<int> answer(n, 1);
+		std::vector<int> results(n, 1);
 
+		/* Prefix */
 		for (int i = 1; i < n; i++)
-			answer[i] = answer[i - 1] * nums[i - 1];
+			results[i] = results[i - 1] * nums[i - 1];
 
-		int remaining_product = 1;
+		/* Suffix */
+		int suffix = 1;
 		for (int i = n - 1; i >= 0; i--)
 		{
-			answer[i] *= remaining_product;
-			remaining_product *= nums[i];
+			results[i] *= suffix;
+			suffix    *= nums[i];
 		}
 
-		return answer;
+		return results;
 	}
 };
 
@@ -202,14 +222,14 @@ main()
 
 
 	/* Solution */
-	// std::vector<int> answer = sol.productExceptSelf(nums);
-	std::vector<int> answer = sol_followup.productExceptSelf(nums);
+	// std::vector<int> results = sol.productExceptSelf(nums);
+	std::vector<int> results = sol_followup.productExceptSelf(nums);
 
 	/* Write Output */
 
 	first = true;
-	std::cout << "\n\tanswer: [";
-	for (auto x: answer)
+	std::cout << "\n\tresults: [";
+	for (auto x: results)
 	{
 		if (!first)
 			std::cout << ", ";
