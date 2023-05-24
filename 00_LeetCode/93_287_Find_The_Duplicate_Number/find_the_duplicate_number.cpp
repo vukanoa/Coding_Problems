@@ -19,11 +19,15 @@
 
 	There is only one repeated number in "nums", return this repeated number.
 
-	// My Note(This isn't a part of LeetCode Description)
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		My Note(This isn't a part of LeetCode Description)
+
 		(This means that one number can repeat multiple times, not that the
-		repeating number is can repeat max once. That is, the repeating number
-		has frequency of 2 while other have frequence of 1.
+		repeating number can repeat once, i.e. repeating number has frequency
+		of 2 while other have frequence of 1.
+
 		This is possible: [2, 2, 2, 2, 2])
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	You must solve the problem WITHOUT modifying the array "nums" and uses
 	only constant extra space.
@@ -73,7 +77,7 @@
 
 	Intuition
 	The idea is to reduce the problem to Problem: 142 Linked List Cycle II
-	"Given a linked list, return the nole where the cycle begins."
+	"Given a linked list, return the node where the cycle begins."
 
 	First of all, where does the cycle come from? Let's use the function
 	f(x) = nums[x] to construct the sequence:
@@ -97,18 +101,19 @@
 	|    |   |           |
 	------   -------------
 
-	(etc. you get the point. Every VALUE is used as a pointer. And instead
-	of having addresses as pointer values which you derefference, we use
+	(etc. you get the point. Every VALUE is used as a POINTER. And instead
+	of having addresses as pointer values which you dereference, we use
 	indices instead.
 	And dereferencing is the same:
 		nums[4] <==> *(nums + 4)
 
 
-	                    6
-	                   ^ \
-	                  /   \
-	2 -> 4 -> 3 -> 1 /     v
-	               ^------ 5
+	                  6
+	                  ^
+	                 /  \
+	                /    \
+	2 -> 4 -> 3 -> 1      v
+	               ^----- 5
 
 	The example above is simple because the loop is small. Here is a more
 	interesting example.
@@ -135,11 +140,14 @@
 
 	In phase 1:
 		hare = nums[nums[hare]] is twice as tortoise = nums[tortoise]
+	
+	// In linked lists it's:
+	// hare = hare->next->next; tortoise = tortoise->next;
 
-	Since the hare goes fast, it would be the firs tto enter the cycle and run
+	Since the hare goes fast, it would be the first to enter the cycle and run
 	around the cycle. At some point, the tortoise enters the cycle as well, and
 	since it's moving slower the hare catches up to the tortoise at some
-	intersetion point. Now phase 1 is over, and the tortoise has lost.
+	intersection point. Now phase 1 is over, and the tortoise has lost.
 
 	Note that the intersection point is not the cycle entrance in the general
 	case.
@@ -173,16 +181,17 @@ first intersection
 	        \  c-a   |
 		     \------/
 
-	To computer the intersection point, let's note tha the hare has traversed
+	To compute the intersection point, let's note that the hare has traversed
 	twice as many nodes as the tortoise, i.e. 2d(tortoise) = d(hare), implying:
 
-	2(F + a) = F + nC + a, where n i some integer.
+	2(F + a) = F + nC + a, where nC is some integer.
 
 	Hence the coordinate of the intersection point is F + a = nC
 
 	In phase 2, we give the tortoise a second chance by slowing down the hare,
 	so that it now moves at the speed of tortoise:
-		tortoise = nums[tortoise], hare = nums[hare]
+		tortoise = nums[tortoise]; hare = nums[hare]
+
 	The tortoise is back at the starting position, and the hare starts from the
 	intersection point.
 
@@ -199,7 +208,8 @@ tortoise    \  c-a   |
 
 */
 
-
+/* Time  Beats: 76.77% */
+/* Space Beats: 57.56% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -229,10 +239,12 @@ public:
 	}
 };
 
+
 int
 main()
 {
 	Solution sol;
+
 
 	/* Example 1 */
 	std::vector<int> nums = {1, 3, 4, 2, 2};
@@ -261,9 +273,14 @@ main()
 	}
 	std::cout << "]\n";
 
+
 	/* Solution */
 	int output = sol.findDuplicate(nums);
+
+
+	/* Write Output */
 	std::cout << "\n\tDuplicate: " << output << "\n\n";
+
 
 	return 0;
 }
