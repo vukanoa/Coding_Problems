@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <algorithm> // For Heap
 
 /*
 	============
@@ -26,10 +28,10 @@
 		- void addnum(int num) adds the integer "num" from the data stream to
 		  the data structure.
 		- double findMedian() returns the median of all elements so far.
-		  Answers within 1-^-5 of the actual answer will be accepted.
+		  Answers within 10^-5 of the actual answer will be accepted.
 
 	Follow up:
-		- If all integer numbers from the s tream are in the range [0, 100],
+		- If all integer numbers from the stream are in the range [0, 100],
 		  how would you optimize your solution?
 
 		- If 99% of all integer numbers from the stream are in the range
@@ -72,128 +74,118 @@
 	--- IDEA ---
 	------------
 
-	We're having sorted Doubly Linked List and we always insert in the right
-	place.
-
-	The key here is, we're always keeping pointer mid at our median.
-
-	This is the core, everytime we add a number, we update the mid pointer
-	accordingly. As you can see, this is a O(1) operation.
-
-    void update(struct ListNode* new_node)
-    {
-        if (mid == nullptr)
-            mid = head;
-		else
-		{
-			if (added_after_mid)
-			{
-				if (size % 2 != 0) // Odd number of elements
-					mid = mid->next;
-			}
-			else
-			{
-				if (size % 2 == 0)
-					mid = mid->prev;
-			}
-		}
-    }
-
+	TODO
+	
 */
 
+/* Time  Beats: 86.25% */
+/* Space Beats: 73.42% */
 
-// Naive Solution
-class MedianFinder {
-private:
-    struct ListNode{
-        int val;
-        struct ListNode* prev;
-        struct ListNode* next;
+/*
+	Time  Complexity:
+		1.
+			addNum: O(logn)
 
-        ListNode(int num) : val(num), next(nullptr), prev(nullptr){}
-    };
+		2.
+			findMedian: O(1)
+*/
+/*
+	Space Complexity: O(1)
+		1.
+			addNum: O(1)
 
-    struct ListNode* head;
-    struct ListNode* mid;
-    unsigned size;
-    bool added_after_mid;
+		2.
+			findMedian: O(1)
+*/
+class MedianFinder{
 public:
-    MedianFinder()
-    : mid(nullptr), head(nullptr), size(0), added_after_mid(false)
-    {}
+	MedianFinder() : size(0)
+	{}
 
-    void addNum(int num)
-    {
-         struct ListNode* new_node = new ListNode(num);
+	void addNum(int num)
+	{
+		left.push_back(num);
+		std::push_heap(left.begin(), left.end()); // O(logn)
 
-        // O(n)
-        if (head == nullptr)
-            head = new_node;
-        else
-        {
-            if (new_node->val <= head->val)
-            {
-                new_node->next = head;
-				head->prev = new_node;
-                head = new_node;
-            }
-            else
-            {
-                struct ListNode* prev = nullptr;
-                struct ListNode* curr = head;
-                while (curr && curr->val < new_node->val)
-                {
-                    prev = curr;
-                    curr = curr->next;
-                }
-
-                new_node->next = prev->next;
-                prev->next = new_node;
-				new_node->prev = prev;
-
-				if (curr)
-					curr->prev = new_node;
-            }
-
-        }
-
-        size++;
-        if (mid && num > mid->val)
-            added_after_mid = true;
-        else
-            added_after_mid = false;
-
-        update(new_node);
-		std::cout << "\n\tAdded: " << num;
-    }
-
-    void update(struct ListNode* new_node)
-    {
-        if (mid == nullptr)
-            mid = head;
-		else
+		if (!left.empty() && !right.empty() && left.front() > right.front())
 		{
-			if (added_after_mid)
+			std::pop_heap(left.begin(), left.end()); // O(logn)
+
+			int top = left.back(); // O(1)
+			left.pop_back();       // O(1)
+
+			right.push_back(top);  // O(1)
+			std::push_heap(right.begin(), right.end(), std::greater<>{}); // O(logn)
+		}
+
+		int difference = left.size() - right.size();
+
+		if (std::abs(difference) > 1) // They are not approximately of same size
+		{
+			if (left.size() > right.size())
 			{
-				if (size % 2 != 0) // Odd number of elements
-					mid = mid->next;
+				std::pop_heap(left.begin(), left.end()); // O(logn)
+
+				int top = left.back(); // O(1)
+				left.pop_back();       // O(1)
+				
+				right.push_back(top);  // (1)
+				std::push_heap(right.begin(), right.end(), std::greater<>{}); // O(logn)
 			}
 			else
 			{
-				if (size % 2 == 0)
-					mid = mid->prev;
+				std::pop_heap(right.begin(), right.end(), std::greater<>{}); // O(logn)
+
+				int top = right.back(); // O(1)
+				right.pop_back();       // O(1)
+
+				left.push_back(top);    // O(1)
+				std::push_heap(left.begin(), left.end()); // O(logn)
 			}
 		}
-    }
 
-    double findMedian()
-    {
-        if (size & 1) // Odd number of elements
-            return (double)mid->val;
+		size++;
+	}
 
-        return (double)(mid->val + (mid->next)->val) / 2;
-    }
+	double findMedian()
+	{
+		if (size & 1) // Odd size of elements
+		{
+			if (left.size() > right.size())
+				return left.front();
+			else
+				return right.front();
+		}
+		else
+		{
+			return (left.front() + right.front()) / 2.0;
+		}
+	}
+
+private:
+	std::vector<int> left;  // small Heap (MAX Heap)
+	std::vector<int> right; // large Heap (MIN Heap)
+
+	int size;
 };
+
+
+void
+print_stream(std::vector<int>& stream)
+{
+	bool first = true;
+	std::cout << "\n\n\tCurrent Stream: [";
+	for (auto x: stream)
+	{
+		if (!first)
+			std::cout << ", ";
+
+		std::cout << x;
+		first = false;
+	}
+	std::cout << "]";
+
+}
 
 
 int
@@ -203,17 +195,27 @@ main()
 
 	std::cout << "\n\t====================================";
 	std::cout << "\n\t=== FIND MEDIAN FROM DATA STREAM ===";
-	std::cout << "\n\t====================================\n\n";
+	std::cout << "\n\t====================================";
 
+	// For printing
+	std::vector<int> stream;
 
 	/* Example 1 */
  	obj->addNum(1);
+	stream.push_back(1);
 	obj->addNum(2);
+	stream.push_back(2);
+
  	double mid = obj->findMedian();
+	print_stream(stream);
 	std::cout << "\n\tMid: " << mid;
 
+
 	obj->addNum(3);
+	stream.push_back(3);
+
  	mid = obj->findMedian();
+	print_stream(stream);
 	std::cout << "\n\tMid: " << mid;
 
 
