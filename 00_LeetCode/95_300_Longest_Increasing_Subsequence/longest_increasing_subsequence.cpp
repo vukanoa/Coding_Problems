@@ -51,18 +51,24 @@
 
 
 
+
 /*
 	------------
 	--- IDEA ---
 	------------
 
 	This is a classic Dynamic Programming problem.
-	Let dp[i] is the longest increase subsequence of nums[0..i] which has
-	nums[i] as the end element of the subsequence.
+
+	Let dp[i] be the longest increase subsequence of nums[0..i] where nums[i]
+	is the last element of the subsequence.
+
+	It's pretty much self-explanatory. Just simulate one example by going
+	through the code and it will be clear.
 
 */
 
-
+/* Time  Beats: 64.76% */
+/* Space Beats: 69.51% */
 
 /* Time  Complexity: O(n^2) */
 /* Space Complexity: O(n) */
@@ -85,6 +91,7 @@ public:
 		return *std::max_element(dp.begin(), dp.end());
 	}
 };
+
 
 
 
@@ -152,7 +159,8 @@ public:
 
 */
 
-
+/* Time  Beats:   100% */
+/* Space Beats: 87.72% */
 
 /*	Time  Complexity: O(n * logn) */
 /*
@@ -166,7 +174,7 @@ public:
 	{
 		std::vector<int> sub;
 
-		for (int x : nums)
+		for (int& x : nums)
 		{
 			if (sub.empty() || sub[sub.size() - 1] < x)
 				sub.push_back(x);
@@ -180,6 +188,7 @@ public:
 		return sub.size();
 	}
 };
+
 
 
 
@@ -211,8 +220,9 @@ public:
 
 */
 
+/* Time  Beats: 95.35% */
+/* Space Beats: 29.4% */
 
-/* Beats 83.20% (It's the most left bar) */
 /*
 	Time  Complexity: O(n * logMAX)
 	where MAX <= 20000 is the difference between minimum and maximum elements
@@ -267,6 +277,7 @@ public:
 
 
 
+
 /*
 	------------
 	--- IDEA ---
@@ -296,8 +307,10 @@ public:
 
 */
 
-// It uses the same Max BIT class as the Solution above
-// Beats 77.49% (The bar is, again, all the way to the left)
+// ##### This Solution uses the same Max BIT class as the Solution above #####
+
+/* Time  Beats: 75.39% */
+/* Space Beats: 37.24% */
 
 /* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(n) */
@@ -349,7 +362,7 @@ main()
 
 	std::cout << "\n\t======================================";
 	std::cout << "\n\t=== LONGEST INCREASING SUBSEQUENCE ===";
-	std::cout << "\n\t======================================\n\n";
+	std::cout << "\n\t======================================\n";
 
 
 	/* Write Input */
@@ -363,14 +376,14 @@ main()
 		std::cout << x;
 		first = false;
 	}
-	std::cout << "]\n\n";
+	std::cout << "]\n";
 
 
 	/* Solution */
 	// int longest = sol_dp.lengthOfLIS(nums);
-	// int longest = sol_grd_bin.lengthOfLIS(nums);
+	int longest = sol_grd_bin.lengthOfLIS(nums);
 	// int longest = sol_bit.lengthOfLIS(nums);
-	int longest = sol_com.lengthOfLIS(nums);
+	// int longest = sol_com.lengthOfLIS(nums);
 
 
 	std::cout << "\n\tLongest Increasing Subsequence: " << longest << "\n\n";
