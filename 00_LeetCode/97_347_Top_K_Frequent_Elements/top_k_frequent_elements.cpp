@@ -2,6 +2,7 @@
 #include <vector>
 #include <unordered_map>
 #include <queue>
+#include <algorithm>
 
 /*
 	==============
@@ -80,7 +81,8 @@
 
 */
 
-
+/* Time  Beats: 94.66% */
+/* Space Beats: 34.30% */
 
 /* Time  Complexity: O(K * logN) */
 /* Space Complexity: O(N) */
@@ -216,6 +218,8 @@ public:
 
 */
 
+/* Time  Beats: 83.57% */
+/* Space Beats: 7.25% */
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
@@ -233,7 +237,7 @@ public:
 		// Step 2: Bucket Sort's first step
 		// O(N)
 		std::vector<std::vector<int>> freq(nums.size() + 1);
-		for (auto it: map)
+		for (const auto& it: map)
 			freq[it.second].push_back(it.first);
 
 		// Step 3: Take every item from the back until k elements are taken
@@ -255,11 +259,206 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	The main reason why this Solution is as Efficient is the Time Complexity
+	explanation which is explained down below, but I will repeat it again to
+	emphasize its importance for this problem:
+
+	Time  Complexity: O(M * log M) or (N)
+
+	In Constraints, it is said:
+		1 <= nums.length <= 10^5
+		-10^4 <= nums[i] <= 10^4
+	
+	              nums.length, let's call it => N
+	2 * 10^4 DIFFERENT VALUES, let's call it => M
+
+	We can see that:
+		N >= M
+	
+	Since even if in theory M can be greater than N, practically that is not
+	possible.
+
+	If we have a vector "nums" of size 4, we cannot use more than 4 DIFFERENT
+	VALUES insides that vector "nums".
+
+	So in case we have vector size of N and in it all the elements are unique,
+	that means that M == N.
+
+	However in the VAST majority of cases we can consider:
+		N > M
+
+	In the Follow-Up Question we're asked to solve it better than O(N * logN).
+
+	Since N > M, we can conclude that:
+		O(M * log M) is BETTER than O(N * logN)
+	
+	Also:
+		O(N) can be either BETTER or WORSE than O(M * logM) depending on the
+		vector nums.
+	
+	So the Time Complexity is either O(N) or O(M * logM) whichever happens to
+	take more time is the "bottleneck" and thus that will be the overall Time
+	Complexity.
+
+	In case where O(N) < O(M * logM), Time Complexity is going to be:
+		O(N + M * logM) => O(M * logM)
+
+		Example: [3, 3, 3, 3, 3, 2, 2, 3, 1, 1, 3, 2, 3, ...]
+		(There are only 1's, 2's and 3's in this vector)
+
+		N = 50 000
+		M = 3
+		O(N) > O(M * logM) => The overall Time Complexity is: O(N)
+
+
+
+	In case where O(N) > O(M * logM), Time Complexity is going to be:
+		O(N + M * logM) => O(N)
+	
+		Example: [7, 2, 8, 9, 1] => N == M => O(N) < O(M * logM) => The overall
+		Time Complexity is: O(M * logM), i.e. O(N * logN) since N == M.
+
+
+	Why do we have O(N + M * logM)? Where did we get those "numbers"?
+
+	First we have to find a Min element and the Max element value in "nums".
+	That takes O(2 * N) => O(N)
+
+	Then we initialize a vector of size: Max element - Min element
+	We create a Hash Map:(However I'm implementing it as a vector of pairs)
+
+		 key      value(occurrences)
+		+-------+-------+
+		| min+0 |   0   |
+		+-------+-------+
+		| min+1 |   3   |
+		+-------+-------+
+		| min+2 |   2   |
+		+-------+-------+
+		| ...   |       |
+		+-------+-------+
+		| ...   |       |
+		+-------+-------+
+		| max   |   5   |
+		+-------+-------+
+
+	Now sort this Hash Map(vector of pairs). Since there are M elements in this
+	Hash Map(vector of pairs), sorting takes O(M * logM) Time Complexity.
+
+	After that return last k elements. That's the whole IDEA.
+
+*/
+
+
+/* Time  Beats: 99.18% */
+/* Space Beats: 85.50% */
+
+/*
+	Time  Complexity: O(M * log M) or (N)
+
+	In Constraints, it is said:
+		1 <= nums.length <= 10^5
+		-10^4 <= nums[i] <= 10^4
+	
+	              nums.length, let's call it => N
+	2 * 10^4 DIFFERENT VALUES, let's call it => M
+
+	We can see that:
+		N >= M
+	
+	Since even if in theory M can be greater than N, practically that is not
+	possible.
+
+	If we have a vector "nums" of size 4, we cannot use more than 4 DIFFERENT
+	VALUES insides that vector "nums".
+
+	So in case we have vector size of N and in it all the elements are unique,
+	that means that M == N.
+
+	However in the VAST majority of cases we can consider:
+		N > M
+
+	In the Follow-Up Question we're asked to solve it better than O(N * logN).
+
+	Since N > M, we can conclude that:
+		O(M * log M) is BETTER than O(N * logN)
+	
+	Also:
+		O(N) can be either BETTER or WORSE than O(M * logM) depending on the
+		vector nums.
+	
+	So the Time Complexity is either O(N) or O(M * logM) whichever happens to
+	take more time is the "bottleneck" and thus that will be the overall Time
+	Complexity.
+
+	In case where O(N) < O(M * logM), Time Complexity is going to be:
+		O(N + M * logM) => O(M * logM)
+
+		Example: [3, 3, 3, 3, 3, 2, 2, 3, 1, 1, 3, 2, 3, ...]
+		(There are only 1's, 2's and 3's in this vector)
+
+		N = 50 000
+		M = 3
+		O(N) > O(M * logM) => The overall Time Complexity is: O(N)
+
+*/
+/* Space Complexity: O(M) */
+class Solution_Efficient {
+private:
+	struct sort_pred {
+		bool operator()(const std::pair<int,int> &left, const std::pair<int,int> &right)
+		{
+			return left.second < right.second;
+		}
+	};
+
+public:
+	std::vector<int> topKFrequent(std::vector<int>& nums, int k)
+	{
+		int max = *std::max_element(nums.begin(), nums.end());
+		int min = *std::min_element(nums.begin(), nums.end());
+
+		std::vector<std::pair<int, int>> map;
+
+		for (int i = min; i <= max; i++)
+			map.emplace_back(i, 0);
+
+		for (int i = 0; i < nums.size(); i++)
+		{
+			auto& pair = map[nums[i] - min];
+			pair.second++;
+		}
+
+		// Sort the vector by "second" value
+		std::sort(map.begin(), map.end(), sort_pred());
+
+		std::vector<int> results;
+
+		for (int i = k; i > 0; i--)
+		{
+			auto& pair = map[map.size() - i];
+			results.push_back(pair.first);
+		}
+
+		return results;
+	}
+};
+
+
+
 int
 main()
 {
-	Solution sol;
-	Solution_Bucket sol_bucket;
+	Solution           sol;
+	Solution_Bucket    sol_bucket;
+	Solution_Efficient sol_eff;
 
 	/* Example 1 */
 	// std::vector<int> nums = {1, 1, 1, 2, 2, 3};
@@ -296,7 +495,8 @@ main()
 
 	/* Solution */
 	// std::vector ret = sol.topKFrequent(nums, k);
-	std::vector ret = sol_bucket.topKFrequent(nums, k);
+	// std::vector ret = sol_bucket.topKFrequent(nums, k);
+	std::vector ret = sol_eff.topKFrequent(nums, k);
 
 
 	/* Write Output */
