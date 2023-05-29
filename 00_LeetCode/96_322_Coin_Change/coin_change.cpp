@@ -70,10 +70,11 @@
 	Amount: 6
 
 	If you were to use a greedy algorithm, you'd quickly find that you'd need
-	3 coins which we clearly see that is not optimal.
+	3 coins which we clearly see that it's not optimal.
+
 	So you cannot "just pick the largest one and go with it and then drop it
 	after you cannot fit it once again and go for a smaller one", since the
-	largest one maybe isn't even once in the solution.
+	largest one maybe shouldn't even be in the solution.
 
 	The next thing that comes up to mind is: Can this be a DFS-Backtracking?
 
@@ -85,9 +86,9 @@
 	compute more than once.
 
 	So a natural question arises - Can I memorize this?
-	As soon as you as yourself this question, the answer almost always is: Yes.
+	As soon as you ask this question, the answer almost always is - Yes.
 
-	We could you a "Top-Down memoization"(Not memoRization) approach and that
+	We could use a "Top-Down memoization"(Not memoRization) approach and that
 	would be a DP(Dynamic Programming approach).
 
 	However, a more natural way of using DP is writing it "Bottom-Up".
@@ -98,27 +99,26 @@
 	at the very end - Solve our given problem.
 
 	So how do we do this?
-	Let's consider the previous example that crushed your "Is it greedy?"
+	Let's consider the previous example that crushed our "Is it greedy?"
 	question.
 
 	Array: [1, 3, 4]
 	Amount: 6
 
 	We have to solve subproblems, but what are those subproblems?
-	Since out goal is to reach 6, let's try to find an answer to:
-		1, 2, 3, 4 & 5
+	Since our goal is to reach 6, let's try to find an answer to:
+		1, 2, 3, 4 and 5
 	before we try to go for our given amount 6.
 
-	First, let's make an array dp. What length it should be of?
+	First, let's make an array dp. What length should it be?
 	Well, since dp[0] is always 0 since we need 0 coins to get to amount of 0,
-	we have to have this base case solved as well which will make our dp of
-	size amount + 1.
+	we must have this base case solved which will make our dp of size: amount+1
 
 	What are the values we should initialize this array with?
 	It's important that we assign 0 to dp[0] and all the other should be either
 	amount + 1(since any combination we try will be less than that) or INT_MAX
 
-	I'll go with INT_MAX. So initially our DP looks like this:
+	Let's go with INT_MAX. So initially our DP looks like this:
 
 	[0, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX]
 	 0     1        2        3        4        5        6
@@ -126,22 +126,23 @@
 	So let's try to solve this problem as if the amount given is 1.
 
 	We should iterate through all the coins and if our amount(1 in this case)
-	minus current coin we're on is less than 0, then that means there is no
-	solution for this amount.(We are iterating through coins from the smallest
-	to the largest)
+	minus the coin we're currently on is less than 0, then that means there is
+	no solution for this amount.(We are iterating through coins from the
+	smallest to the largest) [Example below]
 
 	Note that the coins don't have to be in sorted order, thus we should always
 	sort it as a first thing.
+	(We can sort them because that won't worsen our overall Time Complexity)
 
 	So, we're doing this:
 	Array: [1, 3, 4]
 	Amount: 1
 
-	if (1 - coins[0] < 0)
+	if (amount - coins[0] < 0)
 		break; // This will return -1 to denote that there is no way getting it
 
-	else if (dp[1 - coins[0]] != MAX)
-		dp[1] = std::mind(dp[1], dp[1 - coins[0]] + 1); // +1 to add this coin
+	else if (dp[amount - coins[0]] != INT_MAX)
+		dp[amount] = std::min(dp[amount], dp[amount - coins[0]] + 1); // +1 to add this coin
 
 	The idea is to find the minimum number of coins needed to solve all these
 	subproblems and then each time we search for amount X, subtract value of
@@ -150,7 +151,7 @@
 
 	Example:
 	Array: [1, 3, 4]
-	Amount: 1
+	Amount: 6
 
 	dp[0] = 0;
 	dp[1] = 1
@@ -167,22 +168,27 @@
 			Amount(which is 6) minus value of current coin => 6 - 1 = 5
 			Now we try and see what is the value of dp[5] since that is the
 			minimum number of coins needed to sum up to 5 and then we add 1
-			more(this very coin we're trying)
+			more(this current coin we're trying)
 			Previously dp[6] was INT_MAX, now it's 3.
 			Let's continue
 
 		2) We take coin with value 3(coin at index 1)
 			6 - 3 = 3
 			dp[3] = 1
-			dp[3] + 1 = 2
+			dp[3] + 1 => 1 + 1 = 2
+
 			dp[6] = std::min(dp[6], dp[3] + 1)
+			dp[6] = std::min(  3  ,   1   + 1)
+
 			Now our dp[6] is 2.
 
 		3) We take coin with value 4(coin at index 2)
 			6 - 4 = 2
 			dp[2] = 2
-			dp[2] + 1 = 3
+			dp[2] + 1 => 2 + 1 = 3
+
 			dp[6] = std::min(dp[6], dp[2] + 1);
+			dp[6] = std::min(  2  ,   2   + 1);
 
 			Since dp[6] was 2 because of the previous step, we're doing this:
 			dp[6] = std::min(2, 2 + 1);
@@ -190,9 +196,11 @@
 
 			Thus we won't change the dp[6] to 3, since 2 is smaller.
 
-	And at the end we ask if dp[6] is NOT INT_MAX. If it's not we return the
-	value we got, if it is INT_MAX then that means we did not found a way to
-	sum up to the amount value and thus return -1.
+	And at the end we ask if dp[6] is NOT INT_MAX.
+	If it is NOT    INT_MAX, then we return the value we got.
+
+	if it is INDEED INT_MAX, then we return -1 since that means we did not
+	found a way to sum up to the amount value.
 
 */
 
@@ -264,8 +272,17 @@ main()
 	// int amount = 7;
 
 	/* Example 6 */
-	std::vector<int> nums = {1, 2, 5, 10};
-	int amount = 18;
+	// std::vector<int> nums = {1, 2, 5, 10};
+	// int amount = 18;
+
+	/* Example 7 */
+	// std::vector<int> nums = {1, 3, 4};
+	// int amount = 6;
+
+	/* Example 8 */
+	std::vector<int> nums = {1, 3, 4, 5};
+	int amount = 7;
+
 
 	std::cout << "\n\t===================";
 	std::cout << "\n\t=== COIN CHANGE ===";
