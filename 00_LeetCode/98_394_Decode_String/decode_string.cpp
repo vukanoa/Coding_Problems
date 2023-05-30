@@ -113,6 +113,8 @@
 	ones.
 */
 
+/* Time  Beats:   100% */
+/* Space Beats: 51.65% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
@@ -152,6 +154,8 @@ public:
 		return decodeString(s, i);
 	}
 };
+
+
 
 
 /*
@@ -240,10 +244,11 @@ public:
 	To overcome that.
 */
 
+/* Time  Beats:   100% */
+/* Space Beats: 90.51% */
 
-
-/* Time  Complexity: O(n) */ /* Beats 100%   */
-/* Space Complexity: O(1) */ /* Beats 90.51% */
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
 class Solution_Stack{
 public:
 	std::string decodeString(std::string s)
@@ -259,19 +264,19 @@ public:
 				std::string substr;
 
 				while (stack.back() != '[')
-                {
+				{
 					substr = stack.back() + substr;
-                    stack.pop_back();
-                }
+					stack.pop_back();
+				}
 
 				stack.pop_back(); // Pop the '['
 
 				std::string k;
 				while (!stack.empty() && isdigit(stack.back()))
-                {
+				{
 					k = stack.back() + k;
-                    stack.pop_back();
-                }
+					stack.pop_back();
+				}
 
 				int num = std::stoi(k);
 
@@ -280,8 +285,8 @@ public:
 			}
 		}
 
-        if (isdigit(stack.back()))
-            return "";
+		if (isdigit(stack.back()))
+			return "";
 
 		return stack;
 	}
@@ -310,15 +315,19 @@ main()
 	std::cout << "\n\t=== DECODE STRING ===";
 	std::cout << "\n\t=====================\n";
 
+
 	/* Write Input */
 	std::cout << "\n\ts = \"" << s << "\"\n";
+
 
 	/* Solution */
 	// std::string result = sol.decodeString(s);
 	std::string result = sol_stack.decodeString(s);
 
+
 	/* Write Output */
 	std::cout << "\n\tOutput: " << result << "\n\n";
+
 
 	return 0;
 }
