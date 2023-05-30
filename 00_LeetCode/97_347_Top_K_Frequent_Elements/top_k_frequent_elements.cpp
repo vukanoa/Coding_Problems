@@ -84,9 +84,12 @@
 /* Time  Beats: 94.66% */
 /* Space Beats: 34.30% */
 
-/* Time  Complexity: O(K * logN) */
-/* Space Complexity: O(N) */
-class Solution{
+/* Time  Complexity: O(M * logM) or O(N) */
+/*
+	Space Complexity: O(M)
+	Where M is the number of different values in vector "nums".
+*/
+class Solution_Heap_1{
 private:
 	struct Node{
 		int num;
@@ -115,15 +118,16 @@ public:
 
 		// Step 2: Now build a Heap
 		// Compare defines a max-heap based on frequency
-		// O(N)
+		// O(M * logM), where M is number of different values in vector "nums"
+		// O(M) for traversing through "map", O(logM) to push in a Heap
 		std::priority_queue<struct Node, std::vector<struct Node>, struct Compare> heap;
 		for (auto it: map)
 			heap.push(Node(it.first, it.second));
 
 		std::vector<int> ret;
 
-		// Step 3: Pop top K elements and store the numbers in "ret" vector
-		// O(K * logN)
+		// Step 3: Pop top K elements and store the numbers in "results" vector
+		// O(K)
 		while (k--)
 		{
 			struct Node tmp = heap.top();
@@ -137,6 +141,62 @@ public:
 
 
 
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Same as above, just implemented in a different way.
+	
+*/
+
+/* Time  Beats: 83.57% */
+/* Space Beats: 97.10% */
+
+/* Time  Complexity: O(M * logM) or O(N) */
+/*
+	Space Complexity: O(M)
+	Where M is the number of different values in vector "nums".
+*/
+class Solution_Heap_2{
+public:
+	std::vector<int> topKFrequent(std::vector<int>& nums, int k)
+	{
+		// Key=Number    Value=Frequency
+		std::unordered_map<int, int> map;
+
+		// Step 1: Store frequence of all elements in a map
+		// O(N)
+		for (int n : nums)
+			map[n]++;
+
+		// Step 2: Build a Heap
+		// O(M * logM), where M is number of different values in vector "nums"
+		// O(M) for traversing through "map", O(logM) to push in a Heap
+		std::priority_queue<std::pair<int, int>> max_heap;
+		for (const auto& it: map)
+			max_heap.push({it.second, it.first});
+
+		std::vector<int> results;
+
+		// Step 3: Pop top K elements and store the numbers in "results" vector
+		// O(K)
+		while (k--)
+		{
+			auto& tmp = max_heap.top();
+			results.push_back(tmp.second);
+
+			max_heap.pop();
+		}
+
+		return results;
+	}
+};
+
+
+
+
 /*
 	------------
 	--- IDEA ---
@@ -147,29 +207,6 @@ public:
 	Now we should simulate what Bucket Sort does, but not all the way. We do
 	not have to sort it completely.
 
-	Okay, first of all, why are we doing this?
-
-	Consider this example:
-	[1, 1, 1, 2, 2, 100]
-
-	If we were to do the exact same thing as in Bucket Sort, we would possibly
-	use waay more Space than necessary.
-
-	If we were to store the number of occurrences of each element in a separate
-	array, then in this case we would have:
-	[0, 3, 2, ..., 1]
-	 0  1  2      100
-
-	That means that we have allocated 100 elements on the Stack or Heap, but
-	we only use 3 slots. That is unacceptable.
-
-	We can overcome this with a clever observation. We can see that there are
-	most N(nums.size()) elements in the vector "nums".
-
-	Since that is the case, we know for a fact that a maximum number of
-	occurences that an element can have is N. (Array is consisted of a single
-	element repeated N times).
-
 	Example:
 		[8, 8, 8, 8, 8]
 
@@ -178,7 +215,7 @@ public:
 	(Though there will always be K distinct unique elements. Meaning we will
 	always have a result, we don't have to check these cases)
 
-	The solution is to to have an array of size N(maximum possible number of
+	The solution is to have an array of size N(maximum possible number of
 	occurences) and that for each slot, we maintain a vector of elements that
 	have that number of occurences in the array "nums".
 
@@ -342,7 +379,11 @@ public:
 		+-------+-------+
 		| min+2 |   2   |
 		+-------+-------+
+		| min+3 |   9   |
+		+-------+-------+
 		| ...   |       |
+		+-------+-------+
+		| min+8 |   7   |
 		+-------+-------+
 		| ...   |       |
 		+-------+-------+
@@ -351,6 +392,28 @@ public:
 
 	Now sort this Hash Map(vector of pairs). Since there are M elements in this
 	Hash Map(vector of pairs), sorting takes O(M * logM) Time Complexity.
+
+	After Sorting:
+
+
+		 key      value(occurrences)
+		+-------+-------+
+		| min+6 |   0   |
+		+-------+-------+
+		|  ...  |       |
+		+-------+-------+
+		|  ...  |       |
+		+-------+-------+
+		| min+2 |   2   |
+		+-------+-------+
+		| min+1 |   3   |
+		+-------+-------+
+		| max   |   5   |
+		+-------+-------+
+		| min+8 |   7   |
+		+-------+-------+
+		| min+3 |   9   |
+		+-------+-------+
 
 	After that return last k elements. That's the whole IDEA.
 
@@ -456,7 +519,8 @@ public:
 int
 main()
 {
-	Solution           sol;
+	Solution_Heap_1    sol_heap_1;
+	Solution_Heap_2    sol_heap_2;
 	Solution_Bucket    sol_bucket;
 	Solution_Efficient sol_eff;
 
@@ -477,6 +541,7 @@ main()
 	std::cout << "\n\t=== TOP K FREQUENT ELEMENTS ===";
 	std::cout << "\n\t===============================\n";
 
+
 	/* Write Input */
 	std::cout << "\n\tK = " << k;
 
@@ -494,7 +559,8 @@ main()
 
 
 	/* Solution */
-	// std::vector ret = sol.topKFrequent(nums, k);
+	// std::vector ret = sol_heap_1.topKFrequent(nums, k);
+	// std::vector ret = sol_heap_2.topKFrequent(nums, k);
 	// std::vector ret = sol_bucket.topKFrequent(nums, k);
 	std::vector ret = sol_eff.topKFrequent(nums, k);
 
