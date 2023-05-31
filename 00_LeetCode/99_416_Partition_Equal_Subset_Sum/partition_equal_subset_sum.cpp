@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include <numeric>
+#include <algorithm>
 
 /*
 	==============
@@ -177,14 +179,14 @@
 /* Time  Beats:  5.00% */
 /* Space Beats:  5.23% */
 
-/* Time  Complexity: O(n * sum(nums)) */ /* Time Beats: 5.3% */
-/* Space Complexity: O(n * sum(nums)) */ /* Time Beats: 5% */
+/* Time  Complexity: O(n * sum(nums)) */
+/* Space Complexity: O(n * sum(nums)) */
 class Solution{
 public:
 	bool canPartition(std::vector<int>& nums)
 	{
 		int sum = 0;
-		for (auto& n : nums)
+		for (const auto& n : nums)
 			sum += n;
 
 		if (sum & 1) // Odd number
@@ -199,12 +201,13 @@ public:
 		for (int i = n - 1; i >= 0; i--)
 		{
 			std::set<int> tmp_set;
-			for (auto& elem : dp_set)
+			for (const auto& elem : dp_set)
 			{
-				if (elem + nums[i] == target)
+				if ((elem + nums[i]) == target)
 					return true;
 
 				tmp_set.insert(elem + nums[i]);
+				tmp_set.insert(elem);
 			}
 
 			dp_set.insert(tmp_set.begin(), tmp_set.end());
@@ -218,10 +221,110 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Same IDEA as the above Solution, just optimized code.
+	
+*/
+
+/* Time  Beats: 10.31% */
+/* Space Beats: 73.30% */
+
+/* Time  Complexity: O(n * sum(nums)) */
+/* Space Complexity: O(n * sum(nums)) */
+class Solution_Optimized_1{
+public:
+	bool canPartition(std::vector<int>& nums)
+	{
+		int n = nums.size();
+		int sum = std::accumulate(nums.begin(), nums.end(), 0);
+
+		if (sum % 2 != 0)
+			return false;
+
+		int target = sum / 2;
+		std::vector<std::vector<bool>> dp(n, std::vector<bool>(target + 1, false));
+
+		// Populate the first column
+		dp[0][0] = true;
+
+		// Populate the first row
+		if (nums[0] <= target)
+			dp[0][nums[0]] = true;
+
+		for (int i = 1; i < n; i++)
+		{
+			for (int j = 0; j <= target; j++)
+			{
+				dp[i][j] = dp[i - 1][j];
+
+				if (j >= nums[i])
+					dp[i][j] = dp[i][j] || dp[i - 1][j - nums[i]];
+			}
+		}
+
+		return dp[n - 1][target];
+	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Same IDEA as the above two Solutions, just optimized even more.
+	
+*/
+
+/* Time  Beats: 59.85% */
+/* Space Beats: 99.50% */
+
+/* Time  Complexity: O(n * sum(nums)) */
+/* Space Complexity: O(n * sum(nums)) */
+class Solution_Optimized_2_Efficient{
+public:
+	bool canPartition(std::vector<int>& nums)
+	{
+		int n = nums.size();
+		int sum = std::accumulate(nums.begin(), nums.end(), 0);
+
+		std::sort(nums.rbegin(), nums.rend());
+
+		if (sum % 2 != 0)
+			return false;
+
+		int target = sum / 2;
+		std::vector<bool> dp(target + 1, false);
+		dp[0] = true;
+
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = target; j >= nums[i]; j--)
+			{
+				dp[j] = dp[j] || dp[j - nums[i]];
+			}
+		}
+
+		return dp[target];
+	}
+};
+
+
 int
 main()
 {
-	Solution sol;
+	Solution                       sol;
+	Solution_Optimized_1           sol_opt_1;
+	Solution_Optimized_2_Efficient sol_opt_2_eff;
+
 
 	/* Example 1 */
 	std::vector<int> nums = {1, 5, 11, 5};
@@ -249,10 +352,12 @@ main()
 	}
 	std::cout << "]\n";
 
-	std::cout << "\n\t\tIs is possible to make 2 equal subset sums?\n";
+	std::cout << "\n\t\tIs it possible to make 2 equal subset sums?\n";
 
 	/* Solution */
-	bool possible = sol.canPartition(nums);
+	// bool possible = sol.canPartition(nums);
+	// bool possible = sol_opt_1.canPartition(nums);
+	bool possible = sol_opt_2_eff.canPartition(nums);
 
 	/* Write Output */
 	if (possible)
