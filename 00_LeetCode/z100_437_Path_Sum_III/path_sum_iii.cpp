@@ -1,6 +1,9 @@
 #include <iostream>
 #include <unordered_map>
 
+// For printing
+#include <queue>
+
 /*
 	==============
 	=== MEDIUM ===
@@ -84,7 +87,7 @@ struct TreeNode {
 	__3_____2__________11__
 	3__-2_____1____________
 
-	It means that we will consider both path but INCLUDING this current node,
+	It means that we will consider both paths but INCLUDING this current node,
 	10 in this case.
 
 	2nd one means - Do a same problem starting with a current's left node as
@@ -103,20 +106,23 @@ struct TreeNode {
 		b) DFS(node->left, sum - node->val)
 		c) DFS(node->right, sum - node->val)
 
-	"a)" means if the current node->val is equal to the sum we're searching for
+	a) means if the current node->val is equal to the sum we're searching for
 	(this sum can be the absolute sum or the subSum since we always subtract
 	current node->val from sum(or subSum) when going left or right).
-	If it it then include 1 in equation we're returning.
+	If it is then include 1 in equation we're returning.
 
-	"b)" means do a DFS starting with the current's node left as root, but
+	b) means do a DFS starting with the current's node LEFT as root, but
 	include this current one so, the second argument is now:
 		sum - node->val
 
-	"c" same as "b)" but current's node right as root.
+	c) means do a DFS starting with the current's node RIGHT as root, but
+	include this current one so, the second argument is now:
+		sum - node->val
 
 */
 
-
+/* Time  Beats: 30.83% */
+/* Space Beats: 90.91% */
 
 /*
 	Worst Time  Complexity: O(n^2)
@@ -133,6 +139,7 @@ public:
         if (root == nullptr)
             return 0;
 
+		/* Counting the number of paths: Start with root, start left w/o root, start right w/o root */
         return DFS(root, targetSum) + pathSum(root->left, targetSum) + pathSum(root->right, targetSum);
     }
 
@@ -146,6 +153,8 @@ public:
 };
 
 
+
+
 /*
 	------------
 	--- IDEA ---
@@ -153,23 +162,122 @@ public:
 
 	Go through the code. Stunningly clever idea.
 
-	10: 1
-	15: 1
-	// 18: 1
-	// 21: 1
-	// 20: 1
-	17: 1
+	In the first example we have:
+	_______________________
+	___________10__________
+	_____5__________-3_____
+	__3_____2__________11__
+	3__-2_____1____________
 
-	count = 2 // The above "simulation" is up to the node "1" of Example 1.
+
+	This part of the code is the Crux of this Solution:
+        if(map.find(sum - target) != map.end())
+            count += map[sum - target];
+	
+	We "ask" that each time before we do map[sum]++
+
+	Let's go from the root to the left most node:
+
+			Map
+		 key : val
+		+----+----+
+		|  EMPTY  |
+		+----+----+
+		  
+
+	sum = 10
+
+		if ( (sum - target) exist in the Hash Map)
+		if ( ( 10 -   8   ) exist in the Hash Map)
+			count += map[2] // map[2] is 0
+		
+			Map
+		 key : val
+		+----+----+
+		| 10 | 1  |
+		+----+----+
+
+
+	sum = 15
+
+		if ( (sum - target) exist in the Hash Map)
+		if ( ( 15 -   8   ) exist in the Hash Map)
+			count += map[7] // map[7] is 0
+
+			Map
+		 key : val
+		+----+----+
+		| 10 | 1  |
+		+----+----+
+		| 15 | 1  |
+		+----+----+
+
+
+	sum = 18
+
+		if ( (sum - target) exist in the Hash Map)
+		if ( ( 18 -   8   ) exist in the Hash Map)
+			count += map[10] // map[10] EXIST and it's 1. Meaning there is only
+			                 // one "10" up to this path.
+
+			Map
+		 key : val
+		+----+----+
+		| 10 | 1  |
+		+----+----+
+		| 15 | 1  |
+		+----+----+
+		| 18 | 1  |
+		+----+----+
+
+
+	sum = 21
+
+		if ( (sum - target) exist in the Hash Map)
+		if ( ( 21 -   8   ) exist in the Hash Map)
+			count += map[13] // map[13] is 0
+
+			Map
+		 key : val
+		+----+----+
+		| 10 | 1  |
+		+----+----+
+		| 15 | 1  |
+		+----+----+
+		| 18 | 1  |
+		+----+----+
+		| 21 | 1  |
+		+----+----+
+	
+	Then, once we've reached the end of the "left path". now go one node "up"
+	and then go to the right. Once we go up, we decrease current map[sum].
+	Now we have this:
+
+	sum = 16
+
+		if ( (sum - target) exist in the Hash Map)
+		if ( ( 16 -   8   ) exist in the Hash Map)
+			count += map[8] // map[8] is 0
+
+			Map
+		 key : val
+		+----+----+
+		| 10 | 1  |
+		+----+----+
+		| 15 | 1  |
+		+----+----+
+		| 18 | 1  |
+		+----+----+
+		| 16 | 1  |
+		+----+----+
+
 	...
 
 */
 
+/* Time  Beats: 99.97% */
+/* Space Beats: 42.76% */
 
-/*
-Time  Beats: 99.97%
-Space Beats: 42.76%
-*/
 /*
 	Time  Complexity: O(N)
 	Where N is the number of nodes in the binary tree. In the recursion we are
@@ -191,7 +299,7 @@ public:
         if(!root)
             return;
 
-		//Path sum from root
+		// Path sum from root
         sum += root->val;
 
         if(sum == target)
@@ -204,7 +312,7 @@ public:
 
         map[sum]++;
 
-        countPathSum(root->left, target, sum);
+        countPathSum(root->left,  target, sum);
         countPathSum(root->right, target, sum);
 
 		// After visiting the left and right subtree, we have to reduce this
@@ -223,59 +331,88 @@ public:
 
 
 
-/* Print nodes at a current level */
-void printCurrentLevel(TreeNode* root, int level)
+/*
+	=============================
+	=== This is just printing ===
+	=============================
+*/
+
+void
+print_array(std::vector<std::string>& nums)
 {
-    if (root == NULL)
+	bool first = true;
+	std::cout << "\n\t\t\t(TODO: Implement a Visual representation of a Binary Tree)\n\n";
+	std::cout << "\n\t*** Level Order ***";
+	std::cout << "\n\tTree: [";
+	for (auto x: nums)
 	{
-        std::cout << "null ";
-        return;
+		if (!first)
+			std::cout << ", ";
+
+		std::cout << x;
+		first = false;
 	}
-    if (level == 1)
-        std::cout << root->val << " ";
-    else if (level > 1) {
-        printCurrentLevel(root->left, level - 1);
-        printCurrentLevel(root->right, level - 1);
-    }
+	std::cout << "]\n";
 }
 
-/* Compute the "height" of a tree -- the number of
-    nodes along the longest path from the root node
-    down to the farthest leaf node.*/
-int height(TreeNode* node)
+
+void
+print_levelorder(TreeNode* root)
 {
-    if (node == NULL)
-        return 0;
-    else {
-        /* compute the height of each subtree */
-        int lheight = height(node->left);
-        int rheight = height(node->right);
+	if (root == nullptr)
+		return;
+	
+	std::queue<TreeNode*> queue;
+	queue.push(root);
 
-        /* use the larger one */
-        if (lheight > rheight) {
-            return (lheight + 1);
-        }
-        else {
-            return (rheight + 1);
-        }
-    }
+	std::vector<std::string> vector_print;
+
+	while (!queue.empty())
+	{
+		int size = queue.size();
+
+		for (int i = 0; i < size; i++)
+		{
+			TreeNode* node = queue.front();
+			queue.pop();
+
+			if (node == nullptr)
+			{
+				vector_print.push_back("null");
+				continue;
+			}
+			else
+				vector_print.push_back(std::to_string(node->val));
+
+			if (node->left != nullptr)
+				queue.push(node->left);
+			else
+				queue.push(nullptr);
+
+			if (node->right != nullptr)
+				queue.push(node->right);
+			else
+				queue.push(nullptr);
+		}
+	}
+
+	int x = vector_print.size() - 1;
+	while (vector_print[x] == "null")
+	{
+		vector_print.pop_back();
+		x--;
+	}
+
+	print_array(vector_print);
 }
 
-/* Function to print level
-order traversal a tree*/
-void printLevelOrder(TreeNode* root)
-{
-    int h = height(root);
-    int i;
-    for (i = 1; i <= h; i++)
-        printCurrentLevel(root, i);
-}
 
 int
 main()
 {
 	Solution sol;
 	Solution_DP sol_dp;
+
 
 	/* Example 1 */
 	/*
@@ -306,6 +443,8 @@ main()
 
 	TreeNode* root = &ten;
 	int targetSum = 8;
+
+
 
 
 	/* Example 2 */
@@ -345,18 +484,21 @@ main()
 	std::cout << "\n\t=== PATH SUM III ===";
 	std::cout << "\n\t====================\n";
 
+
 	/* Write Input */
+	print_levelorder(root);
 	std::cout << "\n\tTarget: " << targetSum;
-	std::cout << "\n\tTree:\n\t\t";
-	printLevelOrder(root);
 	std::cout << "\n";
+
 
 	/* Solution */
 	// int count = sol.pathSum(root, targetSum);
 	int count = sol_dp.pathSum(root, targetSum);
 
+
 	/* Write Output */
-	std::cout << "\n\n\tOutput: " << count << "\n\n";
+	std::cout << "\n\n\n\tOutput: " << count << "\n\n";
+
 
 	return 0;
 }
