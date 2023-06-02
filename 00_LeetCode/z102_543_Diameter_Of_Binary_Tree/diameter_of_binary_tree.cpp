@@ -1,4 +1,5 @@
 #include <iostream>
+#include <queue>
 
 /*
 	============
@@ -86,12 +87,12 @@ struct TreeNode {
 
 */
 
-
 /* Time  Beats: 70.86% */
 /* Space Beats: 69.70% */
-/*	Time  Complexity: O(N) */
+
+/*	Time  Complexity: O(n) */
 /*
-	Space Complexity: O(N)
+	Space Complexity: O(n)
 	Because of the Call Stack
 */
 class Solution{
@@ -123,70 +124,134 @@ public:
 
 
 
-/* Print nodes at a current level */
-void
-print_current_level(TreeNode* root, int level)
-{
-    if (root == NULL)
-    {
-        std::cout << "null ";
-        return;
-    }
 
-    if (level == 1)
-        std::cout << root->val << " ";
-    else if (level > 1)
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Same as above, just implemented on another occasion so I wanted to have
+	it here as well.
+	
+*/
+
+/* Time  Beats: 94.44% */
+/* Space Beats: 86.28% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_DFS{
+public:
+	int diameterOfBinaryTree(TreeNode* root)
 	{
-        print_current_level(root->left, level - 1);
-        print_current_level(root->right, level - 1);
-    }
-}
+		int longest_diameter = 0;
+		dfs(root, longest_diameter);
+
+		return longest_diameter;
+	}
+
+private:
+	int dfs(TreeNode* root, int& longest_diameter)
+	{
+		if (root == nullptr)
+			return 0;
+
+		int left  = dfs(root->left,  longest_diameter);
+		int right = dfs(root->right, longest_diameter);
+
+		if (left + right > longest_diameter)
+			longest_diameter = left + right;
+
+		if (left == 0 && right == 0)
+			return 1;
+
+		return left > right ? left+1 : right+1;
+	}
+};
 
 
 /*
-    Compute the "height" of a tree -- the number of
-    nodes along the longest path from the root node
-    down to the farthest leaf node
+	=============================
+	=== This is just printing ===
+	=============================
 */
-int
-height(TreeNode* node)
-{
-    if (node == NULL)
-        return 0;
-    else
-    {
-        /* compute the height of each subtree */
-        int lheight = height(node->left);
-        int rheight = height(node->right);
 
-        /* use the larger one */
-        if (lheight > rheight)
-            return (lheight + 1);
-        else
-            return (rheight + 1);
-    }
-}
-
-
-/*
-    Function to print level
-    order traversal a tree
-*/
 void
-print_level_order(TreeNode* root)
+print_array(std::vector<std::string>& nums)
 {
-    int h = height(root);
-    int i;
+	bool first = true;
+	std::cout << "\n\t\t\t(TODO: Implement a Visual representation of a Binary Tree)\n\n";
+	std::cout << "\n\t*** Level Order ***";
+	std::cout << "\n\tTree: [";
+	for (auto x: nums)
+	{
+		if (!first)
+			std::cout << ", ";
 
-    for (i = 1; i <= h; i++)
-        print_current_level(root, i);
+		std::cout << x;
+		first = false;
+	}
+	std::cout << "]\n\n";
+}
+
+
+void
+print_levelorder(TreeNode* root)
+{
+	if (root == nullptr)
+		return;
+	
+	std::queue<TreeNode*> queue;
+	queue.push(root);
+
+	std::vector<std::string> vector_print;
+
+	while (!queue.empty())
+	{
+		int size = queue.size();
+
+		for (int i = 0; i < size; i++)
+		{
+			TreeNode* node = queue.front();
+			queue.pop();
+
+			if (node == nullptr)
+			{
+				vector_print.push_back("null");
+				continue;
+			}
+			else
+				vector_print.push_back(std::to_string(node->val));
+
+			if (node->left != nullptr)
+				queue.push(node->left);
+			else
+				queue.push(nullptr);
+
+			if (node->right != nullptr)
+				queue.push(node->right);
+			else
+				queue.push(nullptr);
+		}
+	}
+
+	int x = vector_print.size() - 1;
+	while (vector_print[x] == "null")
+	{
+		vector_print.pop_back();
+		x--;
+	}
+
+	print_array(vector_print);
 }
 
 
 int
 main()
 {
-	Solution sol;
+	Solution     sol;
+	Solution_DFS sol_dfs;
+
 
 	/* Example 1 */
 	/*
@@ -299,16 +364,19 @@ main()
 	std::cout << "\n\t=== DIAMETER OF BINARY TREE ===";
 	std::cout << "\n\t===============================\n";
 
+
 	/* Write Input */
-	std::cout << "\n\tTree:\n\t\t";
-	print_level_order(root);
-	std::cout << "\n\n";
+	print_levelorder(root);
+
 
 	/* Solution */
-	int diameter = sol.diameterOfBinaryTree(root);
+	// int diameter = sol.diameterOfBinaryTree(root);
+	int diameter = sol_dfs.diameterOfBinaryTree(root);
+
 
 	/* Write Output */
 	std::cout << "\n\tDiameter: " << diameter << "\n\n";
+
 
 	return 0;
 }
