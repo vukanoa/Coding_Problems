@@ -49,111 +49,6 @@
 	--- IDEA ---
 	------------
 
-	This approach, while a bit optimized, is still a Brute Force Solution.
-
-	Consider this example:
-		[-1, 1, 0, 1, -1]
-
-	If we were to calculate every subbaray starting with index 0, we would get
-	[-1, 0, 0, 1, 0]
-	  0  1  2  3  4
-
-	Now if we wanted to calculate every subbaray starting with index 0, we can
-	immediately notice that we're doing a repeated work.
-	For example:
-		Subarray [1, 0, 1] of original array [-1, 1, 0, 1, -1]
-
-	We can see that we do a repeated work since subarray (1, 3) is a subarray
-	(0, 3) minus nums[0];
-
-	So every time we're calculating subarray we can use the previous row, thus
-	we don't even have to use a matrix, but it's easier for explanation since
-	this is not an optimal solution anyway.
-
-	We would only have elemets on the right diagonal and above inside the
-	matrix dp.
-
-	DP:
-
-		   | -1  |  1  |  0  |  1  | -1  |
-		---+-----+-----+-----+-----+------
-		-1 |  -1 |  0  |  0  |  1  |  0  |
-		---+-----+-----+-----+-----+------
-		 1 |     |  1  |  1  |  2  |  1  |
-		---+-----+-----+-----+-----+------
-		 0 |     |     |  0  |  1  |  0  |
-		---+-----+-----+-----+-----+------
-		 1 |     |     |     |  1  |  0  |
-		---+-----+-----+-----+-----+------
-		-1 |     |     |     |     | -1  |
-
-	You can clearly see that, for example:
-		dp[2][3] = d[2 - 1][3] - nums[2- 1]
-
-	However, this is still an O(N^2) approach, it's still Brute Force.
-
-*/
-
-
-/* Brute Force, a bit optimized, but still Brute Force */
-
-/* Time  Complexity: O(N^2) */
-/* Space Complexity: O(N^2) */
-class Solution_Brute_DP {
-public:
-    int subarraySum(std::vector<int>& nums, int k)
-    {
-        if (nums.size() == 1)
-        {
-            if (nums[0] == k)
-                return 1;
-
-            return 0;
-        }
-
-        int n = nums.size();
-		std::vector<std::vector<int>> dp(n, std::vector<int>(n));
-
-        dp[0][0] = nums[0];
-        int count = (nums[0] == k) ? 1 : 0;
-
-        for (int j = 1; j < n; j++)
-        {
-            dp[0][j] = nums[j] + dp[0][j - 1];
-
-            if (dp[0][j] == k)
-                count++;
-        }
-
-        for (int i = 1; i < n; i++)
-        {
-            for (int j = i; j < n; j++)
-            {
-                if (i == j)
-                    dp[i][j] = nums[i];
-                else
-                    dp[i][j] = dp[i - 1][j] - nums[i - 1];
-
-                if (dp[i][j] == k)
-                    count++;
-            }
-        }
-
-        return count;
-    }
-};
-
-
-
-
-
-
-
-/*
-	------------
-	--- IDEA ---
-	------------
-
 	Consider this example:
 		[1, 1, 1, 1, 1, 1], k = 3
 
@@ -169,8 +64,8 @@ public:
 
 	So far Sum = 4
 	So what are we looking here?
-	Can we chop off some prefix of this subarray a prefix such that we can make
-	this Sum(= 4) match our given k?
+	Can we chop off some prefix of this subarray?
+	A prefix such that we can make this Sum(= 4) match our given k?
 
 	The answer is yes.
 	We can calculate it:
@@ -520,7 +415,7 @@ public:
           |  [1, -1, 1, 1, 1, 1]
           |   #   #  #  #  #
           |
-2-sn  ----|  // Then we remove Subbarray [0 - 1] Inclusive
+2-nd  ----|  // Then we remove Subbarray [0 - 1] Inclusive
 
 		total =+ hashmap[0] => total = 2
 
@@ -601,33 +496,33 @@ public:
 	At the very end we return "total" as the final answer.
 */
 
+/* Time  Beats: 89.97% */
+/* Space Beats: 95.60% */
 
-/* Time  Beats: 96.4% */
-/* Space Beats: 46.7% */
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
 class Solution{
 public:
 	int subarraySum(std::vector<int>& nums, int k)
 	{
-		int ret = 0;
+		int result = 0;
 		int curr_sum = 0;
 
 		std::unordered_map<int, int> prefix_sums;
 		prefix_sums = {{0, 1}};
 
-		for (auto& n : nums)
+		for (const auto& n : nums)
 		{
 			curr_sum += n;
 			int diff = curr_sum - k;
 
 			if (prefix_sums.find(diff) != prefix_sums.end())
-				ret += prefix_sums[diff];
+				result += prefix_sums[diff];
 
 			prefix_sums[curr_sum]++;
 		}
 
-		return ret;
+		return result;
 	}
 };
 
@@ -635,8 +530,8 @@ public:
 int
 main()
 {
-	Solution_Brute_DP sol_brute;
 	Solution sol;
+
 
 	/* Example 1 */
 	// std::vector<int> nums = {1, 1, 1};
@@ -650,9 +545,11 @@ main()
 	std::vector<int> nums = {-1, 1, 0, 1, -1};
 	int k = 0;
 
+
 	std::cout << "\n\t=============================";
 	std::cout << "\n\t=== SUBARRAY SUM EQUALS K ===";
 	std::cout << "\n\t=============================\n";
+
 
 	/* Write Input */
 	bool first = true;
@@ -668,12 +565,14 @@ main()
 	std::cout << "]";
 	std::cout << "\n\tK = " << k << "\n";
 
+
 	/* Solution */
-	// int count = sol_brute.subarraySum(nums, k);
-	int count = sol_brute.subarraySum(nums, k);
+	int count = sol.subarraySum(nums, k);
+
 
 	/* Write Output */
 	std::cout << "\n\tOutput: " << count << "\n\n";
+
 
 	return 0;
 }
