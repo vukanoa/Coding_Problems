@@ -1,8 +1,6 @@
 #include <iostream>
-#include <unordered_map>
 #include <vector>
-#include <list>
-#include <map>
+#include <queue>
 
 /*
 	==============
@@ -87,215 +85,128 @@
 	--- IDEA ---
 	------------
 
-	First, go through an entire grid and:
-		1) Count how many fresh oranges are there. Save in variable "fresh".
-		2) Put indexes of rotten oranges in vec_1
+	It's a basic BFS. The only "tricky" part are the first three things that
+	are written in this Solution:
+		1. Check if there aren't any fresh oranges left. If that is the case
+		   then return 0.
 
-	After that check if there are any fresh oranges. If there are not,
-	immediately return 0 that indicates that all oranges have been rotten in
-	minute 0.
+		2. Check if there aren't any rotten oranges at the beginning, if that
+		   is the case, then return -1.
 
-	If there are any fresh oranges left in the grid then:
-		if (It's an even minute)
-			go through vec_1 and check every vec_1 element's:
-			 UP
-		LEFT    RIGHT
-			DOWN
+		3. Fill the queue with **all** the rotten oranges at Minute 0.
+	
+	3rd one is very important since that is the initial state of the queue upon
+	entering the while loop of the BFS functionality.
 
-			If any orange that is UP, DOWN, LEFT or RIGHT to our current rotten
-			orange is 1(fresh one) assign 2 to it(make it rotten) and PUSH
-			indexes of it in vec_2.
-
-
-			Why in vec_2 and not in vec_1?
-				If we were to push it in vec_1, we would process every fresh
-				orange at once. It would be as if we have done it in minute 0.
-
-				So we're changing grid in real time, but pushing newly rotten
-				orange indexes in vec_2.
-
-				Once we're in an odd minute, then it the opposite.
-				We're iterating throgh vec_2 and we're pushing newly rotten
-				orange indexes in vec_1.
-
-			And ERASE current rotten orange from vec_1(int this case).
-			Why?
-			Because we have already processed that orange. That orange have
-			already "infected" the fresh ones and put them into vec_2(or vec_1
-			depending on the minute).
-
-	At the end we check if there are any fresh oranges left.
-
-	If there are not:
-		return the number of minutes needed to rotten the entire grid.
-	else
-		return -1 to indicate it's impossible to rotten all the fresh oranges.
+	Each level in BFS is one "Minute".
+	
+	At the end just check if there are any fresh oranges left(ones that aren't
+	able to be reached). If there are, return -1, else return number of elapsed
+	minutes.
 
 */
 
+/* Time  Beats:   100% */
+/* Space Beats: 76.48% */
 
-
-/* Time  Beats: 75.26% */
-/* Space Beats: 85.29% */
-/* Time  Complexity: O(n^2) */
+/* Time  Complexity: O(n * m) */
 /* Space Complexity: O(num of (fresh + rotten) oranges) */
 class Solution{
 public:
 	int orangesRotting(std::vector<std::vector<int>>& grid)
 	{
-		std::vector<std::pair<int, int>> vec_1;
-		std::vector<std::pair<int, int>> vec_2;
-		int fresh  = 0;
-		int minute = 0;
+		int m = grid.size();
+		int n = grid[0].size();
 
-		for (int i = 0; i < grid.size(); i++)
-		{
-			for (int j = 0; j < grid[0].size(); j++)
-			{
-				if (grid[i][j] == 0)
-					continue;
-				else if (grid[i][j] == 1)
-					fresh++;
-				else
-					vec_1.push_back({i, j});
-			}
-		}
-
-		if (fresh == 0)
+		/* If there aren't any fresh oranges left, return 0 */
+		if (leftover_fresh(grid) == false)
 			return 0;
 
-		while (!vec_1.empty() || !vec_2.empty())
+		/* If there aren't any rotten oranges at the beginning, return -1 */
+		if (no_rotten_ones(grid))
+			return -1;
+
+		/* Fill the queue with all rotten oranges found on minute 0 */
+		std::queue<std::pair<int, int>> queue;
+		for (int i = 0; i < m; i++)
 		{
-
-			if (minute % 2 == 0) // Use vec_1
+			for (int j = 0; j < n; j++)
 			{
-				for(auto it = vec_1.begin(); it != vec_1.end();)
-				{
-
-					/* UP */
-					if ((it->first - 1) >= 0) // Not out of bounds
-					{
-						// If it's a fresh orange
-						if (grid[it->first - 1][it->second] == 1)
-						{
-							grid[it->first - 1][it->second] = 2;
-
-							fresh--;
-							vec_2.push_back({it->first - 1, it->second});
-						}
-					}
-
-					/* DOWN */
-					if ((it->first + 1) < grid.size()) // Not out of bounds
-					{
-						if (grid[it->first + 1][it->second] == 1)
-						{
-							grid[it->first + 1][it->second] = 2;
-
-							fresh--;
-							vec_2.push_back({it->first + 1, it->second});
-						}
-					}
-
-					/* LEFT */
-					if ((it->second - 1) >= 0) // Not out of bounds
-					{
-						if (grid[it->first][it->second - 1] == 1)
-						{
-							grid[it->first][it->second - 1] = 2;
-
-							fresh--;
-							vec_2.push_back({it->first, it->second - 1});
-						}
-					}
-
-					/* RIGHT */
-					if ((it->second + 1) < grid[0].size()) // Not out of bounds
-					{
-						// If it's a fresh orange
-						if (grid[it->first][it->second + 1] == 1)
-						{
-							grid[it->first][it->second + 1] = 2;
-
-							fresh--;
-							vec_2.push_back({it->first, it->second + 1});
-						}
-					}
-
-					vec_1.erase(it);
-				}
-
-				minute++;
+				if (grid[i][j] == 2)
+					queue.push({i, j});
 			}
-			else // Use vec_2
-			{
-				for(auto it = vec_2.begin(); it != vec_2.end();)
-				{
-					/* UP */
-					if ((it->first - 1) >= 0) // Not out of bounds
-					{
-						// If it's a fresh orange
-						if (grid[it->first - 1][it->second] == 1)
-						{
-							grid[it->first - 1][it->second] = 2;
-
-							fresh--;
-							vec_1.push_back({it->first - 1, it->second});
-						}
-					}
-
-					/* DOWN */
-					if ((it->first + 1) < grid.size()) // Not out of bounds
-					{
-						if (grid[it->first + 1][it->second] == 1)
-						{
-							grid[it->first + 1][it->second] = 2;
-
-							fresh--;
-							vec_1.push_back({it->first + 1, it->second});
-						}
-					}
-
-					/* LEFT */
-					if ((it->second - 1) >= 0) // Not out of bounds
-					{
-						if (grid[it->first][it->second - 1] == 1)
-						{
-							grid[it->first][it->second - 1] = 2;
-
-							fresh--;
-							vec_1.push_back({it->first, it->second - 1});
-						}
-					}
-
-					/* RIGHT */
-					if ((it->second + 1) < grid[0].size()) // Not out of bounds
-					{
-						// If it's a fresh orange
-						if (grid[it->first][it->second + 1] == 1)
-						{
-							grid[it->first][it->second + 1] = 2;
-
-							fresh--;
-							vec_1.push_back({it->first, it->second + 1});
-						}
-					}
-
-					vec_2.erase(it);
-				}
-
-				minute++;
-			}
-
-
-			if (fresh == 0)
-				break;
 		}
 
-		if (fresh == 0)
-			return minute;
+		/* Directions */
+		std::vector<std::pair<int, int>> directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 
-		return -1;
+		int minutes = -1;
+
+		/* BFS */
+		while (!queue.empty())
+		{
+			int tmp = queue.size() - 1;
+
+			while (tmp-- >= 0)
+			{
+				auto curr = queue.front();
+				queue.pop();
+
+				for (auto& dir : directions)
+				{
+					int row = curr.first  + dir.first;
+					int col = curr.second + dir.second;
+
+					if (row >= 0 && row < m && col >= 0 && col < n && grid[row][col] == 1)
+					{
+						queue.push({row, col});
+						grid[row][col] = 2;
+					}
+				}
+			}
+
+			minutes++;
+		}
+
+		/* If there aren't any fresh oranges left, return -1, else minutes */
+		return leftover_fresh(grid) ? -1 : minutes;
+	}
+
+private:
+	/* Checks if there are any fresh oranges left in entire grid */
+	bool leftover_fresh(std::vector<std::vector<int>>& grid)
+	{
+		int m = grid.size();
+		int n = grid[0].size();
+
+		for (int i = 0; i < m; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				if (grid[i][j] == 1)
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+	/* Check if there aren't any rotten oranges. If there aren't return true */
+	bool no_rotten_ones(std::vector<std::vector<int>>& grid)
+	{
+		int m = grid.size();
+		int n = grid[0].size();
+
+		for (int i = 0; i < m; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				if (grid[i][j] == 2)
+					return false;
+			}
+		}
+
+		return true;
 	}
 };
 
@@ -347,7 +258,6 @@ main()
 	std::cout << "\n\t=== ROTTING ORANGES ===";
 	std::cout << "\n\t=======================\n\n";
 
-	/* Write Output */
 
 	/* Write Output */
 	bool first = true;
@@ -366,8 +276,10 @@ main()
 	/* Solution */
 	int output = sol.orangesRotting(grid);
 
+
 	/* Write Output */
 	std::cout << "\n\tOutput: " << output << "\n\n";
+
 
 	return 0;
 }
