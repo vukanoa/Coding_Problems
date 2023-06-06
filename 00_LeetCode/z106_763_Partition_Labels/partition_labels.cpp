@@ -56,169 +56,118 @@
 	--- IDEA ---
 	------------
 
-*/
+	Input:  s = "ababcbacadefegdehijkhklij"
+	Output: [9, 7, 8]
+	
+	a {0,   8}  00-------------08
+	b {1,   5}   01------05
+	c {4,   7}         04-----7
+	d {9,  14}                   09--------14
+	e {10, 15}                     10--------15
+	f {11, -1}                       11
+	g {13, -1}                           13
+	h {16, 19}                                 16----19
+	i {17, 22}                                   17--------22
+	j {18, 23}                                     18--------23
+	k {20, -1}                                         20
+	l {21, -1}                                           21
+
+	However, this Example is an Exception due to the fact that the Example is
+	in alphabettical order in terms of the first appearance of the character in
+	string "s".
 
 
-/*
-	------------
-	--- IDEA ---
-	------------
+	That' doesn't have to be the case:
+	Input:  s = "eccbbbbdec"
+	Output: [10]
 
-	It's my very messy idea, but it works at the end.
+	e {0,  8}  0-------8 
+	c {1,  9}   1-------9
+	b {3,  6}     3--6
+	d {7, -1}         7
 
-	We make a Hash Map:
-		{ Key :   Value   }
-		|  a  : [beg,end] |
-		|  b  : [beg,end] |
-		|  c  : [beg,end] |
-		|  d  : [beg,end] |
-		|  e  : [beg,end] |
-		|  f  : [beg,end] |
-		|  g  : [beg,end] |
-		|  h  : [beg,end] |
-		|  i  : [beg,end] |
-		|  j  : [beg,end] |
-		|  k  : [beg,end] |
-		|  l  : [beg,end] |
-		|  m  : [beg,end] |
-		|  n  : [beg,end] |
-		|  o  : [beg,end] |
-		|  p  : [beg,end] |
-		|  q  : [beg,end] |
-		|  r  : [beg,end] |
-		|  s  : [beg,end] |
-		|  t  : [beg,end] |
-		|  u  : [beg,end] |
-		|  v  : [beg,end] |
-		|  w  : [beg,end] |
-		|  x  : [beg,end] |
-		|  y  : [beg,end] |
-		|  z  : [beg,end] |
+	Since this can be the case, we'll have a vector named "order", which will
+	push_back the character once it appears for the first time in string "s".
 
-	beg - Index of the place where that character first appeared in string s
-	      (-1 if it doesn't appear at all)
-		  Default: -1
-
-	end - Index of the place where that character last appeared in string s
-	      (-1 if it doesn't appear more than once)
-		  Default: -1
-
-	That's done in O(n).
-
-	Now we iterate through an entire string s once again. Again, only once so
-	that's also O(n).
-
-	// TO DO
+	// TODO
 
 */
 
+/* Time  Beats:   100% */
+/* Space Beats: 63.61% */
 
-
-/*	Time  Beats: 29.16% */
-/*  Space Beats:  5.51% */
-/*	Time  Complexity: O(n) */
-/*
-	Space Complexity: O(1)
-	Tehnically it's O(1) since we are told that s is consisted of only
-	lowercase english letters. So making a Hash Map of size 26 will always be
-	of size 26 no matter the length of string s.
-*/
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
 class Solution{
 public:
 	std::vector<int> partitionLabels(std::string s)
 	{
-		std::unordered_map<char, std::vector<int>> umap
-		{
-			{'a', std::vector(2, -1)},
-			{'b', std::vector(2, -1)},
-			{'c', std::vector(2, -1)},
-			{'d', std::vector(2, -1)},
-			{'e', std::vector(2, -1)},
-			{'f', std::vector(2, -1)},
-			{'g', std::vector(2, -1)},
-			{'h', std::vector(2, -1)},
-			{'i', std::vector(2, -1)},
-			{'j', std::vector(2, -1)},
-			{'k', std::vector(2, -1)},
-			{'l', std::vector(2, -1)},
-			{'m', std::vector(2, -1)},
-			{'n', std::vector(2, -1)},
-			{'o', std::vector(2, -1)},
-			{'p', std::vector(2, -1)},
-			{'q', std::vector(2, -1)},
-			{'r', std::vector(2, -1)},
-			{'s', std::vector(2, -1)},
-			{'t', std::vector(2, -1)},
-			{'u', std::vector(2, -1)},
-			{'v', std::vector(2, -1)},
-			{'w', std::vector(2, -1)},
-			{'x', std::vector(2, -1)},
-			{'y', std::vector(2, -1)},
-			{'z', std::vector(2, -1)}
-		};
+		std::vector<std::pair<int, int>> map (26, {-1, -1} );
+		std::vector<int> results;
 
-		// O(n)
+		std::vector<char> order;
+
+		/*
+		   If a character appears for the first time in string "s", update its
+		   "first" part in std::pair, and push that character in vector
+		   "order", otherwise, update it's "second" part in std::pair
+		*/
 		for (int i = 0; i < s.length(); i++)
 		{
-			if (umap[s[i]][0] == -1)
-				umap[s[i]][0] = i;
+			if (map[s[i] - 'a'].first == -1)
+			{
+				map[s[i] - 'a'].first = i;
+				order.push_back(s[i]);
+			}
 			else
-				umap[s[i]][1] = i;
+				map[s[i] - 'a'].second = i;
 		}
 
+		int x = 0;
+		int start = map[order[x] - 'a'].first;
+		int end   = map[order[x] - 'a'].second;
 
-		std::vector<int> ret;
-		int prev_wall = 0;
-		int wall = -1;
-		int flag = 0;
-
-		for (int i = 0; i < s.length(); i++)
+		/* Individual characters before the loop */
+		while (end == -1 && x+1 < order.size())
 		{
-			if (umap[s[i]][1] == -1)
-			{
-				if (umap[s[i]][0] > wall || wall == -1)
-				{
-					if (wall != -1 && umap[s[i - 1]][1] != -1)
-					{
-						ret.push_back(wall - prev_wall + 1);
+			results.push_back(1);
+			start = map[order[x+1] - 'a'].first;
+			end   = map[order[x+1] - 'a'].second;
 
-						prev_wall = wall + 1;
-						wall = umap[s[i]][1];
-					}
-					ret.push_back(1);
-
-                    prev_wall = ((i - 1) >= 0) ? (i - 1) : 0;
-					wall = i;
-					flag = 1;
-				}
-			}
-			else if (umap[s[i]][0] > wall)
-			{
-				// Only for the very first element
-				if (wall == -1)
-				{
-					prev_wall = umap[s[i]][0]; // Equivalent to prev_wall = i;
-					wall      = umap[s[i]][1];
-				}
-				else
-				{
-					if (flag == 0)
-						ret.push_back(wall - prev_wall + 1);
-
-					prev_wall = wall + 1;
-					wall = umap[s[i]][1];
-
-					flag = 0;
-				}
-			}
-			else if (umap[s[i]][1] > wall)
-				wall = umap[s[i]][1];
+			x++;
 		}
 
-		if (umap[s[s.length() - 1]][1] != - 1)
-			ret.push_back(wall - prev_wall + 1);
+		/* Meat of the Solution */
+		for (int i = x; i < order.size(); i++)
+		{
+			if (map[order[i] - 'a'].first > end)
+			{
+				if (end != -1)
+					results.push_back(end - start + 1);
+				else
+					results.push_back(1);
 
-		return ret;
+				start = map[order[i] - 'a'].first;
+				end   = map[order[i] - 'a'].second;
+			}
+			else if (map[order[i] - 'a'].second > end)
+				end = map[order[i]- 'a'].second;
+		}
+
+		/*
+		   Last range if the entire string is not constructed of individual
+		   chars.
+		*/
+		if (x+1 < order.size())
+		{
+			if (end != -1)
+				results.push_back(end - start + 1);
+			else
+				results.push_back(1);
+		}
+
+
+		return results;
 	}
 };
 
@@ -262,8 +211,7 @@ public:
 
 	Maybe that character itself is the last occurence of it. (It appears
 	only once in string s).
-
-	We can do exactly that, thus we will make a Hash Map:
+We can do exactly that, thus we will make a Hash Map:
 	We put a character in Hash Map only if we stumble upon it while iterating
 	over string s.
 
@@ -654,10 +602,10 @@ public:
 
 */
 
+/* Time  Beats: 83.33% */
+/* Space Beats: 38.77% */
 
-/* Time  Beats: % */
-/* Space Beats: % */
-/* Time  Complexity: O(N) */
+/* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
 class Solution_Neat{
 public:
