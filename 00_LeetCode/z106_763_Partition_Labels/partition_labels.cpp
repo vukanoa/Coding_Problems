@@ -640,11 +640,63 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Completely equivalent IDEA to the one above, just optimized code.
+	
+*/
+
+/* Time  Beats:   100% */
+/* Space Beats: 86.24% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Neat_Optimized{
+public:
+	std::vector<int> partitionLabels(std::string s)
+	{
+		// std::unordered_map<char, int> last_index;
+		std::vector<int> last_index_map (26, -1);
+
+		// O(n)
+		for (int i = 0; i < s.length(); i++)
+			last_index_map[s[i] - 'a'] = i;
+
+
+		std::vector<int> ret;
+		int size = 0;
+		int wall = 0;
+
+		// O(n)
+		for (int i = 0; i < s.length(); i++)
+		{
+			size++;
+			wall = std::max(wall, last_index_map[s[i] - 'a']);
+
+			if (i == wall)
+			{
+				ret.push_back(size);
+				size = 0;
+			}
+		}
+
+		return ret;
+	}
+};
+
+
 int
 main()
 {
-	Solution sol;
-	Solution_Neat sol_neat;
+	Solution                sol;
+	Solution_Neat           sol_neat;
+	Solution_Neat_Optimized sol_neat_optimized;
+
 
 	/* Example 1 */
 	std::string s = "ababcbacadefegdehijhklij";
@@ -668,12 +720,16 @@ main()
 	std::cout << "\n\t=== PARTITION LABELS ===";
 	std::cout << "\n\t========================\n";
 
+
 	/* Write Input */
 	std::cout << "\n\ts = \"" << s << "\"\n";
 
+
 	/* Solution */
 	// std::vector<int> ret = sol.partitionLabels(s);
+	// std::vector<int> ret = sol_neat.partitionLabels(s);
 	std::vector<int> ret = sol_neat.partitionLabels(s);
+
 
 	/* Write Output */
 	bool first = true;
@@ -687,6 +743,7 @@ main()
 		first = false;
 	}
 	std::cout << "]\n\n";
+
 
 	return 0;
 }
