@@ -46,7 +46,7 @@
 
 	--- Example 3 ---
 	Input:  text1 = "abc", text2 = "def"
-	Output:
+	Output: 0
 	Explanation: There is no such common subsequence, so the result is 0.
 
 	*** Constraints ***
@@ -370,19 +370,23 @@ ace
 */
 
 
-/* Time  Beats: 21.0% */
-/* Space Beats: 10.9% */
+/* Time  Beats: 60.82% */
+/* Space Beats: 46.52% */
+
 /* Time  Complexity: O(n * m) */
 /* Space Complexity: O(n * m) */
 class Solution{
 public:
 	int longestCommonSubsequence(std::string& text1, std::string& text2)
 	{
-		std::vector<std::vector<int>> dp(text1.length() + 1, std::vector<int>(text2.length() + 1, 0));
+		int m = text1.length();
+		int n = text2.length();
 
-		for (int i = text1.length() - 1; i >= 0; i--)
+		std::vector<std::vector<int>> dp(m + 1, std::vector<int>(n + 1, 0));
+
+		for (int i = m - 1; i >= 0; i--)
 		{
-			for (int j = text2.length() - 1; j >= 0; j--)
+			for (int j = n - 1; j >= 0; j--)
 			{
 				if (text1[i] == text2[j])
 					dp[i][j] = 1 + dp[i + 1][j + 1];
@@ -401,6 +405,7 @@ main()
 {
 	Solution sol;
 
+
 	/* Example 1 */
 	// std::string text1 = "abcde";
 	// std::string text2 = "ace";
@@ -417,19 +422,24 @@ main()
 	std::string text1 = "oxcpqrsvwf";
 	std::string text2 = "shmtulqrypy";
 
+
 	std::cout << "\n\t==================================";
 	std::cout << "\n\t=== LONGEST COMMOM SUBSEQUENCE ===";
 	std::cout << "\n\t==================================\n";
+
 
 	/* Write Input */
 	std::cout << "\n\tText 1: \"" << text1 << "\"";
 	std::cout << "\n\tText 2: \"" << text2 << "\"\n";
 
+
 	/* Solution */
 	int output = sol.longestCommonSubsequence(text1, text2);
 
+
 	/* Write Output */
 	std::cout << "\n\tOutput: " << output << "\n\n";
+
 
 	return 0;
 }
