@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <functional>
 
 #include <queue>
 
@@ -66,6 +67,7 @@
 
 
 
+
 // Definition for a binary tree node.
 struct TreeNode {
     int val;
@@ -77,7 +79,6 @@ struct TreeNode {
 };
 
 
-
 /*
 	------------
 	--- IDEA ---
@@ -87,7 +88,6 @@ struct TreeNode {
 	
 */
 
-
 /* Time  Beats: 79.42% */
 /* Space Beats: 65.30% */
 
@@ -95,7 +95,7 @@ struct TreeNode {
 /* Space Complexity: O(n) */
 class Solution {
 public:
-    TreeNode* sortedArrayToBST(std::vector<int>& nums)
+	TreeNode* sortedArrayToBST(std::vector<int>& nums)
 	{
 		if (nums.size() == 1)
 			return new TreeNode(nums[0]);
@@ -104,7 +104,7 @@ public:
 		int right = nums.size() - 1;
 
 		return construct_BST(nums, left, right);
-    }
+	}
 
 private:
 	TreeNode* construct_BST(std::vector<int>& nums, int left, int right)
@@ -130,6 +130,95 @@ private:
 
 		return root;
 	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Much more neatly written.
+	
+*/
+
+/* Time  Beats: 98.21% */
+/* Space Beats: 94.95% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Neat{
+public:
+	TreeNode* sortedArrayToBST(std::vector<int>& nums)
+	{
+		if (nums.size() == 1)
+			return new TreeNode(nums[0]);
+
+		return construct_BST(nums, 0, nums.size() - 1);
+	}
+
+private:
+	TreeNode* construct_BST(std::vector<int>& nums, int left, int right)
+	{
+		if (left > right)
+			return nullptr;
+
+		int mid = (left + right) / 2;
+
+		TreeNode* root = new TreeNode(nums[mid]);
+
+		root->left  = construct_BST(nums, left,  mid-1);
+		root->right = construct_BST(nums, mid+1, right);
+
+		return root;
+	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Implemented using recursive Lambda function.
+	
+*/
+
+/* Time  Beats: 24.85% */
+/* Space Beats: 17.93% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Lambda {
+public:
+	TreeNode* sortedArrayToBST(std::vector<int>& nums)
+	{
+		if (nums.size() == 1)
+			return new TreeNode(nums[0]);
+
+		std::function<TreeNode*(int, int)> construct_BST;
+
+		/* Lambda */
+		construct_BST = [&](int left, int right) -> TreeNode* {
+			if (left > right)
+				return nullptr;
+
+			int mid = (left + right) / 2;
+
+			TreeNode* root = new TreeNode(nums[mid]);
+
+			root->left  = construct_BST(left,  mid-1);
+			root->right = construct_BST(mid+1, right);
+
+			return root;
+		};
+
+			return construct_BST(0, nums.size() - 1);
+		}
 };
 
 
@@ -213,7 +302,9 @@ print_levelorder(TreeNode* root)
 int
 main()
 {
-	Solution sol;
+	Solution        sol;
+	Solution_Neat   sol_neat;
+	Solution_Lambda sol_lambda;
 
 
 	/* Example 1 */
@@ -246,7 +337,9 @@ main()
 
 
 	/* Solution */
-	TreeNode* root = sol.sortedArrayToBST(nums);
+	// TreeNode* root = sol.sortedArrayToBST(nums);
+	TreeNode* root = sol_neat.sortedArrayToBST(nums);
+	// TreeNode* root = sol_lambda.sortedArrayToBST(nums);
 
 
 	/* Write Output */
