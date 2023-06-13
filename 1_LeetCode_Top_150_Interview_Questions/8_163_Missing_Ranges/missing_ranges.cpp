@@ -54,6 +54,19 @@
 */
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	It's self-explanatory.
+
+	Check "lower" with the first element.
+	Check middle elements with their previous elements.
+	Check "upper" with the last element.
+	
+*/
+
 /* Time  Complexity: O(n) */
 /*
 	Space Complexity: O(1)
@@ -64,76 +77,38 @@ class Solution{
 public:
 	std::vector<std::string> findMissingRanges(std::vector<int>& nums, int lower, int upper)
 	{
+		if (nums.empty())
+			return {range(lower, upper)};
+
 		int n = nums.size();
 		std::vector<std::string> results;
 
-		if (n == 0)
-		{
-			std::string ret = "";
-			ret += std::to_string(lower) + "->" + std::to_string(upper);
-
-			results.push_back(ret);
-
-			return results;
-		}
-
 		// First
-		if (nums[0] != lower)
-		{
-			std::string str = "";
+		if (nums.front() > lower)
+			results.push_back(range(lower, nums.front() - 1));
 
-			if (nums[0] - 1 != lower)
-			{
-				str += std::to_string(lower) + "->" + std::to_string((nums[0] - 1));
-				results.push_back(str);
-			}
-			else
-			{
-				str += std::to_string(lower);
-				results.push_back(str);
-			}
-		}
-
+		// Middle
 		for (int i = 1; i < n; i++)
 		{
-			if (nums[i] - 1 == nums[i-1])
-				continue;
-
-			std::string str = "";
-
-			if (nums[i] - 1 > nums[i-1] + 1)
-			{
-				str += std::to_string(nums[i-1] + 1) + "->" + std::to_string(nums[i] - 1);
-				results.push_back(str);
-			}
-			else // Equal
-			{
-				str += std::to_string(nums[i] - 1);
-				results.push_back(str);
-			}
+			if (nums[i] > nums[i - 1] + 1)
+				results.push_back(range(nums[i - 1] + 1, nums[i] - 1));
 		}
-
 
 		// Last
-		if (nums[n - 1] < upper)
-		{
-			std::string str = "";
-
-			if (nums[n - 1] + 1 != upper)
-			{
-				str += std::to_string(nums[n - 1] + 1) + "->" + std::to_string(upper);
-				results.push_back(str);
-			}
-			else
-			{
-				str += std::to_string(upper);
-				results.push_back("" + upper);
-			}
-		}
+		if (nums.back() < upper)
+			results.push_back(range(nums.back() + 1, upper));
 
 
-		
 		return results;
+	}
+
+private:
+	std::string range(int low, int high)
+	{
+		if (low == high)
+			return std::to_string(low);
+
+		return std::to_string(low) + "->" + std::to_string(high);
 	}
 };
 
@@ -141,7 +116,7 @@ public:
 int
 main()
 {
-	Solution sol;
+	Solution      sol;
 
 
 	/* Example 1 */
