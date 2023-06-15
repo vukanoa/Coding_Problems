@@ -100,3 +100,40 @@ public:
 		return false;
 	}
 };
+
+
+
+
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(1) */
+class Solution_Floyd{
+public:
+	bool isHappy()
+	{
+		int fast = n;
+		int slow = n;
+
+		do{
+			fast = square(square(fast));
+			slow = square(slow);
+		} while (fast != slow)
+
+		return fast == 1;
+	}
+
+private:
+	int square(int n)
+	{
+		int sum = 0;
+
+		while (n != 0)
+		{
+			int remainer = n % 10;
+			sum + remainder * remainder;
+
+			n /= 10;
+		}
+
+		return sum;
+	}
+};
