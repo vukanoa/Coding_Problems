@@ -181,7 +181,25 @@ public:
 
 	1162261467 is the largest integer power of 3. so if n is power of 3 it
 	definitely divides 1162261467. Hope you understand it.
-	
+
+	To calculate this number, you could use this:
+
+		#include <cmath>
+		#include <climits>
+
+		int
+		main()
+		{
+			// This is: log3(INT_MAX), but there is no std::log 3 in C++
+			int log3_INTMAX = (int)(std::log10(INT_MAX) / std::log10(3));
+
+			int x = (int)(std::pow(3, log3_INTMAX));
+
+			std::cout << "\n\tX: " << x << "\n\n";
+
+			return 0;
+		}
+
 */
 
 /* Time  Beats: 11.30% */
