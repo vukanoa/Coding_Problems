@@ -59,7 +59,20 @@
 	--- IDEA ---
 	------------
 
-	TODO
+	nums1 = [4, 9, 5]
+	nums2 = [9, 4, 9, 8, 4]
+
+	Hash Map is going to have:
+
+	   (num)   (occurrence)
+		Key  :  Value
+		 4   :   1
+		 9   :   1
+		 5   :   1
+	
+	Then just iterate through nums2 and if nums2[i] exists in the map, meaning
+	it's value is > 0, then put in the results vector and decrease the value
+	in the Hash Map for that key.
 	
 */
 
@@ -99,7 +112,18 @@ public:
 	--- IDEA ---
 	------------
 
-	TODO
+	Same idea, however, we're told in the constraints that the maximum size
+	of nums1 and num2 is 1000:
+
+		0 <= nums1[i], nums2[i] <= 1000
+
+	Thus we can have a vector of 1000 elements and that would technically make
+	this Solution O(1) even though we're using more Space than in the previous
+	Solution. At lest on aveage. But the size of Space we're using doesn't
+	depends on the size of nums1 or nums2, thus it's Space O(1).
+
+	And it runs a bit faster when we're using a vector, than when we're using
+	a std::unordered_map.
 	
 */
 
@@ -142,14 +166,21 @@ public:
     1. What if the given array is already sorted? How would you optimize your
 	   algorithm?
 	
-	TODO
+	In that case we have two indexes(pointer), one in nums1 and the other in
+	nums2.
+
+	Which ever goes out of bounds first, we return the current state of the
+	vector "results".
 	
 */
+
+/* Time  Beats: 100% */
+/* Space Beats: 54.46% */
 
 /* Time  Complexity: O(max(M * logM, N * logN)) */
 /*
 	Space Complexity: O(1)
-	Assuming Sorting is possible in O(1). For example Heap Sort.
+	Assuming Sorting is possible in O(1) Space. For example Heap Sort.
 */
 class Solution{
 public:
@@ -169,7 +200,7 @@ public:
 				i++;
 			else if (nums1[i] > nums2[j])
 				j++;
-			else if (nums1[i] == nums2[j])
+			else if (nums1[i] == nums2[j]) // Just else, but it's more verbose
 			{
 				results.push_back(nums1[i]);
 				i++;
@@ -219,9 +250,6 @@ public:
 		nums2 = [1, 2, 8]
 		
 	Simulation would go like this:
-	But this assumes that nums2 is sorted. Nope.
+	But this assumes that nums2 is sorted.
 
-	
 */
-
-
