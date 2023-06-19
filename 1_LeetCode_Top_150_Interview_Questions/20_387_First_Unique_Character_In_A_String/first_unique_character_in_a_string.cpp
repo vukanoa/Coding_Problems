@@ -86,3 +86,43 @@ public:
         return -1;
     }
 };
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	ios_base::sync_with_stdio(false); // Why does it this make faster??
+	I have no idea.
+	
+*/
+
+/* Time  Beats: 99.94% */
+/* Space Beats: 89.28% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    int firstUniqChar(string s)
+    {
+        ios_base::sync_with_stdio(false); // Why does it this make faster??
+
+		// 26 is the number of lowercase English letters
+        std::vector<int> map(26, 0); // This is constant, hence Space O(1)
+
+        for (char& c : s)
+            map[c - 'a']++;
+
+        for (int i = 0; i < s.length(); i++)
+        {
+            if (map[s[i] - 'a'] == 1)
+                return i;
+        }
+
+        return -1;
+    }
+};
