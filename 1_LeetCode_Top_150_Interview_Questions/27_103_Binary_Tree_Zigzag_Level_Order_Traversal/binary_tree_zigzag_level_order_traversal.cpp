@@ -87,6 +87,23 @@ struct TreeNode {
 	__4_____5_____6_____7__
 	8___9_10_11_12_13_14_15
 
+	There's this IDEA out there that this problem should be done using only
+	one deque in which you push an entire level and you reverse it at every
+	odd level. However, that's unnecessary.
+
+	The Time Complexity is still O(n), but you have more operations. The wall
+	time clock is longer.
+
+	Instead, we can use two vectors.
+	In one we're pushing only when we are at the odd level and in the other we
+	only push when we are at the even level.
+
+	We always take the elements from the back of the vector.
+
+	When we're at the ODD  level, we first push Left  child and then the Right.
+	When we're at the EVEN level, we first push Right child and then the Left.
+
+	That's it. This is faster.
 	
 */
 
