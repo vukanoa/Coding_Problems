@@ -79,7 +79,59 @@
 	--- IDEA ---
 	------------
 
-	TODO
+	Example 1:
+
+			                    "11106"
+	
+			_______________________._______________________
+			___________1______________________11___________
+			_____1__________11___________1__________10_____
+			__1____10_____F___________F___________6________
+			F_____6_______________________________T________
+			      T
+	
+	We have two "T"s, so the answer is: 2.
+
+	For recursion to stop It's either that:
+		1. dp[i] is not 0
+
+		   or
+
+		2. s[i] == 0
+
+
+	if s[i] == 0, that's F. It means that "combination" is not possible, thus
+	return 0.
+
+	Essentially: dp[i] = dp[i + 1] + dp[i + 2];
+
+	And we do that recursively.
+
+	At one point, index "i" will get out of bounds if a combination is okay, so
+	that's why we have to have: dp(s.length() + 1, 0) and that's why we have to
+	assign dp[s.length()] = 1;
+
+	If we have, successfully, gone through all the elements, without returning
+	0, that means that "path" is valid and must be included in overall count of
+	results.
+
+	So:
+		dp[s.length() + 1] = 1
+	
+	is necessary.
+
+	
+	Example 2:
+
+			                    "12"
+			                 ___________
+			                 _____1_____
+			                 __2____12__
+			                 T_____T____
+	
+	Again, two T's, so the answer is: 2
+	
+	Go through the code for this example and you'll get it.
 	
 */
 
@@ -149,7 +201,61 @@ private:
 	--- IDEA ---
 	------------
 
-	TODO
+
+	Example 1:
+
+			                    "11106"
+	
+			_______________________._______________________
+			___________1______________________11___________
+			_____1__________11___________1__________10_____
+			__1____10_____F___________F___________6________
+			F_____6_______________________________T________
+			      T
+	
+	We have two "T"s, so the answer is: 2.
+
+	For recursion to stop It's either that:
+		1. memo[i] is not 0
+
+		   or
+
+		2. s[i] == 0
+
+
+	if s[i] == 0, that's F. It means that "combination" is not possible, thus
+	return 0.
+
+	Essentially: memo[i] = memo[i + 1] + memo[i + 2];
+
+	And we do that recursively.
+
+	At one point, index "i" will get out of bounds if a combination is okay, so
+	that's why we have to have: memo(s.length() + 1, 0) and that's why we have to
+	assign memo[s.length()] = 1;
+
+	If we have, successfully, gone through all the elements, without returning
+	0, that means that "path" is valid and must be included in overall count of
+	results.
+
+	So:
+		memo[s.length() + 1] = 1
+	
+	is necessary.
+
+	
+	Example 2:
+
+			                    "12"
+			                 ___________
+			                 _____1_____
+			                 __2____12__
+			                 T_____T____
+	
+	Again, two T's, so the answer is: 2
+	
+	Go through the code for this example and you'll get it.
+	ODO
 	
 */
 
@@ -158,7 +264,7 @@ private:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_2 {
 public:
     int memo[100] = {}; // 100 is listed to be a constraint
     int numDecodings(const std::string& s)
@@ -197,7 +303,10 @@ private:
 	--- IDEA ---
 	------------
 
-	TODO
+	Same idea, but implemented in O(1) because we can see that we don't need
+	to use entire array of dp, but only 3 elements.
+
+	Similar to a House Robber problem or the Kadane's Algorithm.
 	
 */
 
