@@ -138,3 +138,39 @@ public:
         return max_profit;
     }
 };
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Same Idea, though, much more neatly written.
+
+	Though, now we don't count "end day - start day", but "today - yesterday"
+	if today is larger than yesterday(i.e. we're going to make a profit).
+	
+*/
+
+/* Time  Beats:  100% */
+/* Space Beats: 79.41% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Neat{
+public:
+	int maxProfit(vector<int>& prices)
+	{
+		int profit = 0;
+
+		for (int i = 1; i < prices.size(); i++)
+		{
+			if (prices[i] > prices[i - 1])
+				profit += prices[i] - prices[i - 1];
+		}
+
+			return profit;
+		}
+};
