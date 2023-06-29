@@ -137,51 +137,50 @@
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    std::string fractionToDecimal(int numerator, int denominator)
+	std::string fractionToDecimal(int numerator, int denominator)
 	{
-        if(!numerator)
+		if(!numerator)
 			return "0";
 
-        std::string result = "";
+		std::string result = "";
 
-        if (numerator > 0 ^ denominator > 0)
+		if (numerator > 0 ^ denominator > 0)
 			result += '-';
 
-        long num = std::labs(numerator);
+		long num = std::labs(numerator);
 		long den = std::labs(denominator);
 
-        long quotient = num / den;
-        long remainder= num % den;
-        result += to_string(quotient);
-        
-        if(remainder == 0)
+		long quotient = num / den;
+		long remainder= num % den;
+		result += to_string(quotient);
+		
+		if(remainder == 0)
 			return result;
-        
-        result += '.';
-        unordered_map<long, int> map;
-
-        while(remainder != 0)
+		
+		result += '.';
+		unordered_map<long, int> map;
+		
+		while(remainder != 0)
 		{
-            if(map.find(remainder) != map.end())
+			if(map.find(remainder) != map.end())
 			{
-                int pos = map[remainder];
-                result.insert(pos, "(");
-                result += ')';
-
-                break;
-            }
-            else
+				int pos = map[remainder];
+				result.insert(pos, "(");
+				result += ')';
+				
+				break;
+			}
+			else
 			{
-                map[remainder] = result.length();
+				map[remainder] = result.length();
 
 				remainder *= 10;
-                quotient  = remainder / den;
+				quotient  = remainder / den;
 				remainder = remainder % den;
 
-                result += to_string(quotient);
-            }
-        }
-
-        return result;
-    }
+				result += to_string(quotient);
+			}
+		}
+			return result;
+	}
 };
