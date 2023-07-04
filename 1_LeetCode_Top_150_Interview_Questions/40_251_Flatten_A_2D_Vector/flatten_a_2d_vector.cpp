@@ -63,6 +63,15 @@
 */
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Straightforward.
+	
+*/
+
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
 class Vector2D {
@@ -89,4 +98,50 @@ public:
 private:
 	std::vector<int> vec;
 	int i = 0;
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Iterator.
+	
+*/
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Vector2D {
+public:
+	Vector2D(vector<vector<int>>& v)
+	{
+		i = v.begin();
+		iEnd = v.end();
+	}
+
+	int next()
+	{
+		moveIterator();
+		return (*i)[j++];
+	}
+
+	bool hasNext()
+	{
+		moveIterator();
+		return i != iEnd;
+	}
+
+private:
+	// (*i)[j] := current pointed value
+	vector<vector<int>>::iterator i, iEnd;
+	int j = 0;
+
+	void moveIterator()
+	{
+		while (i != iEnd && j == (*i).size())
+			++i, j = 0;
+	}
 };
