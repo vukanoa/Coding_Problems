@@ -100,3 +100,37 @@ public:
 		}
 	}
 };
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Same idea, written in a different way.
+
+*/
+
+/* Time  Beats:    89% */
+/* Space Beats: 84.49% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(1) */
+class Solution{
+public:
+	void wiggleSort(vector<int>& nums)
+	{
+		std::vector<int> sorted(nums);
+
+		std::sort(sorted.begin(), sorted.end());
+		int n = nums.size();
+
+		int i = n - 1;
+		int j = 0;
+		int k = i / 2 + 1;
+		for (i = n - 1; i >= 0; i--)
+			nums[i] = sorted[i&1 ? k++ : j++];
+	}
+};
