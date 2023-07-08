@@ -95,6 +95,18 @@
 
 */
 
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	It's self-explanatory. Just code-up the description, it's that easy.
+	
+	The only thing that is "a trick" if you don't knos are these direction
+	vectors.
+*/
+
 /* Time  Beats: 50.44% */
 /* Space Beats: 71.95% */
 
@@ -155,6 +167,64 @@ public:
 			for (int j = 0; j < n; j++)
 			{
 				board[i][j] = result_table[i][j];
+			}
+		}
+	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Since the board has ints but only the 1-bit is used, I use the 2-bit to
+	store the new state. At the end, replace the old state with the new state
+	by shifting all values one bit to the right.	
+
+	Note that the "count" counts the live ones among a cell's neighbors and the
+	cell itself. Starting with int count = -board[i][j] counts only the live
+	neighbors.
+
+*/
+
+/* Time  Beats:   100% */
+/* Space Beats: 95.56% */
+
+/* Time  Complexity: O(m * n) */
+/* Space Complexity: O(1) */
+class Solution{
+public:
+	void gameOfLife(vector<vector<int>>& board)
+	{
+		int m = board.size();
+		int n = board[0].size();
+
+		for (int i = 0; i < m; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				int count = 0;
+
+				for (int x = std::max(i-1, 0); x < std::min(i+2, m); x++)
+				{
+					for (int y = std::max(j-1, 0); y < std::min(j+2, n); y++)
+						count += board[x][y] & 1;
+				}
+
+				if (count == 3 || count - board[i][j] == 3)
+					board[i][j] |= 2;
+			}
+		}
+
+		// Replace board with the next state
+		for (int i = 0; i < m; ++i)
+		{
+			for (int j = 0; j < n; ++j)
+			{
+				board[i][j] >>= 1;
 			}
 		}
 	}
