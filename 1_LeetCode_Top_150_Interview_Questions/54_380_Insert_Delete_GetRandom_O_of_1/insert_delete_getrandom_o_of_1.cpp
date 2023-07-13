@@ -96,11 +96,28 @@ int main()
 	------------
 
 	TODO
+
+	If you write getRandom() function like this:
+		std::random_device dev;
+		std::mt19937 rng(dev());
+
+		// Distribution in range [0, vec.size() - 1]
+		std::uniform_int_distribution<std::mt19937::result_type> gen(0, vec.size() - 1);
+
+		return vec[gen(rng)];
+	
+	It is noticeably slower than simply writing: 
+		return vec[rand() % vec.size()];
 	
 */
 
+// With "mt19937" random number generator
 /* Time  Beats:  5.20% */
 /* Space Beats: 33.72% */
+
+// Using simple modulo arithmetic
+/* Time  Beats: 92.18% */
+/* Space Beats: 65.19% */
 
 /* Time  Complexity: O(1) */
 /* Space Complexity: O(1) */
@@ -136,15 +153,9 @@ public:
 		return true;
     }
     
-    int getRandom()
+	int getRandom()
 	{
-		std::random_device dev;
-		std::mt19937 rng(dev());
-
-		// Distribution in range [0, vec.size() - 1]
-		std::uniform_int_distribution<std::mt19937::result_type> gen(0, vec.size() - 1);
-
-		return vec[gen(rng)];
+        return vec[rand() % vec.size()];
 	}
 
 private:
