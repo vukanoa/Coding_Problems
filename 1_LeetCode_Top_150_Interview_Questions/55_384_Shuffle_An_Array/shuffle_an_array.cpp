@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <random>
 
 /*
 	==============
@@ -80,6 +81,10 @@
 	--- IDEA ---
 	------------
 
+	This is my invention, before I knew "Fisher-Yates" exists. It's almost
+	equivalent. It's just written a bit differently. But other than that it
+	pretty much works the same way.
+
 	The main thing here is that we made a shuffle in O(n) instead of O(n^2).
 	How?
 
@@ -123,19 +128,17 @@
 /* Space Complexity: O(n) */
 class Solution {
 public:
-    Solution(vector<int>& nums)
+    Solution(std::vector<int>& nums)
         : nums(nums), default_nums(nums)
     {}
     
-    vector<int> reset()
+    std::vector<int> reset()
     {
         nums = default_nums;
         return nums;
     }
     
-    // Time  O(n)
-    // Space O(n)
-    vector<int> shuffle()
+    std::vector<int> shuffle()
     {
         std::vector<int> tmp;
 
@@ -174,12 +177,15 @@ private:
 
 
 
+
 /*
 	------------
 	--- IDEA ---
 	------------
 
 	Same idea, but implemented in a better way.
+
+	It turns out that this Algorithm is called "Fisher-Yates" Algorithm.
 
 */
 
@@ -214,4 +220,92 @@ public:
 private:
     std::vector<int> nums;
     std::vector<int> default_nums;
+};
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	This is also "Fisher-Yates" Algorithm.
+
+    Avoid using rand() because it only generates pseudo-random integral value
+	between 0 and RAND_MAX which value is implementation dependent.
+
+    You should also avoid using random_shuffle() which is using rand()
+	(problematic for inputs larger than RAND_MAX).
+
+	Luckily, there are some alternatives, namely, C++ <random> header and
+	std::shuffle. The following example is using <random> to generate
+	pseudo-random numbers along with the Fisher-Yates Shuffle algorithm to
+	produce random permutations of the array:	
+
+
+
+	The code in vector<int> shuffle() could be replaced with std::shuffle like
+	so:
+		vector<int> shuffle()
+		{
+			std::shuffle(begin(arr), end(arr), seed);
+			return arr;
+		}
+
+
+	In-fact, the underlying implementation of std::shuffle is possibly using
+	the same algorithm anyway:
+
+		template<class RandomIt, class URBG>
+		void shuffle(RandomIt first, RandomIt last, URBG&& g)
+		{
+			typedef typename std::iterator_traits<RandomIt>::difference_type diff_t;
+			typedef std::uniform_int_distribution<diff_t> distr_t;
+			typedef typename distr_t::param_type param_t;
+		 
+			distr_t D;
+			diff_t n = last - first;
+			for (diff_t i = n-1; i > 0; --i) {
+				using std::swap;
+				swap(first[i], first[D(g, param_t(0, i))]);
+			}
+		}
+	
+	However, if you're asked this question, it's probably expected to implement
+	it yourself. But it's worth mentioning it anyway.
+
+*/
+
+/* Time  Beats: 75.47% */
+/* Space Beats: 20.16% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+    Solution(std::vector<int>& nums)
+		: nums(nums), default_nums(nums), seed(random_device{}())
+	{}
+
+    std::vector<int> reset()
+	{
+		nums = default_nums;
+		return nums;
+	}
+
+    std::vector<int> shuffle()
+	{
+        for (int x = nums.size() - 1; x > 0; x--)
+		{
+            auto index = uniform_int_distribution<int>(0, x)(seed);
+            std::swap(nums[x], nums[index]);
+        }
+
+        return nums;
+    }
+
+private:
+    std::vector<int> nums;
+    std::vector<int> default_nums;
+
+    default_random_engine seed;
 };
