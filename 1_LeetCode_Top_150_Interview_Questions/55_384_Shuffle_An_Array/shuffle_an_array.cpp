@@ -171,3 +171,47 @@ private:
  * vector<int> param_1 = obj->reset();
  * vector<int> param_2 = obj->shuffle();
  */
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Same idea, but implemented in a better way.
+
+*/
+
+/* Time  Beats: 99.69% */
+/* Space Beats: 44.81% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+    Solution(vector<int>& nums)
+        : nums(nums), default_nums(nums)
+    {}
+    
+    vector<int> reset()
+    {
+        nums = default_nums;
+        return nums;
+    }
+    
+    vector<int> shuffle()
+    {
+		for (int x = 0; x < nums.size(); x++)
+		{
+			int index = rand() % (nums.size() - x);
+			std::swap(nums[x + index], nums[x]);
+		}
+
+		return nums;
+    }
+
+private:
+    std::vector<int> nums;
+    std::vector<int> default_nums;
+};
