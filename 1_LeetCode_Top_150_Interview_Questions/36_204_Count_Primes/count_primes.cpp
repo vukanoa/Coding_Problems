@@ -48,8 +48,62 @@
 	--- IDEA ---
 	------------
 
-	TODO
-	
+	Sieve of Eratosthenes.
+
+	Suppose we are given N = 10
+
+	1  Non-Prime
+	2  Prime
+	3  Prime
+	4  Non-Prime
+	5  Prime
+	6  Non-Prime
+	7  Prime
+	8  Non-Prime
+	9  Non-Prime
+	10 Non-Prime
+
+
+	Now Suppose we are given N = 30
+	1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30
+	P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P
+
+	'-' - True  for all the Composite numbers
+	'P' - False for all the Prime numbers
+
+	At the very beginning we only mark 1 to True since 1 is certainly a
+	Composite number.
+
+	We start from index 2. Since 2 is a Prime number we are going to mark every
+	multiple of 2 as a Composite number(set to "-", meaning "Composite").
+
+	1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30
+	-   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P   P
+
+	After doing a "2", we'll be in this situation:
+
+	1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30
+	-   P   P   -   P   -   P   -   P   -   P   -   P   -   P   -   P   -   P   -   P   -   P   -   P   -   P   -   P   -
+
+	Now we're doing a 3. We will mark all the multiples of 3 as Composite:
+
+	1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30
+	-   P   P   -   P   -   P   -   -   -   P   -   P   -   -   -   P   -   P   -   -   -   P   -   P   -   -   -   P   -
+
+
+	...
+
+	We essentially do that for all N numbers, thus making it O(n).
+	We'll end up with this:
+
+	1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30
+	-   P   P   -   P   -   P   -   -   -   P   -   P   -   -   -   P   -   P   -   -   -   P   -   -   -   P   -   P   -
+
+	Now just traverse this vector and count P's.
+	i.e. count how many Primes("false" values) are there.
+		false == Prime
+		true  == Composite number
+
 */
 
 /* Time  Beats: 36.41% */
