@@ -55,51 +55,58 @@
 
 */
 
+
 /*
 	------------
 	--- IDEA ---
 	------------
 
-	TODO
-	
+	Self-Explanatory code using Stacks(actually vector, but as a stack).
+
 */
 
-/* Time  Beats: 43.92% */
-/* Space Beats: 41.15% */
+/* Time  Beats: 88.05% */
+/* Space Beats: 23.91% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution{
+class Solution_Stack{
 public:
 	int calculate(string s)
 	{
-		std::istringstream in('+' + s + '+');
-
-		long long total = 0;
-		long long term  = 0;
-		long long n;
-
-		char op;
-
-		while (in >> op)
+		char op  = '+'; 
+		int curr = 0; 
+		std::vector<int> stack; 
+		
+		for (int i = 0; i < s.size(); ++i)
 		{
-			if (op == '+' or op == '-')
-			{
-				total += term;
-				in >> term;
-				term *= 44 - op;
-			}
-			else
-			{
-				in >> n;
+			if(std::isdigit(s[i]))
+				curr = curr*10 + (s[i] - '0'); 
 
-				if (op == '*')
-					term *= n;
-				else
-					term /= n;
+			if(i == s.size() - 1 || s[i] == '+' || s[i] == '-' || s[i] == '*' || s[i] == '/')
+			{
+				if (op == '+')
+					stack.push_back(curr); 
+				else if (op == '-')
+					stack.push_back(curr * (-1)); 
+				else if (op == '*')
+				{
+					int num = stack.back();
+					stack.pop_back();
+					stack.push_back(num * curr);
+				}
+				else if (op == '/')
+				{
+					int num = stack.back();
+					stack.pop_back();
+					stack.push_back(num / curr); 
+				}
+
+				curr = 0;
+				op = s[i];      
 			}
 		}
 
-		return total;
+		return accumulate(stack.begin(), stack.end(), 0); 
 	}
 };
