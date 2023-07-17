@@ -14,7 +14,7 @@
 	Description:
 	============
 
-	According to Wikipedia's article: "The Game of Life, also known simply as
+	According to Wikipedia's article: "The Game of Life", also known simply as
 	Life, is a cellular automaton devised by the British mathematician John
 	Horton Conway in 1970."
 
@@ -103,7 +103,7 @@
 
 	It's self-explanatory. Just code-up the description, it's that easy.
 	
-	The only thing that is "a trick" if you don't knos are these direction
+	The only thing that is "a trick" is if you don't know are these direction
 	vectors.
 */
 
