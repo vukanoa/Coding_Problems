@@ -65,8 +65,25 @@
 
 */
 
-/* Time  Beats: 95.37% */
-/* Space Beats: 85.59% */
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Binary Search. Not a typical one.
+
+	Find a "mid" and then count how many items in the matrix are less than or
+	equal to mid.
+
+	Use that information to move "high" or "low" pointers accordingly.
+
+	Repeat the while loop, as in any Binary Search, until "low" becomes greater
+	than or equal to "high".
+
+*/
+
+/* Time  Beats: 93.43% */
+/* Space Beats: 85.47% */
 
 /* Time  Complexity: O(n * log(max_val - min_val)) */
 /* Space Complexity: O(1) */
@@ -83,7 +100,7 @@ public:
 		while (low < high)
 		{
 			int mid = std::floor((high - low) / 2 + low);
-			int cnt = count(matrix, k , mid);
+			int cnt = count(matrix, mid);
 
 			if (cnt >= k)
 				high = mid;
@@ -95,8 +112,7 @@ public:
 	}
 
 private:
-	// O(n), but we could improve it to be O(log n)
-	int count(std::vector<std::vector<int>>& matrix, int k, int mid)
+	int count(std::vector<std::vector<int>>& matrix, int mid)
 	{
 		int cnt = 0;
 		int rows = matrix.size();
