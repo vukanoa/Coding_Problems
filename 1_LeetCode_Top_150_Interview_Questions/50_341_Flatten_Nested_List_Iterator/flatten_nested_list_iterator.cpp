@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 /*
 	==============
@@ -41,7 +42,24 @@
 	as correct.
 
 	===============================
-	FUNCTION: <++>
+	class NestedIterator {
+	public:
+		
+		NestedIterator(vector<NestedInteger> &nestedList) 
+		{
+			
+		}
+		
+		int next() 
+		{
+
+		}
+		
+		bool hasNext() 
+		{
+
+		}
+	};
 	===============================
 
 	==========================================================================
@@ -92,30 +110,50 @@
 	--- IDEA ---
 	------------
 
-	TODO
-	
-*/
+	Once we visualize it, it becomes obvious:
 
+	Example: nestedList = [[1, [3, 4], [5, 6]], 2, [1, 1]]
+
+	[    List    ,    2    ,    List    ]
+	      |                      |
+	      1                      1
+	      |                      |
+	     List - 3, 4             1
+	      |
+	     List - 5, 6
+	
+
+
+	It becomes obvious that we need to use recursion.
+	Recursively push in vector "res" from which we take elements with "next()"
+	function.
+
+	"hasNext()" only checks if index is less than res.size() and returns the
+	boolean value.
+
+*/
 
 /* Time  Beats: 98.50% */
 /* Space Beats: 33.27% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
 class NestedIterator {
 public:
     
-    vector<int> res; //store final result
-    int idx=0; //store index
+    vector<int> res; // Store final result
+    int index = 0;     // Store index
     
-    void flattenList(vector<NestedInteger> &nestedList)
+    void flattenList(std::vector<NestedInteger> &nestedList)
     {
-        for(auto x:nestedList)
+        for(auto& x : nestedList)
         {
-            //if x is int then push it into the vector res
+            // If x is int then push it into the vector res
             if(x.isInteger())
             {
                 res.push_back(x.getInteger());
             }
-            
-            //if x is list then call the flattenList function again
+            // If x is list then call the flattenList function again
             else
             {
                 flattenList(x.getList());
@@ -123,23 +161,24 @@ public:
         }
     }
     
-    NestedIterator(vector<NestedInteger> &nestedList) 
+    NestedIterator(std::vector<NestedInteger> &nestedList) 
     {
-        //call the flattenList function to make the 1d array of whole nestedList
+        // Call the flattenList function to make the 1D array of the entire
+		// nestedList
         flattenList(nestedList);
-        
     }
     
     int next() 
     {
-        //return the value at index idx
-        return res[idx++];   
+        // Return the value at index index
+        return res[index++];   
     }
     
     bool hasNext() 
     {
-        //check whether next elements is available or not by checking index value is less than res size
-        return idx<res.size();   
+        // Check whether next elements is available or not by checking if index
+		// value is less than res size
+        return index < res.size();   
     }
 };
 
