@@ -51,10 +51,37 @@
 	--- IDEA ---
 	------------
 
-	Basic Sliding with with HashMap.
-	
-*/
+	Basic Sliding Window with a HashMap.
 
+	We'll keep track of "left" and "right" pointers since we're doing a Sliding
+	Window technique.
+
+	While right boundary is within the string 's', do the following:
+		
+		(
+		  if number of distinct elements in our Hashmap is equal to k
+			and
+		  if the current element is NOT one of the distinct ones in the Hashmap
+		)
+		then:
+			std::max(result up until this point, right - left);
+	
+			We should remove all the characters on the left until we
+			have k-1 distinct ones in the Hashmap(because our current
+			s[right] is not the distinct one and we need **at most** k)
+
+
+		Either way, always ask if the current element, i.e. map[s[right]] == 0:
+			If it is that means it's a new distinct element, therefore we
+			should increment the number of distinct elements.
+
+		At the end, always, increment the number of occurrences of that element
+		in the Hash Map.
+	
+	After the while loop has ended, we got the longest substring with at most
+	k elements in our "result" variable. Just return that.
+
+*/
 
 /* Time  Complexity: O(n) */
 /*
@@ -80,21 +107,18 @@ public:
 
 		while (right < s.length())
 		{
-			if (distinct == k)
+			if (distinct == k && map[s[right] - 'a'] == 0)
 			{
-				if (map[s[right] - 'a'] == 0)
+				result = std::max(result, right - left);
+
+				while (distinct > k-1)
 				{
-					result = std::max(result, right - left);
+					map[s[left] - 'a']--;
 
-					while (distinct > k-1)
-					{
-						map[s[left] - 'a']--;
+					if (map[s[left] - 'a'] == 0)
+						distinct--;
 
-						if (map[s[left] - 'a'] == 0)
-							distinct--;
-
-						left++;
-					}
+					left++;
 				}
 			}
 
