@@ -54,6 +54,67 @@
 
 */
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Consider this Example:
+		A = [ 1,  2]
+		B = [-2, -1]
+		C = [-1,  2]
+		D = [ 0,  2]
+
+	Brute force comes to mind first - Just loop through these arrays in 4 loops
+	and try to form all the possible tuples and see how many tuples have the
+	sum of 0.
+
+	If we were to try to implement it using 4 for loops, we'd get a TLE.
+
+	So what can we do to reduce Time Complexity?
+
+	What if we took the last vector "D" and put its values and occurences in an
+	unordered Hash Map?
+
+	    Hash Map
+	|  Key : Value |
+	+--------------+
+	|   0  :   1   |
+	+--------------+
+	|   2  :   1   |
+	+--------------+
+
+	Now we can implement it using 3 for loops. That's certainly better.
+	We would iterate through the 3 for loops and in the third, the most inner
+	one, we'd ask if the sum of (-(a + b + c) == d).
+
+	Why the "Minus"? (-(a + b + c))?
+
+	We are searching for a sum of 3. Let's put it in an equation:
+	
+	    a + b + c + d = 0
+	        a + b + c = -d  / *(-1)
+	      -(a + b + c)= +d
+	
+	But this would also give us a TLE.
+
+	So what in the world do we have to do?
+
+	That was close to the answer. We have to put both "C" and "D" vectors in a
+	Hash Map. Or to be more precise - We have to put the sum of each
+	combination from "C" and "D" into a Hash Map and then do the same, but now
+	with only 2 for loops.
+
+	2 for loops to put "C" and "D" into a Hash Map
+
+	+
+
+	2 for loops to search (-(a + b) in a Hash Map)
+
+	So the Time Complexity is: O(n^2) + O(n^2) => O(n^2)
+
+*/
+
 /* Time  Beats: 56.29% */
 /* Space Beats: 98.80% */
 
