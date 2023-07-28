@@ -73,21 +73,22 @@
 
 
 	*** Constraints ***
-    m == board.length
-    n == board[i].length
-    1 <= m, n <= 12
-    board[i][j] is a lowercase English letter.
-    1 <= words.length <= 3 * 10^4
-    1 <= words[i].length <= 10
-    words[i] consists of lowercase English letters.
-    All the strings of words are unique.
+	m == board.length
+	n == board[i].length
+	1 <= m, n <= 12
+	board[i][j] is a lowercase English letter.
+	1 <= words.length <= 3 * 10^4
+	1 <= words[i].length <= 10
+	words[i] consists of lowercase English letters.
+	All the strings of words are unique.
 
 */
 
-/* Time  Complexity: TLE */
 
-/* Time  Complexity: O(wods.length * m * n) */
-/* Space Complexity: O(words[i].length) */
+/* Time  Complexity: TLE. Used to pass all tests prior to June 2022. */
+
+/* Time  Complexity: O(words.length * m * n * 4^words.length) */
+/* Space Complexity: O(words.length + m * n) */
 class Solution_TLE_Solution {
 public:
 	std::vector<std::string> findWords(std::vector<std::vector<char>>& board, std::vector<std::string>& words)
@@ -184,13 +185,117 @@ private:
 	--- IDEA ---
 	------------
 
-	TODO
+	Looking at the previous TLE Solution we can see that we are, sort of, doing
+	repetitive work. It seems as though we can optimize it.
+
+	In the above Solution, we're going through each word and for each word,
+	we're going to try each of the letter in the board(unless, of course, we
+	happen to find the whole word starting from a position before the last one
+	in the board, in that case, we won't check the remaining letter on the
+	board for that specific word, since we have already found it).
+
+	However, thinking about it, we can see that it would be more optimal, if we
+	could, somehow, iterate through the board only once, and for each letter
+	we're on we can ask if that is the starting letter and then if it is, we
+	consider it as we do a dfs on that letter. And then every subsequent letter
+	we "take" while doing this dfs we can ask if that prefix exists in our
+	wordlist.
+
+	Since we have asked a question:"Does that PREFIX exists in our wordlist?"
+	that highly suggests that, to solve this problem optimally, we must use a
+	Trie as a data structure.
+
+	Let's have an example wordlist:["app", "ape", "ace", "blue"]
+
+	For this wordlist, our Prefix Tree(aka "Trie") would look like this:
+
+	                      Prefix Tree(aka "Trie")
+	                           /    |
+	                          a     b
+	                        / |     |
+	                       p  c     l
+	                     / |  |     |
+	                    p  e  e     u
+	                                |
+	                                e
+	    Board
+	+-----+-----+
+	|  a  |  c  |
+	+-----+-----+
+	|  p  |  e  |
+	+-----+-----+
+
+	Now we start with letter 'a' at board[0][0] as the starting letter and we
+	are checking if there are any letter that are starting with letter 'a'.
+	How are we checking that?
+
+	In the Trie, we have a field named "children", which consists of 26 letters
+	which are nullptr at the beginning. Once a word with a certain letter that
+	previously was nullptr start with it, insert its characters level by level
+	in the appropriate level.
+
+	This way, we can check if there are any words in our wordlist that begin
+	with any letter and not only that, but we can achieve such functionality in
+	O(1) Time Complexity.
+
+	We only have to check if root->children[letter_we_are_searching_for] is
+	nullptr.
+
+	If it is then that means there is no word that starts with that letter.
+	Otherwise, there is.
+
+	So, in this case, we start with letter 'a' in board[0][0] and we do a DFS
+	on it. Each time we're checking if a certain PREFIX exists in the trie.
+	It's essentially as if we're doing a subproblem each time. That's why we
+	always pass the "Trie level" of the letter we're on.
+
+	What do I mean by this?
+
+	Original Trie:
+
+	                      Prefix Tree(aka "Trie") // Root Level(0th level)
+	                           /    |
+	                          a     b
+	                        / |     |
+	                       p  c     l
+	                     / |  |     |
+	                    p  e  e     u
+	                                |
+	                                e
 	
+	Once we start with letter 'a':
+
+	                      Prefix Tree(aka "Trie") // 1st level
+	                        / | 
+	                       p  c 
+	                     / |  | 
+	                    p  e  e 
+	                            
+	Since we're ON the letter 'a', we can only see the "subtrees" from it.
+	Therefore, we only see letters 'p' and 'c'.
+	Meaning that in our wordlist, only letters 'p' and 'c' come afer letter 'a'
+	which is true since our wordlist looks like this:
+
+		["app", "ape", "ace", "blue"]
+
+	Once we're on the letter 'a', we can only have either letter 'p' or 'c'.
+
+	We do that for every letter on the board as a starting letter.
+
+	That way the Time Complexity is highly optimized.
+
+	From:
+		O(words.length * m * n * 4^words.length)
+	to
+		O(m * n * 4^words.length)
+
 */
 
 /* Time  Beats: 95.83% */
 /* Space Beats: 69.66% */
 
+/* Time  Complexity: O(m * n * 4^words.length) */
+/* Space Complexity: O(words.length + m * n) */
 class Solution {
 	struct TrieNode {
 	TrieNode *children[26];
@@ -217,7 +322,7 @@ public:
 			}
 		}
 
-			return result;
+		return result;
 	}
 
 	/* Inserts a word into the Trie */
@@ -225,19 +330,19 @@ public:
 	{
 		TrieNode *root = new TrieNode();
 
-		for (int j = 0; j < words.size(); j++)
+		for (int i = 0; i < words.size(); i++)
 		{
-			std::string word = words[j];
+			std::string word = words[i];
 			TrieNode *curr = root;
 
-			for (int i = 0; i < word.length(); i++) 
+			for (int j = 0; j < word.length(); j++) 
 			{
-				char c = word[i] - 'a';
+				int letter_index = word[j] - 'a';
 
-				if (curr->children[c] == nullptr)
-					curr->children[c] = new TrieNode();
+				if (curr->children[letter_index] == nullptr)
+					curr->children[letter_index] = new TrieNode();
 
-				curr = curr->children[c];
+				curr = curr->children[letter_index];
 			}
 
 			curr->word = word;
@@ -246,29 +351,30 @@ public:
 		return root;
 	}
 
-	void dfs(std::vector<std::vector<char>>& board, int i, int j, TrieNode *p, std::vector<std::string>& result)
+	void dfs(std::vector<std::vector<char>>& board, int i, int j, TrieNode *trie, std::vector<std::string>& result)
 	{
 		char c = board[i][j];
 
-		if (c == '#' || !p->children[c - 'a'])
+		if (c == '#' || !trie->children[c - 'a'])
 			return;
 
-		p = p->children[c - 'a'];
+		trie = trie->children[c - 'a'];
 
-		if (p->word.size() > 0)
+		if (trie->word.size() > 0)
 		{
-			result.push_back(p->word);
-			p->word = "";
+			result.push_back(trie->word);
+			trie->word = "";
 		}
 
 		int m = board.size();
 		int n = board[0].size();
 
 		board[i][j] = '#';
-		if (i > 0)     dfs(board, i - 1, j    , p, result);
-		if (j > 0)     dfs(board, i    , j - 1, p, result);
-		if (i < m - 1) dfs(board, i + 1, j    , p, result);
-		if (j < n - 1) dfs(board, i    , j + 1, p, result);
+
+		if (i > 0)     dfs(board, i - 1, j    , trie, result); // Up
+		if (j > 0)     dfs(board, i    , j - 1, trie, result); // Left
+		if (i < m - 1) dfs(board, i + 1, j    , trie, result); // Down
+		if (j < n - 1) dfs(board, i    , j + 1, trie, result); // Right
 
 		board[i][j] = c;
 	}
