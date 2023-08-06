@@ -180,7 +180,7 @@
 /* Space Complexity: O(1) */
 class Codec {
 public:
-    std::string encode(std::vector<std::string>& strs)
+	std::string encode(std::vector<std::string>& strs)
 	{
 		std::ostringstream out;
 
@@ -188,9 +188,9 @@ public:
 			out << str.size() << '#' << str;
 
 		return out.str();
-    }
+	}
 
-    std::vector<std::string> decode(std::string s)
+	std::vector<std::string> decode(std::string s)
 	{
 		std::vector<std::string> decoded_str;
 
@@ -212,5 +212,5 @@ public:
 		}
 
 		return decoded_str;
-    }
+	}
 };

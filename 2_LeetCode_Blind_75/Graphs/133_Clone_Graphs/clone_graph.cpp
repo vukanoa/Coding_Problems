@@ -88,20 +88,20 @@
 // Definition for a Node.
 class Node {
 public:
-    int val;
-    std::vector<Node*> neighbors;
-    Node() {
-        val = 0;
-        neighbors = std::vector<Node*>();
-    }
-    Node(int _val) {
-        val = _val;
-        neighbors = std::vector<Node*>();
-    }
-    Node(int _val, std::vector<Node*> _neighbors) {
-        val = _val;
-        neighbors = _neighbors;
-    }
+	int val;
+	std::vector<Node*> neighbors;
+	Node() {
+		val = 0;
+		neighbors = std::vector<Node*>();
+	}
+	Node(int _val) {
+		val = _val;
+		neighbors = std::vector<Node*>();
+	}
+	Node(int _val, std::vector<Node*> _neighbors) {
+		val = _val;
+		neighbors = _neighbors;
+	}
 };
 */
 
@@ -124,7 +124,7 @@ public:
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    Node* cloneGraph(Node* node)
+	Node* cloneGraph(Node* node)
 	{
 		if (node == nullptr)
 			return nullptr;
@@ -146,7 +146,7 @@ public:
 		}
 
 		return umap.at(node);
-    }
+	}
 
 private:
 	void create_clones(Node* node, std::unordered_map<Node*, Node*>& umap, std::unordered_set<int>& uset)
