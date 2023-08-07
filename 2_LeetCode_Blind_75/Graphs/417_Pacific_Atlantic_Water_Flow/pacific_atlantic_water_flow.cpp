@@ -194,3 +194,87 @@ private:
 			dfs(i, j+1, height, ocean);
 	}
 };
+
+
+
+
+/********************************/
+/********* Another DFS **********/
+/********************************/
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	TODO
+	
+*/
+
+/* Time  Beats: 99.05% */
+/* Space Beats: 77.09% */
+
+/* Time  Complexity: O(m * n) */
+/* Space Complexity: O(m * n) */
+class Solution {
+public:
+	// Trick for this problem: Go from outside towards the inside
+	std::vector<std::vector<int>> pacificAtlantic(std::vector<std::vector<int>>& heights)
+	{
+		int m = heights.size();
+		int n = heights[0].size();
+
+		std::vector<std::vector<int>> results;
+
+		std::vector<std::vector<bool>> pacific (m, std::vector<bool>(n));
+		std::vector<std::vector<bool>> atlantic(m, std::vector<bool>(n));
+
+		for (int i = 0; i < m; i++)
+		{
+			dfs(heights, pacific,  i, 0);
+			dfs(heights, atlantic, i, n-1);
+		}
+		
+		for (int j = 0; j < n; j++)
+		{
+			dfs(heights, pacific,  0,   j);
+			dfs(heights, atlantic, m-1, j);
+		}
+		
+		
+		for (int i = 0; i < m; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				if (pacific[i][j] && atlantic[i][j]) // If both occurrences can be reached from that particular point
+					results.push_back({i, j});       // Store it in results
+			}
+		}
+
+		return results;
+	}
+
+private:
+	void dfs(std::vector<std::vector<int>>& heights, std::vector<std::vector<bool>>& visited, int i, int j)
+	{
+		int m = heights.size();
+		int n = heights[0].size();
+
+		visited[i][j] = true;
+
+		// Up
+		if (i-1 >= 0 && visited[i-1][j] != true && heights[i-1][j] >= heights[i][j])
+			dfs(heights, visited, i-1, j);
+
+		// Down
+		if (i+1 < m && visited[i+1][j] != true && heights[i+1][j] >= heights[i][j])
+			dfs(heights, visited, i+1, j);
+
+		// Left
+		if (j-1 >= 0 && visited[i][j-1] != true && heights[i][j-1] >= heights[i][j])
+			dfs(heights, visited,  i,  j-1);
+
+		// Righeightst
+		if (j+1 < n && visited[i][j+1] != true && heights[i][j+1] >= heights[i][j])
+			dfs(heights, visited,  i,  j+1);
+	}
+};
