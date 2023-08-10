@@ -97,6 +97,12 @@ public:
  *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
  * };
  */
+
+/* Time  Beats: 99.34% */
+/* Space Beats: 7.21% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
 class Solution {
 public:
 	int goodNodes(TreeNode* root)
@@ -115,7 +121,7 @@ private:
 	void dfs(TreeNode* root, int& count, std::stack<int>& stack)
 	{
 		if (root->val >= stack.top())
-			stack.push(root->left->val);
+			stack.push(root->val);
 		
 		if (root->left != nullptr)
 		{
@@ -127,7 +133,7 @@ private:
 
 		if (root->right != nullptr)
 		{
-			if (root->right->val >= stack.top)
+			if (root->right->val >= stack.top())
 				count++;
 			
 			dfs(root->right, count, stack);
