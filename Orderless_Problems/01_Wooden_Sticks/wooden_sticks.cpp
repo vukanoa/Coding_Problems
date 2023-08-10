@@ -1,74 +1,75 @@
 #include <iostream>
 
-int solution (int A, int B);
-
-int
-main()
+int solution(int A, int B)
 {
-	// int x = solution(10, 21);
-	// int x = solution(21, 10);
-	// int x = solution(5, 21);
-	// int x = solution(4, 21);
+	if (A+B <= 3)
+		return 0;
 
-	// int x = solution(2, 1);
-	// int x = solution(1, 8);
+	// Make sure A is always longer so that we don't have to "duplicate" code
+	if(A < B)
+		std::swap(A, B);
 
-	// int x = solution(15, 18);
-	// int x = solution(13, 31);
-	int x = solution(13, 13);
-
-	std::cout << "\n\tSolution is: " << x << std::endl << std::endl;
+	if (A/4 > B)
+		return A/4;
+	else if (A/3 >= B)
+		return B;
+	else if (A/3 < B)
+		return std::max(A/3, B/2);
 
 	return 0;
 }
 
-
 int
-solution (int a, int b)
+main()
 {
-	if (a <= 0 && b <= 0)
-		return 0;
-	else if (a <= 0 && b <= 3)
-		return 0;
-	else if (a <= 3 && b <= 0)
-		return 0;
-	else if (a + b <= 3)
-		return 0;
-	
-	int t_a = a;
-	int t_b = b;
-	
-	if (a < b)
-	{
-		while (b / a < 3)
-			a--;
+	/* Example 1 */
+	// int a = 10;
+	// int b = 21;
 
-		if (a < b/4)
-			return b/4;
-		else
-		{
-			if (a < t_a/2)
-				return t_a/2;
+	/* Example 2 */
+	// int a = 21;
+	// int b = 10;
 
-			return a;
-		}
-	}
-	else
-	{
-		while (a / b < 3)
-			b--;
+	/* Example 3 */
+	// int a = 5;
+	// int b = 21;
 
-		if (b < a/4)
-			return a/4;
-		else
-		{
-			if (b < t_b/2)
-				return t_b/2;
+	/* Example 4 */
+	// int a = 4;
+	// int b = 21;
 
-			return b;
-		}
+	/* Example 5 */
+	// int a = 2;
+	// int b = 1;
 
-	}
+	/* Example 6 */
+	// int a = 1;
+	// int b = 8;
+
+	/* Example 7 */
+	// int a = 15;
+	// int b = 18;
+
+	/* Example 8 */
+	// int a = 13;
+	// int b = 31;
+
+	/* Example 9 */
+	int a = 13;
+	int b = 13;
+
+	std::cout << "\n\t=====================";
+	std::cout << "\n\t=== WOODEN STICKS ===";
+	std::cout << "\n\t=====================\n";
+
+	/* Write Input */
+	std::cout << "\n\tInput: A = " << a << ", B = " << b << "\n";
+
+	/* Solution */
+	int result = solution(a, b);
+
+	/* Write Onput */
+	std::cout << "\n\tSolution is: " << result << std::endl << std::endl;
 
 	return 0;
 }
