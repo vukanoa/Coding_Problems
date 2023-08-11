@@ -1,8 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <utility>
-#include <algorithm>
-
 /*
 
 	Example 1
@@ -50,81 +45,68 @@
 
 */
 
+#include <iostream>
+#include <vector>
+#include <climits>
 
-/* Naive, not efficient solution */
-/*
-bool
-solution(int N, std::vector<int> &A, std::vector<int> &B)
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+int solution(int N, std::vector<int>& A, std::vector<int>& B)
 {
-	int cur = 1;
-	int i = 0;
-	while (i < A.size())
-	{
-		if (A[i] == cur && B[i] == cur+1)
-		{
-			if (cur+1 == N)
-				return true;
-			else
-			{
-				cur++;
-				i = 0;
-				continue;
-			}
-		}
-		else if (B[i] == cur && A[i] == cur+1)
-		{
+	int M = A.size();
 
-			if (cur+1 == N)
-				return true;
-			else
-			{
-				cur++;
-				i = 0;
-				continue;
-			}
-		}
-		i++;
+	// To have a straight path(such as 1 - 2 - 3), you need minimum N-1 edges
+	if (M < N-1)
+		return false;
+	
+	// N+1 so that I don't have to worry about indexing
+	std::vector<int> map(N+1, INT_MAX);
+
+	for (int i = 0; i < M; i++)
+	{
+		if (B[i] > A[i] && B[i] < map[A[i]])
+			map[A[i]] = B[i];
+
+		if (A[i] > B[i] && A[i] < map[B[i]])
+			map[B[i]] = A[i];
 	}
 
-	return false;
-}
+/*
+	A = [1, 2, 4, 4, 3]
+	B = [2, 3, 1, 3, 1]
+
+	1 : 2
+	2 : 3
+	3 : 4
+	4 : INT_MAX
 */
 
-
-bool
-solution(int N, std::vector<int> &A, std::vector<int> &B)
-{
-	int cur = 1;
-	int i = 0;
-	while (i < A.size())
+	/* Starting from the index: 1 for the ease of indexing explained above */
+	/*
+	   Going up until N, even though we index from 1 since we don't have to
+	   check if the Nth number(4 in this case) is connected further
+	*/
+	for (int i = 1; i < N; i++)
 	{
-		if (A[i] == cur && B[i] == cur+1)
-		{
-			if (cur+1 == N)
-				return true;
-			else
-				cur++;
-		}
-		else if (B[i] == cur && A[i] == cur+1)
-		{
+		// If not connected at all
+		if (map[i] == INT_MAX)
+			return false;
 
-			if (cur+1 == N)
-				return true;
-			else
-				cur++;
-		}
-		i++;
+		// If not connected to subsequent node
+		if (map[i] != i + 1)
+			return false;
 	}
 
-	return false;
+	return true;
 }
+
 
 int
 main()
 {
 	/* Example 1 */
 	int N = 4;
-	std::vector<int> A = {1, 2, 4, 4, 5};
+	std::vector<int> A = {1, 2, 4, 4, 3};
 	std::vector<int> B = {2, 3, 1, 3, 1};
 
 	/* Example 2 */
@@ -142,57 +124,47 @@ main()
 	// std::vector<int> A = {1, 3};
 	// std::vector<int> B = {2, 2};
 
-
-	/* Before sorting */
-	std::cout << "\n\tBefore: \n";
-	std::cout << "\t\tN: " << N << "\n";
-
-	std::cout << "\n\t\tA: ";
-	for(auto x: A)
-		std::cout << x << " ";
-	std::cout << "\n";
-
-	std::cout << "\n\t\tB: ";
-	for(auto x: B)
-		std::cout << x << " ";
-	std::cout << "\n";
+	std::cout << "\n\t========================";
+	std::cout << "\n\t=== GRAPH ONE BY ONE ===";
+	std::cout << "\n\t========================\n";
 
 
-	/* Sort */
-	std::vector< std::pair <int,int> > vect;
-
-    for (int i = 0; i < A.size(); i++)
-        vect.push_back( std::make_pair(A[i], B[i]));
-
-	std::sort(vect.begin(), vect.end());
-
-	for ( int i = 0; i < 5; ++i )
+	/* Write Input */
+	std::cout << "\n\tInput";
+	std::cout << "\n\t\tN: " << N;
+	bool first = true;
+	std::cout << "\n\t\tA: [";
+	for (auto x: A)
 	{
-		A[i] = vect[i].first;
-		B[i] = vect[i].second;
+		if (!first)
+			std::cout << ", ";
+
+		std::cout << x;
+		first = false;
 	}
+	std::cout << "]";
+
+	first = true;
+	std::cout << "\n\t\tB: [";
+	for (auto x: B)
+	{
+		if (!first)
+			std::cout << ", ";
+
+		std::cout << x;
+		first = false;
+	}
+	std::cout << "]\n\n";
 
 
-	/* After sorting */
-	std::cout << "\n\tAfter: \n";
-	std::cout << "\t\tN: " << N << "\n";
 
-	std::cout << "\n\t\tA: ";
-	for(auto x: A)
-		std::cout << x << " ";
-	std::cout << "\n";
-
-	std::cout << "\n\t\tB: ";
-	for(auto x: B)
-		std::cout << x << " ";
-	std::cout << "\n";
+	/* Solution */
+	bool sol = solution(N, A, B);
 
 
-	/* Solve the problem */
-	std::cout << "\n\t=========\n";
-	std::cout << "\tSolution:\n";
-	std::cout << "\t=========\n";
-	if (solution(N, A, B))
+	/* Write Output */
+	std::cout << "\n\tSolution: ";
+	if (sol)
 		std::cout << "\n\t\tThe path from 1 to " << N << " does INDEED exist!\n\n";
 	else
 		std::cout << "\n\t\tThe path from 1 to " << N << " does NOT exist!\n\n";
