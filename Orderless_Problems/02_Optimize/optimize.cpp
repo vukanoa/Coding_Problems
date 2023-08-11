@@ -39,8 +39,19 @@ int solution(vector<int> &A)
 }
 */
 
+/*
+	I've solved it in two similar ways.
+*/
+
+
+
 using namespace std;
 
+/*
+	****************
+	*** ORIGINAL ***
+	****************
+*/
 
 int original(vector<int>& A)
 {
@@ -55,6 +66,15 @@ int original(vector<int>& A)
 	return result;
 }
 
+
+/*
+	**************************
+	*** FIRST OPTIMIZATION ***
+	**************************
+*/
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
 int solution(std::vector<int>& A)
 {
 	if (A.size() == 1)
@@ -111,6 +131,43 @@ int solution(std::vector<int>& A)
 
 	result = std::max(result, 0   + first_diff_from_right);
 	result = std::max(result, n-1 - first_diff_from_left);
+
+	return result;
+}
+
+
+
+
+/*
+	*********************************
+	*** EVEN GREATER OPTIMIZATION ***
+	*********************************
+*/
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+int solution(std::vector<int>& A)
+{
+	int n = A.size();
+	if (n == 1)
+		return 0;
+	
+	std::unordered_set<int> unique_elements;
+	int result = 0;
+
+	for (int i = 0; i < n; i++)
+	{
+		if (unique_elements.find(A[i]) == unique_elements.end())
+		{
+			unique_elements.insert(A[i]);
+
+			if (A[i] != A[n - 1])
+			{
+				result = std::max(result, i);
+				result = std::max(reuslt, n - 1 - i);
+			}
+		}
+	}
 
 	return result;
 }
