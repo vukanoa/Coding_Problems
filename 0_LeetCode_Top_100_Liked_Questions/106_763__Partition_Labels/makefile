@@ -1,7 +1,7 @@
 .PHONY = all clean
 
 all:
-	g++ daily_temperatures.cpp -o program
+	g++ partition_labels.cpp -o program
 
 clean:
 	rm -f program

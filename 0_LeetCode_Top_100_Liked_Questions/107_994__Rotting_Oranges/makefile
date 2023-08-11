@@ -1,7 +1,7 @@
 .PHONY = all clean
 
 all:
-	g++ partition_labels.cpp -o program
+	g++ rotting_oranges.cpp -o program -g
 
 clean:
 	rm -f program

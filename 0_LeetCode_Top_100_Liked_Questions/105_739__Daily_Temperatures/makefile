@@ -1,7 +1,7 @@
 .PHONY = all clean
 
 all:
-	g++ permutation_in_string.cpp -o program
+	g++ daily_temperatures.cpp -o program
 
 clean:
 	rm -f program

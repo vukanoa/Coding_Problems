@@ -1,7 +1,7 @@
 .PHONY = all clean
 
 all:
-	g++ subarray_sum_equals_k.cpp -o program -g
+	g++ permutation_in_string.cpp -o program
 
 clean:
 	rm -f program

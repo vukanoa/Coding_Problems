@@ -1,7 +1,7 @@
 .PHONY = all clean
 
 all:
-	g++ diameter_of_binary_tree.cpp -o program
+	g++ subarray_sum_equals_k.cpp -o program -g
 
 clean:
 	rm -f program

@@ -1,7 +1,7 @@
 .PHONY = all clean
 
 all:
-	g++ binary_search.cpp -o program
+	g++ path_sum_iii.cpp -o program
 
 clean:
 	rm -f program

@@ -1,7 +1,7 @@
 .PHONY = all clean
 
 all:
-	g++ rotting_oranges.cpp -o program -g
+	g++ longest_common_subsequence.cpp -o program
 
 clean:
 	rm -f program
