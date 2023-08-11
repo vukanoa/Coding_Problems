@@ -1,120 +1,116 @@
 #include <iostream>
 #include <vector>
-#include <unordered_set>
-#include <map>
+#include <deque>
+#include <unordered_map>
 
-
-/*
-	==========
-	Complexity
-	==========
-	
-	O(n)      - Time // If we get reeeeally unlucky then O(n^2)
-	O(R)      - Space, where R is Number of Unique elements in Original array
-*/
-
-int
-solution(std::vector<int>& A)
+int solution(std::vector<int>& A)
 {
-	/* Map */
-	std::map<int, int> map;
+	int n = A.size();
+	std::unordered_map<int, int> umap;
 
 	// O(n)
-	for(const int& x: A) // Fill hash table with occurence per each unique element
-		map[x]++;
+	// Count the occurrences of each number
+	for (int i = 0; i < n; i++)
+		umap[A[i]]++;
 
-	// O(R), where R is Number of Unique elements, R <= N -> O(N)
-	// for (auto x : map)
-	// 	std::cout << "[" << x.first << "] = " << x.second << std::endl;
+	std::vector<int> occur(n + 1, 0);
 
-
-	/* Maps & Set*/
-	std::map<int, int> occur;
-	std::map<int, int> to_del;
-	std::unordered_set<int> set;
-
-	int ret_count = 0;
-	int tmp = 0;
+	// O(n)
+	// Vector of occurrences
+	for (const auto& entry : umap)
+		occur[entry.second]++;
 
 
-	std::vector<int>::iterator it;
-
-	// O(n) // O(n^2) in the very worst case where we have disastrous hash table
-	for(it = A.begin(); it != A.end();)
+	std::deque<int> deque;
+	bool flag = false;
+	// O(n)
+	// Push all occurences that don't happen in this array. But push only those
+	// that are less than the largest occurrence in the array since we are
+	// allower to delete only
+	for (int i = n; i >= 0; i--)
 	{
-		int index = std::distance(A.begin(), it);
-		if (!set.count(*it)) // If exists in the set, O(1), unlikely to be O(n)
+		if (flag == false && occur[i] != 0)
+			flag = true;
+
+		if (flag == true && occur[i] == 0)
+			deque.push_back(i);
+	}
+
+	std::unordered_map<int, int> map_occur;
+
+	// O(n)
+	// Make a Hash Map of occurrences as a key
+	for (const auto& entry : umap)
+	{
+		if (map_occur.find(entry.second) == map_occur.end())
+			map_occur.insert({entry.second, 1});
+		else
+			map_occur[entry.second]++;
+	}
+
+	int deletions = 0;
+	// O(n)
+	for (auto& entry : map_occur)
+	{
+		while (entry.second > 1)
 		{
-			if (occur[map[*it]] == 0) // If that num of occurence hasn't happened
-			{
-				occur[map[*it]] = *it;
-				set.insert(*it); // O(1), it's unlikely that we would have O(n)
-				it++;
-			}
+			if (deque.empty())
+				deletions += entry.first;
 			else
 			{
-				tmp = map[*it];
-				while (occur[map[*it]] != 0 && map[*it] > 0)
-				{
-					map[*it]--;
-					ret_count++;
-				}
-
-				if (map[*it] > 0)
-					occur[map[*it]] = *it;
-
-				set.insert(*it); // O(1), it's unlikely that we would have O(n)
-				to_del[*it] = tmp - map[*it]; 
-				to_del[*it]--;
-
-				A.erase(it);
+				deletions += entry.first - deque.front();
+				deque.pop_front();
 			}
-		}
-		else if(to_del[*it] > 0)
-		{
-			to_del[*it]--;
-			A.erase(it);
-		}
-		else
-		{
-			it++;
+
+			entry.second--;
 		}
 	}
 
-	return ret_count;
+	return deletions;
 }
+
 
 int
 main()
 {
-	/* Vectors */
-	std::vector<int> A = {1, 1, 1, 2, 2, 2};
+	std::cout << "\n\t=========================";
+	std::cout << "\n\t=== UNIQUE OCCURRENCE ===";
+	std::cout << "\n\t=========================\n";
+
+	/* Example 1 */
+	// std::vector<int> A = {1, 1, 1, 2, 2, 2};
+
+	/* Example 2 */
 	// std::vector<int> A = {5, 3, 3, 2, 5, 2, 3, 2};
+
+	/* Example 3 */
 	// std::vector<int> A = {127, 15, 3, 8, 10};
-	// std::vector<int> A = {10000000, 10000000, 5, 5, 5, 2, 2, 2, 1, 1};
 
-	std::cout << "\n\n";
-	std::cout << "\tBEFORE:";
-	std::cout << "\n\t\t";
+	/* Example 4 */
+	std::vector<int> A = {1000000, 1000000, 5, 5, 5, 2, 2, 2, 0, 0};
 
-	// Print the array BEFORE the call of function solution
-	for(const int& x : A)
-		std::cout << x << " ";
+	/* Write Input */
+	std::cout << "\n\tInput:";
+	bool first = true;
+	std::cout << "\n\t\tA: [";
+	for (auto x: A)
+	{
+		if (!first)
+			std::cout << ", ";
+
+		std::cout << x;
+		first = false;
+	}
+	std::cout << "]\n\n";
 
 
+	/* Solution */
 	int sol = solution(A);
-	
-	std::cout << "\n\n\n";
-	std::cout << "\tSolution is: " << sol;
-	std::cout << "\n\n\n";
 
-	std::cout << "\tAFTER:";
-	std::cout << "\n\t\t";
 
-	// Print the array AFTER the call of function solution
-	for(const int& x : A)
-		std::cout << x << " ";
-
+	/* Write Output */
+	std::cout << "\n\tSolution:";
+	std::cout << "\n\t\tResult: " << solution(A);
 	std::cout << "\n\n";
 
 	return 0;
