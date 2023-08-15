@@ -66,7 +66,7 @@
 	
 	Update: I added one more Solution, the 5th one. I believe it is the most
 	        concise. However, maybe the 3rd one still remains easier to
-			comprehend.
+	        comprehend.
 
 */
 
@@ -503,23 +503,23 @@ class Solution_Concise {
 public:
 	int rob(std::vector<int>& nums)
 	{
-        int n = nums.size();
+		int n = nums.size();
 
-        if (n == 1)
-            return nums[0];
-        
-        int prev = 0;
-        int curr = 0;
+		if (n == 1)
+		    return nums[0];
 
-        for (int i = 0; i < n; i++)
-        {
-            int tmp = std::max(prev + nums[i], curr);
+		int prev = 0;
+		int curr = 0;
 
-            prev = curr;
-            curr = tmp;
-        }
+		for (int i = 0; i < n; i++)
+		{
+			int tmp = std::max(prev + nums[i], curr);
 
-        return curr;
+			prev = curr;
+			curr = tmp;
+		}
+
+		return curr;
 	}
 };
 
