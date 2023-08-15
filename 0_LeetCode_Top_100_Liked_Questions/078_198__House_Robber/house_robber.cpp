@@ -63,6 +63,10 @@
 	explanation of the 3rd Solution down below.
 
 	I believe that is the most clear on how to solve this problem.
+	
+	Update: I added one more Solution, the 5th one. I believe it is the most
+	        concise. However, maybe the 3rd one still remains easier to
+			comprehend.
 
 */
 
@@ -479,6 +483,47 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	The most concise.
+
+*/
+
+/* Time  Beats:   100% */
+/* Space Beats: 94.28% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Concise {
+public:
+	int rob(std::vector<int>& nums)
+	{
+        int n = nums.size();
+
+        if (n == 1)
+            return nums[0];
+        
+        int prev = 0;
+        int curr = 0;
+
+        for (int i = 0; i < n; i++)
+        {
+            int tmp = std::max(prev + nums[i], curr);
+
+            prev = curr;
+            curr = tmp;
+        }
+
+        return curr;
+	}
+};
+
+
 int
 main()
 {
@@ -486,6 +531,7 @@ main()
 	Solution_1_Space_Efficient        sol_1_space;
 	Solution_Reusable                 sol_reusable;
 	Solution_Reusable_Space_Efficient sol_reusable_space;
+	Solution_Concise                  sol_concise;
 
 
 	/* Example 1 */
@@ -530,7 +576,8 @@ main()
 	// int money = sol_1.rob(nums);
 	// int money = sol_1_space.rob(nums);
 	// int money = sol_reusable.rob(nums);
-	int money = sol_reusable_space.rob(nums);
+	// int money = sol_reusable_space.rob(nums);
+	int money = sol_concise.rob(nums);
 
 
 	/* Write Output */
