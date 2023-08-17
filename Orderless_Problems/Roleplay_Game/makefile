@@ -1,7 +1,7 @@
 .PHONY = all clean
 
 all:
-	g++ learning_skills_graph.cpp -o program
+	g++ roleplay_game.cpp -o program
 
 clean:
 	rm -f program
