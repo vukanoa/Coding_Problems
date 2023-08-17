@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <sstream>
 #include <string>
 
 /*
@@ -17,114 +19,153 @@
     2 - A[2][1] => y - A[3][1] => 1 - A[3][0]
 */
 
-// Check in 3x3 submatrix
-int x[] = { -1, -1, -1, 0, 0, 1, 1, 1 };
-int y[] = { -1, 0, 1, -1, 1, -1, 0, 1 };
-
-
-std::string
-transform(std::string U)
-{
-	std::string word;
-	char cur = U[0];
-	int  cnt = 0;
-
-	word.push_back(U[0]);
-
-	for (int i  = 0; i < U.length(); i++)
+/* Time  Complexity: O(Y^2 * 4^(Y^2)) */
+/* Space Complexity: O(Y^2) */
+class Solution{
+public:
+	int solution(std::vector<char>& A, int Y, std::string U)
 	{
-		if (i > 0 && U[i] != U[i-1])
+		std::vector<std::vector<char>> matrix(Y, std::vector(Y, 'a'));
+
+		// Form a Matrix
+		int pointer = 0;
+		for (int i = 0; i < Y; i++)
 		{
-			word.push_back(cnt + 48); // 0 = 48 in ASCII
-			word.push_back(U[i]);
-			cur = U[i];
-			cnt = 1;
+			for (int j = 0; j < Y; j++)
+				matrix[i][j] = A[pointer++];
 		}
-		else
-			cnt++;
+
+		// Form a Word in the format [letter, digit, letter, ...]
+		std::ostringstream out;
+
+		int i = 0;
+		pointer = i + 1;
+		while (i < U.length())
+		{
+			while (pointer < U.length() && U[i] == U[pointer])
+				pointer++;
+
+			out << U[i] << pointer - i;
+
+			i = pointer;
+			pointer++;
+		}
+
+		// Word in necessarity format
+		std::string W = out.str();
+		for (int i = 0; i < Y; i++)
+		{
+			for (int j = 0; j < Y; j++)
+			{
+				if (W[0] == matrix[i][j])
+				{
+					int up    = i;
+					int down  = i;
+					int left  = j;
+					int right = j;
+
+					if (dfs(matrix, i, j, W, 1, up, down, left, right))
+						return true;
+				}
+			}
+		}
+
+		return false;
 	}
-	word.push_back(cnt + 48); // 0 = 48 in ASCII
 
-	return word;
-}
+private:
+	bool dfs(std::vector<std::vector<char>>& matrix,
+	         int i,
+	         int j,
+	         std::string& W,
+	         int x,
+			 int up,
+			 int down,
+			 int left,
+			 int right)
+	{
+		if (x == W.length())
+			return down - up <= 2 && right - left <= 2; // Within submatrix_3x3
 
+		// Up, Down, Left, Right
+		std::vector<std::pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
-bool
-not_out_or_previous(int row, int col, int prev_row, int prev_col, int Y)
-{
-    return (row >= 0) && (row < Y) && (col >= 0) && (col < Y) && !(row == prev_row && col == prev_col);
-}
+		for (const auto& dir : directions)
+		{
+			int row = i + dir.first;
+			int col = j + dir.second;
 
+			if (row >= 0 && row < matrix.size() && col >= 0 && col < matrix[0].size())
+			{
+				if (std::isdigit(W[x]) && matrix[row][col] - '0' >= W[x] - '0'
+				   ||
+				   W[x] == matrix[row][col])
+				{
+					int u = std::min(up,    row);
+					int d = std::max(down,  row);
+					int l = std::min(left,  col);
+					int r = std::max(right, col);
 
-bool search_matrix(char mat[][4], int row, int col, int prev_row, int prev_col, std::string word, std::string path, int index, int n, int Y)
-{
-    if (index > n || mat[row][col] != word[index]) // If character doesn't match with next character in the word
-        return false;
+					if (dfs(matrix, row, col, W, x+1, u, d, l, r))
+						return true;
+				}
+			}
+		}
 
-    // Append
-    path += std::string(1, word[index]) + "(" + std::__cxx11::to_string(row) + ", " + std::__cxx11::to_string(col) + ") ";
-
-
-    if (index == n) // Current character matches with the last character in the word -> Found. Done.
-    {
-        std::cout << "\n\t" << path << "\n";
-        return true;
-    }
-
-    for (int k = 0; k < 8; ++k)
-    {
-        if (not_out_or_previous(row + x[k], col + y[k], prev_row, prev_col, Y))
-        {
-            if (search_matrix(mat, row + x[k], col + y[k], row, col, word, path, index + 1, n, Y))
-                return true;
-        }
-    }
-
-    return false;
-}
-
-
-bool
-solution(char mat[][4], int Y, std::string U)
-{
-	std::string word = transform(U);
-	int n = word.size() - 1;
-
-    for (int i = 0; i < Y; ++i)
-    {
-        for (int j = 0; j < Y; ++j)
-        {
-            if (mat[i][j] == word[0])
-            {
-                if (search_matrix(mat, i, j, -1, -1, word, "", 0, n, Y))
-                    return true;
-            }
-        }
-    }
-
-    return false;
-}
+		return false;
+	}
+};
 
 
 int
 main()
 {
-	int Y = 4;
-    char mat[4][4] = {
-                            {'x', '1', 'd', '2'},
-                            {'1', 'a', '1', 'd'},
-                            {'c', '2', 'r', '1'},
-                            {'1', 'y', '3', 'i'}
-    };
+	Solution sol;
 
-	std::string U = "carry";     // does INDEED exist
+	/* Example 1 */
+	// std::vector<char> A = {'x', '1', 'd', '2', '1', 'a', '1', 'd', 'c', '2', 'r', '1', '2', 'y', '3', 'i'};
+	// int Y = 4;
+	// std::string U = "carry";     // does INDEED exist
+
+	/* Example 2 */
+	// std::vector<char> A = {'x', '1', 'd', '2', '1', 'a', '1', 'd', 'c', '2', 'r', '1', '2', 'y', '3', 'i'};
+	// int Y = 4;
 	// std::string U = "carrw";  // does NOT    exist
 
-    if (solution(mat, Y, U))
+	/* Example 3 */
+	std::vector<char> A = {'x', '1', 'd', '2', '1', 'a', '1', 'd', 'c', '2', 'r', '1', '2', 'y', '3', 'i'};
+	int Y = 4;
+	std::string U = "ccyyyrdd";     // Exist but out of 3x3 submatrix, therefore - FALSE
+
+
+	std::cout << "\n\t===================";
+	std::cout << "\n\t=== JOHN PUZZLE ===";
+	std::cout << "\n\t===================\n";
+
+
+	/* Write Input */
+	std::cout << "\n\tMatrix: \n\t\t";
+	for (int i = 0; i < Y; i++)
+	{
+		for (int j = 0; j < Y; j++)
+			std::cout << A[i * Y + j] << " ";
+
+		std::cout << "\n\t\t";
+	}
+	std::cout << "\n\tU = \"" << U << "\"\n";
+
+	/* Solution */
+	bool found = sol.solution(A, Y, U);
+
+	/* Write Output */
+    if (found)
 		std::cout << "\n\t" << "Word \"" << U << "\" does INDEED exist in the matrix!\n\n";
     else
-		std::cout << "\n\tWord \"" << U << "\" does NOT exist in the matrix!\n\n";
+	{
+		std::cout << "\n\tWord \"" << U << "\" does NOT exist in the matrix!\n";
+		std::cout << "\t(Atleast not within 3x3 submatrix)\n\n";
+	}
 
 
-    return 0;
+	return 0;
 }
