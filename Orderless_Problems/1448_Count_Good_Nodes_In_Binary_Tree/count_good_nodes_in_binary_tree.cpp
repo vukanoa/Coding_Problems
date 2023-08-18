@@ -77,26 +77,6 @@
  *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
  * };
  */
-class Solution {
-public:
-	int goodNodes(TreeNode* root)
-	{
-
-	}
-};
-
-
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
- *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- * };
- */
 
 /* Time  Beats: 99.34% */
 /* Space Beats: 7.21% */
@@ -143,3 +123,42 @@ private:
 			stack.pop();
 	}
 };
+
+
+
+
+/* Time  Beats: 98.03% */
+/* Space Beats: 67.51% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+	int goodNodes(TreeNode* root)
+	{
+		if(root == NULL)
+			return 0;
+
+		int count = 0;
+		dfs(root, root->val, count);
+
+		return count;
+	}
+
+private:
+	void dfs(TreeNode* root, int max, int& count)
+	{
+		if(root == NULL)
+			return;
+		
+		// If max value of ancestors is less than or equal to curr node then increment count
+		if(root->val >= max)
+			count++;
+
+		max = std::max(max, root->val);
+
+		dfs(root->left,  max, count);
+		dfs(root->right, max, count);
+	}
+};
+
