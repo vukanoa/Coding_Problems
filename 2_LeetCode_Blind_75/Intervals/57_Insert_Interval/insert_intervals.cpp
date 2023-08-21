@@ -53,6 +53,37 @@
 
 */
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	There are 3 possibilities:
+	        1. It's before the first interval
+	        2. It's after  the last  interval
+	        3. It's overlapping
+	        4. It's a separate new interval that needs to be pushed somewhere in the middle
+
+	Consider this example:
+	        intervals = [[3, 5], [8, 10], [15, 18]]
+
+	All the possible cases:
+	        1.  [0, 1]   // Before the first interval
+	        2.  [0, 4]   // Overlapping
+	        3.  [0, 16]  // Overlapping
+	        4.  [0, 19]  // Overlapping
+	        5.  [3, 8]   // Overlapping
+	        6.  [3, 15]  // Overlapping
+	        7.  [6, 7]   // New separate interval
+	        8.  [6, 17]  // Overlapping
+	        9.  [6, 19]  // Overlapping
+	        10. [16, 20] // Overlapping
+	        11. [19, 20] // After the last interval
+	
+	It's pretty much self-explanatory.
+
+*/
+
 /* Time  Beats: 69.92% */
 /* Space Beats: 26.73% */
 
@@ -84,6 +115,59 @@ public:
 		}
 
 		result.push_back(newInterval);
+
+		return result;
+	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	This Solution is more in the spirit of C++
+
+*/
+
+/* Time  Beats: 98.73% */
+/* Space Beats: 51.03% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+	std::vector<std::vector<int>> insert(std::vector<std::vector<int>>& intervals, std::vector<int>& newInterval)
+	{
+		int n = intervals.size();
+		int i = 0;
+		std::vector<std::vector<int>> result;
+		
+		// Case 1: no overlapping case before the merge intervals
+		// Compare ending point of intervals to starting point of newInterval
+		while(i < n && intervals[i][1] < newInterval[0])
+		{
+			result.push_back(intervals[i]);
+			i++;
+		}                           
+
+		// Case 2: overlapping case and merging of intervals
+		while(i < n && newInterval[1] >= intervals[i][0])
+		{
+			newInterval[0] = min(newInterval[0], intervals[i][0]);
+			newInterval[1] = max(newInterval[1], intervals[i][1]);
+			i++;
+		}
+		result.push_back(newInterval);
+
+		// Case 3: no overlapping of intervals after newinterval being merged
+		while(i < n)
+		{
+			result.push_back(intervals[i]);
+			i++;
+		}
 
 		return result;
 	}
