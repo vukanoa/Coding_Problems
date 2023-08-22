@@ -174,8 +174,8 @@ public:
 	
 */
 
-/* Time  Beats: 91.68% */
-/* Space Beats: 74.62% */
+/* Time  Beats:   100% */
+/* Space Beats: 63.24% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -194,7 +194,7 @@ public:
 			while (right > left && !alpha_num(s[right]))
 				right--;
 
-			if (std::tolower(static_cast<unsigned char>(s[left])) != std::tolower(static_cast<unsigned char>(s[right])))
+			if (std::tolower((s[left])) != std::tolower((s[right])))
 				return false;
 
 			left++;
