@@ -404,12 +404,58 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	My Efficient way.
+	
+*/
+
+/* Time  Beats: 89.89% */
+/* Space Beats: 97.54% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_My_Efficient {
+public:
+	int lengthOfLongestSubstring(std::string s)
+	{
+		int n = s.length();
+		std::vector<int> ascii(128, 0);
+
+		int longest = 0;
+
+		int left  = 0;
+		int right = 0;
+
+		while (right < n)
+		{
+			ascii[s[right]]++;
+
+			while (ascii[s[right]] > 1)
+				ascii[s[left++]]--;
+
+			longest = std::max(longest, right - left + 1);
+
+			right++;
+		}
+
+		return longest;
+	}
+};
+
+
 int
 main()
 {
-	Solution sol;
-	Solution_N sol_n;
-	Solution_Efficient sol_efficient;
+	Solution              sol;
+	Solution_N            sol_n;
+	Solution_Efficient    sol_efficient;
+	Solution_My_Efficient sol_my_efficient;
 
 	/* Example 1 */
 	// std::string s = "abcabcbb";
@@ -435,6 +481,7 @@ main()
 	// int longest = sol.lengthOfLongestSubstring(s);
 	// int longest = sol_n.lengthOfLongestSubstring(s);
 	int longest = sol_efficient.lengthOfLongestSubstring(s);
+	// int longest = sol_my_efficient.lengthOfLongestSubstring(s);
 
 	/* Write Output */
 	std::cout << "\n\tLongest: " << longest << "\n\n";
