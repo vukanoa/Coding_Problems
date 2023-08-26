@@ -739,13 +739,65 @@ public:
 };
 
 
+
+
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V) */
+class Solution_My_Invention {
+public:
+	bool canFinish(int n, std::vector<std::vector<int>>& pre)
+	{
+        std::vector<bool> path(n, false);
+        std::unordered_set<int> visit;
+
+        std::vector<std::vector<int>> adj_list(n);
+
+        // Make adjecency list
+        for (auto& edge : pre)
+            adj_list[edge[0]].push_back(edge[1]);
+        
+        for (int i = 0; i < n; i++)
+        {
+            if (!topological(i, adj_list, path, visit))
+                return false;
+        }
+
+        return visit.size() == n;
+	}
+
+    bool topological(int node, std::vector<std::vector<int>>& adj_list, std::vector<bool>& path, std::unordered_set<int>& visit)
+    {
+        // Loop
+        if (path[node] == true)
+            return false;
+
+        if (visit.count(node)) // Exists in the set
+            return true;
+        
+        path[node] = true;
+        visit.insert(node);
+
+        for (int j = 0; j < adj_list[node].size(); j++)
+        {
+            if (!topological(adj_list[node][j], adj_list, path, visit))
+                return false;
+        }
+
+        path[node] = false;
+
+        return true;
+    }
+};
+
+
 int
 main()
 {
-	Solution_Neat_DFS sol_dfs;
-	Solution sol;
-	Solution_Topological sol_topo;
+	Solution_Neat_DFS      sol_dfs;
+	Solution               sol;
+	Solution_Topological   sol_topo;
 	Solution_Topological_2 sol_topo_2;
+	Solution_My_Invention  sol_my;
 
 
 	/* Example 1 */
@@ -803,7 +855,8 @@ main()
 	// if (sol_dfs.canFinish(numCourses, prerequisites))
 	// if (sol.canFinish(numCourses, prerequisites))
 	// if (sol_topo.canFinish(numCourses, prerequisites))
-	if (sol_topo_2.canFinish(numCourses, prerequisites))
+	// if (sol_topo_2.canFinish(numCourses, prerequisites))
+	if (sol_my.canFinish(numCourses, prerequisites))
 		std::cout << "\n\tResult: Possible!\n\n";
 	else
 		std::cout << "\n\tResult: Impossible!\n\n";
