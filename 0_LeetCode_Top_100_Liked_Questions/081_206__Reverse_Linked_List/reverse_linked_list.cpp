@@ -135,6 +135,44 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Much more simple recursive Solution.
+
+*/
+
+/* Time  Beats: 73.79% */
+/* Space Beats:  5.53% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Simple_Recursion{
+public:
+	ListNode* reverseList(ListNode* head)
+	{
+		if (head == nullptr)
+			return nullptr;
+
+		ListNode* new_head = head;
+
+		if (head->next)
+		{
+			new_head = reverseList(head->next);
+			head->next->next = head;
+		}
+
+		head->next = nullptr;
+
+		return new_head;
+	}
+};
+
+
 void
 print_list(struct ListNode* head)
 {
