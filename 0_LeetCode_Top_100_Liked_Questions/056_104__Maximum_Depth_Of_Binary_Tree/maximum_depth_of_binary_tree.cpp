@@ -74,8 +74,8 @@ struct TreeNode {
 
 */
 
-/* Time  Beats: 73.50% */
-/* Space Beats: 63.71% */
+/* Time  Beats: 100% */
+/* Space Beats: 34.31% */
 
 /*	Time  Complexity: O(n) */
 /*
@@ -89,10 +89,7 @@ public:
 		if (root == nullptr)
 			return 0;
 
-		int max_left  = maxDepth(root->left);
-		int max_right = maxDepth(root->right);
-
-		return std::max(max_left, max_right) + 1;
+		return 1 + std::max(maxDepth(root->left), maxDepth(root->right));
 	}
 };
 
@@ -116,7 +113,7 @@ public:
 	Space Complexity: O(h)
 	Where 'h' is the height of the tree, for the recursive stack.
 */
-class Solution_2 {
+class Solution_DFS {
 private:
 	void dfs(TreeNode* root, int current, int& max)
 	{
@@ -137,6 +134,97 @@ public:
 		dfs(root, 0, max);
 
 		return max;
+	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Using BFS(i.e. Level-Order)
+	
+*/
+
+/* Time  Beats: 88.24% */
+/* Space Beats:  9.20% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_BFS {
+public:
+	int maxDepth(TreeNode* root)
+	{
+		if (root == nullptr)
+			return 0;
+
+		int level = 0;
+		std::queue<TreeNode*> queue;
+
+		// Emplace is a bit faster than "push" for custom Data Types
+		queue.emplace(root);
+
+		while (!queue.empty())
+		{
+			int nodes_at_this_level = queue.size();
+
+			for (int i = 0; i < nodes_at_this_level; i++)
+			{
+				TreeNode* node = queue.front();
+				queue.pop(); // Pop from the front because it's a queue
+
+				if (node->left)
+					queue.emplace(node->left);
+				
+				if (node->right)
+					queue.emplace(node->right);
+			}
+
+			level++;
+		}
+
+		return level;
+	}
+};
+
+
+
+/* Time  Beats: 67.09% */
+/* Space Beats:  9.20% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Iterative_DFS_Preorder {
+public:
+	int maxDepth(TreeNode* root)
+	{
+		std::stack<std::pair<TreeNode*, int>> stack;
+
+		stack.push({root, 1});
+		int result = 0;
+
+		while (!stack.empty())
+		{
+			std::pair<TreeNode*, int> entry = stack.top();
+			stack.pop();
+
+			TreeNode* node = entry.first;
+			int depth = entry.second;
+
+			if (node)
+			{
+				result = std::max(result, depth);
+				
+				// We are adding nullptr as well
+				stack.push({node->left,  depth + 1});
+				stack.push({node->right, depth + 1});
+			}
+		}
+
+		return result;
 	}
 };
 
@@ -221,8 +309,10 @@ print_levelorder(TreeNode* root)
 int
 main()
 {
-	Solution   sol;
-	Solution_2 sol_2;
+	Solution                        sol;
+	Solution_DFS                    sol_dfs;
+	Solution_BFS                    sol_bfs;
+	Solution_Iterative_DFS_Preorder sol_iter;
 
 
 	/* Example 1 */
