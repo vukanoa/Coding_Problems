@@ -168,6 +168,56 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Using Dummy node to avoid the initial if-else.
+	It's a beat more neatly written.
+
+*/
+
+/* Time  Beats: 100% */
+/* Space Beats: 11.47% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Dummy{
+public:
+	ListNode* mergeTwoLists(ListNode* list1, ListNode* list2)
+	{
+		ListNode* dummy = new ListNode();
+		ListNode* tail = dummy;
+
+		while (list1 && list2)
+		{
+			if (list1->val < list2->val)
+			{
+				tail->next = list1;
+				list1 = list1->next;
+			}
+			else
+			{
+				tail->next = list2;
+				list2 = list2->next;
+			}
+
+			tail = tail->next;
+		}
+
+		if (list1)
+			tail->next = list1;
+		else if (list2)
+			tail->next = list2;
+
+		return dummy->next;
+	}
+};
+
+
 void
 print_list(struct ListNode* head)
 {
@@ -191,7 +241,8 @@ print_list(struct ListNode* head)
 int
 main()
 {
-	Solution sol;
+	Solution       sol;
+	Solution_Dummy sol_dummy;
 
 	/* Example 1 */
 	ListNode four1(4);
@@ -234,7 +285,8 @@ main()
 
 
 	// Solution
-	ListNode* head = sol.mergeTwoLists(list1, list2);
+	// ListNode* head = sol.mergeTwoLists(list1, list2);
+	ListNode* head = sol_dummy.mergeTwoLists(list1, list2);
 
 
 	/* Write Input */
