@@ -82,3 +82,35 @@ public:
         return num;
     }
 };
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Another way of implementing it.
+
+*/
+
+
+/* Time  Beats:   100% */
+/* Space Beats: 28.56% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    int hammingWeight(uint32_t n)
+    {
+        int count = 0;
+
+        while (n)
+        {
+            count += n & 1;
+            n >>= 1;
+        }
+
+        return count;
+    }
+};
