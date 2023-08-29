@@ -151,6 +151,9 @@ public:
 	
 */
 
+/* Time  Beats: 90.33% */
+/* Space Beats: 58.62% */
+
 /* Time  Beats: 83.57% */
 /* Space Beats: 97.10% */
 
@@ -159,35 +162,34 @@ public:
 	Space Complexity: O(M)
 	Where M is the number of different values in vector "nums".
 */
-class Solution_Heap_2{
+class Solution_Heap_2 {
 public:
 	std::vector<int> topKFrequent(std::vector<int>& nums, int k)
 	{
 		// Key=Number    Value=Frequency
-		std::unordered_map<int, int> map;
+		std::unordered_map<int, int> umap_freq;
 
-		// Step 1: Store frequence of all elements in a map
+		// Step 1: Store frequence of all elements in a Hash Map
 		// O(N)
-		for (int n : nums)
-			map[n]++;
+		for (int& num : nums)
+			umap_freq[num]++;
 
 		// Step 2: Build a Heap
 		// O(M * logM), where M is number of different values in vector "nums"
 		// O(M) for traversing through "map", O(logM) to push in a Heap
 		std::priority_queue<std::pair<int, int>> max_heap;
-		for (const auto& it: map)
-			max_heap.push({it.second, it.first});
-
-		std::vector<int> results;
+		for (auto& entry : umap_freq)
+			max_heap.push({entry.second, entry.first});
 
 		// Step 3: Pop top K elements and store the numbers in "results" vector
 		// O(K)
+		std::vector<int> results;
 		while (k--)
 		{
-			auto& tmp = max_heap.top();
-			results.push_back(tmp.second);
-
+			std::pair<int, int> pair = max_heap.top();
 			max_heap.pop();
+
+			results.push_back(pair.second);
 		}
 
 		return results;
