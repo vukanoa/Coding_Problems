@@ -179,11 +179,55 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Similar to first solution, just in one pass.
+
+*/
+
+/* Time  Beats: 98.72% */
+/* Space Beats: 96.71% */
+
+/* Time  Complexity: O(k * n * logn) */
+/* Space Complexity: O(k * n)     */
+class Solution_Efficient {
+public:
+	std::vector<std::vector<std::string>>
+	groupAnagrams(std::vector<std::string>& strs)
+	{
+		std::unordered_map<std::string, int> umap;
+		std::vector<std::vector<std::string>> results;
+		
+		for (const std::string& str: strs)
+		{
+			std::string key = str;
+			std::sort(key.begin(), key.end());
+			
+			if (umap.find(key) == umap.end()) // New Anagram
+			{
+				umap[key] = results.size();
+				results.push_back({});
+			}
+
+			results[umap[key]].push_back(str);
+		}
+
+			return results;
+	}
+};
+
+
 int
 main()
 {
-	// Solution sol;
-	Solution_improved sol_improved;
+	// Solution          sol;
+	// Solution_improved sol_improved;
+	Solution_Efficient sol_eff;
 
 	/* Example 1 */
 	std::vector<std::string> strs = {"eat", "tea", "tan", "ate", "nat", "bat"};
@@ -227,7 +271,8 @@ main()
 
 	/* Solution */
 	// std::vector<std::vector<std::string>> results = sol.groupAnagrams(strs);
-	std::vector<std::vector<std::string>> results = sol_improved.groupAnagrams(strs);
+	// std::vector<std::vector<std::string>> results = sol_improved.groupAnagrams(strs);
+	std::vector<std::vector<std::string>> results = sol_eff.groupAnagrams(strs);
 
 
 	/* Write Output */
