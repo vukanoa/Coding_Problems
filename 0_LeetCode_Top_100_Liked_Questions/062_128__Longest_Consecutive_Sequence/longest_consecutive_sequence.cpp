@@ -219,10 +219,53 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Equivalent Solution implemented more in the Spirit of C++.
+
+*/
+
+/* Time  Beats: 23.43% */
+/* Space Beats: 70.15% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Spirit_CPP {
+public:
+	int longestConsecutive(std::vector<int>& nums)
+	{
+        std::unordered_set<int> uset(nums.begin(), nums.end());
+        
+        int longest = 0;
+        for (const int& num : nums)
+        {
+            if (uset.count(num - 1)) // Not a start of the sequence
+                continue;
+
+            int next_num = num + 1;
+            int curr_sequence_len = 1;
+
+            while (uset.count(next_num++)) // Exists in the set
+                curr_sequence_len++;
+            
+            longest = std::max(longest, curr_sequence_len);
+        }
+
+        return longest;
+	}
+};
+
+
 int
 main()
 {
-	Solution sol;
+	Solution            sol;
+	Solution_Spirit_CPP sol_cpp;
 
 	/* Example 1 */
 	std::vector<int> nums = {100, 4, 200, 1, 3, 2};
@@ -259,7 +302,8 @@ main()
 
 
 	/* Solution */
-	int max = sol.longestConsecutive(nums);
+	// int max = sol.longestConsecutive(nums);
+	int max = sol_cpp.longestConsecutive(nums);
 
 
 	/* Write Output */
