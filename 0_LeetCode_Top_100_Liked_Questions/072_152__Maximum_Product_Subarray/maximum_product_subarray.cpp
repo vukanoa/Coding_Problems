@@ -357,11 +357,46 @@ public:
 };
 
 
+
+
+/* Time  Beats: 93.83% */
+/* Space Beats: 20.59% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Intuitive{
+public:
+	int maxProduct(std::vector<int>& nums)
+	{
+		int n = nums.size();
+		int max = std::max(nums[0], nums[n-1]);
+
+		int dp = nums[0];
+		for (int i = 1; i < n; i++)
+		{
+			dp = dp == 0 ? nums[i] : nums[i] * dp;
+			max = std::max(max, dp);
+		}
+
+		dp = nums[n - 1];
+		for (int i = n - 2; i >= 0; i--)
+		{
+			dp = dp == 0 ? nums[i] : nums[i] * dp;
+			max = std::max(max, dp);
+		}
+
+		return max;
+	}
+};
+
+
+
 int
 main()
 {
-	Solution_DP sol_dp;
-	Solution_Neat_DP sol_neat_dp;
+	Solution_DP        sol_dp;
+	Solution_Neat_DP   sol_neat_dp;
+	Solution_Intuitive sol_intuitive;
 
 	/* Example 1 */
 	// std::vector<int> nums = {2, 3, -2, 4};
@@ -422,6 +457,7 @@ main()
 	/* Solution */
 	// int product = sol_dp.maxProduct(nums);
 	int product = sol_neat_dp.maxProduct(nums);
+	// int product = sol_intuitive.maxProduct(nums);
 
 
 	/* Write Output */
