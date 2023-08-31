@@ -341,12 +341,52 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	This is how you find the Pivot in a Rotated Sorted array.
+	This is by far the simplest Solution.
+
+*/
+
+/* Time  Beats: 100% */
+/* Space Beats: 50.98% */
+
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(1) */
+class Solution_Find_Pivot_Simplest {
+public:
+	int findMin(std::vector<int>& nums)
+	{
+        int left  = 0;
+        int right = nums.size() - 1;
+
+        while (left < right)
+        {
+            int mid = left + (right - left) / 2;
+
+            if (nums[mid] > nums[right])
+                left = mid + 1;
+            else
+                right = mid;
+        }
+
+        return nums[right];
+	}
+};
+
+
 int
 main()
 {
-	Solution_BS_Recursively sol_rec;
-	Solution_BS_Iteratively sol_iter;
-	Solution_BS_Short       sol_short;
+	Solution_BS_Recursively      sol_rec;
+	Solution_BS_Iteratively      sol_iter;
+	Solution_BS_Short            sol_short;
+	Solution_Find_Pivot_Simplest sol_pivot;
 
 
 	/* Example 1 */
@@ -405,7 +445,8 @@ main()
 	/* Solution */
 	// int min = sol_rec.findMin(nums);
 	// int min = sol_iter.findMin(nums);
-	int min = sol_short.findMin(nums);
+	// int min = sol_short.findMin(nums);
+	int min = sol_pivot.findMin(nums);
 
 
 	/* Write Output */
