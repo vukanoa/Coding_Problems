@@ -195,3 +195,98 @@ private:
 		}
 	}
 };
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	The merge function is different so I wanted to have both Solutions here.
+
+*/
+
+/* Time  Beats: 76.48% */
+/* Space Beats: 60.16% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    void reorderList(ListNode* head)
+	{
+        if (head == nullptr || head->next == nullptr)
+            return;
+        
+        ListNode* slow = head;
+        ListNode* fast = head->next;
+
+        while (fast && fast->next)
+        {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+
+        ListNode* head2 = slow->next;
+        
+        // Unlink two halves
+        slow->next = nullptr;
+
+        // Reverse second half
+        head2 = reverse_list(head2);
+
+        // Merge alternating between two halves
+        head = merge_alternate_two_lists(head, head2);
+    }
+
+private:
+    ListNode* reverse_list(ListNode* head)
+    {
+        ListNode* prev = nullptr;
+        ListNode* curr = head;
+
+        while (curr)
+        {
+            ListNode* next = curr->next;
+
+            curr->next = prev;
+            prev = curr;
+            curr = next;
+        }
+
+        return prev;
+    }
+
+    ListNode* merge_alternate_two_lists(ListNode* list1, ListNode* list2)
+    {
+        ListNode* dummy = new ListNode();
+        ListNode* tail = dummy;
+
+        int i = 0;
+        while (list1 && list2)
+        {
+            if (i % 2 == 0) // Even
+            {
+                tail->next = list1;
+                list1 = list1->next;
+            }
+            else // Odd
+            {
+                tail->next = list2;
+                list2 = list2->next;
+            }
+
+            tail = tail->next;
+            i++;
+        }
+
+        if (list1)
+            tail->next = list1;
+        else
+            tail->next = list2;
+        
+        return dummy->next;
+    }
+};
