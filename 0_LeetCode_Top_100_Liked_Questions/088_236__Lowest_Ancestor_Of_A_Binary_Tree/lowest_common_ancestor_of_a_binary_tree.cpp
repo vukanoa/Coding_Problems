@@ -142,60 +142,60 @@ class Solution {
 private:
 	int inorder_search(TreeNode* root, TreeNode* x, std::stack<TreeNode*>& stack_x)
 	{
-	    if (root == nullptr)
-	        return 0;
-	    else if (root == x)
-	        return 1;
-	    else
-	        stack_x.push(root);
+		if (root == nullptr)
+			return 0;
+		else if (root == x)
+			return 1;
+		else
+			stack_x.push(root);
 
-	    if (inorder_search(root->left, x, stack_x))
-	        return 1;
+		if (inorder_search(root->left, x, stack_x))
+			return 1;
 
-	    if (inorder_search(root->right, x, stack_x))
-	        return 1;
+		if (inorder_search(root->right, x, stack_x))
+			return 1;
 
-	    stack_x.pop();
-	    return 0;
+		stack_x.pop();
+		return 0;
 	}
 
 public:
 	TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
 	{
-	    std::stack<TreeNode*> stack_p;
-	    std::stack<TreeNode*> stack_q;
+		std::stack<TreeNode*> stack_p;
+		std::stack<TreeNode*> stack_q;
 
-	    inorder_search(root, p, stack_p);
-	    inorder_search(root, q, stack_q);
+		inorder_search(root, p, stack_p);
+		inorder_search(root, q, stack_q);
 
-	    while (stack_p.size() > stack_q.size())
-	    {
-	        if (stack_p.top() == q)
-	            return q;
-	        else
-	            stack_p.pop();
-	    }
+		while (stack_p.size() > stack_q.size())
+		{
+			if (stack_p.top() == q)
+				return q;
+			else
+				stack_p.pop();
+		}
 
-	    while (stack_q.size() > stack_p.size())
-	    {
-	        if (stack_q.top() == p)
-	            return p;
-	        else
-	            stack_q.pop();
-	    }
+		while (stack_q.size() > stack_p.size())
+		{
+			if (stack_q.top() == p)
+				return p;
+			else
+				stack_q.pop();
+		}
 
-	    while (!stack_p.empty() && !stack_q.empty())
-	    {
-	        if (stack_p.top() != stack_q.top())
-	        {
-	            stack_p.pop();
-	            stack_q.pop();
-	        }
-	        else
-	            return stack_p.top();
-	    }
+		while (!stack_p.empty() && !stack_q.empty())
+		{
+			if (stack_p.top() != stack_q.top())
+			{
+				stack_p.pop();
+				stack_q.pop();
+			}
+			else
+				return stack_p.top();
+		}
 
-	    return nullptr;
+		return nullptr;
 	}
 };
 
@@ -216,7 +216,7 @@ public:
 /* Faster */
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution_2{
+class Solution_Clean {
 public:
 	TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
 	{
@@ -226,13 +226,61 @@ public:
 		TreeNode* left  = lowestCommonAncestor(root->left,  p, q);
 		TreeNode* right = lowestCommonAncestor(root->right, p, q);
 
-		if (left == nullptr)
+		if (left == nullptr)  // Both == nullptr or only left == nullptr
 			return right;
 
-		if (right == nullptr)
+		if (right == nullptr) // Only right == nullptr
 			return left;
-		else // If both are not null that means that we have found our solution
+		
+        // If both are not null that means that we have found our solution
+		return root;
+	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	This Solution is almost equivalent to Solution_Clean, however, it's maybe
+	easier to read and, therefore, grasp the idea.
+
+*/
+
+/* Time  Beats: 77.11% */
+/* Space Beats: 82.35% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_DFS {
+public:
+	TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
+	{
+		return dfs(root, p, q);
+	}
+
+	TreeNode* dfs(TreeNode* root, TreeNode* p, TreeNode* q)
+	{
+		if (!root || root == p || root == q)
 			return root;
+
+		TreeNode* left  = dfs( root->left, p, q);
+		TreeNode* right = dfs(root->right, p, q);
+
+		if (left && !right)  // Only right == nullptr
+			return left;
+
+		if (!left && right)  // Only left == nullptr
+			return right;
+
+		if (!left && !right) // Both == nullptr
+			return nullptr;
+
+		// if (left && right)
+		return root;
 	}
 };
 
@@ -271,7 +319,7 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution_Another {
+class Solution_Intersection {
 public:
 	TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
 	{
@@ -421,9 +469,10 @@ print_levelorder(TreeNode* root)
 int
 main()
 {
-	Solution         sol;
-	Solution_2       sol_2;
-	Solution_Another sol_another;
+	Solution              sol;
+	Solution_Clean        sol_clean;
+	Solution_DFS          sol_dfs;
+	Solution_Intersection sol_intersect;
 
 
 	/* Example 1 */
@@ -504,8 +553,9 @@ main()
 
 	/* Solution */
 	// TreeNode* ancestor = sol.lowestCommonAncestor(root, p, q);
-	TreeNode* ancestor = sol_2.lowestCommonAncestor(root, p, q);
-	// TreeNode* ancestor = sol_another.lowestCommonAncestor(root, p, q);
+	TreeNode* ancestor = sol_clean.lowestCommonAncestor(root, p, q);
+	// TreeNode* ancestor = sol_dfs.lowestCommonAncestor(root, p, q);
+	// TreeNode* ancestor = sol_intersect.lowestCommonAncestor(root, p, q);
 
 
 	/* Write Output */
