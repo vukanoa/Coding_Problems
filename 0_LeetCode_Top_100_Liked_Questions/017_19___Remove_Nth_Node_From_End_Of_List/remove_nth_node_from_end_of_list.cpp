@@ -108,9 +108,9 @@ struct ListNode {
 	Note: Memory leak happens for code is shorter.
 */
 
-
 /* Time  Beats: 100%   */
-/* Space Beats: 39.89% */
+/* Space Beats: 91.56% */
+
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
 class Solution {
