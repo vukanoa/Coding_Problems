@@ -425,11 +425,85 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	This is much simpler.
+
+	First use Binary Search to find pivot.
+	Then  use Binary Search to find target.
+
+*/
+
+/* Time  Beats:   100% */
+/* Space Beats: 58.46% */
+
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(1) */
+class Solution_Trick{
+public:
+	int search(std::vector<int>& nums, int target)
+	{
+		int n = nums.size();
+		int left = find_pivot(nums);
+
+		// Classical Binary Search
+		if (target <= nums[n - 1])
+			return binary_search(nums, left,  n-1  , target);
+
+		return binary_search(nums,   0 , left-1, target);
+	}
+
+private:
+	int find_pivot(const std::vector<int>& nums)
+	{
+		int left  = 0;
+		int right = nums.size() - 1;
+
+		while (left < right)
+		{
+			int mid = left + (right - left) / 2;
+
+			if (nums[mid] > nums[right])
+				left = mid + 1;
+			else
+				right = mid;
+		}
+
+		return left;
+	}
+
+	int binary_search(std::vector<int>& nums, int left, int right, int target)
+	{
+		while (left < right)
+		{
+			int mid = (left + right) / 2;
+
+			if (nums[mid] == target)
+				return mid;
+
+			if (target < nums[mid])
+				right = mid - 1;
+			else
+				left = mid + 1;
+		}
+
+		return nums[left] == target ? left : -1;
+	}
+};
+
+
+
 int
 main()
 {
-	Solution sol;
+	Solution         sol;
 	Solution_Verbose sol_ver;
+	Solution_Trick   sol_trick;
 
 	/* Example 1 */
 	// std::vector<int> nums = {4, 5, 6, 7, 0, 1, 2};
@@ -488,7 +562,8 @@ main()
 
 	/* Solution */
 	// int index = sol.search(nums, target);
-	int index = sol_ver.search(nums, target); 
+	// int index = sol_ver.search(nums, target); 
+	int index = sol_trick.search(nums, target); 
 
 
 	/* Write Output */
