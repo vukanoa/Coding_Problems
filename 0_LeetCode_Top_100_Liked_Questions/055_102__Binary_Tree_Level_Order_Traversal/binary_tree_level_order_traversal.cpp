@@ -130,6 +130,66 @@ public:
 };
 
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Implemented on another occasion and I like this one much better.
+	
+*/
+
+/* Time  Beats: 88.21% */
+/* Space Beats: 26.52% */
+
+/*
+	Time  Complexity: O(n)
+*/
+/*
+	Space Complexity: O(n)
+
+	The biggest level of the tree could be n/2, that's how Trees work. At least
+	Binary Trees.
+*/
+class Solution_Another_Implementation {
+public:
+	std::vector<std::vector<int>> levelOrder(TreeNode* root)
+	{
+		if (root == nullptr)
+			return {};
+
+		std::vector<std::vector<int>> results;
+
+		std::queue<TreeNode*> queue;
+		queue.push(root);
+
+		while (!queue.empty())
+		{
+			int size = queue.size();
+			std::vector<int> level;
+
+			while (size--)
+			{
+				TreeNode* node = queue.front();
+				queue.pop();
+
+				level.push_back(node->val);
+
+				if (node->left)
+					queue.push(node->left);
+
+				if (node->right)
+					queue.push(node->right);
+			}
+
+			results.push_back(level);
+		}
+
+		return results;
+	}
+};
+
+
 
 
 /*
@@ -210,7 +270,8 @@ print_levelorder(TreeNode* root)
 int
 main()
 {
-	Solution sol;
+	Solution                        sol;
+	Solution_Another_Implementation sol_another;
 
 	/* Example 1 */
 	TreeNode fifteen(15);
@@ -260,6 +321,7 @@ main()
 
 	/* Solution */
 	std::vector<std::vector<int>> results = sol.levelOrder(root);
+	// std::vector<std::vector<int>> results = sol_another.levelOrder(root);
 
 
 	/* Write Output */
