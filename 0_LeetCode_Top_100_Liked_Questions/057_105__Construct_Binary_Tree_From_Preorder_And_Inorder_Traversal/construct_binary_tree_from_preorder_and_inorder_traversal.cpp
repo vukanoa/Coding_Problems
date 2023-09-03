@@ -265,6 +265,73 @@ public:
 
 
 /*
+	------------
+	--- IDEA ---
+	------------
+
+	TODO
+	
+*/
+
+/* Time  Beats:   100% */
+/* Space Beats: 89.93% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_My_Way {
+public:
+	TreeNode* buildTree(std::vector<int>& preorder, std::vector<int>& inorder)
+	{
+		int n = inorder.size();
+		TreeNode* root = nullptr;
+
+		for (int i = 0; i < inorder.size(); i++)
+		{
+			if (inorder[i] == preorder[0])
+			{
+				root = new TreeNode(preorder[0]);
+
+				int x = 1;
+				root->left  = make_tree(preorder, inorder, x,   0, i-1);
+				root->right = make_tree(preorder, inorder, x, i+1, n-1);
+			}
+		}
+
+		return root;
+	}
+
+private:
+	TreeNode* make_tree(std::vector<int>& preorder,
+	                    std::vector<int>& inorder,
+	                    int& x,
+						int start,
+						int end)
+	{
+		if (x >= preorder.size())
+			return nullptr;
+
+		TreeNode* node = nullptr;
+
+		for (int i = end; i >= start; i--)
+		{
+			if (preorder[x] == inorder[i])
+			{
+				node = new TreeNode(preorder[x]);
+				x++;
+
+				node->left  = make_tree(preorder, inorder, x, start, i-1);
+				node->right = make_tree(preorder, inorder, x,   i+1, end);
+				break;
+			}
+		}
+
+		return node;
+	}
+};
+
+
+
+/*
 	=============================
 	=== This is just printing ===
 	=============================
@@ -377,8 +444,9 @@ print_inorder(std::vector<int>& inorder)
 int
 main()
 {
-	Solution_readable sol_read;
+	Solution_readable  sol_read;
 	Solution_efficient sol_eff;
+	Solution_My_Way    sol_my;
 
 	/* Example 1 */
 	/*
@@ -461,7 +529,8 @@ main()
 
 	/* Solution */
 	// TreeNode* root = sol_read.buildTree(preorder, inorder);
-	TreeNode* root = sol_eff.buildTree(preorder, inorder);
+	// TreeNode* root = sol_eff.buildTree(preorder, inorder);
+	TreeNode* root = sol_my.buildTree(preorder, inorder);
 
 
 	/* Write Output */
