@@ -520,6 +520,83 @@ public:
 };
 
 
+
+
+/* Time  Beats: 68.26% */
+/* Space Beats: 23.00% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Trie_Cleaner_Impl {
+public:
+
+	Trie()
+	{
+		root = new Node();
+	}
+
+	void insert(std::string word)
+	{
+		if (search(word))
+			return;
+
+		Node* tmp = root;
+
+		for (int i = 0; i < word.length(); i++)
+		{
+			if (tmp->letters[word[i] - 'a'] == nullptr)
+				tmp->letters[word[i] - 'a'] = new Node();
+
+			tmp = tmp->letters[word[i] - 'a'];
+		}
+
+		tmp->end = true;
+	}
+
+
+	bool search(std::string word)
+	{
+		Node* tmp = root;
+
+		for (int i = 0; i < word.length(); i++)
+		{
+			if (tmp->letters[word[i] - 'a'] == nullptr)
+				return false;
+
+			tmp = tmp->letters[word[i] - 'a'];
+		}
+
+		return tmp->end;
+	}
+
+
+	bool startsWith(std::string prefix)
+	{
+		Node* tmp = root;
+
+		for (int i = 0; i < prefix.length(); i++)
+		{
+			if (tmp->letters[prefix[i] - 'a'] == nullptr)
+				return false;
+
+			tmp = tmp->letters[prefix[i] - 'a'];
+		}
+
+		return true;
+	}
+
+private:
+	struct Node{
+		std::vector<Node*> letters;
+		bool end = false;
+
+		Node() : letters(26, nullptr) {}
+	};
+
+	struct Node* root = nullptr;
+};
+
+
 int
 main()
 {
