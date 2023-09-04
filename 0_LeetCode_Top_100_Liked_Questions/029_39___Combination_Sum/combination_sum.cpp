@@ -101,12 +101,8 @@
 	
 */
 
-
-using std::vector; // Names would be way to long if I were to user std::vector everytime in this Problem
-
-
-/* Time  Beats: 32.51% */
-/* Space Beats: 35.80% */
+/* Time  Beats: 78.14% */
+/* Space Beats: 48.43% */
 
 /*
 	Time  Complexity: O(2^n)
@@ -122,39 +118,45 @@ using std::vector; // Names would be way to long if I were to user std::vector e
 */
 class Solution{
 public:
-	vector<vector<int>> combinationSum(vector<int>& candidates, int target)
+	std::vector<std::vector<int>> combinationSum(std::vector<int>& candidates, int target)
 	{
-		vector<vector<int>> results;
+		// Sorting won't make the Time Complexity worse, so make sure to sort
+		std::sort(candidates.begin(), candidates.end());
 
-		backtrack_combination(candidates, target, {}, 0, 0, results);
+		std::vector<std::vector<int>> results;
+		backtracking(candidates, target, {}, 0, results, 0);
 
 		return results;
 	}
 
 private:
-	void backtrack_combination(vector<int>& candidates, int target, vector<int> curr_combination, int curr_sum, int curr_index, vector<vector<int>>& results)
+	void backtracking(std::vector<int>& candidates,
+	                  int target,
+	                  std::vector<int> curr_comb,
+	                  int curr_sum,
+	                  std::vector<std::vector<int>>& results,
+	                  int start)
 	{
-		/* Backtrack */
-		if (curr_sum > target)
-			return;
-
 		/* Backtrack */
 		if (curr_sum == target)
 		{
-			results.push_back(curr_combination);
+			results.push_back(curr_comb);
 			return;
 		}
 
-		for (int i = curr_index; i < candidates.size(); i++)
+		for (int i = start; i < candidates.size(); i++)
 		{
-			curr_combination.push_back(candidates[i]);
+			/* Backtrack */
+			if (curr_sum + candidates[i] > target)
+				return;
 
-			backtrack_combination(candidates, target, curr_combination, curr_sum + candidates[i], i, results);
-
-			curr_combination.pop_back();
+			curr_comb.push_back(candidates[i]);
+			backtracking(candidates, target, curr_comb, curr_sum + candidates[i], results, i);
+			curr_comb.pop_back();
 		}
 	}
 };
+
 
 int
 main()
