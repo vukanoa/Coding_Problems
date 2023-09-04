@@ -188,6 +188,100 @@ public:
 	--- IDEA ---
 	------------
 
+	Same Solution as the below one, but written in an inefficient way. It's
+	good to see the difference, so here it is.
+
+*/
+
+/* Time  Beats: 5.02% */
+/* Space Beats: 5.04% */
+
+/*
+	Time  Complexity: O(N * 4^L)
+	
+	The Time Complexity of the "backtracking" function is O(4^L), where L is
+	the length of the input "word". This is because for each call to
+	"backtracking", there are up to four recursive calls
+	(up, right, down, left), and this recursion depth can go up to L.
+	Therefore, the Time Complexity of the "exist" function is O(N * 4^L), where
+	N is the total number of cells in the "board".
+*/
+/*
+	Space Complexity: O(L)
+	
+	Since the maximum depth of recursion is L, and each recursion depth
+	requires O(1) extra space. Additionally, the "flags" vector has a Space
+	Complexity of O(N), where N is the total number of cells in the "board".
+*/
+class Solution_Inefficient {
+public:
+	bool exist(std::vector<std::vector<char>>& board, std::string word)
+	{
+		int m = board.size();
+		int n = board[0].size();
+
+		for (int row = 0; row < m; row++)
+		{
+			for (int col = 0; col < n; col++)
+			{
+				if (board[row][col] == word[0]) // If first letter matches
+				{
+					char letter = word[0];
+					board[row][col] = '#';
+
+					std::string curr_str = "";
+					if (backtracking(board, word, row, col, curr_str + word[0], 1))
+						return true;
+
+					board[row][col] = letter;
+				}
+			}
+		}
+
+		return false;
+	}
+
+private:
+	bool backtracking(std::vector<std::vector<char>>& board, std::string& word, int row, int col, std::string curr_str, int i)
+	{
+		if (curr_str == word)
+			return true;
+
+		int m = board.size();
+		int n = board[0].size();
+
+		// Clockwise
+		// Up, Right, Down, Left 
+		std::vector<std::pair<int, int>> directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+
+		for (const auto& dir : directions)
+		{
+			if (row + dir.first  < 0 || row + dir.first  >= m || col + dir.second < 0 || col + dir.second >= n)
+				continue;
+
+			if (board[row + dir.first][col + dir.second] == word[i])
+			{
+				char letter = word[i];
+				board[row + dir.first][col + dir.second] = '#';
+
+				if (backtracking(board, word, row + dir.first, col + dir.second, curr_str + word[i], i + 1))
+					return true;
+
+				board[row + dir.first][col + dir.second] = letter;
+			}
+		}
+
+		return false;
+	}
+};
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
 	As the name of the helper function says: We are doing a DFS using
 	Backtracking.
 
@@ -226,6 +320,21 @@ public:
 */
 class Solution_Efficient{
 public:
+	bool exist(std::vector<std::vector<char>>& board, std::string word)
+	{
+		for (int i = 0; i < board.size(); i++)
+		{
+			for (int j = 0; j < board[0].size(); j++)
+			{
+				if (dfs_backtracking(board, word, 0, i, j))
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+private:
 	bool dfs_backtracking(std::vector<std::vector<char>>& board, std::string& word, int w, int i, int j)
 	{
 		if (w == word.length()) return true;
@@ -243,20 +352,6 @@ public:
 			if (dfs_backtracking(board, word, w+1, i  , j-1)) return true;
 
 			board[i][j] = word[w]; // Return used element so that we can use it again since we haven't found it yet
-		}
-
-		return false;
-	}
-
-	bool exist(std::vector<std::vector<char>>& board, std::string word)
-	{
-		for (int i = 0; i < board.size(); i++)
-		{
-			for (int j = 0; j < board[0].size(); j++)
-			{
-				if (dfs_backtracking(board, word, 0, i, j))
-					return true;
-			}
 		}
 
 		return false;
