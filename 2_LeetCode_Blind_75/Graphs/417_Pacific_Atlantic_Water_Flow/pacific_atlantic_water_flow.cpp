@@ -108,110 +108,85 @@
 
 */
 
-
 /*
 	------------
 	--- IDEA ---
 	------------
 
-	TODO
+	If you try to do it in a naive way, you would do a simple DFS for each
+	height in the matrix. However that is very inefficient. The Time Complexity
+	of that approach would be O((n * m)^2), which is unacceptable.
+
+	Then you'd maybe think: I can **memoize** paths that I've tried and I can
+	use some other matrix, say "indicators" which will have the calculated
+	values in it indicating if it's possible to reach either of oceans, both or
+	none.
+
+	However that approach is almost impossible to code up. Try it yourself, I
+	haven't managed to do it.
+
+	The right way to solve this problem is - First Start from the Pacific ocean
+	and do a DFS from 0th row and then do the same for 0th Column and do a DFS
+	from each of those heights and mark all the heights that you can reach.
+
+	Second, start from the Atlantic ocean and do a DFS from last row and then
+	from last column and, again, do a DFS from each of those heights and mark
+	all the heights that you can reach.
+
+	At the end Iterate through all the positions of heights and check if from
+	that point both oceans can be reach. If it can - push in vector "results'.
+
+	*******************************
+	*** Important thing to note ***
+	*******************************
+
+	We're told that if we are on some height, we can't go "up", meaning that
+	the water can only flow from that point to height that is either of equal
+	height or height that is lower than current height.
+
+	However, that's if you are starting from the height and then going to the
+	ocean/s.
+
+	But in this approach, we're doing the exact opposite. We're starting from
+	the Ocean/s and then doing a DFS from it, therefore we can continue in a
+	certain direction if current heights is LESS than or EQUAL to the one we're
+	trying to go on.
+
+	Consider te very first example:
+
+	      0     1     2     3     4
+	   +-----+-----+-----+-----+-----+
+	0  |  1  |  2  |  2  |  3  |  5  |
+	   +-----+-----+-----+-----+-----+
+	1  |  3  |  2  |  3  |  4  |  4  |
+	   +-----+-----+-----+-----+-----+
+	2  |  2  |  4  |  5  |  3  |  1  |
+	   +-----+-----+-----+-----+-----+
+	3  |  6  |  7  |  1  |  4  |  5  |
+	   +-----+-----+-----+-----+-----+
+	4  |  3  |  1  |  1  |  2  |  4  |
+	   +-----+-----+-----+-----+-----+
 	
+	Consider heights[2][2], which is 5. From it, we can go to the right. To:
+	3, then from 3 we can go to 1 and then from 1 to the Atlantic Ocean.
+
+	We can go from 5 to 3 because 5 is GREATER THAN OR EQUAL TO 3. Similarly, 
+	we can go from 3 to 1 because 3 is GREATER THAN OR EQUAL TO 1. And from 1
+	we can reach the Atlantic Ocean.
+
+
+	However, since we're going in the opposite direction, from the last column
+	and 2nd row, which is value 1, we can go to the left because now we have to
+	do an OPPOSITE check up.
+
+	We can go from 1 to 3 because 1 is LESS THAN OR EQUAL TO 3. Etc.
+	
+	It's important to notice this.
+
 */
 
-/* Time  Beats: 98.26% */
-/* Space Beats: 88.42% */
-
-/* Time  Complexity: O(m * n) */
-/* Space Complexity: O(m * n) */
-class Solution {
-public:
-	std::vector<std::vector<int>> pacificAtlantic(std::vector<std::vector<int>>& heights)
-	{
-		std::vector<std::vector<int>> res;
-
-		int m = heights.size();
-		int n = heights[0].size();
-
-		std::vector<std::vector<bool>> pacific (m + 1, std::vector<bool>(n + 1, false));
-		std::vector<std::vector<bool>> atlantic(m + 1, std::vector<bool>(n + 1, false));
-
-		// Check Edges for Pacific ocean
-		for(int i = 0; i < m; i++)
-		{
-			for(int j = 0; j < n; j++)
-			{
-				if(i == 0 || j == 0)
-					dfs(i, j, heights, pacific);
-			}
-		}
-
-		// Check Edges for Atlantic ocean
-		for(int i = 0; i < m; i++)
-		{
-			for(int j = 0; j < n; j++)
-			{
-				if(i == m-1 || j == n-1)
-					dfs(i, j, heights, atlantic);
-			}
-		}
-
-		// If water can flow from a cell in both atlantic and pacific add that to our answer.
-		for(int i = 0; i < m; i++)
-		{
-			for(int j = 0; j < n; j++)
-			{
-				if(atlantic[i][j] == true && pacific[i][j] == true)
-					res.push_back({i, j});
-			}
-		}
-
-		return res;
-	}
-
-private:
-	void dfs(int i, int j, std::vector<std::vector<int>>& height, std::vector<std::vector<bool>>& ocean)
-	{
-		int m = height.size();
-		int n = height[0].size();
-
-		if (ocean[i][j] == false)
-			ocean[i][j] = true;
-
-		// Up
-		if(i > 0 && height[i-1][j] >= height[i][j] && ocean[i-1][j] == false)
-			dfs(i-1, j, height, ocean);
-
-		// Left
-		if(j > 0 && height[i][j-1] >= height[i][j] && ocean[i][j-1] == false)
-			dfs(i, j-1, height, ocean);
-
-		// Down
-		if(i < m-1 && height[i+1][j] >= height[i][j] && ocean[i+1][j] == false)
-			dfs(i+1, j, height, ocean);
-
-		// Right
-		if(j < n-1 && height[i][j+1] >= height[i][j] && ocean[i][j+1] == false)
-			dfs(i, j+1, height, ocean);
-	}
-};
-
-
-
-
-/********************************/
-/********* Another DFS **********/
-/********************************/
-/*
-	------------
-	--- IDEA ---
-	------------
-
-	TODO
-	
-*/
-
-/* Time  Beats: 99.05% */
-/* Space Beats: 77.09% */
+/* Time  Beats: 95.60% */
+/* Space Beats: 89.06% */
 
 /* Time  Complexity: O(m * n) */
 /* Space Complexity: O(m * n) */
@@ -223,29 +198,30 @@ public:
 		int m = heights.size();
 		int n = heights[0].size();
 
-		std::vector<std::vector<int>> results;
+		std::vector<std::vector<bool>> pacific (m, std::vector<bool>(n, false));
+		std::vector<std::vector<bool>> atlantic(m, std::vector<bool>(n, false));
 
-		std::vector<std::vector<bool>> pacific (m, std::vector<bool>(n));
-		std::vector<std::vector<bool>> atlantic(m, std::vector<bool>(n));
-
+		// First and last Row
 		for (int i = 0; i < m; i++)
 		{
-			dfs(heights, pacific,  i, 0);
-			dfs(heights, atlantic, i, n-1);
+			dfs(heights, pacific,  i, 0  , heights[i][ 0 ]);
+			dfs(heights, atlantic, i, n-1, heights[i][n-1]);
 		}
 		
+		// First and last Column
 		for (int j = 0; j < n; j++)
 		{
-			dfs(heights, pacific,  0,   j);
-			dfs(heights, atlantic, m-1, j);
+			dfs(heights, pacific,  0,   j, heights[ 0 ][j]);
+			dfs(heights, atlantic, m-1, j, heights[m-1][j]);
 		}
-		
-		
+
+		// Results
+		std::vector<std::vector<int>> results;
 		for (int i = 0; i < m; i++)
 		{
 			for (int j = 0; j < n; j++)
 			{
-				if (pacific[i][j] && atlantic[i][j]) // If both occurrences can be reached from that particular point
+				if (pacific[i][j] && atlantic[i][j]) // If both oceans can be reached from that particular point
 					results.push_back({i, j});       // Store it in results
 			}
 		}
@@ -254,27 +230,19 @@ public:
 	}
 
 private:
-	void dfs(std::vector<std::vector<int>>& heights, std::vector<std::vector<bool>>& visited, int i, int j)
+	void dfs(std::vector<std::vector<int>>& heights, std::vector<std::vector<bool>>& visited, int i, int j, int prev_height)
 	{
 		int m = heights.size();
 		int n = heights[0].size();
 
+		if (i < 0 || j < 0 || i == m || j == n || visited[i][j] || heights[i][j] < prev_height)
+			return;
+
 		visited[i][j] = true;
 
-		// Up
-		if (i-1 >= 0 && visited[i-1][j] != true && heights[i-1][j] >= heights[i][j])
-			dfs(heights, visited, i-1, j);
-
-		// Down
-		if (i+1 < m && visited[i+1][j] != true && heights[i+1][j] >= heights[i][j])
-			dfs(heights, visited, i+1, j);
-
-		// Left
-		if (j-1 >= 0 && visited[i][j-1] != true && heights[i][j-1] >= heights[i][j])
-			dfs(heights, visited,  i,  j-1);
-
-		// Righeightst
-		if (j+1 < n && visited[i][j+1] != true && heights[i][j+1] >= heights[i][j])
-			dfs(heights, visited,  i,  j+1);
+		dfs(heights, visited, i-1, j  , heights[i][j]); // Up
+		dfs(heights, visited, i+1, j  , heights[i][j]); // Down
+		dfs(heights, visited, i  , j-1, heights[i][j]); // Left
+		dfs(heights, visited, i  , j+1, heights[i][j]); // Right
 	}
 };
