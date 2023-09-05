@@ -741,6 +741,9 @@ public:
 
 
 
+/* Time  Beats: 99.92% */
+/* Space Beats: 30.68% */
+
 /* Time  Complexity: O(V + E) */
 /* Space Complexity: O(V) */
 class Solution_My_Invention {
@@ -748,42 +751,42 @@ public:
 	bool canFinish(int n, std::vector<std::vector<int>>& pre)
 	{
         std::vector<bool> path(n, false);
-        std::unordered_set<int> visit;
+        std::unordered_set<int> done;
 
         std::vector<std::vector<int>> adj_list(n);
 
-        // Make adjecency list
+        // Make adjacency list
         for (auto& edge : pre)
             adj_list[edge[0]].push_back(edge[1]);
         
         for (int i = 0; i < n; i++)
         {
-            if (!topological(i, adj_list, path, visit))
+            if (!topological(adj_list, path, done, i))
                 return false;
         }
 
-        return visit.size() == n;
+        return done.size() == n;
 	}
 
-    bool topological(int node, std::vector<std::vector<int>>& adj_list, std::vector<bool>& path, std::unordered_set<int>& visit)
+    bool topological(std::vector<std::vector<int>>& adj_list, std::vector<bool>& path, std::unordered_set<int>& done, int node)
     {
         // Loop
         if (path[node] == true)
             return false;
 
-        if (visit.count(node)) // Exists in the set
+        if (done.count(node)) // Exists in the set
             return true;
         
         path[node] = true;
-        visit.insert(node);
 
         for (int j = 0; j < adj_list[node].size(); j++)
         {
-            if (!topological(adj_list[node][j], adj_list, path, visit))
+            if (!topological(adj_list, path, done, adj_list[node][j]))
                 return false;
         }
 
         path[node] = false;
+        done.insert(node); // Can be completed
 
         return true;
     }
