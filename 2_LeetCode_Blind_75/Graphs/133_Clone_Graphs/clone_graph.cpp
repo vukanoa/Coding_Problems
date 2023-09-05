@@ -1,6 +1,5 @@
 #include <iostream>
 #include <unordered_map>
-#include <unordered_set>
 #include <vector>
 
 /*
@@ -113,15 +112,30 @@ public:
 	--- IDEA ---
 	------------
 
-	TODO
+	It's very similar to "Clone Singly Linked List with Random Pointers".
 	
+	However, Graph is, obviously, a different Data Structure, so the code
+	differs as well.
+
+	1. Do a DFS on a give Graph
+	2. While performing a DFS, make a copy of the current node and push current
+	   original node, as a key in the Hash Map and copied node as a value.
+	3. When ou finish, you must link copied nodes.
+	4. Iterate through entires in the Hash Map and do this:
+	       Node* original  = entry.first;
+	       Node* copy_node = entry.second;
+
+	       // This is the CRUX
+	       for (int i = 0; i < original->neighbors.size(); i++)
+	           copy_node->neighbors.push_back(umap[original->neighbors[i]]);
+	       
 */
 
 /* Time  Beats: 100% */
 /* Space Beats: 67.55% */
 
 /* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
+/* Space Complexity: O(n) */
 class Solution {
 public:
 	Node* cloneGraph(Node* node)
@@ -130,37 +144,33 @@ public:
 			return nullptr;
 
 		std::unordered_map<Node*, Node*> umap;
-		std::unordered_set<int> uset;
 
 		// Create Clones
-		create_clones(node, umap, uset);
+		clone_graph(umap, node);
 
 		// Link all Clones
-		for (auto& pair : umap)
+		for (auto& entry : umap)
 		{
-			for (int i = 0; i < pair.first->neighbors.size(); i++)
-			{
-				Node* tmp = umap.at(pair.first->neighbors[i]);
-				pair.second->neighbors.push_back(tmp);
-			}
+			Node* original  = entry.first;
+			Node* copy_node = entry.second;
+
+			for (int i = 0; i < original->neighbors.size(); i++)
+				copy_node->neighbors.push_back(umap[original->neighbors[i]]);
 		}
 
-		return umap.at(node);
+		return umap[node];
 	}
 
-private:
-	void create_clones(Node* node, std::unordered_map<Node*, Node*>& umap, std::unordered_set<int>& uset)
+	void clone_graph(std::unordered_map<Node*, Node*>& umap, Node* curr_node)
 	{
 		// If it was already processed
-		if (uset.find(node->val) != uset.end())
+		if (umap.find(curr_node) != umap.end())
 			return;
 
-		uset.insert(node->val);
-		Node* copy_node = new Node(node->val);
+		Node* copy_node = new Node(curr_node->val); // Make a Copy Node
+		umap.insert({curr_node, copy_node});        // Insert in Hash Map
 
-		umap.insert({node, copy_node});
-
-		for (int i = 0; i < node->neighbors.size(); i++)
-			create_clones(node->neighbors[i], umap, uset);
+		for (int i = 0; i < curr_node->neighbors.size(); i++)
+			clone_graph(umap, curr_node->neighbors[i]);
 	}
 };
