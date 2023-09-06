@@ -341,8 +341,8 @@ private:
 	                                                     change
 	                                                         | (decremented)
 	                                                ----------
-	                                                |         
-	                                                v         
+	                                                |
+	                                                v
 	                                        count = 2
 	
 	// count = 2
@@ -356,11 +356,11 @@ class Solution_Union_&_Find {
 public:
 	int countComponents(int n, std::vector<std::pair<int, int>>& edges)
 	{
-		std::vector<int> parent(n);
-		std::vector<int> rank(n, 1);
+		std::vector<int> parents(n);
+		std::vector<int> ranks(n, 1);
 
 		// Vector parent = [0, 1, 2, ..., n-1]
-		std::iota(parent.begin(), parent.end(), 0);
+		std::iota(parents.begin(), parents.end(), 0);
 
 		// Iota equivalent to this
 		// for (int i = 0; i < n; i++)
@@ -368,47 +368,48 @@ public:
 
 		int count = n;
 		for (std::pair<int, int> edge : edges)
-			count -= Union(edge.first, edge.second, parent);
+		{
+			if (Union(edge, parents, ranks))
+				count--;
+		}
 
 		return count;
 	}
 
 private:
-	int Find(int node_val, std::vector<int>& parent)
+	int Find(int node, std::vector<int>& parents)
 	{
-		int tmp = node_val;
-
 		// Get root parent
-		while (tmp != parent[tmp])
+		while (node != parents[node])
 		{
 			// Huge Optimization (From O(n) to Amortized O(1) Time Complexity)
 			// If there is no grandparent, nothing will happen
-			parent[tmp] = parent[parent[tmp]];
+			parents[node] = parents[parents[node]];
 
-			tmp = parent[tmp];
+			node = parents[node];
 		}
 
-		return tmp;
+		return node;
 	}
 
-	int Union(int node_val_1, int node_val_2, std::vector<int>& parent)
+	int Union(std::pair<int, int>& edge, std::vector<int>& parents, std::vector<int>& ranks)
 	{
 		// Parent 1 & Parent 2
-		int p1 = Find(node_val_1, parent);
-		int p2 = Find(node_val_2, parent);
+		int p1 = Find(edge.first,  parents);
+		int p2 = Find(edge.second, parents);
 
 		if (p1 == p2)
 			return false;
 
-		if (rank[p2] > rank[p1])
+		if (ranks[p2] > ranks[p1])
 		{
-			parent[p1] = p2;
-			rank[p2] += rank[p1];
+			parents[p1] = p2;
+			ranks[p2] += ranks[p1];
 		}
-		else // rank[p1] > rank[p2]
+		else // ranks[p1] > ranks[p2]
 		{
-			parent[p2] = p1;
-			rank[p1] += rank[p2];
+			parents[p2] = p1;
+			ranks[p1] += ranks[p2];
 		}
 
 		return true;
