@@ -239,9 +239,9 @@ public:
 			return true; // Empty Graph does count as a Valid Tree
 
 		std::vector<std::vector<int>> adj_list;
-		std::unordered_set<int> uset_visited;
+		std::unordered_set<int> visited;
 
-		// Represent Graph using adjacency list
+		// Represent Graph using Adjacency List
 		for (const auto& edge : edges)
 		{
 			adj_list[edge.first].push_back(edge.second);
@@ -249,35 +249,32 @@ public:
 		}
 
 		// DFS
-		bool loop = dfs(0, adj_list, uset_visited, default_previous_node);
+		bool loop = dfs(adj_list, visited, default_previous_node, 0);
 
 		// If there is a Loop or Not all n nodes are connected
-		if (loop || uset_visited.size() < n)
+		if (loop || visited.size() < n)
 			return false;
 
 		return true; // This Graph is a Valid Tree
 	}
 
 private:
-	void dfs(int curr_node,
-	         std::vector<std::vector<int>& adj_list,
-	         std::unordered_set<int>& uset_visited,
-	         int prev_node)
+	void dfs(std::vector<std::vector<int>& adj_list, std::unordered_set<int>& visited, int prev_node, int curr_node)
 	{
 		// There is a loop
-		if (uset_visited.find(curr_node) != uset_visited.end())
+		if (visited.count(curr_node))
 			return true;
 
-		uset_visited.insert(curr_node);
+		visited.insert(curr_node);
 
-		for (const auto& i : adj_list[curr_node])
+		for (const int& curr_node_ith_neighbor : adj_list[curr_node])
 		{
 			// Ignore previous node in adjacency list
-			if (i == prev_node)
+			if (curr_node_ith_neighbor == prev_node)
 				continue;
 
 			// There is a loop
-			if (dfs(i, adj_list, uset_visited, curr_node))
+			if (dfs(adj_list, uset_visited, curr_node, curr_node_ith_neighbor))
 				return true;
 		}
 
