@@ -524,6 +524,36 @@ public:
 };
 
 
+
+
+/* Time  Beats:   100% */
+/* Space Beats: 50.80% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+	int rob(std::vector<int>& nums)
+	{
+		int n = nums.size();
+
+		int prev = 0;
+		int curr = nums[0]; // This way we don't have to cover the edge case
+
+		for (int i = 1; i < n; i++) // Starts from 1
+		{
+			int tmp = std::max(curr, nums[i] + prev);
+
+			prev = curr;
+			curr = tmp;
+		}
+
+		return curr;
+	}
+};
+
+
+
 int
 main()
 {
@@ -532,6 +562,7 @@ main()
 	Solution_Reusable                 sol_reusable;
 	Solution_Reusable_Space_Efficient sol_reusable_space;
 	Solution_Concise                  sol_concise;
+	Solution_Concise_2                sol_concise_2;
 
 
 	/* Example 1 */
@@ -578,6 +609,7 @@ main()
 	// int money = sol_reusable.rob(nums);
 	// int money = sol_reusable_space.rob(nums);
 	int money = sol_concise.rob(nums);
+	// int money = sol_concise_2.rob(nums);
 
 
 	/* Write Output */
