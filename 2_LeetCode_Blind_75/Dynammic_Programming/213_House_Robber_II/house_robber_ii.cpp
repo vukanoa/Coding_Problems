@@ -84,8 +84,8 @@
 
 */
 
-/* Time  Beats: 100% */
-/* Space Beats: 77.95% */
+/* Time  Beats:   100% */
+/* Space Beats: 96.68% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -93,23 +93,23 @@ class Solution {
 public:
 	int rob(std::vector<int>& nums)
 	{
-		int n = nums.size(); 
+		int n = nums.size();
 
-		if (n < 2)
-			return n ? nums[0] : 0;
-
-		return std::max(house_robber(nums, 0, n - 2), house_robber(nums, 1, n - 1));
+		return std::max(house_robber(nums, 0, n-1), house_robber(nums, 1, n));
 	}
 
 private:
 	int house_robber(std::vector<int>& nums, int start, int end)
 	{
-		int prev = 0;
-		int curr = 0;
+		if (start == nums.size()) // Out of bounds(Expl: n=1, start=1, end=1)
+			return 0;
 
-		for (int i = start; i <= end; i++)
+		int prev = 0;
+		int curr = nums[start];
+
+		for (int i = start + 1; i < end; i++)
 		{
-			int tmp = std::max(prev + nums[i], curr);
+			int tmp = std::max(curr, prev + nums[i]);
 
 			prev = curr;
 			curr = tmp;
