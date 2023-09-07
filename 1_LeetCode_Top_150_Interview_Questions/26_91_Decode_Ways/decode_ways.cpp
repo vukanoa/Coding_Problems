@@ -37,7 +37,7 @@
 	      decode it.
 
 	      The test cases are generated so that the answer fits in a 32-bit
-		  integer.
+	      integer.
 	=====
 
 	==========================================
@@ -81,23 +81,23 @@
 
 	Example 1:
 
-			                    "11106"
-	
-			_______________________._______________________
-			___________1______________________11___________
-			_____1__________11___________1__________10_____
-			__1____10_____F___________F___________6________
-			F_____6_______________________________T________
-			      T
-	
+	                           "11106"
+
+	        ______________________._______________________
+	        __________1______________________11___________
+	        ____1__________11___________1__________10_____
+	        _1____10_____F___________F___________6________
+	        _____6_______________________________T________
+	             T
+
 	We have two "T"s, so the answer is: 2.
 
 	For recursion to stop It's either that:
-		1. dp[i] is not 0
+	    1. dp[i] is not 0
 
-		   or
+	       or
 
-		2. s[i] == 0
+	    2. s[i] == 0
 
 
 	if s[i] == 0, that's F. It means that "combination" is not possible, thus
@@ -116,18 +116,18 @@
 	results.
 
 	So:
-		dp[s.length() + 1] = 1
+	    dp[s.length() + 1] = 1
 	
 	is necessary.
 
 	
 	Example 2:
 
-			                    "12"
-			                 ___________
-			                 _____1_____
-			                 __2____12__
-			                 T_____T____
+	                            "12"
+	                         ___________
+	                         _____1_____
+	                         __2____12__
+	                         T_____T____
 	
 	Again, two T's, so the answer is: 2
 	
@@ -187,23 +187,23 @@ private:
 
 	Example 1:
 
-			                    "11106"
-	
-			_______________________._______________________
-			___________1______________________11___________
-			_____1__________11___________1__________10_____
-			__1____10_____F___________F___________6________
-			F_____6_______________________________T________
-			      T
+	                            "11106"
+
+	        ______________________._______________________
+	        __________1______________________11___________
+	        ____1__________11___________1__________10_____
+	        _1____10_____F___________F___________6________
+	        _____6_______________________________T________
+	             T
 	
 	We have two "T"s, so the answer is: 2.
 
 	For recursion to stop It's either that:
-		1. memo[i] is not 0
+	    1. memo[i] is not 0
 
-		   or
+	       or
 
-		2. s[i] == 0
+	    2. s[i] == 0
 
 
 	if s[i] == 0, that's F. It means that "combination" is not possible, thus
@@ -222,18 +222,18 @@ private:
 	results.
 
 	So:
-		memo[s.length() + 1] = 1
+	    memo[s.length() + 1] = 1
 	
 	is necessary.
 
 	
 	Example 2:
 
-			                    "12"
-			                 ___________
-			                 _____1_____
-			                 __2____12__
-			                 T_____T____
+	                            "12"
+	                         ___________
+	                         _____1_____
+	                         __2____12__
+	                         T_____T____
 	
 	Again, two T's, so the answer is: 2
 	
@@ -249,33 +249,33 @@ private:
 /* Space Complexity: O(n) */
 class Solution_2 {
 public:
-    int memo[100] = {}; // 100 is listed to be a constraint
-    int numDecodings(const std::string& s)
+	int memo[100] = {}; // 100 is listed to be a constraint
+	int numDecodings(const std::string& s)
 	{
-        return dp(s, 0);
-    }
+		return dp(s, 0);
+	}
 
 private:
-    int dp(const string& s, int i)
+	int dp(const string& s, int i)
 	{
-        if (i == s.size())
+		if (i == s.size())
 			return 1;
 
-        if (memo[i] != 0)
+		if (memo[i] != 0)
 			return memo[i];
 
-        int res = 0;
+		int res = 0;
 
 		// Single digit
-        if (s[i] != '0')
-            res += dp(s, i+1);
+		if (s[i] != '0')
+			res += dp(s, i+1);
 
 		// Two digits
-        if (i+1 < s.size() && (s[i] == '1' || s[i] == '2' && s[i+1] <= '6'))
-            res += dp(s, i+2);
+		if (i+1 < s.size() && (s[i] == '1' || s[i] == '2' && s[i+1] <= '6'))
+			res += dp(s, i+2);
 
-        return memo[i] = res;
-    }
+		return memo[i] = res;
+	}
 };
 
 
@@ -300,28 +300,29 @@ private:
 /* Space Complexity: O(1) */
 class Solution_Bottom_Up { 
 public:
-    int numDecodings(const std::string& s)
+	int numDecodings(const std::string& s)
 	{
-        int n = s.size();
+		int n = s.length();
+
 		int dp  = 0;
 		int dp1 = 1;
 		int dp2 = 0;
 
-        for (int i = n - 1; i >= 0; i--)
+		for (int i = n - 1; i >= 0; i--)
 		{
 			// Single digit
-            if (s[i] != '0')
-                dp += dp1;
+			if (s[i] != '0')
+				dp += dp1;
 
 			// Two digits
-            if (i+1 < s.size() && (s[i] == '1' || s[i] == '2' && s[i+1] <= '6'))
-                dp += dp2;
+			if (i+1 < s.size() && (s[i] == '1' || s[i] == '2' && s[i+1] <= '6'))
+				dp += dp2;
 
-            dp2 = dp1;
-            dp1 = dp;
-            dp = 0;
-        }
+			dp2 = dp1;
+			dp1 = dp;
+			dp = 0;
+		}
 
-        return dp1;
-    }
+		return dp1;
+	}
 };
