@@ -140,56 +140,39 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution{
+class Solution { 
 public:
-	int numDecodings(std::string s)
+	int numDecodings(const std::string& s)
 	{
 		std::vector<int> dp(s.length() + 1, 0);
 		dp[s.length()] = 1;
 
-		return dfs(s, dp, 0);
+		return backtracking(s, dp, 0);
 	}
 
 private:
-	int dfs(std::string& s, std::vector<int>& dp, int i)
+	int backtracking(const std::string& s, std::vector<int>& dp, int i)
 	{
 		if (dp[i] != 0)
 			return dp[i];
-		
+
 		if (s[i] == '0')
 			return 0;
 
-		int result = dfs(s, dp, i + 1);
-		
-		/* if (a and (b or (c and d and e))) */
-		if (
-		       i + 1 < s.length()
-			   &&
-			   (
-		           s[i] == '1' 
-		           || 
-				   (
-		               s[i] == '2'
-					   && 
-				       (
-					       s[i + 1] == '0' ||
-		                   s[i + 1] == '1' ||
-		                   s[i + 1] == '2' ||
-		                   s[i + 1] == '3' ||
-		                   s[i + 1] == '4' ||
-		                   s[i + 1] == '5' ||
-		                   s[i + 1] == '6'
-					   )
-		           )
-		       )
-		   )
+		int result = backtracking(s, dp, i+1);
+
+		if (i + 1 < s.length())
 		{
-			result += dfs(s, dp, i + 2);
+			std::string str = s.substr(i, 2);
+			int num = std::stoi(str);
+
+			if (num >= 1 && num <= 26)
+				result += backtracking(s, dp, i + 2);
 		}
 
 		dp[i] = result;
 
-		return result;
+		return dp[i];
 	}
 };
 
