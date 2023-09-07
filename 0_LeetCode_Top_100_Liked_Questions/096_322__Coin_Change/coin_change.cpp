@@ -231,17 +231,17 @@ public:
 		// O(amount * coins.size())
 		for (int a = 1; a <= amount; a++)
 		{
-			dp[a] = INT_MAX;
-			for (const int& c : coins)
+			dp[a] = amount + 1;
+			for (const int& coin : coins)
 			{
-				if (a - c < 0)
+				if (a - coin >= 0)
+					dp[a] = std::min(dp[a], 1 + dp[a - coin]);
+				else
 					break;
-				else if (dp[a - c] != INT_MAX)
-					dp[a] = std::min(dp[a], 1 + dp[a - c]);
 			}
 		}
 
-		return dp[amount] == INT_MAX ? -1 : dp[amount];
+		return dp[amount] > amount ? -1 : dp[amount];
 	}
 };
 
