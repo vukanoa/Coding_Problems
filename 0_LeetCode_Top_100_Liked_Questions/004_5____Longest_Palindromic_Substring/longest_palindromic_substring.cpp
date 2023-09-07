@@ -229,6 +229,62 @@ public:
 	==============
 */
 
+/* Time  Beats: 84.01% */
+/* Space Beats: 60.55% */
+class Solution_easier_for_me {
+public:
+	std::string longestPalindrome(std::string s)
+	{
+		int n = s.length();
+
+		std::string odd_str = "";
+		for (int i = 0; i < n; i++)
+		{
+			int count = 1;
+
+			for (int j = 0; i-j-1 >= 0 && i+j+1 < n; j++)
+			{
+				if (s[i-j-1] != s[i+j+1])
+					break;
+				else
+					count += 2;
+			}
+
+			if (count > odd_str.length())
+				odd_str = s.substr(i - count/2, count);
+		}
+
+		std::string even_str = "";
+		for (int i = 0; i < n-1; i++)
+		{
+			int count = 0;
+			for (int j = 0; i-j >= 0 && i+j+1 < n; j++)
+			{
+				if (s[i-j] != s[i+j+1])
+					break;
+				else
+					count += 2;
+			}
+
+			if (count > even_str.length())
+				even_str = s.substr(i - count/2 + 1, count);
+		}
+
+		if (odd_str.length() >= even_str.length())
+			return odd_str;
+
+		return even_str;
+	}
+};
+
+/* ------------------------------------------------------------------------- */
+
+/*
+	==============
+	=== O(n^2) ===
+	==============
+*/
+
 class Solution_n2_table{
 public:
 	string longestPalindrome(string s)
