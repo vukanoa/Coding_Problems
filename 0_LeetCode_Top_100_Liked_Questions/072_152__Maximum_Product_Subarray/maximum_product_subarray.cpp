@@ -57,7 +57,7 @@
 
 	It is sort of like Kadane's algorithm.
 	However, we have to keep track of both highest and lowest values, even
-	if we are looking for hight, or maximum, value.
+	if we are looking for high, or maximum, value.
 
 	Why is that?
 	Consider this example:
@@ -224,7 +224,7 @@
 
 	Also, the reason we assign max to be nums[n - 1] is because that is the
 	only element we won't be iterating with in the while loop, thus just assume
-	that it is the answe and if proven otherwise in the loop, update the value.
+	that it is the answer and if proven otherwise in the loop, update the value.
 
 	Thus, we end up with the implementation below.
 
@@ -359,8 +359,8 @@ public:
 
 
 
-/* Time  Beats: 93.83% */
-/* Space Beats: 20.59% */
+/* Time  Beats: 100% */
+/* Space Beats: 69.92% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
