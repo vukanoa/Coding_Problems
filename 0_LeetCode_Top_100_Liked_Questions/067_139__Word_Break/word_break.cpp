@@ -171,29 +171,29 @@ public:
 
 
 	1.
-		'e' // start: 7
+	    'e' // start: 7
 	i = 7   "e"
 
 	2.
-		'd' // start: 6
+	    'd' // start: 6
 	i = 6   "d"
 	i = 7   "de"
 
 	3.
-		'o' // start: 5
+	    'o' // start: 5
 	i = 5   "o"
 	i = 6   "od"
 	i = 7   "ode"
 
 	4.
-		'c' //start: 4       start --------
+	    'c' //start: 4       start --------
 	i = 4   "c"                           |
 	i = 5   "co"                          |
 	i = 6   "cod"                         v
 	i = 7   "code" && dp[8] == true => dp[4] = true
-						 ^
-						 |
-		i + 1 ------------
+	                     ^
+	                     |
+	    i + 1 ------------
 
 
 	5. 't' // start: 3
@@ -225,9 +225,9 @@ public:
 	i = 1   "le"                          |
 	i = 2   "lee"                         v
 	i = 3   "leet" && dp[4] == true => dp[0] = true
-						 ^
-						 |
-		i + 1 ------------
+	                     ^
+	                     |
+	    i + 1 ------------
 
 	9. Exit the for loop
 
@@ -307,7 +307,7 @@ public:
 		1 <= wordDict.length <= 1000
 	
 	Since wordDict.length is greater than s.length, i.e. m > n, then:
-		O(n^3) should preffered over O(n^ * m)
+		O(n^3) should preffered over O(n^2 * m)
 	although that is the exact opposite of what I find.
 */
 /*
@@ -317,28 +317,27 @@ class Solution_DP_Neat {
 public:
 	bool wordBreak(std::string& s, std::vector<std::string> wordDict)
 	{
-		std::vector<bool> dp(s.length() + 1, false);
-		dp[s.length()] = true;
+		int n = s.length();
+		int m = wordDict.size();
 
-		int last = s.length();
-		for (int i = s.length() - 1; i >= 0; i--)
+		std::vector<bool> dp(n + 1, false);
+		dp[n] = true; // Empty String is always possible to make
+
+		for (int i = n-1; i >= 0; i--)
 		{
-			for (int j = 0; j < wordDict.size(); j++)
+			for (int j = 0; j < m; j++)
 			{
-				int substr_size = wordDict[j].size();
+				int substr_len = wordDict[j].length();
 
-				if (
-					substr_size + i <= s.length()
-					&& 
-					s.substr(i, substr_size) == wordDict[j] // O(n)
-					&&
-					dp[i + substr_size] == true
-					)
+				if (i + substr_len <= n
+				    &&
+				    s.substr(i, substr_len) == wordDict[j] // O(n)
+				    &&
+				    dp[i + substr_len] == true)
 				{
 					dp[i] = true;
 					break;
 				}
-
 			}
 		}
 
