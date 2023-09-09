@@ -100,14 +100,74 @@ public:
 	--- IDEA ---
 	------------
 
-	DFS with Cache.
-	TODO
+	At each index we can either choose it or skip it. Thus doing every possible
+	combination would take O(2^n) Time.
+
+	Can we do better?
+	Let's draw a decision tree.
+
+	Consider this example:
+	    nums = [1, 2, 4, 3]
+	            0  1  2  3
+	                                          START
+	                                         / | \ \________________
+	                                ________/  |  \__________       \
+	                              0/          1|           2|        \3
+	                              /            |            |         \
+	                             /             |            |         |
+	                            /              |            |         |
+	                           /               |            |         |
+	                        [1]               [2]          [4]       [3]
+	                   ___/  | \___          /   \          |         |
+	                 1/     2|     \3      2/     \3        X         X
+	                 /       |      \      |       |
+	             [1,2]     [1,4]  [1,3]  [2,4]  [2,3]
+	         ___/   |        |      |      |      |
+	       2/      3|        X      X      X      X
+	       /        |
+	    [1,2,4]   [1,2,3]
+	       |         |
+	       X         X
+
+
+	We can see, for example, that going all the way to the left, after we
+	include 4(index 2) we aren't able to increase our subsequence any further.
+	Thus, if we go any other route, if we choose 4(index 2), it's immediately
+	terminated sinsce we've already calculated that we can't increase our
+	subsequence from that point onwards.
+
+	So in order to remove repeated calculations, we'll have a "cache", i.e. our
+	LIS(Longest Increasing Subsequence) vector which represents our DP array
+	where we store our calculated sequences.
+
+	Since LIS[2] represents how many elements, or how big is going to be our
+	subsequence if we include number at index 2, until the end of the array is
+	increasing, we can see that we have to start from the back.
+
+	In our Example:
+	    nums = [1, 2, 4, 3]
+	            0  1  2  3
 	
+	LIS[3] will always be 1, because 3 == n-1
+
+	Then when we're calculating LIS[2] we can either have:
+		1. 1 or
+		2. 1 + LIS[3]   if (nums[2] < nums[3])
+
+	However, we can only take the latter if nums[2] < nums[3].
+
+	When we're calculating LIS[1], we can either have:
+		1. 1 or
+		2. 1 + LIS[2]  if(nums[1] < nums[2]) or
+		3. 1 + LIS[3]  if(nums[1] < nums[3])
+	
+	You can see that we're iterating through the array for every element, thus
+	it's a O(n^2) Time Complexity.
 */
 
 
-/* Time  Beats: 35.56% */
-/* Space Beats: 50.84% */
+/* Time  Beats: 62.94% */
+/* Space Beats: 71.42% */
 class Solution_DFS_with_Cache_DP {
 public:
 	int lengthOfLIS(std::vector<int>& nums)
@@ -115,9 +175,9 @@ public:
 		int n = nums.size();
 		std::vector<int> LIS (n, 1);
 
-		for (int i = n - 1; i >= 0; i--)
+		for (int i = n-1; i >= 0; i--)
 		{
-			for (int j = i + 1; j < n; j++)
+			for (int j = i+1; j < n; j++)
 			{
 				if (nums[i] < nums[j])
 					LIS[i] = std::max(LIS[i], 1 + LIS[j]);
