@@ -60,25 +60,23 @@
 */
 
 
-/* Time  Beats: 70.21% */
-/* Space Beats: 5.47% */
+/* Time  Beats: 83.79% */
+/* Space Beats:  5.04% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution_unoptimized{
+class Solution_Unoptimized{
 public:
 	int maxSubArray(std::vector<int>& nums)
 	{
 		std::vector<int> dp(nums.size(), 0);
-		dp[0] = nums[0];
-		int max = dp[0];
+		dp[0]   = nums[0];
+		int max = nums[0];
 
 		for (int i = 1; i < nums.size(); i++)
 		{
 			dp[i] = std::max(dp[i - 1] + nums[i], nums[i]);
-
-			if (dp[i] > max)
-				max = dp[i];
+			max   = std::max(max, dp[i]);
 		}
 
 		return max;
@@ -88,24 +86,22 @@ public:
 
 /* We only need the dp[i - 1] each time, so using a vector is redundant */
 
-/* Time  Beats: 91.19% */
-/* Space Beats: 63.38% */
+/* Time  Beats: 86.15% */
+/* Space Beats: 88.10% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_efficient{
+class Solution_Efficient {
 public:
 	int maxSubArray(std::vector<int>& nums)
 	{
-		int dp = nums[0];
-		int max = dp;
+		int dp  = nums[0];
+		int max = nums[0];
 
 		for (int i = 1; i < nums.size(); i++)
 		{
-			dp = std::max(dp + nums[i], nums[i]);
-
-			if (dp > max)
-				max = dp;
+			dp  = std::max(dp + nums[i], nums[i]);
+			max = std::max(max, dp);
 		}
 
 		return max;
@@ -119,8 +115,8 @@ extern std::vector<int> big_example();
 int
 main()
 {
-	Solution_unoptimized sol_unopt;
-	Solution_efficient   sol_eff;
+	Solution_Unoptimized sol_unopt;
+	Solution_Efficient   sol_eff;
 
 	/* Example 1 */
 	std::vector<int> nums = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
