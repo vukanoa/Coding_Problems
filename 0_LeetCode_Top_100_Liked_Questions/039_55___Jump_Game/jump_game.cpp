@@ -86,7 +86,7 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution{
+class Solution {
 public:
 	bool canJump(std::vector<int>& nums)
 	{
@@ -122,10 +122,59 @@ public:
 };
 
 
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Another way to implemented the same idea. This one seems easier to read and
+	grasp.
+
+*/
+
+/* Time  Beats: 76.88% */
+/* Space Beats: 79.05% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+	bool canJump(std::vector<int>& nums)
+	{
+		int n = nums.size();
+
+		int i = 0;
+		int start = 0;
+		int end = nums[0];
+
+		while (i <= start+end)
+		{
+			if (i+nums[i] == n-1 || i == n-1)
+				return true;
+				
+			if (i+nums[i] > start+end)
+			{
+				start = i;
+				end = nums[i];
+			}
+
+			i++;
+		}
+
+		return false;
+	}
+};
+
+
 int
 main()
 {
-	Solution sol;
+	Solution   sol;
+	Solution_2 sol_2;
+
 
 	/* Example 1 */
 	std::vector<int> nums = {2, 3, 1, 1, 4};
@@ -163,6 +212,7 @@ main()
 
 	/* Solution */
 	bool possible = sol.canJump(nums);
+	// bool possible = sol_2.canJump(nums);
 
 
 	/* Write Output */
