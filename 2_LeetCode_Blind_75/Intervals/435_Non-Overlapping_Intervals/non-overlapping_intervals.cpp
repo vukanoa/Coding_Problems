@@ -98,8 +98,8 @@
 
 */
 
-/* Time  Complexity: O(94.67) */
-/* Space Complexity: O(53.74) */
+/* Time  Beats: 94.67% */
+/* Space Beats: 53.74% */
 
 /*
 	Time  Complexity: O(n * logn)
@@ -129,6 +129,47 @@ public:
 			// If "left" one has bigger ending point or if they are not
 			// overlapping at all
 			left = i;
+		}
+
+		return count;
+	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Similar idea. Written on another occassion.
+
+*/
+
+/* Time  Beats: 91.17% */
+/* Space Beats: 55.52% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(1) or O(n) depending on the underlying Sort */
+class Solution_another_way {
+public:
+	int eraseOverlapIntervals(std::vector<std::vector<int>>& intervals)
+	{
+		std::sort(intervals.begin(), intervals.end());
+
+		int count = 0;
+		int last_ending = intervals[0][1];
+
+		for (int i = 1; i < intervals.size(); i++)
+		{
+			if (last_ending > intervals[i][0])
+			{
+				count++;
+				last_ending = std::min(last_ending, intervals[i][1]);
+			}
+			else
+				last_ending = intervals[i][1];
 		}
 
 		return count;
