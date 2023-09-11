@@ -177,10 +177,58 @@ public:
 };
 
 
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	It's really self-explanatory. Also, it's written much more elegantnly.
+
+*/
+
+/*
+	Time  Complexity: O(n * logn)
+*/
+/*
+	Space Complexity: O(1)
+	"results" is not additional Space.
+
+	However, it really depends if the underlying Sort uses additional extra
+	space. If it does, then the overall Space Complexity is O(n).
+*/
+class Solution_Elegant {
+public:
+	std::vector<std::vector<int>> merge(std::vector<std::vector<int>>& intervals)
+	{
+		int n = intervals.size();
+		std::sort(intervals.begin(), intervals.end()); // Default by first val
+
+		std::vector<std::vector<int>> results;
+		results.push_back(intervals[0]);
+
+		for (int i = 1; i < intervals.size(); i++)
+		{
+			int res_size = results.size();
+			if (results[res_size - 1][1] >= intervals[i][0])
+			{
+				results[res_size - 1][0] = std::min(results[res_size - 1][0], intervals[i][0]);
+				results[res_size - 1][1] = std::max(results[res_size - 1][1], intervals[i][1]);
+			}
+			else
+				results.push_back(intervals[i]);
+		}
+
+		return results;
+	}
+};
+
+
 int
 main()
 {
-	Solution sol;
+	Solution         sol;
+	Solution_Elegant sol_elegant;
 
 	/* Example 1 */
 	// std::vector<std::vector<int>> intervals = {{1, 3}, {2, 6}, {8, 10}, {15, 18}};
@@ -243,9 +291,10 @@ main()
 
 
 	/* Solution */
-	std::vector<std::vector<int>> results = sol.merge(intervals);
+	// std::vector<std::vector<int>> results = sol.merge(intervals);
+	std::vector<std::vector<int>> results = sol_elegant.merge(intervals);
 
-	
+
 	/* Write Output */
 	first = true;
 	std::cout << "\n\tIntervals: [";
