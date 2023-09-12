@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-
+#include <algorithm>
 
 /*
 	==============
@@ -150,6 +150,91 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Keep pointers: Left, Right, Top, Bottom
+
+	After that it becomes easy, just do simulate example and you'll get it.
+*/
+
+/* Time  Beats: 100% */
+/* Space Beats: 21.11% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(1) */
+class Solution_L_R_T_B {
+public:
+	void rotate(std::vector<std::vector<int>>& matrix)
+	{
+		int n = matrix.size();
+
+		int left  = 0;
+		int right = n-1;
+
+		while (left < right)
+		{
+			int top    = left;
+			int bottom = right;
+
+			int tmp;
+			for (int i = 0; i < right-left; i++)
+			{
+				tmp = matrix[top][left + i];
+
+				std::swap(tmp, matrix[top + i   ][right    ]);
+				std::swap(tmp, matrix[bottom    ][right - i]);
+				std::swap(tmp, matrix[bottom - i][left     ]);
+				std::swap(tmp, matrix[top       ][left + i ]);
+			}
+
+			left++;
+			right--;
+		}
+	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Transpose Matrix and then Reverse Columns.
+
+	Check Linear Algebra.
+
+*/
+
+/* Time  Beats:  100% */
+/* Space Beats: 58.65% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(1) */
+class Solution_Transpose_Reverse {
+public:
+    void rotate(std::vector<std::vector<int>>& matrix)
+	{
+        int rows = matrix.size();
+
+        for(int i = 0; i < rows; i++)
+		{
+            for(int j = 0; j < i; j++)
+				std::swap(matrix[i][j], matrix[j][i]);
+        }
+
+        for(int i = 0; i < rows; i++)
+            std::reverse(matrix[i].begin(), matrix[i].end());
+    }
+};
+
+
 void
 print_matrix(std::vector<std::vector<int>>& matrix)
 {
@@ -167,7 +252,9 @@ print_matrix(std::vector<std::vector<int>>& matrix)
 int
 main()
 {
-	Solution sol;
+	Solution                   sol;
+	Solution_L_R_T_B           sol_l_r_t_b;
+	Solution_Transpose_Reverse sol_transpose_reverse;
 
 	/* Example 1 */
 	std::vector<std::vector<int>> matrix = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
@@ -189,7 +276,9 @@ main()
 
 
 	/* Solution */
-	sol.rotate(matrix);
+	// sol.rotate(matrix);
+	// sol_l_r_t_b.rotate(matrix);
+	sol_transpose_reverse.rotate(matrix);
 
 
 	/* Write Output */
