@@ -75,7 +75,7 @@
 		going to stumble upon a 5, which is also the beginning(of a conference)
 		it's not that the first meeting is ending.
 
-		So what does that tells us?
+		So what does that tell us?
 		It tells us that two meeting have started so far but none has ended.
 
 		So at this point in time:
@@ -94,8 +94,8 @@
 
 		We have 2 meetings that are going on at the same amount of time.
 
-		So we're going to be maintaining is a variable "count", which tells us
-		at any given point in time, what is the number of meetings going on.
+		So we're going to be maintaining a variable "count", which tells us at
+		any given point in time, what is the number of meetings going on.
 
 		Right now it's 2, but we're going to be returning whatever the max
 		value of it happened to be.
@@ -103,7 +103,7 @@
 		Next is the point 10, which is the first ending point.
 		So what does that tell us?
 		That tells us that a meeting has just ended. So what are we going to do
-		with out "count"?
+		with our "count"?
 
 		We knew we have 2 meetings going on at the same time, but now, after
 		this point:
@@ -122,7 +122,7 @@
 
 		
 		We're only going to have one meeting going on, therefore we're going
-		to se the number of meetings to 1.
+		to see the number of meetings to 1.
 
 		Next one is 15 and it happens to be the starting point.
 		So now, once again, there are two meeting going on at the same time.
@@ -147,8 +147,8 @@ class Solution{
 public:
 	int minMeetingRooms(std::vector<std::vector<int>>& intervals)
 	{
-		std::vector startings;
-		std::vector endings;
+		std::vector<int> startings;
+		std::vector<int> endings;
 
 		for (int i = 0; i < intervals.size(); i++)
 		{
