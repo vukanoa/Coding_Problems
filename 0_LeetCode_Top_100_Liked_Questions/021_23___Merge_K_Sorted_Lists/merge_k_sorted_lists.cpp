@@ -105,53 +105,51 @@ struct ListNode {
     ListNode(int x, ListNode *next) : val(x), next(next) {}
 };
 
-
 /* Much more Space  efficient than the, divide and conquer, solution below */
 
 /* Time  Beats:  5.40% */
 /* Space Beats: 96.36% */
+
 /* Time  Complexity: O(totalNumberOfNodes * k) */
 /* Space Complexity: O(1) */
 class Solution{
 public:
-	struct ListNode* mergeKLists(std::vector<struct ListNode*>& lists)
+	ListNode* mergeKLists(std::vector<ListNode*>& lists)
 	{
-		struct ListNode dummy;
-
-		struct ListNode* head = &dummy;
-		struct ListNode* tail = &dummy;
-
 		int n = lists.size();
-		int null_cnt = 0;
 
-		while (null_cnt < n)
+		ListNode* dummy_node = new ListNode();
+		ListNode* tail = dummy_node;
+
+		std::vector<ListNode*> null_vec(n, nullptr);
+		int idx = -1;
+
+		while (lists != null_vec)
 		{
 			int min = INT_MAX;
-			int index = -1;
+
 			for (int i = 0; i < n; i++)
 			{
 				if (lists[i] != nullptr && lists[i]->val < min)
 				{
+					idx = i;
 					min = lists[i]->val;
-					index = i;
+
+					std::cout << "\n\tOvde sam: " << lists[i]->val << "\n";
 				}
 			}
 
-			if (index < 0)
-				break;
+			tail->next = lists[idx];
+			lists[idx] = lists[idx]->next;
 
-			tail->next = lists[index];
 			tail = tail->next;
-
-			lists[index] = lists[index]->next;
-
-			if (lists[index] == nullptr)
-				null_cnt++;
+			tail->next = nullptr;
 		}
 
-		return head->next;
+		return dummy_node->next;
 	}
 };
+
 
 
 
