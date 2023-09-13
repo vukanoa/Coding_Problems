@@ -52,6 +52,106 @@
 
 */
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Idea is pretty intuitive, it's a basic Sliding Window approach.
+
+	Important things:
+	    1. If certain letter in string s doesn't appear in string t, we don't
+	       increment its value in our Hash Map s_map.
+
+	    2. Because of the first point - If certain letter in string s doesn't
+	       appear in string t, we won't decrease value in our Hash Map s_map
+	       before we move our left pointer. It's already zero guaranteed.
+
+		3. Function same_hash_maps is operating in O(1) since 128 is a constant
+
+*/
+
+/* Time  Beats:  8.27% */
+/* Space Beats: 39.16% */
+
+/*
+	Time  Complexity: O(m + n)
+
+	Technically, this is indeed O(m + n) because "same_hash_map" works in O(1)
+	since it's always 128 characters and that's a constant.
+
+	However, the "wall-clock time" is going to be a lot more than necessary.
+*/
+/*
+	Space Complexity: O(1)
+	
+	Same thing - We'll always keep only two vectors of exactly 128 characters
+	and since 128 is a constant, the overall Space Complexity is O(1)
+*/
+class Solution_Basic_Sliding_Window {
+public:
+	std::string minWindow(std::string s, std::string t)
+	{
+		int m = s.length();
+		int n = t.length();
+
+		if (m < n)
+			return "";
+
+		std::vector<int> s_map(128, 0);
+		std::vector<int> t_map(128, 0);
+
+		for (const char& c : t)
+			t_map[c]++;
+
+		int left  = 0;
+		int right = 0;
+
+		int start = -1;;
+		int min_window_size = INT_MAX;
+
+		while (right < s.length())
+		{
+			if (t_map[s[right]] > 0) // Only if it exists in 't'
+				s_map[s[right]]++;
+
+			while (same_hash_maps(s_map, t_map))
+			{
+				// Update minimum String
+				if (right - left + 1 < min_window_size)
+				{
+					min_window_size = right - left + 1;
+					start = left;
+				}
+
+				// 'Cause have been incrementing only letters present in t
+				if (s_map[s[left]] > 0)
+					s_map[s[left]]--;
+
+				left++;
+			}
+
+			right++;
+		}
+
+		return start == -1 ? "" : s.substr(start, min_window_size);
+	}
+
+private:
+	bool same_hash_maps(std::vector<int>& s_map, std::vector<int>& t_map)
+	{
+		for (int i = 0; i < 128; i++)
+		{
+			if (s_map[i] < t_map[i])
+				return false;
+		}
+
+		return true;
+	}
+};
+
+
+
 
 /*
 	------------
