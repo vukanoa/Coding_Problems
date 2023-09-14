@@ -277,6 +277,63 @@ public:
 
 
 /*
+	------------
+	--- IDEA ---
+	------------
+
+	This is how I think about this problem. I was just trying to solve it
+	without thinking about the code and, intuitively, I've come up with this
+	Solution.
+
+	This is a good example to try this code on:
+
+	______________________________________________-21______________________________________________
+	_______________________9______________________________________________17_______________________
+	___________1______________________-15______________________18______________________2___________
+	_________________8_______________________55_________-4___________12_____________________41_____
+	____________________29__________________________________30_________________________________-50_
+	__________________________________________________________________________________________3____
+
+*/
+
+/* Time  Beats: 76.97% */
+/* Space Beats: 13.38% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Intuitive {
+public:
+	int maxPathSum(TreeNode* root)
+	{
+		int max = INT_MIN;
+
+		dfs(root, max);
+
+		return max;
+	}
+
+private:
+	int dfs(TreeNode* root, int& max)
+	{
+		if (!root)
+			return 0;
+
+		int left  = dfs(root->left, max);
+		int right = dfs(root->right, max);
+
+		max = std::max(max, left  + root->val + right); // All 3
+		max = std::max(max, left  + root->val);         // Left  + Root
+		max = std::max(max, right + root->val);         // Right + Root
+		max = std::max(max, root->val);                 // Only Root
+
+		return std::max(std::max(left + root->val, right + root->val), root->val);
+	}
+};
+
+
+
+
+/*
 	=============================
 	=== This is just printing ===
 	=============================
@@ -355,8 +412,9 @@ print_levelorder(TreeNode* root)
 int
 main()
 {
-	Solution_1 sol_1;
-	Solution_2 sol_2;
+	Solution_1         sol_1;
+	Solution_2         sol_2;
+	Solution_Intuitive sol_intuitive;
 
 
 	/* Example 1 */
@@ -542,7 +600,8 @@ main()
 
 	/* Solution */
 	// int max = sol_1.maxPathSum(root);
-	int max = sol_2.maxPathSum(root);
+	// int max = sol_2.maxPathSum(root);
+	int max = sol_intuitive.maxPathSum(root);
 
 
 	/* Write Output */
