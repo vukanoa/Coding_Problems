@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
 	Balanced:
 	()
@@ -15,58 +13,85 @@
 	) (()) ))(
 */
 
-int
-solution(std::string &S)
-{
-	int cnt = 0;
-	int ret = 0;
+#include <iostream>
 
-	for(int i = 0; i < S.length(); i++)
+
+class Solution{
+public:
+	int solution(std::string& S)
 	{
-		if (S[i] != '(' && S[i] != ')')
-			continue;
-		else if (S[i] == '(')
-		{
-			if (i > 0 && S[i-1] == ')')
-				cnt = 0;
+		int add = 0;
+		int indicator = 0;
 
-			cnt++;
-		}
-		else if (S[i] == ')')
+		for (int i = 0; i < S.length(); i++)
 		{
-			cnt--;
-			if (cnt < 0)
-				ret++;
+			if (S[i] == ')')
+			{
+				if (indicator > 0)
+					indicator--;
+				else
+					add++;
+			}
+			else
+				indicator++;
 		}
+
+		add += indicator;
+
+		return add;
 	}
-	ret += cnt;
+};
 
-	return ret;
-}
 
-int
-main()
+int main()
 {
-	/* Balanced with letters */
-	// std::string S = "()P";
-	// std::string S = "(P)";
-	// std::string S = "P()";
+	Solution sol;
 
-	/* Balanced */
+	/* Example 1 */
 	// std::string S = "()";
+
+	/* Example 2 */
 	// std::string S = "()(())()";
+
+	/* Example 3 */
 	// std::string S = "()()()";
 
-	/* Not Balanced */
-	std::string S = ")(())))(";
+	/* Example 4 */
 	// std::string S = "(";
-	// std::string S = ")()(";
-	// std::string S = "))((";
 
-	int sol = solution(S);
-	std::cout << "\n\n\tString: " << S << "\n\n\n";
-	std::cout << "\tSolution is: " << sol << "\n\n\n";
+	/* Example 5 */
+	// std::string S = ")()()(";
 
+	/* Example 6 */
+	std::string S = "))((";
+
+	/* Example 7 */
+	// std::string S = ")(())))()())";
+
+	/* Example 8 */
+	// std::string S = ")(())))(";
+
+	/* Example 9 */
+	// std::string S = ")()()";
+
+	/* Example 10 */
+	// std::string S = "";
+
+
+	std::cout << "\n\t=========================";
+	std::cout << "\n\t=== STRING S BALANCED ===";
+	std::cout << "\n\t=========================\n";
+
+
+	/* Write Input */
+	std::cout << "\n\tInput: " << S << "\n";
+
+	/* Solution */
+	int add = sol.solution(S);
+
+	/* Write Output */
+	std::cout << "\n\tAdd: " << add << "\n\n";
 
 	return 0;
 }
+
