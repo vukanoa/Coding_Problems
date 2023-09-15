@@ -87,7 +87,7 @@
 
 /* Time  Complexity: TLE. Used to pass all tests prior to June 2022. */
 
-/* Time  Complexity: O(words.length * m * n * 4^words.length) */
+/* Time  Complexity: O(words.length * m * n * 4^(m * n)) */
 /* Space Complexity: O(words.length + m * n) */
 class Solution_TLE_Solution {
 public:
@@ -294,12 +294,12 @@ private:
 /* Time  Beats: 95.83% */
 /* Space Beats: 69.66% */
 
-/* Time  Complexity: O(m * n * 4^words.length) */
+/* Time  Complexity: O(m * n * 4^(m * n)) */
 /* Space Complexity: O(words.length + m * n) */
 class Solution {
 	struct TrieNode {
 	TrieNode *children[26];
-	string word;
+	std::string word;
 
 	TrieNode() : word("")
 	{
@@ -351,19 +351,19 @@ public:
 		return root;
 	}
 
-	void dfs(std::vector<std::vector<char>>& board, int i, int j, TrieNode *trie, std::vector<std::string>& result)
+	void dfs(std::vector<std::vector<char>>& board, int i, int j, TrieNode *trie_node, std::vector<std::string>& result)
 	{
 		char c = board[i][j];
 
-		if (c == '#' || !trie->children[c - 'a'])
+		if (c == '#' || !trie_node->children[c - 'a'])
 			return;
 
-		trie = trie->children[c - 'a'];
+		trie_node = trie_node->children[c - 'a'];
 
-		if (trie->word.size() > 0)
+		if (trie_node->word.size() > 0)
 		{
-			result.push_back(trie->word);
-			trie->word = "";
+			result.push_back(trie_node->word);
+			trie_node->word = "";
 		}
 
 		int m = board.size();
@@ -371,11 +371,143 @@ public:
 
 		board[i][j] = '#';
 
-		if (i > 0)     dfs(board, i - 1, j    , trie, result); // Up
-		if (j > 0)     dfs(board, i    , j - 1, trie, result); // Left
-		if (i < m - 1) dfs(board, i + 1, j    , trie, result); // Down
-		if (j < n - 1) dfs(board, i    , j + 1, trie, result); // Right
+		if (i > 0)     dfs(board, i - 1, j    , trie_node, result); // Up
+		if (j > 0)     dfs(board, i    , j - 1, trie_node, result); // Left
+		if (i < m - 1) dfs(board, i + 1, j    , trie_node, result); // Down
+		if (j < n - 1) dfs(board, i    , j + 1, trie_node, result); // Right
 
 		board[i][j] = c;
+	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	The same approach as above, only implemented in another way, however this
+	one is waaay more slow.
+
+	I'm going to include it here anyway, just for the sake of seeing that you
+	can implement this DFS-Backtracking approach in two ways:
+
+	1. Strict recursion
+	2. Using vector "directions"
+	
+*/
+
+/* Time  Beats: 5.01% */
+/* Space Beats: 5.07% */
+
+/* Time  Complexity: O(m * n * 4^(m * n)) */
+/* Space Complexity: O(words.length + m * n) */
+class Solution_Using_vector_Directions {
+	struct Trie{
+		std::vector<Trie*> children;
+		bool end;
+
+		Trie() : children(26, nullptr), end(false)
+		{}
+	};
+
+public:
+	std::vector<std::string> findWords(std::vector<std::vector<char>>& board, std::vector<std::string>& words)
+	{
+		int m = board.size();
+		int n = board[0].size();
+
+		Trie* root = insert_words_in_trie(words);
+
+		std::vector<std::string> results;
+
+		for (int i = 0; i < m; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				Trie* tmp_root = root;
+
+				if (tmp_root->children[board[i][j] - 'a'])
+					dfs(board, tmp_root->children[board[i][j] - 'a'], i, j, std::string(1, board[i][j]), results);
+			}
+		}
+
+		return results;
+	}
+
+private:
+	Trie* insert_words_in_trie(std::vector<std::string>& words)
+	{
+		Trie* root = new Trie();
+
+		for (int i = 0; i < words.size(); i++)
+		{
+			Trie* tmp = root;
+
+			for (int j = 0; j < words[i].size(); j++)
+			{
+				if (tmp->children[words[i][j] - 'a'] == nullptr)
+					tmp->children[words[i][j] - 'a'] = new Trie();
+
+				tmp = tmp->children[words[i][j] - 'a'];
+			}
+			tmp->end = true; // Mark the end of a word
+		}
+
+		return root;
+	}
+
+	void dfs(std::vector<std::vector<char>>& board,
+	         Trie* root,
+	         int row,
+	         int col,
+	         std::string curr_str,
+	         std::vector<std::string>& results)
+	{
+		if (root->end)
+		{
+			results.push_back(curr_str); // It can be "ap", but there can be "ape" too, so we continue
+
+			/*
+			   We don't want to include the same word twice.
+
+			   That happens only if this word is a prefix of another longer
+			   word in the list of words that can also be found traversing the
+			   board.
+
+			   Example: words ["oa", "oaa"]
+
+			   If we didn't set this root->end to false, our results would look
+			   like this:
+			   ["oa", "oa", "oaa"]
+			*/
+			root->end = false;
+		}
+
+		// So that this letter cannot be used more than once
+		char old_char = board[row][col];
+		board[row][col] = '#';
+
+		int m = board.size();
+		int n = board[0].size();
+
+		std::vector<std::pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+		for (auto& dir : directions)
+		{
+			int i = row + dir.first;
+			int j = col + dir.second;
+
+			if (i < 0 || i >= m || j < 0 || j >= n || board[i][j] < 'a' || board[i][j] > 'z')
+				continue;
+
+			if (root->children[board[i][j] - 'a'])
+				dfs(board, root->children[board[i][j] - 'a'], i, j, curr_str + board[i][j], results);
+		}
+
+		// Restore it
+		board[row][col] = old_char;
 	}
 };
