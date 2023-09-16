@@ -1,4 +1,10 @@
 #include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+#include <algorithm>
+#include <string>
+#include <functional>
 
 /*
 	***************
@@ -342,26 +348,27 @@
 
 /* Time  Complexity: O(total num of letters in words) */
 /* Space Complexity: O(total num of letters in words) */
-class Solution{
+class Solution_Using_Lambda {
 public:
 	std::string alienOrder(std::vector<std::string>& words)
 	{
-		std::unordered_map<har, std::unordered_set<char>> adj;
-		for (const std::string& word : words)
+		// Initialize the Hash Map
+		std::unordered_map<char, std::unordered_set<char>> adj;
+		for (std::string& word : words)
 		{
 			for (char& c : word)
-			{
-				adj[c] = unordered_set<char>();
-			}
+				adj[c] = std::unordered_set<char>();
 		}
 
-		for (int i = 0; i < word.size() - 1; i++)
+		// Construct the Graph(adjacency list)
+		for (int i = 0; i < words.size() - 1; i++)
 		{
 			std::string w1 = words[i];
 			std::string w2 = words[i + 1];
 
 			int min_len = std::min(w1.length(), w2.length());
 
+			// Invalid order that they've mentioned in the Description
 			if (w1.length() > w2.length() && w1.substr(0, min_len) == w2.substr(0, min_len))
 				return "";
 
@@ -375,36 +382,175 @@ public:
 			}
 		}
 
-		std::unordered_map<char, bool> visit;
+		std::unordered_map<char, bool> visited;
 		std::string result;
 
 		// Postorder DFS
-		function<bool(char)> dfs = [&](char c)
+		std::function<bool(char)> postorder_dfs = [&](char c) -> bool
 		{
-			if (visit.find(c) != visit.end())
-				return visit[c];
+			if (visited.find(c) != visited.end())
+				return visited[c];
 
-			visit[c] = true;
-			for (char nei : adj[c])
+			visited[c] = true;
+
+			for (char neighbor : adj[c])
 			{
-				if (dfs(nei))
+				if (postorder_dfs(neighbor))
 					return true;
 			}
 
-			visit[c] = false;
+			visited[c] = false;
 			result.push_back(c);
 
 			return false;
-		}
+		};
 
+		// Call Postorder DFS on every letter
 		for (auto& entry : adj)
 		{
-			if (dfs(entry.first))
+			// If we find a loop - Input is invalid, return an empty string
+			if (postorder_dfs(entry.first))
 				return "";
 		}
 
-		std::reverse(res.begin, res.end());
+		// Reverse the string in result
+		std::reverse(result.begin(), result.end());
 
-		return res;
+		return result;
 	}
 };
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Absolutely equivalent Solution, however this one doesn't use the lambda
+	function for postorder_dfs.
+
+*/
+
+/* Time  Complexity: O(total num of letters in words) */
+/* Space Complexity: O(total num of letters in words) */
+class Solution {
+public:
+	std::string alienOrder(std::vector<std::string> &words)
+	{
+		// Initialize the Hash Map
+		std::unordered_map<char, std::unordered_set<char>> adj_list;
+		for (std::string& word : words)
+		{
+			for (char& c : word)
+				adj_list[c] = std::unordered_set<char>();
+		}
+
+		// Construct the Graph (Adjacency List)
+		for (int i = 0; i < words.size() - 1; i++)
+		{
+			std::string word_1 = words[i];
+			std::string word_2 = words[i + 1];
+
+			int min_len = std::min(word_1.size(), word_2.size());
+
+			// Invalid case
+			if (word_1.size() > word_2.size() && word_1.substr(0, min_len) == word_2.substr(0, min_len))
+				return "";
+
+			for (int j = 0; j < min_len; j++)
+			{
+				if (word_1[j] != word_2[j])
+				{
+					adj_list[word_1[j]].insert(word_2[j]);
+					break;
+				}
+			}
+		}
+
+		std::unordered_map<char, bool> visited;
+		std::string result;
+
+		// Call Postorder DFS on every letter
+		for (auto& entry : adj_list)
+		{
+			// If we find a loop - Input is invalid, return an empty string
+			if (postorder_dfs(entry.first, adj_list, visited, result))
+				return "";
+		}
+
+		std::reverse(result.begin(), result.end());
+
+		return result;
+	}
+
+private:
+	bool
+	postorder_dfs(char c,
+                  std::unordered_map<char, std::unordered_set<char>>& adj_list,
+	              std::unordered_map<char, bool>& visited,
+	              std::string& result)
+	{
+		if (visited.find(c) != visited.end())
+			return visited[c];
+
+		visited[c] = true;
+
+		for (char neighbor : adj_list[c])
+		{
+			if (postorder_dfs(neighbor, adj_list, visited, result))
+				return true;
+		}
+
+		visited[c] = false;
+		result.push_back(c);
+
+		return false;
+	}
+};
+
+
+int
+main()
+{
+	Solution sol;
+	Solution_Using_Lambda sol_lambda;
+
+	/* Example 1 */
+	// std::vector<std::string> words = {"wrt", "wrf", "er", "ett", "rftt"};
+
+	/* Example 2 */
+	// std::vector<std::string> words {"we", "ee", "we"}; // Invalid Input
+
+	/* Example 3 */
+	std::vector<std::string> words = {"a", "ba", "bc", "c"};
+
+	std::cout << "\n\t=========================";
+	std::cout << "\n\t=== ALIEN DICTIONARY ===";
+	std::cout << "\n\t=========================\n";
+
+	/* Write Input */
+	bool first = true;
+	std::cout << "\n\tWords: [";
+	for (auto x: words)
+	{
+		if (!first)
+			std::cout << ", ";
+
+		std::cout << "\"" << x << "\"";
+		first = false;
+	}
+	std::cout << "]\n";
+
+
+	/* Solution */
+	// std::string result = sol.alienOrder(words);
+	std::string result = sol_lambda.alienOrder(words);
+
+
+	/* Write Output */
+	std::cout << "\n\tResult is: " << "\"" << result << "\"\n\n";
+
+	return 0;
+}
