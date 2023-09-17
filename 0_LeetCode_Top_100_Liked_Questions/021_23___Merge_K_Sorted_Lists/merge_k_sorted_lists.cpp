@@ -153,10 +153,33 @@ public:
 
 
 
-/* More Time efficient than the above solution */
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	It's a kind of Merge Sort Solution.
+	
+*/
 
 /* Time  Beats: 31.16% */
 /* Space Beats:  8.90% */
+
+/*
+    Time  Complexity: O(n * logk)
+
+    Divide and Conquer is used to iterate on the O(n * k) approach of merging
+	one by one. For each step, 'n' nodes(all of them) are compared during the
+	marge process - O(n).
+
+	At the end of each step, the number of lists that need to be merged has
+	been halfed, therefore the number of iterations needed is the number of
+	times you can half 'k' until you get to 1, that is "logk"(base 2), so each
+	step will be done "logk" times - O(logk)
+
+	Thus the time Complexity is O(n * logk)
+*/
+/* Space Complexity: O(n) */
 class Solution_Divide_And_Conquer{
 public:
     ListNode* mergeKLists(std::vector<ListNode*>& lists)
