@@ -290,8 +290,8 @@ private:
 	one that we need at a given point of searching through the word, we replace
 	that letter cell with an empty character, or <Space> character.
 
-	Why? So that whenever we compare <Space> character to a word[w] it won't
-	match so we won't be using it twice.
+	Why? So that whenever we compare <Space> character to a word[index] it
+	won't match so we won't be using it twice.
 
 	However if going down that path we find out that this path will not result
 	in a complete word, we replace back <Space> character with the character
@@ -318,16 +318,22 @@ private:
 	Where L is the length of the given word. This is because the recursive
 	stack will have at most L frames for each call to dfs_backtracking.
 */
-class Solution_Efficient{
+class Solution_Efficient {
 public:
 	bool exist(std::vector<std::vector<char>>& board, std::string word)
 	{
-		for (int i = 0; i < board.size(); i++)
+		int m = board.size();
+		int n = board[0].size();
+
+		for (int i = 0; i < m; i++)
 		{
-			for (int j = 0; j < board[0].size(); j++)
+			for (int j = 0; j < n; j++)
 			{
-				if (dfs_backtracking(board, word, 0, i, j))
-					return true;
+				if (board[i][j] == word[0])
+				{
+					if (dfs(board, word, i, j, 0))
+						return true;
+				}
 			}
 		}
 
@@ -335,29 +341,27 @@ public:
 	}
 
 private:
-	bool dfs_backtracking(std::vector<std::vector<char>>& board, std::string& word, int w, int i, int j)
+	bool dfs(std::vector<std::vector<char>>& board, std::string& word, int row, int col, int index)
 	{
-		if (w == word.length()) return true;
+		if (index == word.size())
+			return true;
 
-		if (i < 0 || i >= board.size())    return false;
-		if (j < 0 || j >= board[0].size()) return false;
+		if (row < 0 || row == board.size() || col < 0 || col == board[0].size() || board[row][col] != word[index])
+			return false;
 
-		if (word[w] == board[i][j])
-		{
-			board[i][j] = ' '; // So that we don't use the same element twice
+		char c = board[row][col];
+		board[row][col] = '#';
 
-			if (dfs_backtracking(board, word, w+1, i+1, j  )) return true;
-			if (dfs_backtracking(board, word, w+1, i-1, j  )) return true;
-			if (dfs_backtracking(board, word, w+1, i  , j+1)) return true;
-			if (dfs_backtracking(board, word, w+1, i  , j-1)) return true;
+		if (dfs(board, word, row-1, col  , index+1)) return true;
+		if (dfs(board, word, row+1, col  , index+1)) return true;
+		if (dfs(board, word, row  , col-1, index+1)) return true;
+		if (dfs(board, word, row  , col+1, index+1)) return true;
 
-			board[i][j] = word[w]; // Return used element so that we can use it again since we haven't found it yet
-		}
+		board[row][col] = c;
 
 		return false;
 	}
 };
-
 
 
 void
@@ -372,7 +376,6 @@ print_matrix(std::vector<std::vector<char>>& matrix)
 	}
 	std::cout << "\n";
 }
-
 
 
 int
