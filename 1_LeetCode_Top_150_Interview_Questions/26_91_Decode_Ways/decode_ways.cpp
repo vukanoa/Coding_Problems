@@ -71,6 +71,62 @@
 
 */
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	This Code gives TLE, but I wanted to save it here since you may think about
+	it this way at first.
+
+	However, this doesn't pass the "secret tests" since we're doing a lot of
+	repeated work.
+
+	Consider this example:
+	
+	s =  "111111111111111111111111111111111111"
+*/
+
+/* This Code gives TLE(Time Limit Exceeded) */
+
+/* Time  Complexity: O(2^n) */
+/* Space Complexity: O(n) */
+class Solution{
+public:
+	int numDecodings(std::string s)
+	{
+		int count = 0;
+
+		dfs_backtracking(s, count, 0);
+
+		return count;
+	}
+
+private:
+	void dfs_backtracking(std::string& s, int& count, int i)
+	{
+		if (i == s.length())
+		{
+			count++;
+			return;
+		}
+		else if (s[i] == '0')
+			return;
+
+		/* One digit */
+		dfs_backtracking(s, count, i+1);
+
+		/* Two digits */
+		if (i + 1 < s.length())
+		{
+			if (s[i] == '1')
+				dfs_backtracking(s, count, i+2);
+			else if (s[i] == '2' && s[i+1] >= '0' && s[i+1] < '7')
+				dfs_backtracking(s, count, i+2);
+		}
+	}
+};
+
 
 
 
@@ -266,11 +322,11 @@ private:
 
 		int res = 0;
 
-		// Single digit
+		/* One digit */
 		if (s[i] != '0')
 			res += dp(s, i+1);
 
-		// Two digits
+		/* Two digits */
 		if (i+1 < s.size() && (s[i] == '1' || s[i] == '2' && s[i+1] <= '6'))
 			res += dp(s, i+2);
 
@@ -286,11 +342,172 @@ private:
 	--- IDEA ---
 	------------
 
-	Same idea, but implemented in O(1) because we can see that we don't need
-	to use entire array of dp, but only 3 elements.
+	Bottom-Up approach.
+
+	Consider these Examples:
+	    1. s = "226"
+		2. s = "229"
+		3. s = "06"
+
+	1. s = "226"
+	    
+		s  = "2 2 6"
+	    dp = [0 0 0 0]
+		      0 1 2 3
+	    
+		We're essentially looking at subproblems.
+
+		For example, if we had only "6" - In how many ways could we decode it?
+		The answer is, obviously, 1.
+
+		So does that help us somehow?
+
+		What if we had "26", but we've already concluded that string "6" can
+		be decoded only in 1 way.
+
+		Can we use that to our advantage? Yes!
+
+		First, we have to check if the current digit(2 in our case) is != 0
+		because string starting with 0 cannot be decoded in any way:
+		    "0", "033243", "0111", ...
+
+		If it's not 0, then we can count in how many ways can we decode 6 and
+		then we have to consider if we can take 6(in our case) as our 2nd digit
+		of a 2-digit number.
+
+		In this case "26" can indeed be decoded. It's going to be letter 'Z'.
+
+		So we add that as well. Now we know for a fact that string "26" can be
+		decoded in 2 ways.
+		    1. 2 6 --> BF
+			2. 26  --> Z
+
+		Now we have to see in how many ways can a string "226" be decoded.
+
+		Again, can we use our, already computed, result for string "26"? Yes!
+
+		We are essentially going to have a vector dp which will store number of
+		ways in which we can decode from that digit until the end of the
+		string.
+
+		Simulation of example "226" would look like this:
+		    "2 2 6"
+		    [0 0 0 1]
+		           ^
+		 __________|
+		|
+		We know for a fact that an empty string can be "decoded" in only one
+		way, i.e. no letter at all.
+
+		##################
+		### SIMULATION ###
+		##################
+		1)
+		              i
+		    s  = "2 2 6"
+		    dp = [0 0 0 1]
+
+		2)
+		            i
+		    s  = "2 2 6"
+		    dp = [0 0 1 1]
+
+		3)
+		          i
+		    s  = "2 2 6"
+		    dp = [0 2 1 1]
+
+		4)
+		    dp = [3 2 1 1]
+	
+
+
+	2. s = "229"
+		##################
+		### SIMULATION ###
+		##################
+		1)
+		              i
+		    s  = "2 2 9"
+		    dp = [0 0 0 1]
+
+		2)
+		            i
+		    s  = "2 2 9"
+		    dp = [0 0 1 1]
+
+		3)
+		          i
+		    s  = "2 2 9"
+		    dp = [0 1 1 1]
+
+		4)
+		    dp = [2 1 1 1]
+
+
+	3. s = "06"
+		##################
+		### SIMULATION ###
+		##################
+		1)
+		            i
+		    s  = "0 6"
+		    dp = [0 0 1]
+
+		2)
+		          i
+		    s  = "0 6"
+		    dp = [0 1 1]
+
+		3)
+		    dp = [0 1 1]
+
+		We're returning dp[0] always.
+
+*/
+
+/* Time  Beats:   100% */
+/* Space Beats: 32.02% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Bottom_Up {
+public:
+	int numDecodings(std::string s)
+	{
+		std::vector<int> dp(s.length() + 1, 0);
+		int n = dp.size();
+
+		dp[n-1] = 1; // or dp[s.length()] = 1
+
+		for (int i = s.length()-1; i >= 0; i--)
+		{
+			/* One digit */
+			if (s[i] != '0')
+				dp[i] += dp[i + 1];
+
+			/* Two digits */
+			if (i + 1 < s.length() && (s[i] == '1' || (s[i] == '2' && s[i+1] >= '0' && s[i+1] < '7')))
+				dp[i] += dp[i + 2];
+		}
+
+		return dp[0];
+	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Same idea, but implemented in O(1) Space because we can see that we don't
+	need to use entire array of dp, but only 3 elements.
 
 	Similar to a House Robber problem or the Kadane's Algorithm.
-	
+
 */
 
 /* Time  Beats:  100% */
@@ -298,7 +515,7 @@ private:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_Bottom_Up { 
+class Solution_Bottom_Up_Space_Efficient { 
 public:
 	int numDecodings(const std::string& s)
 	{
@@ -310,11 +527,11 @@ public:
 
 		for (int i = n - 1; i >= 0; i--)
 		{
-			// Single digit
+			/* One digit */
 			if (s[i] != '0')
 				dp += dp1;
 
-			// Two digits
+			/* Two digits */
 			if (i+1 < s.size() && (s[i] == '1' || s[i] == '2' && s[i+1] <= '6'))
 				dp += dp2;
 
