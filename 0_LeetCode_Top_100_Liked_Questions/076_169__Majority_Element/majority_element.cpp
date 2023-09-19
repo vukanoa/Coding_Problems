@@ -328,7 +328,10 @@ main()
 	// std::vector<int> nums = {1, 2, 2, 3, 3, 3, 3};
 
 	/* Example 7 */
-	std::vector<int> nums = {1, 1, 2, 1, 2, 3, 3, 4, 3, 3};
+	// std::vector<int> nums = {1, 1, 2, 1, 2, 3, 3, 4, 3, 3};
+
+	/* Example 8 */
+	std::vector<int> nums = {1, 1, 2, 1, 2, 3, 2, 4, 2, 3};
 
 
 
