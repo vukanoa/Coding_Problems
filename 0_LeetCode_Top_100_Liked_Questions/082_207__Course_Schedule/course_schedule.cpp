@@ -490,7 +490,7 @@ private:
 	Consider this Example:
 	    3
 	     \
-		  -> 2
+	      -> 2
 	          \
 	           -> 0
 	               \
@@ -652,9 +652,8 @@ public:
 
 		std::vector<int> indegree(numCourses, 0);
 
-
-        for (int i = 0; i < prerequisites.size(); i++)
-            indegree[prerequisites[i][0]]++;
+		for (int i = 0; i < prerequisites.size(); i++)
+			indegree[prerequisites[i][0]]++;
 
 		std::unordered_set<int> zeroDegree;
 		for (int i = 0; i < numCourses; i++)
@@ -709,32 +708,32 @@ class Solution_Topological_2{
 public:
 	bool canFinish(int n, std::vector<std::vector<int>>& pre)
 	{
-	    std::vector<std::vector<int>> adj(n, std::vector<int>());
-	    std::vector<int> degree(n, 0);
+		std::vector<std::vector<int>> adj(n, std::vector<int>());
+		std::vector<int> degree(n, 0);
 
-	    for (int i = 0; i < pre.size(); i++)
+		for (int i = 0; i < pre.size(); i++)
 		{
-	        adj[pre[i][1]].push_back(pre[i][0]);
-	        degree[pre[i][0]]++;
-	    }
+			adj[pre[i][1]].push_back(pre[i][0]);
+			degree[pre[i][0]]++;
+		}
 
-	    std::queue<int> q;
+		std::queue<int> q;
 
-	    for (int i = 0; i < n; i++)
-	        if (degree[i] == 0) q.push(i);
+		for (int i = 0; i < n; i++)
+			if (degree[i] == 0) q.push(i);
 
-	    while (!q.empty())
+		while (!q.empty())
 		{
-	        int curr = q.front(); q.pop(); n--;
+			int curr = q.front(); q.pop(); n--;
 
-	        for (auto next: adj[curr])
+			for (auto next: adj[curr])
 			{
-	            if (--degree[next] == 0)
+				if (--degree[next] == 0)
 					q.push(next);
 			}
-	    }
+		}
 
-	    return n == 0;
+		return n == 0;
 	}
 };
 
@@ -750,46 +749,46 @@ class Solution_My_Invention {
 public:
 	bool canFinish(int n, std::vector<std::vector<int>>& pre)
 	{
-        std::vector<bool> path(n, false);
-        std::unordered_set<int> done;
+		std::vector<bool> path(n, false);
+		std::unordered_set<int> done;
 
-        std::vector<std::vector<int>> adj_list(n);
+		std::vector<std::vector<int>> adj_list(n);
 
-        // Make adjacency list
-        for (auto& edge : pre)
-            adj_list[edge[0]].push_back(edge[1]);
-        
-        for (int i = 0; i < n; i++)
-        {
-            if (!topological(adj_list, path, done, i))
-                return false;
-        }
+		// Make adjacency list
+		for (auto& edge : pre)
+			adj_list[edge[0]].push_back(edge[1]);
 
-        return done.size() == n;
+		for (int i = 0; i < n; i++)
+		{
+			if (!topological(adj_list, path, done, i))
+				return false;
+		}
+
+		return done.size() == n;
 	}
 
-    bool topological(std::vector<std::vector<int>>& adj_list, std::vector<bool>& path, std::unordered_set<int>& done, int node)
-    {
-        // Loop
-        if (path[node] == true)
-            return false;
+	bool topological(std::vector<std::vector<int>>& adj_list, std::vector<bool>& path, std::unordered_set<int>& done, int node)
+	{
+		// Loop
+		if (path[node] == true)
+			return false;
 
-        if (done.count(node)) // Exists in the set
-            return true;
-        
-        path[node] = true;
+		if (done.count(node)) // Exists in the set
+			return true;
 
-        for (int j = 0; j < adj_list[node].size(); j++)
-        {
-            if (!topological(adj_list, path, done, adj_list[node][j]))
-                return false;
-        }
+		path[node] = true;
 
-        path[node] = false;
-        done.insert(node); // Can be completed
+		for (int j = 0; j < adj_list[node].size(); j++)
+		{
+			if (!topological(adj_list, path, done, adj_list[node][j]))
+				return false;
+		}
 
-        return true;
-    }
+		path[node] = false;
+		done.insert(node); // Can be completed
+
+		return true;
+	}
 };
 
 
