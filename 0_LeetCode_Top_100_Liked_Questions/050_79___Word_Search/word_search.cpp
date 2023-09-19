@@ -350,14 +350,14 @@ private:
 			return false;
 
 		char c = board[row][col];
-		board[row][col] = '#';
+		board[row][col] = '#'; // So that we don't use the same element twice
 
 		if (dfs(board, word, row-1, col  , index+1)) return true;
 		if (dfs(board, word, row+1, col  , index+1)) return true;
 		if (dfs(board, word, row  , col-1, index+1)) return true;
 		if (dfs(board, word, row  , col+1, index+1)) return true;
 
-		board[row][col] = c;
+		board[row][col] = c; // Return used element so that we can use it again since we haven't found it yet
 
 		return false;
 	}
