@@ -122,3 +122,64 @@ public:
 		return std::max(prev, curr);
 	}
 };
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Another way of implementing.
+
+*/
+
+/* Time  Beats: 86.85% */
+/* Space Beats: 58.94% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n) */
+class Solution{
+public:
+	int deleteAndEarn(std::vector<int>& nums)
+	{
+		int n = nums.size();
+		if (n == 1)
+			return nums[0];
+
+		// Hash Map
+		std::unordered_map<int, int> occurrences;
+
+		// Fill the Hash Map
+		for (int& num : nums)
+			occurrences[num]++;
+
+		// New vector without size of unique numbers in "nums"
+		std::vector<int> new_nums(occurrences.size());
+
+		// Fill new vector with unique values form "nums"
+		int i = 0;
+		for (auto& entry : occurrences)
+			new_nums[i++] = entry.first;
+
+		std::sort(new_nums.begin(), new_nums.end());
+
+		// The most important part of the Solution
+		int prev = 0;
+		int curr = new_nums[0] * occurrences[new_nums[0]];
+		for (int i = 1; i < new_nums.size(); i++)
+		{
+			int tmp;
+			if (new_nums[i] - 1 == new_nums[i - 1])
+				tmp = std::max(curr, new_nums[i] * occurrences[new_nums[i]] + prev);
+			else
+				tmp = new_nums[i] * occurrences[new_nums[i]] + std::max(curr, prev);
+
+			prev = curr;
+			curr = tmp;
+		}
+
+		return curr;
+	}
+};
