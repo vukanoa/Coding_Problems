@@ -55,28 +55,24 @@
 	We make an additional matrix named "dp"(Dynamic Programming).
 
 	We iterate through entire matrix "grid" and at each point, that is:
-		'i' and 'j'
+	    'i' and 'j'
+	
+	Calculate Minimum Path Sums for the very first(0-th) row.
+	Calculate Minimum path Sums for the very first(0-th) column.
 
-	put dp[i][j] = grid[i][j];
-
-	If there is a row above the current row and if there is a column before
-	the current column, we add dp[i][j] with the smaller value of those two.
-
-	If either is absent, add only the present one.
-	That is:
-		if we are at the row    0, add only from current point's left
-		if we are at the column 0, add only from current point's up
-
-	If both are absent(though that happens only for the very first element)
-	don't add anything on top of grid[i][j] value;
+	Start iterating from i = 1 and j = 1 since both 0-th row and 0-th column
+	are calculated.
+	
+	At dp[i][j] put grid[i][j](which is the current value) + minimum out of
+	either the cell above the current one, or the cell to the left of the
+	current one.
 
 	After we've filled the entire "dp" matrix, just return dp[m - 1][n - 1]
 
 */
 
-
-/* Time  Beats: 94.91% */
-/* Space Beats: 29.52% */
+/* Time  Beats: 98.17% */
+/* Space Beats: 26.16% */
 
 /* Time  Complexity: O(m * n) */
 /* Space Complexity: O(m * n) */
@@ -87,26 +83,85 @@ public:
         int m = grid.size();
         int n = grid[0].size();
 
-        std::vector<std::vector<int>> dp(m, std::vector<int>(n, 0));
+        std::vector<std::vector<int>> dp(m, std::vector(n, 0));
+        dp[0][0] = grid[0][0];
 
-        for (int i = 0; i < m; i++)
+        for (int i = 1; i < m; i++)
+            dp[i][0] = grid[i][0] + dp[i - 1][0];
+
+        for (int j = 1; j < n; j++)
+            dp[0][j] = grid[0][j] + dp[0][j - 1];
+
+        for (int i = 1; i < m; i++)
         {
-            for (int j = 0; j < n; j++)
-            {
-                dp[i][j] = grid[i][j];
-
-                if (i > 0 && j > 0)
-                    dp[i][j] += std::min(dp[i - 1][j], dp[i][j - 1]);
-                else if (i > 0 && j == 0)     // 0-th Column
-                    dp[i][j] += dp[i - 1][j];
-                else if (i == 0 && j > 0)     // 0-th Row
-                    dp[i][j] += dp[i][j - 1];
-            }
+            for (int j = 1; j < n; j++)
+                dp[i][j] += grid[i][j] + std::min(dp[i - 1][j], dp[i][j - 1]);
         }
 
         return dp[m - 1][n - 1];
     }
 };
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Upon further looking at the problem or the previous Solution, we can notice
+	that at each iteration of 'i' we only need one row. Though it is a bit
+	different than that.
+
+	Again:
+	Calculate Minimum Path Sums for the very first(0-th) row.
+	Calculate Minimum path Sums for the very first(0-th) column.
+
+	Also, again start iterating from i = 1, j = 1.
+	However we need the row[0] to be the corresponding dp[i][0] which is col[i]
+	So at each iteration of 'i' we're putting col[i] into the row[0].
+
+	This way we're ensuring that our row[j - 1] is always working whichever row
+	we're on.
+
+	At the end, just return row[n - 1].
+*/
+
+/* Time  Beats:  100% */
+/* Space Beats: 75.73% */
+
+/* Time  Complexity: O(m * n) */
+/* Space Complexity: O(max(m, n)) */
+class Solution_Optimized {
+public:
+    int minPathSum(std::vector<std::vector<int>>& grid)
+    {
+        int m = grid.size();
+        int n = grid[0].size();
+
+        std::vector<int> row(n, 0);
+        row[0] = grid[0][0];
+        for (int j = 1; j < n; j++)
+            row[j] = row[j-1] + grid[0][j];
+        
+        std::vector<int> col(m, 0);
+        col[0] = grid[0][0];
+        for (int i = 1; i < m; i++)
+            col[i] = col[i-1] + grid[i][0];
+
+        for (int i = 1; i < m; i++)
+        {
+            row[0] = col[i];
+
+            for (int j = 1; j < n; j++)
+                row[j] = grid[i][j] + std::min(row[j-1], row[j]); // min(left, up)
+        }
+
+        return row[n-1];
+    }
+};
+
 
 
 void
@@ -127,7 +182,8 @@ print_matrix(std::vector<std::vector<int>>& matrix)
 int
 main()
 {
-	Solution sol;
+	Solution           sol;
+	Solution_Optimized sol_opt;
 
 	/* Example 1 */
 	std::vector<std::vector<int>> grid = {{1, 3, 1}, {1, 5, 1}, {4, 2, 1}};
@@ -148,7 +204,8 @@ main()
 
 
 	/* Solution */
-	int result = sol.minPathSum(grid);
+	// int result = sol.minPathSum(grid);
+	int result = sol_opt.minPathSum(grid);
 
 
 	/* Write Output */
