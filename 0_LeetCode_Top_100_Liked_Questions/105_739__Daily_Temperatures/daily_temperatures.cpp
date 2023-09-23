@@ -499,6 +499,49 @@ public:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Another way of implementing the above Solution. Maybea bit more intuitive.
+
+*/
+
+/* Time  Beats: 46.94% */
+/* Space Beats: 63.85% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Monotonic_Stack {
+public:
+	std::vector<int> dailyTemperatures(std::vector<int>& temperatures)
+	{
+		int n = temperatures.size();
+
+		std::vector<int> results (n, 0);
+
+		std::stack<int> monotonic_stack;
+		monotonic_stack.push(n-1);
+
+		for (int i = n-2; i >= 0; i--)
+		{
+			while (!monotonic_stack.empty() && temperatures[i] >= temperatures[monotonic_stack.top()])
+				monotonic_stack.pop();
+
+			if (!monotonic_stack.empty() && temperatures[i] < temperatures[monotonic_stack.top()])
+				results[i] = monotonic_stack.top() - i;
+
+			monotonic_stack.push(i);
+		}
+
+		return results;
+	}
+};
+
+
 int
 main()
 {
