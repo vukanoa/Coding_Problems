@@ -239,6 +239,60 @@ public:
 	--- IDEA ---
 	------------
 
+	Almost equivalent IDEA to the one above, but implemented in a way that's
+	easier to undersand.
+
+	This is a good example to simulate:
+
+	nums = [3,  4, -1,  0,  6,  2,  3]
+	        0   1   2   3   4   5   6
+
+	dp   = [1,  2,  1,  2,  3,  3,  4]
+	        0   1   2   3   4   5   6
+
+*/
+
+/* Time  Beats: 60.30% */
+/* Space Beats: 39.14% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(n) */
+class Solution_Touche {
+public:
+	int lengthOfLIS(std::vector<int> &nums)
+	{
+		int n = nums.size();
+		std::vector<int> dp(n, 1);
+
+		int left  = 0;
+		int right = 1;
+		while (right < n)
+		{
+			if (left == right)
+			{
+				left = 0;
+				right++;
+
+				continue;
+			}
+			else if (nums[left] < nums[right])
+				dp[right] = std::max(dp[right], dp[left] + 1);
+
+			left++;
+		}
+
+		return *max_element(dp.begin(), dp.end());
+	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
 	Greedy with Binary Search
 
 	Let's construct the idea from following example.
@@ -548,6 +602,7 @@ main()
 	Solution_Greedy_Binary     sol_grd_bin; // Efficient!
 	Solution_BIT               sol_bit;
 	Solution_BIT_Compress      sol_bit_com;
+	Solution_Touche            sol_touche;
 
 
 	/* Example 1 */
@@ -584,6 +639,7 @@ main()
 	int longest = sol_grd_bin.lengthOfLIS(nums);
 	// int longest = sol_bit.lengthOfLIS(nums);
 	// int longest = sol_bit_com.lengthOfLIS(nums);
+	// int longest = sol_touche.lengthOfLIS(nums);
 
 
 	std::cout << "\n\tLongest Increasing Subsequence: " << longest << "\n\n";
