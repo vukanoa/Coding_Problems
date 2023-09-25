@@ -53,14 +53,58 @@
 	--- IDEA ---
 	------------
 
-	The most basic Binary Search.
+	The most basic Binary Search. However, it's important to note it here as
+	well:
+
+	    DO NOT write Binary Search like this: int mid = (l + r) / 2;
+		Overflow can happen.
 	
+	Consider this:
+
+	You have to find number: INT_MAX-3
+	INT_MAX is: 2,147,483,647
+
+	INT_MAX - 3 --> 2,147,483,647 - 3 = 2,147,483,644
+
+	Imagine that the range we're searching this number in is: [0, INT_MAX];
+
+	At some point in our process of Binary Search, our left bound will be
+	somewhere close to INT_MAX-5 and our right bound will remain INT_MAX since
+	we've always gone to the right after comparing mid with the target value.
+
+	So now:
+	left  = INT_MAX-5
+	right = INT_MAX
+
+	If we try to do this:
+		int mid = (left + right) / 2
+	
+	The Overflow will happen. The computation is going to produce an invalid
+	calculation because int is 32-bits(on 64-bit architecture) which means
+	that the maximum positive value it can store is INT_MAX, therefore
+	doing:
+	    int mid + (left + right) / 2
+
+	Where:
+	left  = INT_MAX-5
+	right = INT_MAX
+
+	Will produce a mistake.
+
+	So how can we resolve this?
+
+	Simply use this formula instead:
+	    int mid = left + (right - left) / 2;
+	
+	What this does is: It adds halfed current range on the left bound. That is
+	guaranteed not to make a Overflow.
+
 */
 
-/* Time  Beats: 86.59% */
-/* Space Beats: 50.71% */
+/* Time  Beats: 91.14% */
+/* Space Beats: 14.53% */
 
-/* Time  Complexity: O(log n) */
+/* Time  Complexity: O(logn) */
 /* Space Complexity: O(1) */
 class Solution{
 public:
@@ -71,16 +115,18 @@ public:
 
 		while (l <= r)
 		{
-			int mid = (l + r) / 2;
+			// DON'T write it like this: mid = (l + r) / 2; It can Overflow!!!
+			int mid = l + (r - l) / 2;
 
 			if (nums[mid] == target) 
 				return mid;
-			else if (target < nums[mid])
-				r = mid - 1;
-			else if (target > nums[mid])
+
+			if (nums[mid] < target)
 				l = mid + 1;
+			else
+				r = mid - 1;
 		}
-		
+
 		return -1;
 	}
 };
