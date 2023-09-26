@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <queue>
 
 /*
 	==============
@@ -43,6 +44,39 @@
 	-10^4 <= nums[i] <= 10^4
 
 */
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Basic use of Priority Queues. Other Solutions as of 25th Septembter 2023
+	do not pass all the tests.
+
+	There is a big test-case which fails for other Solutions down below, but it
+	used to work and it's good to know Quick-Select and its optimization.
+
+*/
+
+/* Time  Beats: 37.72% */
+/* Space Beats: 10.68% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n) */
+class Solution_Basic {
+public:
+	int findKthLargest(std::vector<int>& nums, int k)
+	{
+		std::priority_queue<int> max_heap(nums.begin(), nums.end());
+
+		for (int i = 0; i < k - 1; i++)
+			max_heap.pop();
+
+		return max_heap.top();
+	}
+};
+
+
 
 
 /*
@@ -381,63 +415,7 @@ public:
 	--- IDEA ---
 	------------
 
-	Same as above, just implemented a bit differently.
-	
-*/
-
-
-/* Time  Beats: 6.44% */
-/* Space Beats: 99.47% */
-class Solution_Readable{
-private:
-	int quick_select(std::vector<int>& nums, int k, int left, int right)
-	{
-		int j = left;
-		int i = left;
-		int pivot_index = right;
-
-		while (j < pivot_index)
-		{
-			if (nums[j] <= nums[pivot_index])
-			{
-				std::swap(nums[i], nums[j]);
-				i++;
-			}
-
-			j++;
-		}
-		std::swap(nums[i], nums[right]);
-
-		if (k == i)
-			return nums[i];
-		else if (k < i)
-			return quick_select(nums, k, left, i - 1);
-		else // (k > i)
-			return quick_select(nums, k, i + 1, right);
-	}
-
-public:
-	int findKthLargest(std::vector<int>& nums, int k)
-	{
-		if (nums.size() == 1)
-			return nums[0]; // Since we're certain that k is also 1
-
-		k = nums.size() - k; // Index in the array as if it was sorted.
-		int kth = quick_select(nums, k, 0, nums.size() - 1);
-
-		return kth;
-	}
-};
-
-
-
-
-/*
-	------------
-	--- IDEA ---
-	------------
-
-	This is it. To optimize Quick-Select, we should:
+	To optimize Quick-Select, we should:
 
 	===========================================================================
 	Check if the array is already sorted and if it is then just
@@ -452,7 +430,6 @@ public:
 	===========================================================================
 	
 */
-
 
 /* Time  Beats: 91.69% */
 /* Space Beats: 72.98% */
@@ -516,6 +493,7 @@ public:
 
 
 
+
 /*
 	------------
 	--- IDEA ---
@@ -574,8 +552,7 @@ private:
 int
 main()
 {
-	Solution           sol;
-	Solution_Readable  sol_readable;
+	Solution_Basic     sol_basic;
 	Solution_Efficient sol_efficient;
 	Solution_Difficult sol_difficult;
 
@@ -616,9 +593,8 @@ main()
 
 
 	/* Solution */
-	// int kth = sol.findKthLargest(nums, k);
-	// int kth = sol_readable.findKthLargest(nums, k);
-	int kth = sol_efficient.findKthLargest(nums, k);
+	int kth = sol_basic.findKthLargest(nums, k);
+	// int kth = sol_efficient.findKthLargest(nums, k);
 	// int kth = sol_difficult.findKthLargest(nums, k);
 
 
