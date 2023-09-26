@@ -144,12 +144,115 @@
 
 */
 
-/* Time  Beats: 50.58% */
-/* Space Beats: 56.45% */
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	TODO
+
+*/
+
+/* Time  Beats: 99.69% */
+/* Space Beats: 65.34% */
 
 /* Time  Complexity: O(1) */
 /* Space Complexity: O(n) */
-class LRUCache{
+class LRUCache {
+private:
+	struct Node
+	{
+		int key;
+		int val;
+		Node* prev;
+		Node* next;
+
+		Node(int k, int v) : key(k), val(v), prev(nullptr), next(nullptr)
+		{}
+	};
+
+	int cache_capacity;
+	Node* head;
+	Node* tail;
+
+	std::unordered_map<int, Node*> cache;
+
+public:
+	LRUCache(int capacity) : cache_capacity(capacity)
+	{
+		head = new Node(0, 0); // Left  Dummy Node that points to LRU(Least Recently used)
+		tail = new Node(0, 0); // RIght Dummy node that points to MRU(Most  Recently used)
+
+		head->next = tail;
+		tail->prev = head;
+	}
+
+	int get(int key)
+	{
+		if (cache.find(key) != cache.end())
+		{
+			remove_from_list(cache[key]);
+			append_to_list  (cache[key]);
+
+			return cache[key]->val;
+		}
+
+		return -1;
+	}
+
+	void put(int key, int value)
+	{
+		if (cache.find(key) != cache.end())
+			remove_from_list(cache[key]);
+
+		cache[key] = new Node(key, value);
+		append_to_list(cache[key]);
+
+		if (cache.size() > cache_capacity)
+		{
+			Node* lru = head->next;
+			remove_from_list(lru);
+			cache.erase(lru->key);
+		}
+	}
+
+	void remove_from_list(Node* node)
+	{
+		Node* prev_node = node->prev;
+		Node* next_node = node->next;
+
+		prev_node->next = next_node;
+		next_node->prev = prev_node;
+	}
+
+	void append_to_list(Node* node)
+	{
+		Node* last_node = tail->prev;
+
+		last_node->next = node;
+		tail->prev = node;
+
+		node->prev = last_node;
+		node->next = tail;
+	}
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	It's exactly the same, but this one prints what is doing. Run the program
+	to see what I'm talking about.
+
+*/
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(n) */
+class LRUCache_Printing{
 private:
 	// Definition for doubly-linked list.
 	struct Node {
@@ -167,7 +270,7 @@ private:
 	std::unordered_map<int, Node*> cache;
 
 public:
-	LRUCache(int capacity)
+	LRUCache_Printing(int capacity)
 	{
 		cache_capacity = capacity;
 
@@ -179,8 +282,6 @@ public:
 
 	int get(int key)
 	{
-		std::cout << "\tGet: (" << key << ")\n";
-
 		if (cache.find(key) != cache.end())
 		{
 			remove_from_list(cache.at(key));
@@ -287,7 +388,7 @@ main()
 	std::cout << "\n\t=================\n\n";
 
 	/* Example 1 & Solution*/
-	LRUCache lRUCache(2);
+	LRUCache_Printing lRUCache(2);
 	lRUCache.put(1, 1); // cache is {1=1}
 	lRUCache.put(2, 2); // cache is {1=1, 2=2}
 	lRUCache.get(1);    // return 1
