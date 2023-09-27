@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <functional>
 
 /*
 	==============
@@ -68,11 +69,22 @@
 	
 */
 
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	Self-Explanatory.
+
+	There aren't any "tricks" for this problem. Just think logically and you'll
+	notice that 2 Binary Searches are the most optimal Solution.
+
+*/
 
 /* Time  Beats: 100% */
-/* Space Beats: 80.78% */
+/* Space Beats: 8.63% */
 
-/* Time  Complexity: O(log^2(n)) */
+/* Time  Complexity: O(log(m * n)) */
 /* Space Complexity: O(1) */
 class Solution_BS {
 public:
@@ -84,76 +96,43 @@ public:
 		if (target < matrix[0][0] || target > matrix[m - 1][n - 1])
 			return false;
 
-		int up   = 0;
-		int down = m - 1;
-		int prev_mid = -1; // This is if Binary Search "Gets stuck"
-
-		/* Last Row */
-		if (matrix[down][0] < target)
+		/* Lambda for Binary Search through Columns in a correct Row */
+		std::function<bool(int)> binary_search;
+		binary_search = [&](int row) -> bool
 		{
-			/* Binary Search */
 			int left  = 0;
-			int right = n - 1;
+			int right = n-1;
+			
 			while (left <= right)
 			{
-				int mid = (left + right) / 2;
+				int mid = left + (right - left) / 2;
 
-				if (matrix[down][mid] == target)
+				if (matrix[row][mid] == target)
 					return true;
-				else if (matrix[down][left]  == target)
-					return true;
-				else if (matrix[down][right] == target)
-					return true;
-				else if (target < matrix[down][mid])
+
+				if (matrix[row][mid] < target)
+					left  = mid + 1;
+				else
 					right = mid - 1;
-				else if (matrix[down][mid] < target)
-					left = mid + 1;
 			}
 
 			return false;
-		}
+		};
 
-		/* Binary Search inside Binary Search */
-		while(up <= down)
+		int top = 0;
+		int bot = m-1;
+
+		/* Binary Search through Rows */
+		while (top <= bot)
 		{
-			int mid = (up + down) / 2;
+			int mid = top + (bot - top) / 2;
 
-			if (mid == prev_mid)
-			{
-				int left  = 0;
-				int right = n - 1;
-
-				while (left <= right)
-				{
-					int mid = (left + right) / 2;
-
-					if (matrix[prev_mid][mid] == target)
-						return true;
-					else if (matrix[prev_mid][left]  == target)
-						return true;
-					else if (matrix[prev_mid][right] == target)
-						return true;
-					else if (target < matrix[prev_mid][mid])
-						right = mid - 1;
-					else if (matrix[prev_mid][mid] < target)
-						left  = mid + 1;
-				}
-
-				return false;
-			}
+			if (matrix[mid][n-1] < target)
+				top = mid + 1;
+			else if(target < matrix[mid][0])
+				bot = mid - 1;
 			else
-				prev_mid = mid;
-
-			if (target == matrix[mid][0])
-				return true;
-			else if (matrix[up][0]   == target)
-				return true;
-			else if (matrix[down][0] == target)
-				return true;
-			else if (target < matrix[mid][0])
-				down = mid;
-			else if (matrix[mid][0] < target)
-				up = mid;
+				return binary_search(mid);
 		}
 
 		return false;
@@ -193,10 +172,10 @@ public:
 
 */
 
-/* Time  Beats: 100% */
+/* Time  Beats:   100% */ // I have no idea how is this one faster
 /* Space Beats: 96.94% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(m * n) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
