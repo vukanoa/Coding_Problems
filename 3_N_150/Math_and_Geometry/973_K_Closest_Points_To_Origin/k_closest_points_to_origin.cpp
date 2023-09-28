@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <queue>
 
 /*
 	==============
@@ -109,5 +110,74 @@ private:
 	double euclidean_distance(int& x1, int& y1)
 	{
 		return sqrt(x1*x1 + y1*y1);
+	}
+};
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	We can notice 2 thing2:
+	    1. We don't need to calculate the SQRT. The "higher" values are going
+	       to be "higher" anyway. So don't need to compute that. We can just do
+	       this: x1*x1 + y1*y1
+
+	    2. Since we don't need all n points, we don't have to sort all the
+	       computed distances. Imagine if we had a million of points and also
+	       imagine that k = 3.
+
+	       Why would we had to sort the entire array of million elements if we
+	       only need top 3?
+
+	       To get top 3, we need to use a Max Heap.
+	       Each time we calculate the distance between point Pi and Origin(0,0)
+	       we can push the pair of {distance, Point Pi} and if the number of
+	       distances(i.e. pairs) is greater than k, since we are inserting in a
+	       Max Heap, the biggest distance, i.e. the Point Pi that is farthest
+	       from the Origin(0, 0) can be evicted from our Max Heap, thus leaving
+	       us with exactly K closest points to Origin.
+*/
+
+/* Time  Beats: 35.28% */
+/* Space Beats: 37.94% */
+
+/*
+	Time  Complexity: O(n * logk)
+	k is less than or equal to n. Usually it's less than n, which makes this
+	Solution faster than O(n * logn)
+
+	This one in theory is faster, however on LeetCode, this Solution has a
+	worse Time Complexity than the one above.
+*/
+/*
+	Space Complexity: O(n)
+*/
+class Solution {
+public:
+	std::vector<std::vector<int>> kClosest(std::vector<std::vector<int>>& points, int k)
+	{
+		std::priority_queue<std::pair<int, std::vector<int>>> max_heap;
+		for (auto& point : points)
+		{
+			int x = point[0];
+			int y = point[1];
+
+			max_heap.push({x*x + y*y, point});
+
+			// O(log k)
+			if (max_heap.size() > k)
+				max_heap.pop();
+		}
+
+		std::vector<std::vector<int>> results;
+		for (int i = 0; i < k; ++i)
+		{
+			results.push_back(max_heap.top().second);
+			max_heap.pop();
+		}
+
+		return results;
 	}
 };
