@@ -124,9 +124,6 @@ private:
 	}
 };
 
-
-
-
 /* Time  Beats: 98.03% */
 /* Space Beats: 67.51% */
 
@@ -136,29 +133,25 @@ class Solution {
 public:
 	int goodNodes(TreeNode* root)
 	{
-		if(root == NULL)
-			return 0;
-
 		int count = 0;
-		dfs(root, root->val, count);
+		dfs(root, INT_MIN, count);
 
 		return count;
 	}
 
 private:
-	void dfs(TreeNode* root, int max, int& count)
+	void dfs(TreeNode* root, int max_on_this_path, int& count)
 	{
-		if(root == NULL)
+		if (!root)
 			return;
-		
-		// If max value of ancestors is less than or equal to curr node then increment count
-		if(root->val >= max)
+
+		if (root->val >= max_on_this_path)
+		{
 			count++;
+			max_on_this_path = root->val;
+		}
 
-		max = std::max(max, root->val);
-
-		dfs(root->left,  max, count);
-		dfs(root->right, max, count);
+		dfs(root->left,  max_on_this_path, count);
+		dfs(root->right, max_on_this_path, count);
 	}
 };
-
