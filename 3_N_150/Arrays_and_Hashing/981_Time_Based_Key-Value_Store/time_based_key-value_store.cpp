@@ -1,6 +1,8 @@
 #include <iostream>
 #include <unordered_map>
 #include <map>
+#include <vector>
+#include <algorithm>
 
 /*
 	==============
@@ -100,6 +102,19 @@
 	--- IDEA ---
 	------------
 
+	NOTE: We don't have to do it this way since in the "constraints" we're told
+	that:
+		"All the timestamps timestamp of set are strictly increasing."
+	
+	Which means that we don't have to keep them sorted manually by having a
+	Map(Red-Black tree) since it will be sorted anyway.
+
+	However, I wanted to have this implementation as well because you must show
+	that you know how to use both unordered_map and map in C++ and you have to
+	know how to use iterators in the right way.
+
+	So it's good to go through this Solution as well.
+
 	It's important to know how both "unordered_map" and "map" work.
 
 	First, "unordered_map" is a basic Hash Map. It hashes the keys to give you
@@ -162,10 +177,7 @@
 /* Space Complexity: O(n) */
 class TimeMap {
 public:
-	TimeMap()
-	{
-
-	}
+	TimeMap() {}
 
 	void set(std::string key, std::string value, int timestamp)
 	{
@@ -202,10 +214,103 @@ private:
 };
 
 
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	This is a much more elegant way of writing the above Solution. I wanted to
+	imeplement both just so you can see the difference and different
+	approaches.
+
+*/
+
+/* Time  Beats: 41.42% */
+/* Space Beats: 17.05% */
+
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(n) */
+class TimeMap_Elegant {
+public:
+	TimeMap_Elegant() {}
+
+	void set(std::string key, std::string value, int timestamp)
+	{
+		umap[key].insert({ timestamp, value });
+	}
+
+	std::string get(std::string key, int timestamp)
+	{
+		auto it = umap[key].upper_bound(timestamp);
+
+		return it == umap[key].begin() ? "" : std::prev(it)->second;
+	}
+
+private:
+	std::unordered_map<std::string, std::map<int, std::string>> umap;
+};
+
+
+
+
+/*
+	------------
+	--- IDEA ---
+	------------
+
+	In the "Constraints" it is explicitly said that:
+		"All the timestamps timestamp of set are strictly increasing."
+
+	Thus, we can simplify we Solution, but using only a vector and then we can
+	use a Binary Search to Iterate over this vector and find the given
+	timestamp or, if it doesn't exist, then return the first lower. If there is
+	no any lower, simply return an empty string.
+
+	std::upper_bound is implemented using a Binary Search.
+
+*/
+
+/* Time  Beats: 77.38% */
+/* Space Beats: 44.62% */
+
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(n) */
+class TimeMap_Vector {
+public:
+
+	TimeMap_Vector() {}
+
+	void set(std::string key, std::string value, int timestamp)
+	{
+		umap[key].push_back({ timestamp, value });
+	}
+
+	std::string get(std::string key, int timestamp)
+	{
+		auto it = std::upper_bound(std::begin(umap[key]),
+		                           std::end(umap[key]),
+		                           std::make_pair(timestamp, ""),
+		                           [](const std::pair<int, std::string>& a, const std::pair<int, std::string>& b)
+		                             {
+		                                 return a.first < b.first;
+		                             });
+
+		return it == umap[key].begin() ? "" : std::prev(it)->second;
+	}
+
+private:
+	std::unordered_map<std::string, std::vector<std::pair<int, std::string>>> umap;
+};
+
+
 int
 main()
 {
-	TimeMap timeMap;
+	// TimeMap         timeMap;
+	// TimeMap_Elegant timeMap;
+	TimeMap_Vector  timeMap;
 
 	std::cout << "\n\t==================================";
 	std::cout << "\n\t=== TIME BASED KEY-VALUE STORE ===";
