@@ -256,19 +256,19 @@ private:
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	In the "Constraints" it is explicitly said that:
-		"All the timestamps timestamp of set are strictly increasing."
+    In the "Constraints" it is explicitly said that:
+        "All the timestamps timestamp of set are strictly increasing."
 
-	Thus, we can simplify we Solution, but using only a vector and then we can
-	use a Binary Search to Iterate over this vector and find the given
-	timestamp or, if it doesn't exist, then return the first lower. If there is
-	no any lower, simply return an empty string.
+    Thus, we can simplify we Solution, but using only a vector and then we can
+    use a Binary Search to Iterate over this vector and find the given
+    timestamp or, if it doesn't exist, then return the first lower. If there is
+    no any lower, simply return an empty string.
 
-	std::upper_bound is implemented using a Binary Search.
+    std::upper_bound is implemented using a Binary Search.
 
 */
 
@@ -280,37 +280,98 @@ private:
 class TimeMap_Vector {
 public:
 
-	TimeMap_Vector() {}
+    TimeMap_Vector() {}
 
-	void set(std::string key, std::string value, int timestamp)
-	{
-		umap[key].push_back({ timestamp, value });
-	}
+    void set(std::string key, std::string value, int timestamp)
+    {
+        umap[key].push_back({ timestamp, value });
+    }
 
-	std::string get(std::string key, int timestamp)
-	{
-		auto it = std::upper_bound(std::begin(umap[key]),
-		                           std::end(umap[key]),
-		                           std::make_pair(timestamp, ""),
-		                           [](const std::pair<int, std::string>& a, const std::pair<int, std::string>& b)
-		                             {
-		                                 return a.first < b.first;
-		                             });
+    std::string get(std::string key, int timestamp)
+    {
+        auto it = std::upper_bound(std::begin(umap[key]),
+                                   std::end(umap[key]),
+                                   std::make_pair(timestamp, ""),
+                                   [](const std::pair<int, std::string>& a, const std::pair<int, std::string>& b)
+                                     {
+                                         return a.first < b.first;
+                                     });
 
-		return it == umap[key].begin() ? "" : std::prev(it)->second;
-	}
+        return it == umap[key].begin() ? "" : std::prev(it)->second;
+    }
 
 private:
-	std::unordered_map<std::string, std::vector<std::pair<int, std::string>>> umap;
+    std::unordered_map<std::string, std::vector<std::pair<int, std::string>>> umap;
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, just uses my own Binary Search instead of std's upper_bound.
+
+*/
+
+/* Time  Beats: 56.02% */
+/* Space Beats: 41.66% */
+
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(n) */
+class TimeMap_Vector_My_Binary_Search {
+public:
+
+    TimeMap_Vector_My_Binary_Search() {}
+
+    void set(std::string key, std::string value, int timestamp)
+    {
+        umap[key].push_back({ timestamp, value.empty() ? "" : value});
+    }
+
+    std::string get(std::string key, int timestamp)
+    {
+        if (umap.count(key) == 0)
+            return "";
+
+        auto binary_search = [](std::vector<std::pair<int, std::string>>& vec, int timestamp)
+                               {
+                                   int left  = 0;
+                                   int right = vec.size() - 1;
+                                   
+                                   std::string result = "";
+                                   while (left <= right)
+                                   {
+                                       int mid = left + (right - left) / 2;
+                                       if (vec[mid].first <= timestamp)
+                                       {
+                                           result = vec[mid].second;
+                                           left = mid + 1;
+                                       }
+                                       else
+                                           right = mid - 1;
+                                   }
+
+                                   return result;
+                               };
+
+        return binary_search(umap.at(key), timestamp);
+    }
+
+private:
+    std::unordered_map<std::string, std::vector<std::pair<int, std::string>>> umap;
 };
 
 
 int
 main()
 {
-	// TimeMap         timeMap;
-	// TimeMap_Elegant timeMap;
-	TimeMap_Vector  timeMap;
+	// TimeMap                       timeMap;
+	// TimeMap_Elegant               timeMap;
+	// TimeMap_Vector                timeMap;
+    TimeMap_Vector_My_Binary_Search  timeMap;
 
 	std::cout << "\n\t==================================";
 	std::cout << "\n\t=== TIME BASED KEY-VALUE STORE ===";
