@@ -1,47 +1,47 @@
 #include <iostream>
 
 /*
-	============
-	=== EASY ===
-	============
+    ============
+    === EASY ===
+    ============
 
-	===========================
-	206) Reverse Linked List
-	===========================
+    ===========================
+    206) Reverse Linked List
+    ===========================
 
-	============
-	Description:
-	============
+    ============
+    Description:
+    ============
 
-	Given the "head" of a singly-linked list, reverse the list, and return the
-	reversed list.
+    Given the "head" of a singly-linked list, reverse the list, and return the
+    reversed list.
 
-	================================================
-	FUNCTION: ListNode* reverseList(ListNode* head);
-	================================================
+    ================================================
+    FUNCTION: ListNode* reverseList(ListNode* head);
+    ================================================
 
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
 
-	--- Example 1 ---
-	Input:  head = [1, 2, 3, 4, 5]
-	Output: [5, 4, 3, 2, 1]
+    --- Example 1 ---
+    Input:  head = [1, 2, 3, 4, 5]
+    Output: [5, 4, 3, 2, 1]
 
-	--- Example 2 ---
-	Input:  head = [1, 2]
-	Output: [2, 1]
+    --- Example 2 ---
+    Input:  head = [1, 2]
+    Output: [2, 1]
 
-	--- Example 3 ---
-	Input:  []
-	Output: []
+    --- Example 3 ---
+    Input:  []
+    Output: []
 
-	*** Constraints ***
-	The number of nodes in the list is the range [, 5000]
-	-5000 <= Node.val <= 5000
+    *** Constraints ***
+    The number of nodes in the list is the range [, 5000]
+    -5000 <= Node.val <= 5000
 
-	Follow-up: a linked list can be reversed either iterateively or
-	recursively. Could you implement both?
+    Follow-up: a linked list can be reversed either iterateively or
+    recursively. Could you implement both?
 
 */
 
@@ -57,12 +57,12 @@ struct ListNode {
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	Self-explanatory.
-	
+    Self-explanatory.
+
 */
 
 /* Time  Beats: 95.21% */
@@ -72,35 +72,34 @@ struct ListNode {
 /* Space Complexity: O(1) */
 class Solution{
 public:
-	ListNode* reverseList(ListNode* head)
-	{
-		ListNode* prev = nullptr;
-		ListNode* curr = head;
-		ListNode* next = head;
+    ListNode* reverseList(ListNode* head)
+    {
+        ListNode* prev = nullptr;
+        ListNode* curr = head;
 
-		while (curr)
-		{
-			next = curr->next; // next = next->next;
+        while (curr)
+        {
+            ListNode *next = curr->next;
 
-			curr->next = prev;
-			prev = curr;
-			curr = next;
-		}
+            curr->next = prev;
+            prev = curr;
+            curr = next;
+        }
 
-		return prev;
-	}
+        return prev;
+    }
 };
 
 
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	Same but using Recursion.
-	
+    Same but using Recursion.
+
 */
 
 /* Time  Beats: 70.42% */
@@ -110,39 +109,39 @@ public:
 /* Space Complexity: O(n) */
 class Solution_Recursion{
 public:
-	ListNode* reverseList(ListNode* head)
-	{
-		ListNode* prev = nullptr;
-		ListNode* curr = head;
+    ListNode* reverseList(ListNode* head)
+    {
+        ListNode* prev = nullptr;
+        ListNode* curr = head;
 
-		reverseListRecursively(&prev, &curr);
+        reverseListRecursively(&prev, &curr);
 
         return prev;
-	}
+    }
 
-	void reverseListRecursively(ListNode** prev, ListNode** curr)
-	{
-		if ((*curr) == nullptr)
-			return;
+    void reverseListRecursively(ListNode** prev, ListNode** curr)
+    {
+        if ((*curr) == nullptr)
+            return;
 
-		ListNode* next = (*curr)->next;
-		(*curr)->next = (*prev);
-		(*prev) = (*curr);
-		(*curr) = next;
+        ListNode* next = (*curr)->next;
+        (*curr)->next = (*prev);
+        (*prev) = (*curr);
+        (*curr) = next;
 
-		reverseListRecursively(prev, curr);
-	}
+        reverseListRecursively(prev, curr);
+    }
 };
 
 
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	Much more simple recursive Solution.
+    Much more simple recursive Solution.
 
 */
 
@@ -153,103 +152,103 @@ public:
 /* Space Complexity: O(n) */
 class Solution_Simple_Recursion{
 public:
-	ListNode* reverseList(ListNode* head)
-	{
-		if (head == nullptr)
-			return nullptr;
+    ListNode* reverseList(ListNode* head)
+    {
+        if (head == nullptr)
+            return nullptr;
 
-		ListNode* new_head = head;
+        ListNode* new_head = head;
 
-		if (head->next)
-		{
-			new_head = reverseList(head->next);
-			head->next->next = head;
-		}
+        if (head->next)
+        {
+            new_head = reverseList(head->next);
+            head->next->next = head;
+        }
 
-		head->next = nullptr;
+        head->next = nullptr;
 
-		return new_head;
-	}
+        return new_head;
+    }
 };
 
 
 void
 print_list(struct ListNode* head)
 {
-	std::cout << "\n\t\t[";
+    std::cout << "\n\t\t[";
 
-	bool first = true;
-	while (head)
-	{
-		if (!first)
-			std::cout << " -> ";
-		else
-			first = false;
+    bool first = true;
+    while (head)
+    {
+        if (!first)
+            std::cout << " -> ";
+        else
+            first = false;
 
-		std::cout << head->val;
-		head = head->next;
-	}
+        std::cout << head->val;
+        head = head->next;
+    }
 
-	std::cout << "]\n\n";
+    std::cout << "]\n\n";
 }
 
 
 int
 main()
 {
-	Solution sol;
-	Solution_Recursion sol_rec;
+    Solution sol;
+    Solution_Recursion sol_rec;
 
 
-	/* Example 1 */
-	ListNode one(1);
-	ListNode two(2);
-	ListNode three(3);
-	ListNode four(4);
-	ListNode five(5);
+    /* Example 1 */
+    ListNode one(1);
+    ListNode two(2);
+    ListNode three(3);
+    ListNode four(4);
+    ListNode five(5);
 
-	one.next = &two;
-	two.next = &three;
-	three.next = &four;
-	four.next = &five;
+    one.next = &two;
+    two.next = &three;
+    three.next = &four;
+    four.next = &five;
 
-	ListNode* head = &one;
-
-
-
-	/* Example 2 */
-	// ListNode one(1);
-	// ListNode two(2);
-
-	// one.next = &two;
-
-	// ListNode* head = &one;
+    ListNode* head = &one;
 
 
 
-	/* Example 3 */
-	// ListNode* head = nullptr;
+    /* Example 2 */
+    // ListNode one(1);
+    // ListNode two(2);
+
+    // one.next = &two;
+
+    // ListNode* head = &one;
 
 
-	std::cout << "\n\t===========================";
-	std::cout << "\n\t=== REVERSE LINKED LIST ===";
-	std::cout << "\n\t===========================\n";
+
+    /* Example 3 */
+    // ListNode* head = nullptr;
 
 
-	/* Write Input */
-	std::cout << "\n\tBefore:";
-	print_list(head);
+    std::cout << "\n\t===========================";
+    std::cout << "\n\t=== REVERSE LINKED LIST ===";
+    std::cout << "\n\t===========================\n";
 
 
-	/* Solution */
-	head = sol.reverseList(head);
-	// head = sol_rec.reverseList(head);
+    /* Write Input */
+    std::cout << "\n\tBefore:";
+    print_list(head);
 
 
-	/* Write Output */
-	std::cout << "\n\tAfter:";
-	print_list(head);
+    /* Solution */
+    head = sol.reverseList(head);
+    // head = sol_rec.reverseList(head);
 
 
-	return 0;
+    /* Write Output */
+    std::cout << "\n\tAfter:";
+    print_list(head);
+
+
+    return 0;
 }
