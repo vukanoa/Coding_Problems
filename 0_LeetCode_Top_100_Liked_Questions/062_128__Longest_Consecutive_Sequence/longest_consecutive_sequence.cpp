@@ -275,6 +275,10 @@ public:
 
     I do not know any better and/or more efficient idea to solve this problem.
 
+    (Update: it turns out that on LeetCode, it's faster to just sort "nums"
+     and then just compare with the previous. This makes no sense, but it is
+     how it is)
+
 */
 
 /* Time  Beats: 5.00% */
@@ -302,6 +306,102 @@ public:
         }
 
         return longest;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- idea ---
+    ------------
+
+    just sort it and compare with the previous while iterating through the
+    sorted array "nums".
+
+*/
+
+/* Time  Beats: 82.17% */
+/* Space Beats: 75.53% */
+
+/* Time  Complexity: O(n * logn) */ // This is faster than O(n) somehow
+/* Space Complexity: O(n)        */
+class Solution {
+public:
+    int longestConsecutive(vector<int>& nums)
+    {
+        int n = nums.size();
+
+        std::sort(nums.begin(), nums.end());
+        std::unique(nums.begin(), nums.end());
+
+        int c = 1;
+        int longest = 1;
+        for(int i = 0; i < n - 1; i++)
+        {
+            if(nums[i] - nums[i+1] == -1)
+                c++;
+            else
+            {
+                longest = std::max(longest, c);
+                c = 1;
+            }
+        }
+
+        longest = std::max(longest, c);
+
+        if(n > 0)
+            return m;
+
+        return 0;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- idea ---
+    ------------
+
+    just sort it and compare with the previous while iterating through the
+    sorted array "nums".
+
+*/
+
+/* Time  Beats: 99.27% */
+/* Space Beats: 73.03% */
+
+/* Time  Complexity: O(n * logn) */ // This is faster than O(n) somehow
+/* Space Complexity: O(n)        */
+class Solution {
+public:
+    int longestConsecutive(vector<int>& nums)
+    {
+        ios::sync_with_stdio(0);
+        cin.tie(0);
+
+        int len = 0;
+        int n = nums.size();
+
+        if(n==0 || n==1)
+            return n;
+
+        std::vector<int> res(n,1);
+        std::sort(nums.begin(),nums.end());
+
+
+        for(int i = 1; i < n; i++)
+        {
+            if (nums[i - 1] == nums[i] - 1)
+                res[i] = res[i - 1] + 1;
+            else if (nums[i] - nums[i - 1] == 0)
+                res[i] = res[i - 1];
+        }
+
+        return *max_element(res.begin(),res.end());
     }
 };
 
