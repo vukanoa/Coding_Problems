@@ -2,236 +2,206 @@
 #include <vector>
 
 /*
-	============
-	=== HARD ===
-	============
+    ============
+    === HARD ===
+    ============
 
-	===========================
-	72) Edit Distance
-	===========================
+    ===========================
+    72) Edit Distance
+    ===========================
 
-	============
-	Description:
-	============
+    ============
+    Description:
+    ============
 
-	Given two strings "word1" and "word2", return the minimum number of
-	operations required to convert word1 to word2.
+    Given two strings "word1" and "word2", return the minimum number of
+    operations required to convert word1 to word2.
 
-	You have the following three operations permitted on a word:
-		- Insert a character
-		- Delete a character
-		- Insert a character
+    You have the following three operations permitted on a word:
+        - Insert a character
+        - Delete a character
+        - Insert a character
 
-	=======================================================
-	FUNCTION: int mindDistance(string word1, string word2);
-	=======================================================
+    =======================================================
+    FUNCTION: int mindDistance(string word1, string word2);
+    =======================================================
 
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
 
-	--- Example 1 ---
-	Input:  word1 = "horse", word2 = "ros"
-	Output: 3
+    --- Example 1 ---
+    Input:  word1 = "horse", word2 = "ros"
+    Output: 3
 
-	--- Example 2 ---
-	Input:  word1 = "intention", word2 = "execution"
-	Output: 5
+    --- Example 2 ---
+    Input:  word1 = "intention", word2 = "execution"
+    Output: 5
 
-	*** Constraints ***
-	0 <= word1.length, word2.length <= 500
-	word1 and word2 consist of lowercase English letters
+    *** Constraints ***
+    0 <= word1.length, word2.length <= 500
+    word1 and word2 consist of lowercase English letters
 
 */
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	Levensthein distance
+    Levensthein distance
 
-	We can either:
-		1. Replace
-		2. Insert
-		3. Delete
-	a character.
+    We can either:
+        1. Replace
+        2. Insert
+        3. Delete
+    a character.
 
-	Word_1 = "horse"
-	Word_2 = "ros"
+    Word_1 = "horse"
+    Word_2 = "ros"
 
-	1) horse -> rorse (replace 'h' with 'r') [Replace]
-	2) rorse -> rose  (delete 'r')           [Delete]
-	3) rose  -> ros   (delete 'e')           [Delete]
+    1) horse -> rorse (replace 'h' with 'r') [Replace]
+    2) rorse -> rose  (delete 'r')           [Delete]
+    3) rose  -> ros   (delete 'e')           [Delete]
 
-	Consider another example:
+    Consider another example:
 
-	Word_1 = "benyam"
+    Word_1 = "benyam"
 
-	(-1, 0) ""          // Base case. Substring from -1 to 0 is ""(empty)
-	( 0, 0) "b"         // Substring from 0 to 0 => "b"
-	( 0, 1) "be"        // Substring from 0 to 1 => "be"
-	( 0, 2) "ben"       // Substring from 0 to 2 => "ben"
-	( 0, 3) "beny"      // Substring from 0 to 3 => "beny"
-	( 0, 4) "benya"     // Substring form 0 to 4 => "benya"
-	( 0, 5) "benyam"    // Substring from 0 to 5 => "benyam"
-
-
-	There are 4 possible situations in which we could find ourselves in.
-
-	Word_1 = "benyam"
-	          012345
-
-	Word_2 = "ephrem"
-	          012345
-
-	So when we're doing character comparisons what we're going to do is check
-	the transformation distance for every cross-section of substrings between
-	the two strings.
-
-	It will be clear when we draw our dp(dynamic programming) table, but for
-	now let's see each situtation:
-
-	---------------------------------------------------------------------------
-	Situation 1: [Do nothing] // Characters DO match
-
-	Word_1[0, 5] -> Word_2[0, 5]
-	"benyam"        "ephrem"
-	      ^               ^
-
-	Imagine that we're trying to transform a substring "benyam" into "ephrem".
-
-	Notice: We care about LAST character of each sequence because that is what
-	        we want to check whether we're going to: replace, insert, delete
-
-	Since 'm' is shared between our two sequences of characters, that means
-	that substring transformation from:
-		Word_1[0, 5] -> Word_2[0, 5]
-
-	IS GOING TO HAVE THE SAME EDIT DISTANCE AS SUBSTRING:
-		Word_1[0, 4] -> Word_2[0, 4]
-
-	Why?
-	The 'm' characeters are the SAME. They will NOT contribute to our edit
-	distance because they are the same thing.
-
-	Therefore we do not have to take an action.
-	No operations happens, no comparison happens. We do nothing.
-
-	Answer to this problem:
-		Word_1[0, 5] -> Word_2[0, 5]
-	is the answer to this:
-		Word_1[0, 4] -> Word_2[0, 4]
-
-	subproblem.
-
-	---------------------------------------------------------------------------
-
-	Situation 2: [Replace] // Characters do NOT match
-
-	Word_1[0, 3] -> Word_2[0, 2]
-	"beny"           "eph"
-	    ^               ^
-
-	We're interested in the LAST character. In this case 'y' does NOT match 'h'
-	We have 3 options:
-		1. Replace
-		2. Insert
-		3. Delete
-
-	Let's look it from this perspective.
-	We can transform:
-		Word_1[0, 2] -> Word_2[0, 1]
-		"ben"           "ep"
-
-	We're taking one off of each of the substrings. Just look at the
-	subproblem:
-		Turning "ben" into "ep".
-
-	After we turn "ben" into "ep", we add 'h' to "ep" so that now we have what
-	we wanted at the beginning.
-
-	This is the "Replace" operation.
-		1. Ignore the character that don't match
-		2. Transform "ben" to "ep"
-		3. And the last character we replace. Replace 'y' with 'h'.
-
-	So again, this is the Replacement operation. We transform everything before
-	the mismatch and then at the mismatch we perform a Replace operation.
-
-	---------------------------------------------------------------------------
-
-	Situation 3: [Insert] // Characters do NOT match
-
-	Let's look at the same transformation. We could've inserted instead.
-
-	Word_1[0, 3] -> Word_2[0, 2]
-	"beny"           "eph"
-	    ^               ^
-
-	But now what we do is - We subtract one from Word_2 and then transform:
-		Word_1[0, 3] -> Word_2[0, 1]
-		"beny"           "ep"
-
-	So what we do is - We transform whole original subtring, into the substring
-	of the previous substring, which is "ep" and then after that transformation
-	we perform an insertion.
-
-	We insert 'h' at the end of the transformation result "ep" and then we have
-	what we wanted.
-
-	Remember we want the minimum cost of these 3 options.
-
-	---------------------------------------------------------------------------
-
-	Situation 4: [Delete] // Characters do NOT match
-
-	Same transformation:
-
-	Word_1[0, 3] -> Word_2[0, 2]
-	"beny"           "eph"
-	    ^               ^
-
-	Let's try deletion. Let's tranform:
-		Word_1[0, 2] -> Word_2[0, 2]
-		"ben"           "eph"
-
-	We have effectively deleted the 'y'. We don't care about the 'y' anymore.
-
-	---------------------------------------------------------------------------
-
-	Dynamic Programming table:
-
-           ""  "e" "p" "h" "r" "e" "m"
-            0   1   2   3   4   5   6
-          +---+---+---+---+---+---+---+
-    ""  0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-          +---+---+---+---+---+---+---+
-    "b" 1 | 0 | 0 | X | 0 | 0 | 0 | 0 |
-          +---+---+---+---+---+---+---+
-    "e" 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-          +---+---+---+---+---+---+---+
-    "n" 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-          +---+---+---+---+---+---+---+
-    "y" 4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-          +---+---+---+---+---+---+---+
-    "a" 5 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-          +---+---+---+---+---+---+---+
-    "m" 6 | 0 | 0 | 0 | 0 | 0 | 0 | F |
+    (-1, 0) ""          // Base case. Substring from -1 to 0 is ""(empty)
+    ( 0, 0) "b"         // Substring from 0 to 0 => "b"
+    ( 0, 1) "be"        // Substring from 0 to 1 => "be"
+    ( 0, 2) "ben"       // Substring from 0 to 2 => "ben"
+    ( 0, 3) "beny"      // Substring from 0 to 3 => "beny"
+    ( 0, 4) "benya"     // Substring form 0 to 4 => "benya"
+    ( 0, 5) "benyam"    // Substring from 0 to 5 => "benyam"
 
 
-	Word_1: benyam
-	Word_2: ephrem
+    There are 4 possible situations in which we could find ourselves in.
 
-	Dynamic programming is not about remembering numbers, not about remembering
-	patterns and how you fill the table. It's about - Knowing what is happening
-	and why we do it this way.
+    Word_1 = "benyam"
+              012345
 
-	What are the subproblems? How are we building a globally optimal solution
-	from the subproblems we're breaking down.
+    Word_2 = "ephrem"
+              012345
 
-	So let's see this example(We're at 'X'):
+    So when we're doing character comparisons what we're going to do is check
+    the transformation distance for every cross-section of substrings between
+    the two strings.
+
+    It will be clear when we draw our dp(dynamic programming) table, but for
+    now let's see each situation:
+
+    ---------------------------------------------------------------------------
+    Situation 1: [Do nothing] // Characters DO match
+
+    Word_1[0, 5] -> Word_2[0, 5]
+    "benyam"        "ephrem"
+          ^               ^
+
+    Imagine that we're trying to transform a substring "benyam" into "ephrem".
+
+    Notice: We care about LAST character of each sequence because that is what
+            we want to check whether we're going to: replace, insert, delete
+
+    Since 'm' is shared between our two sequences of characters, that means
+    that substring transformation from:
+        Word_1[0, 5] -> Word_2[0, 5]
+
+    IS GOING TO HAVE THE SAME EDIT DISTANCE AS SUBSTRING:
+        Word_1[0, 4] -> Word_2[0, 4]
+
+    Why?
+    The 'm' characters are the SAME. They will NOT contribute to our edit
+    distance because they are the same thing.
+
+    Therefore we do not have to take an action.
+    No operations happens, no comparison happens. We do nothing.
+
+    Answer to this problem:
+        Word_1[0, 5] -> Word_2[0, 5]
+    is the answer to this:
+        Word_1[0, 4] -> Word_2[0, 4]
+
+    subproblem.
+
+    ---------------------------------------------------------------------------
+
+    Situation 2: [Replace] // Characters do NOT match
+
+    Word_1[0, 3] -> Word_2[0, 2]
+    "beny"           "eph"
+        ^               ^
+
+    We're interested in the LAST character. In this case 'y' does NOT match 'h'
+    We have 3 options:
+        1. Replace
+        2. Insert
+        3. Delete
+
+    Let's look it from this perspective.
+    We can transform:
+        Word_1[0, 2] -> Word_2[0, 1]
+        "ben"           "ep"
+
+    We're taking one off of each of the substrings. Just look at the
+    subproblem:
+        Turning "ben" into "ep".
+
+    After we turn "ben" into "ep", we add 'h' to "ep" so that now we have what
+    we wanted at the beginning.
+
+    This is the "Replace" operation.
+        1. Ignore the character that don't match
+        2. Transform "ben" to "ep"
+        3. And the last character we replace. Replace 'y' with 'h'.
+
+    So again, this is the Replacement operation. We transform everything before
+    the mismatch and then at the mismatch we perform a Replace operation.
+
+    ---------------------------------------------------------------------------
+
+    Situation 3: [Insert] // Characters do NOT match
+
+    Let's look at the same transformation. We could've inserted instead.
+
+    Word_1[0, 3] -> Word_2[0, 2]
+    "beny"           "eph"
+        ^               ^
+
+    But now what we do is - We subtract one from Word_2 and then transform:
+        Word_1[0, 3] -> Word_2[0, 1]
+        "beny"           "ep"
+
+    So what we do is - We transform whole original subtring, into the substring
+    of the previous substring, which is "ep" and then after that transformation
+    we perform an insertion.
+
+    We insert 'h' at the end of the transformation result "ep" and then we have
+    what we wanted.
+
+    Remember we want the minimum cost of these 3 options.
+
+    ---------------------------------------------------------------------------
+
+    Situation 4: [Delete] // Characters do NOT match
+
+    Same transformation:
+
+    Word_1[0, 3] -> Word_2[0, 2]
+    "beny"           "eph"
+        ^               ^
+
+    Let's try deletion. Let's transform:
+        Word_1[0, 2] -> Word_2[0, 2]
+        "ben"           "eph"
+
+    We have effectively deleted the 'y'. We don't care about the 'y' anymore.
+
+    ---------------------------------------------------------------------------
+
+    Dynamic Programming table:
 
            ""  "e" "p" "h" "r" "e" "m"
             0   1   2   3   4   5   6
@@ -251,41 +221,71 @@
     "m" 6 | 0 | 0 | 0 | 0 | 0 | 0 | F |
 
 
-	What does that mean to be in that position?
-	It is a suproblem. Each of the cells are subproblems.
+    Word_1: benyam
+    Word_2: ephrem
 
-	The original question we asked is at 'F'(for Finish) in the table.
-		dp[m][n]
+    Dynamic programming is not about remembering numbers, not about remembering
+    patterns and how you fill the table. It's about - Knowing what is happening
+    and why we do it this way.
 
-	So the edit distance between two original strings is that field.
-	But we answer every subproblem leading to that so that we get globally
-	optimal answer.
+    What are the subproblems? How are we building a globally optimal solution
+    from the subproblems we're breaking down.
 
-	So, let's go back to 'X'.
+    So let's see this example(We're at 'X'):
 
-	What does it mean to be at position 'X'. It means that we're trying to
-	transform:
-		"b" -> "ep"
+           ""  "e" "p" "h" "r" "e" "m"
+            0   1   2   3   4   5   6
+          +---+---+---+---+---+---+---+
+    ""  0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+          +---+---+---+---+---+---+---+
+    "b" 1 | 0 | 0 | X | 0 | 0 | 0 | 0 |
+          +---+---+---+---+---+---+---+
+    "e" 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+          +---+---+---+---+---+---+---+
+    "n" 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+          +---+---+---+---+---+---+---+
+    "y" 4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+          +---+---+---+---+---+---+---+
+    "a" 5 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+          +---+---+---+---+---+---+---+
+    "m" 6 | 0 | 0 | 0 | 0 | 0 | 0 | F |
 
-	Index 'i' is the substring we take from the original string Word_1.
-	Index 'j' is the substring we take from the orignal string Word_2.
 
-	So each of the cells represent us with cross-sections of substring,
-	finding the end distance for them and building up for our final answer at
-	'F' (dp[m][n]).
+    What does that mean to be in that position?
+    It is a suproblem. Each of the cells are subproblems.
 
-	So first of all - If we need to transform an empty string into any one of
-	Word_2 substring or the Word_2 itself
+    The original question we asked is at 'F'(for Finish) in the table.
+        dp[m][n]
 
-	If I need to transform an empty string to "e"
-	If I need to transform an empty string to "ep"
-	If I need to transform an empty string to "eph"
-	...
+    So the edit distance between two original strings is that field.
+    But we answer every subproblem leading to that so that we get globally
+    optimal answer.
 
-	We will always have to perform as many Insertions as it takes to turn an
-	empty string into this new string with characters.
+    So, let's go back to 'X'.
 
-	So now the DP Table looks like this:
+    What does it mean to be at position 'X'. It means that we're trying to
+    transform:
+        "b" -> "ep"
+
+    Index 'i' is the substring we take from the original string Word_1.
+    Index 'j' is the substring we take from the original string Word_2.
+
+    So each of the cells represent us with cross-sections of substring,
+    finding the end distance for them and building up for our final answer at
+    'F' (dp[m][n]).
+
+    So first of all - If we need to transform an empty string into any one of
+    Word_2 substring or the Word_2 itself
+
+    If I need to transform an empty string to "e"
+    If I need to transform an empty string to "ep"
+    If I need to transform an empty string to "eph"
+    ...
+
+    We will always have to perform as many Insertions as it takes to turn an
+    empty string into this new string with characters.
+
+    So now the DP Table looks like this:
 
            ""  "e" "p" "h" "r" "e" "m"
             0   1   2   3   4   5   6
@@ -304,23 +304,23 @@
           +---+---+---+---+---+---+---+
     "m" 6 | 0 | 0 | 0 | 0 | 0 | 0 | F |
 
-	Looking at this table, it's obvious now that the edit distance between
-	the empty string and a string "ep"(right above the X) is 2. That means
-	we have to do 2 Insertions. 'e' and 'p'. That is the answer to our
-	subproblem.
+    Looking at this table, it's obvious now that the edit distance between
+    the empty string and a string "ep"(right above the X) is 2. That means
+    we have to do 2 Insertions. 'e' and 'p'. That is the answer to our
+    subproblem.
 
-	Each of these 'boxes' is a subproblem.
+    Each of these 'boxes' is a subproblem.
 
 
-	Let's go the other way.
-	If we just have the character 'b', and we're transforming it into an empty
-	string, that means we just need 1 Deletion.
+    Let's go the other way.
+    If we just have the character 'b', and we're transforming it into an empty
+    string, that means we just need 1 Deletion.
 
-	If we have "be" and we're transforming it into an empty string, then we
-	need 2 Deletions.
+    If we have "be" and we're transforming it into an empty string, then we
+    need 2 Deletions.
 
-	And so on.
-	Now we have a DP Table that looks like this:
+    And so on.
+    Now we have a DP Table that looks like this:
 
            ""  "e" "p" "h" "r" "e" "m"
             0   1   2   3   4   5   6
@@ -340,14 +340,14 @@
     "m" 6 | 6 | 0 | 0 | 0 | 0 | 0 | F |
 
 
-	Note: This is the bottom-up iterative solution.
-	      Top-down recursive is also a possibility.
+    Note: This is the bottom-up iterative solution.
+          Top-down recursive is also a possibility.
 
-	We just need to understand what these subproblems mean and then we can
-	implement it in any way that we like.
+    We just need to understand what these subproblems mean and then we can
+    implement it in any way that we like.
 
-	
-	Now look at a position 'X' in each step:
+
+    Now look at a position 'X' in each step:
 
            ""  "e" "p" "h" "r" "e" "m"
             0   1   2   3   4   5   6
@@ -366,36 +366,36 @@
           +---+---+---+---+---+---+---+
     "m" 6 | 6 | 0 | 0 | 0 | 0 | 0 | F |
 
-	does 'b' == 'e'? No!
-	So we're going to have to perform an operation.
+    does 'b' == 'e'? No!
+    So we're going to have to perform an operation.
 
-	What are our operations(this is our DP table zoomed in):
-		Replace | Insert
-		--------+-------------
-		Delete  | (We're here)
+    What are our operations(this is our DP table zoomed in):
+        Replace | Insert
+        --------+-------------
+        Delete  | (We're here)
 
-	At position X, we have:
-		   0    |    1
-		--------+-------------
-		   1    | (We're here)
+    At position X, we have:
+           0    |    1
+        --------+-------------
+           1    | (We're here)
 
-	Which is the minimum of these? It's 0. In this case it's a Replacement.
-	We're choosing to replace a 'b' to 'e'.
-	And now since we performed an action we add 1 to the minimum of these 3
-	options.
-	Which in our case is:
-		0 + 1 = 1
+    Which is the minimum of these? It's 0. In this case it's a Replacement.
+    We're choosing to replace a 'b' to 'e'.
+    And now since we performed an action we add 1 to the minimum of these 3
+    options.
+    Which in our case is:
+        0 + 1 = 1
 
-	Now at position X, we have:
-		   0    |    1
-		--------+-------------
-		   1    |    1
+    Now at position X, we have:
+           0    |    1
+        --------+-------------
+           1    |    1
 
 
-	Let's look at some other situation: (Again look at position X):
+    Let's look at some other situation: (Again look at position X):
 
-	Note: We're not going "in order" here. This is just for explanation.
-	In our code, we go from left to right for each row.
+    Note: We're not going "in order" here. This is just for explanation.
+    In our code, we go from left to right for each row.
 
            ""  "e" "p" "h" "r" "e" "m"
             0   1   2   3   4   5   6
@@ -415,39 +415,39 @@
     "m" 6 | 6 | 0 | 0 | 0 | 0 | 0 | F |
 
 
-	At position X these are the SAME characters.
-	If we have an "e" and an "e", the distance is 0.
-	It has the same distance as an "" string and an "" string.
+    At position X these are the SAME characters.
+    If we have an "e" and an "e", the distance is 0.
+    It has the same distance as an "" string and an "" string.
 
-	Matching characters mean we do NOTHING. (Situation 1)
+    Matching characters mean we do NOTHING. (Situation 1)
 
-	So the answer to our subproblem is these two strings WITHOUT THAT MATCHING
-	CHARACTER.
+    So the answer to our subproblem is these two strings WITHOUT THAT MATCHING
+    CHARACTER.
 
-	So what we do for this position X (at 2, 1)? We take it from (1, 0).
+    So what we do for this position X (at 2, 1)? We take it from (1, 0).
 
-	We don't just magically take it from that cell for no reason. It's not just
-	a random pattern. We're taking it because we do not need to factor this
-	character in. It is NOT going to add to our Edit Distance.
+    We don't just magically take it from that cell for no reason. It's not just
+    a random pattern. We're taking it because we do not need to factor this
+    character in. It is NOT going to add to our Edit Distance.
 
-	So our answer that goes into the cell is going to be the Edit Distance
-	without this character. Which is exactly like transforming:
-		"b" -> ""
-	That's why we're taking the diagonal value. It's the minimum number of
-	operations that transform:
-		"b" -> ""
+    So our answer that goes into the cell is going to be the Edit Distance
+    without this character. Which is exactly like transforming:
+        "b" -> ""
+    That's why we're taking the diagonal value. It's the minimum number of
+    operations that transform:
+        "b" -> ""
 
-	And since:
-		"b" -> ""
-	Edit Distance is going to be the same as:
-		"be" -> "e"
+    And since:
+        "b" -> ""
+    Edit Distance is going to be the same as:
+        "be" -> "e"
 
-	we just take the minimum number of operations of the substring(strings
-	without this matching character 'e')
+    we just take the minimum number of operations of the substring(strings
+    without this matching character 'e')
 
-	And now we notice a pattern.
-	Now we can just fill it, but it's not a random pattern. Now we understand
-	why this pattern is the way it is.
+    And now we notice a pattern.
+    Now we can just fill it, but it's not a random pattern. Now we understand
+    why this pattern is the way it is.
 
 
            ""  "e" "p" "h" "r" "e" "m"
@@ -467,23 +467,22 @@
           +---+---+---+---+---+---+---+
     "m" 6 | 6 | 5 | 5 | 5 | 5 | 5 | 5 |
 
-	For our final dp[m][n] since Word_1[6] == Word_2[6] (Characters 'm' match)
-	The Edit Distance to transforming:
-		"benyam" -> "ephrem"
+    For our final dp[m][n] since Word_1[6] == Word_2[6] (Characters 'm' match)
+    The Edit Distance to transforming:
+        "benyam" -> "ephrem"
 
-	is the SAME as the subproblem:
-		"benya" -> "ephre"
+    is the SAME as the subproblem:
+        "benya" -> "ephre"
 
-	That's why we take the value at dp[5][5] and don't add 1 to it.
+    That's why we take the value at dp[5][5] and don't add 1 to it.
 
 
-	Note: Each time when we update dp[i][j] we only need:
-		1. dp[i - 1][j - 1]
-		2. dp[i - 1][  j  ]
-		3. dp[  i  ][j - 1]
+    Note: Each time when we update dp[i][j] we only need:
+        1. dp[i - 1][j - 1]
+        2. dp[i - 1][  j  ]
+        3. dp[  i  ][j - 1]
 
 */
-
 
 /* Time  Beats: 77.15% */
 /* Space Beats: 39.97% */
@@ -493,9 +492,9 @@
 class Solution_1 {
 public:
     int minDistance(std::string word1, std::string word2)
-	{
+    {
         int m = word1.size();
-		int n = word2.size();
+        int n = word2.size();
         std::vector<std::vector<int>> dp(m + 1, std::vector<int>(n + 1, 0));
 
         for (int i = 1; i <= m; i++)
@@ -505,9 +504,9 @@ public:
             dp[0][j] = j;
 
         for (int i = 1; i <= m; i++)
-		{
+        {
             for (int j = 1; j <= n; j++)
-			{
+            {
                 if (word1[i - 1] == word2[j - 1])
                     dp[i][j] = dp[i - 1][j - 1];
                 else
@@ -523,13 +522,69 @@ public:
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	We could optimize our space Complexity to two vectors, instead of the whole
-	matrix.
-	
+    This one works very similar to the above Solution, but it goes from the
+    right-down most cell to the on at position [0][0].
+
+    This is more in line with a "Bounded Knapsack" type of problem.
+
+    We could, also, improve this Solution's Space Complexity in the same way
+    the bottom ones are, but I'm not going to repeat it for this approach as
+    well.
+
+*/
+
+/* Time  Beats: 86.38% */
+/* Space Beats: 24.68% */
+
+/* Time  Complexity: O(m * n) */
+/* Space Complexity: O(m * n) */
+class Solution_Bounded_Knapsack {
+public:
+    int minDistance(std::string word1, std::string word2)
+    {
+        const int ROWS = word2.size() + 1;
+        const int COLS = word1.size() + 1;
+
+        std::vector<std::vector<int>> dp(ROWS, std::vector<int>(COLS));
+        dp[word2.size()][word1.size()] = 0;
+
+        // Fill last column
+        for (int i = ROWS-2; i >= 0; i--)
+            dp[i][COLS-1] = word2.size() - i;
+
+        // Fill last row
+        for (int i = COLS-2; i >= 0; i--)
+            dp[ROWS-1][i] = word1.size() - i;
+
+        for (int i = ROWS-2; i >= 0; i--)
+        {
+            for (int j = COLS-2; j >= 0; j--)
+            {
+                if (word1[j] == word2[i])
+                    dp[i][j] = dp[i+1][j+1];
+                else
+                    dp[i][j] = 1 + std::min(dp[i][j+1], std::min(dp[i+1][j+1], dp[i+1][j]));
+            }
+        }
+
+        return dp[0][0];
+    }
+};
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We could optimize our space Complexity to two vectors, instead of the whole
+    matrix.
+
 */
 
 
@@ -541,45 +596,45 @@ public:
 class Solution_2{
 public:
     int minDistance(std::string word1, std::string word2)
-	{
+    {
         int m = word1.size();
-		int n = word2.size();
-		std::vector<int> previous(n + 1, 0);
-		std::vector<int> current (n + 1, 0);
+        int n = word2.size();
+        std::vector<int> previous(n + 1, 0);
+        std::vector<int> current (n + 1, 0);
 
-		for (int j = 0; j <= n; j++)
-			previous[j] = j;
+        for (int j = 0; j <= n; j++)
+            previous[j] = j;
 
-		for (int i = 1; i <= m; i++)
-		{
-			current[0] = i;
+        for (int i = 1; i <= m; i++)
+        {
+            current[0] = i;
 
-			for (int j = 1; j <= n; j++)
-			{
-				if (word1[i - 1] == word2[j - 1])
-					current[j] = previous[j - 1];
-				else
-					current[j] = std::min(previous[j - 1], std::min(current[j - 1], previous[j])) + 1;
-			}
+            for (int j = 1; j <= n; j++)
+            {
+                if (word1[i - 1] == word2[j - 1])
+                    current[j] = previous[j - 1];
+                else
+                    current[j] = std::min(previous[j - 1], std::min(current[j - 1], previous[j])) + 1;
+            }
 
-			std::fill(previous.begin(), previous.end(), 0);
-			std::swap(previous, current);
-		}
+            std::fill(previous.begin(), previous.end(), 0);
+            std::swap(previous, current);
+        }
 
-		return previous[n];
-	}
+        return previous[n];
+    }
 };
 
 
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	We could also use only one vector.
-	
+    We could also use only one vector.
+
 */
 
 
@@ -591,111 +646,114 @@ public:
 class Solution_3 {
 public:
     int minDistance(std::string word1, std::string word2)
-	{
+    {
         int m = word1.size();
-		int n = word2.size();
+        int n = word2.size();
 
-		int previous;
-		std::vector<int> current (n + 1, 0);
+        int previous;
+        std::vector<int> current (n + 1, 0);
 
-		for (int j = 0; j <= n; j++)
-			current[j] = j;
+        for (int j = 0; j <= n; j++)
+            current[j] = j;
 
-		for (int i = 1; i <= m; i++)
-		{
-			previous = current[0];
-			current[0] = i;
+        for (int i = 1; i <= m; i++)
+        {
+            previous = current[0];
+            current[0] = i;
 
-			for (int j = 1; j <= n; j++)
-			{
-				int tmp = current[j];
+            for (int j = 1; j <= n; j++)
+            {
+                int tmp = current[j];
 
-				if (word1[i - 1] == word2[j - 1])
-					current[j] = previous;
-				else
-					current[j] = std::min(previous, std::min(current[j - 1], current[j])) + 1;
+                if (word1[i - 1] == word2[j - 1])
+                    current[j] = previous;
+                else
+                    current[j] = std::min(previous, std::min(current[j - 1], current[j])) + 1;
 
-				previous = tmp;
-			}
-		}
+                previous = tmp;
+            }
+        }
 
-		return current[n];
-	}
+        return current[n];
+    }
 };
 
 
 void
 print_matrix(std::vector<std::vector<int>>& matrix)
 {
-	for (int i = 0; i < matrix.size(); i++)
-	{
-		std::cout << "\n\n\t\t";
+    for (int i = 0; i < matrix.size(); i++)
+    {
+        std::cout << "\n\n\t\t";
 
-		for (int j = 0; j < matrix[0].size(); j++)
-			printf("%2d ", matrix[i][j]);
-	}
-	std::cout << "\n\n";
+        for (int j = 0; j < matrix[0].size(); j++)
+            printf("%2d ", matrix[i][j]);
+    }
+    std::cout << "\n\n";
 }
 
 int
 main()
 {
-	Solution_1 sol_1;
-	Solution_2 sol_2;
-	Solution_3 sol_3;
+    Solution_Bounded_Knapsack sol_bounded_knap;
 
-	/* Example 1 */
-	// std::string word1 = "horse";
-	// std::string word2 = "ros";
+    Solution_1 sol_1;
+    Solution_2 sol_2;
+    Solution_3 sol_3;
 
-	/* Example 2 */
-	// std::string word1 = "intention";
-	// std::string word2 = "execution";
+    /* Example 1 */
+    // std::string word1 = "horse";
+    // std::string word2 = "ros";
 
-	/* Example 3 */
-	// std::string word1 = "book";
-	// std::string word2 = "rookie";
+    /* Example 2 */
+    // std::string word1 = "intention";
+    // std::string word2 = "execution";
 
-	/* Example 4 */
-	// std::string word1 = "linux";
-	// std::string word2 = "unix";
+    /* Example 3 */
+    // std::string word1 = "book";
+    // std::string word2 = "rookie";
 
-	/* Example 5 */
-	// std::string word1 = "stoicism";
-	// std::string word2 = "seneca";
+    /* Example 4 */
+    // std::string word1 = "linux";
+    // std::string word2 = "unix";
 
-	/* Example 6 */
-	// std::string word1 = "algorithm";
-	// std::string word2 = "";
+    /* Example 5 */
+    // std::string word1 = "stoicism";
+    // std::string word2 = "seneca";
 
-	/* Example 7 */
-	// std::string word1 = "bicycle";
-	// std::string word2 = "push-up";
+    /* Example 6 */
+    // std::string word1 = "algorithm";
+    // std::string word2 = "";
 
-	/* Example 8 */
-	std::string word1 = "benyam";
-	std::string word2 = "ephrem";
+    /* Example 7 */
+    // std::string word1 = "bicycle";
+    // std::string word2 = "push-up";
 
-
-	std::cout << "\n\t=====================";
-	std::cout << "\n\t=== EDIT DISTANCE ===";
-	std::cout << "\n\t=====================\n";
+    /* Example 8 */
+    std::string word1 = "benyam";
+    std::string word2 = "ephrem";
 
 
-	/* Write Input */
-	std::cout << "\n\tWord 1: \"" << word1 << "\"";
-	std::cout << "\n\tWord 2: \"" << word2 << "\"\n";
+    std::cout << "\n\t=====================";
+    std::cout << "\n\t=== EDIT DISTANCE ===";
+    std::cout << "\n\t=====================\n";
 
 
-	/* Solution */
-	// int result = sol_1.minDistance(word1, word2);
-	// int result = sol_2.minDistance(word1, word2);
-	int result = sol_3.minDistance(word1, word2);
+    /* Write Input */
+    std::cout << "\n\tWord 1: \"" << word1 << "\"";
+    std::cout << "\n\tWord 2: \"" << word2 << "\"\n";
 
 
-	/* Write Output */
-	std::cout << "\n\tOperations: " << result << "\n\n";
+    /* Solution */
+    // int result = sol_bounded_knap.minDistance(word1, word2);
+    // int result = sol_1.minDistance(word1, word2);
+    // int result = sol_2.minDistance(word1, word2);
+    int result = sol_3.minDistance(word1, word2);
 
 
-	return 0;
+    /* Write Output */
+    std::cout << "\n\tOperations: " << result << "\n\n";
+
+
+    return 0;
 }
