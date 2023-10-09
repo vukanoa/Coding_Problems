@@ -22,9 +22,9 @@
     Note: Assume the environment does not allow you to store 64-bit integers (signed or unsigned)
     =====
 
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
 
     --- Example 1 ---
     Input: x = 123
@@ -44,23 +44,23 @@
 
 
 /*
-	INT_MAX =  2147483647
-	INT_MIN = -2147483648
+    INT_MAX =  2147483647
+    INT_MIN = -2147483648
 */
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	It is self-explanatory for cases other than edge cases.
+    It is self-explanatory for cases other than edge cases.
 
-	Conisder this:
+    Conisder this:
 
-	x = 2147483647 // INT_MAX
+    x = 2147483647 // INT_MAX
 
-	We'll have this:
+    We'll have this:
 
   1   |      x       |      tmp     |     result     |
   2   |  2147483647  |  0           |  0             |
@@ -74,12 +74,12 @@
   10  |  21          |  74638474    |  74638474      |
   11  |  2           |  746384741   |  746384741     |
   12  |              |  5555555555  |                |
-	                    ^
-	                    |
-	random value --------
+                        ^
+                        |
+    random value --------
 
   So when we are at Iteration 11:
-	tmp = 746384741
+    tmp = 746384741
 
   If we multiply by 10 and add last_digit, it will Overflow. So how do we
   check that?
@@ -87,7 +87,7 @@
   Since result variable has the same values in each iteration as variable "tmp"
   once we do multiply by 10 and add last_digit(of x) we then check if
   doing mirror operations('-' for '+', '/' for '*') on variable "tmp", that is:
-	(tmp - last_digit) and then DIVIDE by 10
+    (tmp - last_digit) and then DIVIDE by 10
 
   If it's the same value as in the varible "result" then there is no Overflow.
   On the other hand, if simply doing mirror operations gives us another
@@ -99,94 +99,94 @@
 /* Space Complexity: O(1) */
 class Solution{
 public:
-	int reverse(int x)
-	{
-		int tmp    = 0;
-		int result = 0;
+    int reverse(int x)
+    {
+        int tmp    = 0;
+        int result = 0;
 
-		while (x != 0)
-		{
-			int last_digit = x % 10;
-			tmp = result * 10 + last_digit; // This
+        while (x != 0)
+        {
+            int last_digit = x % 10;
+            tmp = result * 10 + last_digit; // This
 
-			/* Checking for the Overflow */
-			// Doing a reverse operation from the previous(This) line
-			if ((tmp - last_digit) / 10 != result)
-				return 0;
+            /* Checking for the Overflow */
+            // Doing a reverse operation from the previous(This) line
+            if ((tmp - last_digit) / 10 != result)
+                return 0;
 
-			result = tmp;
-			x = x / 10;
-		}
+            result = tmp;
+            x = x / 10;
+        }
 
-		return result;
-	}
+        return result;
+    }
 };
 
 
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	--- Solution ---
-	It is self-explanatory for cases other than edge cases.
+    --- Solution ---
+    It is self-explanatory for cases other than edge cases.
 
-	Consider this:
+    Consider this:
 
-	x = 2147483647 // INT_MAX
+    x = 2147483647 // INT_MAX
 
-	Only this part is important:
-		// Exceeded 32-bit range
-		if (rev > (INT_MAX / 10) || rev > ((INT_MAX / 10) + number % 10))
-			return 0;
+    Only this part is important:
+        // Exceeded 32-bit range
+        if (rev > (INT_MAX / 10) || rev > ((INT_MAX / 10) + number % 10))
+            return 0;
 
-	So, why are we doing this? Or how exactly and why this works?
+    So, why are we doing this? Or how exactly and why this works?
 
-	INT_MAX =  2147483647
+    INT_MAX =  2147483647
 
-	and we check if out reversed integer variable "rev":
-		if (rev > (INT_MAX) / 10)
+    and we check if out reversed integer variable "rev":
+        if (rev > (INT_MAX) / 10)
 
-	Why?
-	(INT_MAX) / 10 = 214748364;
+    Why?
+    (INT_MAX) / 10 = 214748364;
 
-	Imagine if rev was greater than this value.
-	Imagine:
-		rev = 2147483642;
+    Imagine if rev was greater than this value.
+    Imagine:
+        rev = 2147483642;
 
-	If we werent' to return 0 because of an upcoming Overflow, what would've
-	happened?
+    If we werent' to return 0 because of an upcoming Overflow, what would've
+    happened?
 
-	Well, Overflow, of course, but how?
+    Well, Overflow, of course, but how?
 
-	2147483642 * 10 + ANY_NUMBER is GUARANTEED to be overflowed.
+    2147483642 * 10 + ANY_NUMBER is GUARANTEED to be overflowed.
 
-	Simply multiplying 2147483642 by 10 is already an Overflow.
+    Simply multiplying 2147483642 by 10 is already an Overflow.
 
-	However if "rev" is not bigger than 2147483642 then, assume we have this:
-		rev = 214748363
+    However if "rev" is not bigger than 2147483642 then, assume we have this:
+        rev = 214748363
 
-	rev * 10 = 214783630 which is still less than INT_MAX
-	and adding ANY_DIGIT is guaranteed not to cause an Overflow.
+    rev * 10 = 214783630 which is still less than INT_MAX
+    and adding ANY_DIGIT is guaranteed not to cause an Overflow.
 
-	However if our "rev" is EXACTLY (INT_MAX / 10), meaning:
-		rev = 21474864
+    However if our "rev" is EXACTLY (INT_MAX / 10), meaning:
+        rev = 21474864
 
-	Then we have to check if the last_digit + rev is going to be greater
-	than:
-		INT_MAX % 10
+    Then we have to check if the last_digit + rev is going to be greater
+    than:
+        INT_MAX % 10
 
-	INT_MAX % 10 == 7
+    INT_MAX % 10 == 7
 
-	so if our variable "rev":
-		rev = 21474864
-	and we add either {0, 1, 2, 3, 4, 5, 6, 7} then we're good. There is no
-	Overflow.
+    so if our variable "rev":
+        rev = 21474864
+    and we add either {0, 1, 2, 3, 4, 5, 6, 7} then we're good. There is no
+    Overflow.
 
-	If last_digit is greater than 7 and "rev" is 21474864 then that will
-	cause an Overflow.
+    If last_digit is greater than 7 and "rev" is 21474864 then that will
+    cause an Overflow.
 
 */
 
@@ -195,71 +195,62 @@ public:
 /* Space Beats: 65.36% */
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_Efficient{
+class Solution_Efficient {
 public:
-	int reverse(int x)
-	{
-		int rev = 0;
-		int number;
+    int reverse(int x)
+    {
+        // If it was 1Byte then -8 can exist, but 8 cannot
+        if (x == INT_MIN)
+            return 0;
 
-		// If it was 1B then -8 can exist, but 8 cannot
-		if (x == INT_MIN)
-			return 0;
+        bool neg = x < 0;
+        if (neg)
+            x *= -1;
 
-		// If it is a negative number
-		if (x < 0)
-			number = x * (-1);
-		else
-			number = x;
+        int rev = 0;
+        while (x != 0)
+        {
+            // Exceeded 32-bit range
+            if (rev > INT_MAX / 10 || ( (rev == INT_MAX) && (rev > 7) ) )
+                return 0;
 
-		while (number)
-		{
-			// Exceeded 32-bit range
-			if (rev > (INT_MAX / 10) || ( (rev == INT_MAX / 10) && (number % 10 > 7) ))
-				return 0;
+            rev = rev * 10 + x % 10;
+            x /= 10;
+        }
 
-
-			rev = rev * 10 + number % 10;
-			number = number / 10;
-		}
-
-		// If it was a negative number
-		if (x < 0)
-			return rev * (-1);
-
-		return rev;
-	}
+        return neg ? -1 * rev : rev;
+    }
 };
 
 
 int
 main()
 {
-	Solution sol;
-	Solution_Efficient sol_efficient;
+    Solution sol;
+    Solution_Efficient sol_efficient;
 
-	// int number =  123;
-	// int number = -123;
-	// int number =  120;
-	// int number = -120;
-	int number = -2147483412;
-	// int number =  2147483647; // INT_MAX
-	// int number = -2147483648; // INT_MIN
+    // int number =  123;
+    // int number = -123;
+    // int number =  120;
+    // int number = -120;
+    int number = -2147483412;
+    // int number =  2147483647; // INT_MAX
+    // int number = -2147483648; // INT_MIN
 
-	std::cout << "\n\t=======================";
-	std::cout << "\n\t=== REVERSE INTEGER ===";
-	std::cout << "\n\t=======================\n";
+    std::cout << "\n\t=======================";
+    std::cout << "\n\t=== REVERSE INTEGER ===";
+    std::cout << "\n\t=======================\n";
 
 
-	/* Write Input */
-	std::cout << "\n\tOriginal number: " << number << "\n";
+    /* Write Input */
+    std::cout << "\n\tOriginal number: " << number << "\n";
 
-	/* Solution */
-	// int rev = sol.reverse(number);
-	int rev = sol_efficient.reverse(number);
+    /* Solution */
+    // int rev = sol.reverse(number);
+    int rev = sol_efficient.reverse(number);
 
-	/* Write Output */
-	std::cout << "\n\tReversed number: " << rev << "\n\n";
+    /* Write Output */
+    std::cout << "\n\tReversed number: " << rev << "\n\n";
 
-	return 0;
+    return 0;
 }
