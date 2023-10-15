@@ -68,12 +68,54 @@
 
 */
 
+/* Time  Beats: 72.16% */
+/* Space Beats:  6.04% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Naive {
+public:
+    int pivotIndex(std::vector<int>& nums)
+    {
+        int n = nums.size();
+        std::vector<int> dp_left (n, 0);
+        std::vector<int> dp_right(n, 0);
+
+        for (int i = 1; i < n; i++)
+            dp_left[i] = nums[i-1] + dp_left[i-1];
+
+        for (int i = n-2; i >= 0; i--)
+            dp_right[i] = nums[i+1] + dp_right[i+1];
+        
+        for (int i = 0; i < n; i++)
+        {
+            if (dp_left[i] == dp_right[i])
+                return i;
+        }
+
+        return -1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Almost equivalent idea, but written in a way that uses O(1) Space and has
+    one less for loop.
+    
+*/
+
 /* Time  Beats: 90.30% */
 /* Space Beats: 81.17% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Optimized {
 public:
 	int pivotIndex(std::vector<int>& nums)
 	{
