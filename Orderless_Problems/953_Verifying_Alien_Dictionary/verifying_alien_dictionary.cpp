@@ -1,163 +1,163 @@
 #include <iostream>
 
 /*
-	============
-	=== EASY ===
-	============
+    ============
+    === EASY ===
+    ============
 
-	================================
-	953) Verifying Alien Dictionary
-	================================
+    ================================
+    953) Verifying Alien Dictionary
+    ================================
 
-	============
-	Description:
-	============
+    ============
+    Description:
+    ============
 
-	In an alien language, surprisingly, they also use English lowercase
-	letters, but possibly in a different order. The order of the alphabet is
-	some permutation of lowercase letters.
+    In an alien language, surprisingly, they also use English lowercase
+    letters, but possibly in a different order. The order of the alphabet is
+    some permutation of lowercase letters.
 
-	Given a sequence of words written in the alien language, and the order of
-	the alphabet, return true if and only if the given words are sorted
-	lexicographically in this alien language.
+    Given a sequence of words written in the alien language, and the order of
+    the alphabet, return true if and only if the given words are sorted
+    lexicographically in this alien language.
 
-	==================================================================
-	FUNCTION: bool isAlienSorted(vector<string>& words, string order);
-	==================================================================
+    ==================================================================
+    FUNCTION: bool isAlienSorted(vector<string>& words, string order);
+    ==================================================================
 
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
 
-	--- Example 1 ---
-	Input: words = ["hello","leetcode"], order = "hlabcdefgijkmnopqrstuvwxyz"
-	Output: true
-	Explanation: As 'h' comes before 'l' in this language, then the sequence is
-	             sorted.
+    --- Example 1 ---
+    Input: words = ["hello","leetcode"], order = "hlabcdefgijkmnopqrstuvwxyz"
+    Output: true
+    Explanation: As 'h' comes before 'l' in this language, then the sequence is
+                 sorted.
 
-	--- Example 2 ---
-	Input: words = ["word","world","row"], order = "worldabcefghijkmnpqstuvxyz"
-	Output: false
-	Explanation: As 'd' comes after 'l' in this language, then words[0] >
-	             words[1], hence the sequence is unsorted.
+    --- Example 2 ---
+    Input: words = ["word","world","row"], order = "worldabcefghijkmnpqstuvxyz"
+    Output: false
+    Explanation: As 'd' comes after 'l' in this language, then words[0] >
+                 words[1], hence the sequence is unsorted.
 
-	--- Example 3 ---
-	Input: words = ["apple","app"], order = "abcdefghijklmnopqrstuvwxyz"
-	Output: false
-	Explanation: The first three characters "app" match, and the second string
-	             is shorter (in size.) According to lexicographical rules
-	             "apple" > "app", because 'l' > '∅', where '∅' is defined as
-	             the blank character which is less than any other character
-	             (More info).
+    --- Example 3 ---
+    Input: words = ["apple","app"], order = "abcdefghijklmnopqrstuvwxyz"
+    Output: false
+    Explanation: The first three characters "app" match, and the second string
+                 is shorter (in size.) According to lexicographical rules
+                 "apple" > "app", because 'l' > '∅', where '∅' is defined as
+                 the blank character which is less than any other character
+                 (More info).
 
 
-	*** Constraints ***
-	1 <= words.length <= 100
-	1 <= words[i].length <= 20
-	order.length == 26
-	All characters in words[i] and order are English lowercase letters.
+    *** Constraints ***
+    1 <= words.length <= 100
+    1 <= words[i].length <= 20
+    order.length == 26
+    All characters in words[i] and order are English lowercase letters.
 
 */
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	First we have to put all the letters from string "order" in a Hash Map with
-	its corresponding order value.
+    First we have to put all the letters from string "order" in a Hash Map with
+    its corresponding order value.
 
-	Example:
-	string order = "qet..."
+    Example:
+    string order = "qet..."
 
-		 Hash Map
-	|  Key  :  Value |
-	+----------------|
-	|  'q'  :    1   |
-	+----------------|
-	|  'e'  :    2   |
-	+----------------|
-	|  't'  :    3   |
-	+----------------|
-	|  ...  :   ...  |
-	+----------------|
+         Hash Map
+    |  Key  :  Value |
+    +----------------|
+    |  'q'  :    1   |
+    +----------------|
+    |  'e'  :    2   |
+    +----------------|
+    |  't'  :    3   |
+    +----------------|
+    |  ...  :   ...  |
+    +----------------|
 
-	How do we know if two words are sorted lexicographically?
+    How do we know if two words are sorted lexicographically?
 
-	Well, in English, two words are sorted lexicographically if the first
-	differing character of two words is in sorted order.
+    Well, in English, two words are sorted lexicographically if the first
+    differing character of two words is in sorted order.
 
-	In the English alphabet letter 'a' comes before letter 'c'.
-	So if we have two words:
-	    1. sales
-		2. scare
-	
-	We can say that they are indeed in a sorted order since the very first
-	character 's' is the same in both strings, but the 2nd character(index 1)
-	differs.
+    In the English alphabet letter 'a' comes before letter 'c'.
+    So if we have two words:
+        1. sales
+        2. scare
 
-	The differing character of the first word is 'a' and the differing
-	character of the second word is 'c'.
+    We can say that they are indeed in a sorted order since the very first
+    character 's' is the same in both strings, but the 2nd character(index 1)
+    differs.
 
-	Since we know that in the English alphabet 'a' does indeed comes before 'c'
-	we can conclude that these two words are lexicographically sorted.
+    The differing character of the first word is 'a' and the differing
+    character of the second word is 'c'.
 
-	However, here we do have a different permutation of the English alphabet.
-	For example, as given in Example 1:
+    Since we know that in the English alphabet 'a' does indeed comes before 'c'
+    we can conclude that these two words are lexicographically sorted.
 
-	words = ["hello","leetcode"]
-	order = "hlabcdefgijkmnopqrstuvwxyz"
+    However, here we do have a different permutation of the English alphabet.
+    For example, as given in Example 1:
 
-	Upon further examination, we can conclude that these two are sorted since
-	the first differing character, which in this case is at the very first
-	letter (index 0). Differing characters are 'h' and 'l', respectively.
+    words = ["hello","leetcode"]
+    order = "hlabcdefgijkmnopqrstuvwxyz"
 
-	We now take a look at the string order and we can see that letter 'h' does
-	indeed come before letter 'l', thus we conclude that those two words are
-	sorted.
+    Upon further examination, we can conclude that these two are sorted since
+    the first differing character, which in this case is at the very first
+    letter (index 0). Differing characters are 'h' and 'l', respectively.
 
-	There is one more, crucially important, thing to understand about the
-	lexicographical ordering of the words:
+    We now take a look at the string order and we can see that letter 'h' does
+    indeed come before letter 'l', thus we conclude that those two words are
+    sorted.
 
-	    If one word is the prefix of the other word, prefix(i.e. shorter
-  	    word) MUST come BEFORE the longer one.
+    There is one more, crucially important, thing to understand about the
+    lexicographical ordering of the words:
 
-	    Example:
-	    words = ["he", "hello"] // This is correct
+        If one word is the prefix of the other word, prefix(i.e. shorter
+          word) MUST come BEFORE the longer one.
 
-	    words = ["hello", "he"] // This is INCORRECT
+        Example:
+        words = ["he", "hello"] // This is correct
+
+        words = ["hello", "he"] // This is INCORRECT
 
 
-	This is the crux of this problem.
+    This is the crux of this problem.
 
-	So how can we check for that?
-	We'll always check if there are any differing characters within the length
-	of the "left", i.e word that comes before.
+    So how can we check for that?
+    We'll always check if there are any differing characters within the length
+    of the "left", i.e word that comes before.
 
-	Why?
-	Consider this example:
-	    words = ["he", "hello"] // This is correct
-	
-	We're only going to check if 'h' and 'e' at the position of 0 and 1,
-	respecively, in the Word 2.
+    Why?
+    Consider this example:
+        words = ["he", "hello"] // This is correct
 
-	If we don't find any character that is different in Word 2, then that means
-	one of two things:
-	    1. Two words are exactly the same(Which is lexicographically valid)
-		2. First word is the prefix of the Second one, but Second one is longer
-	
-	However, we have seen that there can be a scenario where the second word
-	is the prefix of the first word and the second word is the longer one:
-	    words = ["hello", "he"] // This is INCORRECT
-	
-	How are we going to check for that?
-	Well, since we are always checking for the differing characters within the
-	length of the first word, we can check if at any point, our index j is
-	"out of bounds"(i.e. equal to word_2.length()).
+    We're only going to check if 'h' and 'e' at the position of 0 and 1,
+    respecively, in the Word 2.
 
-	If that happens to be the case, we're certain that the words are not sorted
-	correcly according to the alien permutation of lowercase English letters,
-	therefore we return false.
+    If we don't find any character that is different in Word 2, then that means
+    one of two things:
+        1. Two words are exactly the same(Which is lexicographically valid)
+        2. First word is the prefix of the Second one, but Second one is longer
+
+    However, we have seen that there can be a scenario where the second word
+    is the prefix of the first word and the second word is the longer one:
+        words = ["hello", "he"] // This is INCORRECT
+
+    How are we going to check for that?
+    Well, since we are always checking for the differing characters within the
+    length of the first word, we can check if at any point, our index j is
+    "out of bounds"(i.e. equal to word_2.length()).
+
+    If that happens to be the case, we're certain that the words are not sorted
+    correcly according to the alien permutation of lowercase English letters,
+    therefore we return false.
 
 */
 
@@ -171,75 +171,75 @@
 */
 class Solution {
 public:
-	bool isAlienSorted(std::vector<std::string>& words, std::string order)
-	{
-		std::unordered_map<char, int> order_map;
+    bool isAlienSorted(std::vector<std::string>& words, std::string order)
+    {
+        std::unordered_map<char, int> order_map;
 
-		// Time: O(1), Space: O(1) since order.length is always 26
-		for (int i = 0; i < order.length(); i++)
-			order_map[order[i]] = i;
+        // Time: O(1), Space: O(1) since order.length is always 26
+        for (int i = 0; i < order.length(); i++)
+            order_map[order[i]] = i;
 
-		for (int i = 0; i < words.size() - 1; i++)
-		{
-			std::string word_1 = words[i];
-			std::string word_2 = words[i + 1];
+        for (int i = 0; i < words.size() - 1; i++)
+        {
+            std::string word_1 = words[i];
+            std::string word_2 = words[i + 1];
 
-			for (int j = 0; j < word_1.length(); j++)
-			{
-				// Word_2 is a prefix of Word_1 and not the other way around
-				if (j == word_2.length())
-					return false;
+            for (int j = 0; j < word_1.length(); j++)
+            {
+                // Word_2 is a prefix of Word_1 and not the other way around
+                if (j == word_2.length())
+                    return false;
 
-				if (word_1[j] != word_2[j])
-				{
-					if (order_map[word_2[j]] < order_map[word_1[j]])
-						return false;
+                if (word_1[j] != word_2[j])
+                {
+                    if (order_map[word_2[j]] < order_map[word_1[j]])
+                        return false;
 
-					break;
-				}
-			}
-		}
+                    break;
+                }
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 };
 
 
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	We can convert every word into a normal order by having mapped letters
-	from a-z to alien order of lowercase english letters.
+    We can convert every word into a normal order by having mapped letters
+    from a-z to alien order of lowercase english letters.
 
-	Example:
-	"hog..."    Alien   order
-	"abc..."    English order
+    Example:
+    "hog..."    Alien   order
+    "abc..."    English order
 
-		 Hash Map
-	|  Key  :  Value |
-	+----------------|
-	|  'h'  :   'a'  |
-	+----------------|
-	|  'o'  :   'b'  |
-	+----------------|
-	|  'g'  :   'c'  |
-	+----------------|
-	|  ...  :   ...  |
-	+----------------|
+         Hash Map
+    |  Key  :  Value |
+    +----------------|
+    |  'h'  :   'a'  |
+    +----------------|
+    |  'o'  :   'b'  |
+    +----------------|
+    |  'g'  :   'c'  |
+    +----------------|
+    |  ...  :   ...  |
+    +----------------|
 
 
-	Alien  order of words = ["go", "hoho"]
+    Alien  order of words = ["go", "hoho"]
 
-	    *** Convert every word into standard English order ***
-	
-	English order of words = ["cb", "abab"]
+        *** Convert every word into standard English order ***
 
-	std::is_sorted(words.begin(), words.end()) will return false in this case
-	since word "cb" comes before "abab" which should not be the case in English
+    English order of words = ["cb", "abab"]
+
+    std::is_sorted(words.begin(), words.end()) will return false in this case
+    since word "cb" comes before "abab" which should not be the case in English
 
 */
 
@@ -253,19 +253,67 @@ public:
 */
 class Solution_Convert_Word_Into_Normal_Order {
 public:
-	bool isAlienSorted(std::vector<std::string>& words, std::string order)
-	{
-		std::unordered_map<char, char> order_map;
+    bool isAlienSorted(std::vector<std::string>& words, std::string order)
+    {
+        std::unordered_map<char, char> order_map;
 
-		for(int i = 0; i < 26; i++)
-			order_map[order[i]] = (i + 'a');
+        for(int i = 0; i < 26; i++)
+            order_map[order[i]] = (i + 'a');
 
-		for(int i = 0; i < words.size(); i++)
-		{
-			for(int j = 0; j < words[i].size(); j++)
-				words[i][j] = order_map[words[i][j]];
-		}
+        for(int i = 0; i < words.size(); i++)
+        {
+            for(int j = 0; j < words[i].size(); j++)
+                words[i][j] = order_map[words[i][j]];
+        }
 
-		return std::is_sorted(words.begin(), words.end());
-	}
+        return std::is_sorted(words.begin(), words.end());
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Use vector as a HashMap.
+
+*/
+
+/* Time  Beats: 83.41% */
+/* Space Beats: 82.40% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    bool isAlienSorted(std::vector<std::string>& words, std::string order)
+    {
+        std::vector<int> alphabet(26, 0);
+
+        for (int i = 0; i < order.length(); i++)
+            alphabet[order[i] - 'a'] = i;
+
+        for (int i = 1; i < words.size(); i++)
+        {
+            int x = 0;
+            int y = 0;
+            while (x < words[i-1].size() && y < words[i].size() && words[i-1][x] == words[i][y])
+            {
+                x++;
+                y++;
+            }
+
+            if (x < words[i-1].size() && y == words[i].size())
+                return false; // ["apple", "app"]
+            else if (x == words[i-1].size())
+                continue;
+            else if (alphabet[words[i-1][x] - 'a'] > alphabet[words[i][y] - 'a'])
+                return false;
+        }
+
+        return true;
+    }
 };
