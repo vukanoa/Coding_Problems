@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <unordered_map>
 
 /*
     ==============
@@ -57,7 +59,76 @@
     ------------
 
     TODO
-    
+
+*/
+
+/* Time  Beats: 22.25% */
+/* Space Beats:  5.63% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution{
+private:
+    struct pair_hash
+    {
+        template <class T1, class T2>
+        std::size_t operator() (const std::pair<T1, T2> &p) const
+        {
+            auto h1 = std::hash<T1>()(p.first);
+            auto h2 = std::hash<T2>()(p.second);
+
+            return h1 ^ (h2 << 1);
+        }
+    };
+
+public:
+    int maxProfit(vector<int>& prices)
+    {
+        int n = prices.size();
+        std::unordered_map<std::pair<int, bool>, int, pair_hash> cache;
+
+        // State == true  ---> Buying
+        // State == false ---> Selling
+        return dfs(prices, 0, true, cache);
+    }
+
+private:
+    int dfs(std::vector<int>& prices, int i, bool state, std::unordered_map<std::pair<int, bool>, int, pair_hash>& cache)
+    {
+        if (i >= prices.size())
+            return 0;
+
+        if (cache.count(std::make_pair(i, state)))
+            return cache[std::make_pair(i, state)];
+
+        int cool = dfs(prices, i+1,  state, cache);
+        if (state == true) // state == buying
+        {
+            int buy  = dfs(prices, i+1, !state, cache) - prices[i];
+
+            cache.insert({{i, state}, std::max(buy, cool)});
+        }
+        else // state == selling
+        {
+            int sell = dfs(prices, i+2, !state, cache) + prices[i];
+
+            cache.insert({{i, state}, std::max(sell, cool)});
+        }
+
+        return cache[std::make_pair(i, state)];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
 */
 
 /* Time  Beats:  100% */
