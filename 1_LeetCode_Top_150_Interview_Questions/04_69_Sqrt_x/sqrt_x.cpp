@@ -2,156 +2,102 @@
 #include <climits>
 
 /*
-	============
-	=== EASY ===
-	============
+    ============
+    === EASY ===
+    ============
 
-	===========================
-	69) Sqrt(x)
-	===========================
+    ===========================
+    69) Sqrt(x)
+    ===========================
 
-	============
-	Description:
-	============
+    ============
+    Description:
+    ============
 
-	Given a non-negative integer x, return the square root of x rounded down to
-	the nearest integer. The returned integer should be non-negative as well.
+    Given a non-negative integer x, return the square root of x rounded down to
+    the nearest integer. The returned integer should be non-negative as well.
 
-	You must not use any built-in exponent function or operator.
+    You must not use any built-in exponent function or operator.
 
-	For example, do not use pow(x, 0.5) in c++ or x ** 0.5 in python.
-
-
-	============================
-	FUNCTION: int mySqrt(int x);
-	============================
-
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
-
-	--- Example 1 ---
-	Input: x = 4
-	Output: 2
-	Explanation: The square root of 4 is 2, so we return 2.
-
-	--- Example 2 ---
-	Input: x = 8
-	Output: 2
-	Explanation: The square root of 8 is 2.82842..., and since we round it down
-	to the nearest integer, 2 is returned.
+    For example, do not use pow(x, 0.5) in c++ or x ** 0.5 in python.
 
 
-	*** Constraints ***
-	1 <= x <= 2^31
+    ============================
+    FUNCTION: int mySqrt(int x);
+    ============================
+
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
+
+    --- Example 1 ---
+    Input: x = 4
+    Output: 2
+    Explanation: The square root of 4 is 2, so we return 2.
+
+    --- Example 2 ---
+    Input: x = 8
+    Output: 2
+    Explanation: The square root of 8 is 2.82842..., and since we round it down
+                 to the nearest integer, 2 is returned.
+
+
+    *** Constraints ***
+    1 <= x <= 2^31
 
 */
 
-
-
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	==================================================================
-	Note: This is INEFFICIENT. Check the Binary Search Solution below.
-	==================================================================
+    Once we find that some number squared is greater than or equal to 'x', we
+    are done.
 
-	Once we find that some number squared is greater than or equal to 'x', we
-	are done.
+    If squared number is exactly equal to x, then:
+        return that number.
 
-	If squared number is exactly equal to x, then:
-		return that number.
+    If it's greater than x, then:
+        return that number - 1;
 
-	If it's greater than x, then:
-		return that number - 1;
+    If x is 0, then:
+        return 0.
 
-	If x is 0, then:
-		return 0.
+    But it would be inefficient to start from 1 and try until we get a number
+    that it's square is greater or equal to x.
 
-	But it would be inefficient to start from 1 and try until we get a number
-	that it's square is greater or equal to x.
-	
-*/
+    That would be O(n). That's what we've done in the Solution above.
 
-/* Time  Beats:  8.77% */
-/* Space Beats: 93.57% */
+    However, to find that "sweet spot", we can use Binary Search.
 
-/* Time  Complexity: O(x) */
-/* Space Complexity: O(1) */
-class Solution_Brute_inefficient {
-public:
-    int mySqrt(int x) {
-        unsigned i = 0;
+    Initialize:
+        first to 1
+        last  to x
 
-        for(;;)
-        {
-            if (i * i == x)
-                return i;
-            
-            if (i * i > x)
-                return i - 1;
-            
-            i++;
-        }
+    While first is less than or equal to last, do the following:
 
-        return 0;
-    }
-};
+        1) Compute mid as first + (last - first) / 2.
 
+        2) If mid * mid equals x, return mid.
 
-/*
-	------------
-	--- IDEA ---
-	------------
+        3) If mid * mid is greater than x, update last to mid - 1.
 
-	Once we find that some number squared is greater than or equal to 'x', we
-	are done.
+        4) If mid * mid is less than x, update first to mid + 1.
 
-	If squared number is exactly equal to x, then:
-		return that number.
+    Return last.
 
-	If it's greater than x, then:
-		return that number - 1;
+    Intuition behind returning last instead of first is that we didn't found
+    any value that is perfect square which means now we have to return a value
+    which is round of sqrt(x).
 
-	If x is 0, then:
-		return 0.
+    So, we have two options :
+        1. Start which is equal to mid+1 (in last iteration of while loop)
+        2. Last  which is equal to mid-1 (in last iteration of while loop)
 
-	But it would be inefficient to start from 1 and try until we get a number
-	that it's square is greater or equal to x.
-
-	That would be O(n). That's what we've done in the Solution above.
-
-	However, to find that "sweet spot", we can use Binary Search.
-
-	Initialize:
-		first to 1
-		last  to x
-
-	While first is less than or equal to last, do the following:
-
-		1) Compute mid as first + (last - first) / 2.
-
-		2) If mid * mid equals x, return mid.
-
-		3) If mid * mid is greater than x, update last to mid - 1.
-
-		4) If mid * mid is less than x, update first to mid + 1.
-	
-	Return last.
-
-	Intuition behind returning last instead of first is that we didn't found
-	any value that is perfect square which means now we have to return a value
-	which is round of sqrt(x).
-
-	So, we have two options :
-		1. Start which is equal to mid+1 (in last iteration of while loop)
-		2. Last  which is equal to mid-1 (in last iteration of while loop)
-
-	Therefore, last is the largest integer value whose square is less than or
-	equal to x, which is the closest possible approximation to the integer
-	square root.
+    Therefore, last is the largest integer value whose square is less than or
+    equal to x, which is the closest possible approximation to the integer
+    square root.
 
 */
 
@@ -165,7 +111,7 @@ public:
     int mySqrt(int x) {
         if (x == 0)
             return 0;
-        
+
         int first = 1;
         int last  = x;
 
@@ -175,7 +121,7 @@ public:
 
             if (mid == x / mid)
                 return mid;
-            
+
             if (mid > x / mid)
                 last = mid - 1;
             else
@@ -187,40 +133,86 @@ public:
 };
 
 
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This way of implementing is much more intuitive to me than the above one.
+
+*/
+
+/* Time  Beats:   100% */
+/* Space Beats: 61.39% */
+
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(1) */
+class Solution_Binary_Search_2 {
+public:
+    int mySqrt(int x)
+    {
+        if (x < 2)
+            return x;
+
+        int left  = 0;
+        int right = x;
+
+        while (left < right)
+        {
+            unsigned long long mid = left + (right - left) / 2;
+
+            if (mid * mid == x)
+                return mid;
+
+            if (mid * mid > x)
+                right = mid;
+            else
+                left = mid + 1;
+        }
+
+        return left - 1; // Or right - 1 it's the same
+    }
+};
+
+
 int
 main()
 {
-	Solution_Binary_Search sol;
+    Solution_Binary_Search   sol;
+    Solution_Binary_Search_2 sol_2;
 
-	/* Example 1 */
-	// int x = 4;
+    /* Example 1 */
+    // int x = 4;
 
-	/* Example 2 */
-	// int x = 8;
+    /* Example 2 */
+    // int x = 8;
 
-	/* Example 3 */
-	// int x = 0;
+    /* Example 3 */
+    // int x = 0;
 
-	/* Example 4 */
-	int x = INT_MAX;
-
-
-	std::cout << "\n\t===============";
-	std::cout << "\n\t=== SQRT(X) ===";
-	std::cout << "\n\t===============\n";
+    /* Example 4 */
+    int x = INT_MAX;
 
 
-	/* Write Input */
-	std::cout << "\n\tNumber: " << x << "\n";
+    std::cout << "\n\t===============";
+    std::cout << "\n\t=== SQRT(X) ===";
+    std::cout << "\n\t===============\n";
 
 
-	/* Solution */
-	int result = sol.mySqrt(x);
+    /* Write Input */
+    std::cout << "\n\tNumber: " << x << "\n";
 
 
-	/* Write Output */
-	std::cout << "\n\tInteger Sqrt(" << x << "): " << result << "\n\n";
+    /* Solution */
+    int result = sol.mySqrt(x);
+    // int result = sol_2.mySqrt(x);
 
 
-	return 0;
+    /* Write Output */
+    std::cout << "\n\tInteger Sqrt(" << x << "): " << result << "\n\n";
+
+
+    return 0;
 }
