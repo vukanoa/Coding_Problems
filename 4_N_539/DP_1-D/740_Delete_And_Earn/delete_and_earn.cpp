@@ -68,86 +68,15 @@
 
 */
 
-/* Time  Beats: 86.75% */
-/* Space Beats: 65.74% */
+/* Time  Beats: 85.56% */
+/* Space Beats: 66.01% */
 
 /* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(n) */
-class Solution{
+class Solution {
 public:
     int deleteAndEarn(std::vector<int>& nums)
     {
-        if (nums.size() == 1)
-            return nums[0];
-
-        // Sort
-        std::sort(nums.begin(), nums.end());
-
-        // Remove duplicates and count occurrences
-        std::vector<int> nums_no_dup;
-        nums_no_dup.push_back(nums[0]);
-
-        std::unordered_map<int, int> umap;
-        umap.insert({nums[0], 1});
-
-        for (int i = 1; i < nums.size(); i++)
-        {
-            if (nums[i] == nums[i - 1])
-                umap[nums[i]]++;
-            else
-            {
-                umap.insert({nums[i], 1});
-                nums_no_dup.push_back(nums[i]);
-            }
-        }
-
-        // Meat of the Solution
-        int prev = 0;
-        int curr = nums[0] * umap[nums[0]];
-
-        for (int i = 1; i < nums_no_dup.size(); i++)
-        {
-            int val = nums_no_dup[i] * umap[nums_no_dup[i]];
-
-            int tmp;
-            if (nums_no_dup[i - 1] + 1 == nums_no_dup[i])
-                tmp = std::max(prev + val, curr);
-            else
-                tmp = std::max(prev + val, curr + val);
-
-            prev = curr;
-            curr = tmp;
-        }
-
-        return std::max(prev, curr);
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Another way of implementing.
-
-*/
-
-/* Time  Beats: 86.85% */
-/* Space Beats: 58.94% */
-
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(n) */
-class Solution{
-public:
-    int deleteAndEarn(std::vector<int>& nums)
-    {
-        int n = nums.size();
-        if (n == 1)
-            return nums[0];
-
         // Hash Map
         std::unordered_map<int, int> occurrences;
 
@@ -155,26 +84,29 @@ public:
         for (int& num : nums)
             occurrences[num]++;
 
-        // New vector without size of unique numbers in "nums"
-        std::vector<int> new_nums(occurrences.size());
+        // New vector with distinct elements
+        std::vector<int> uniq_nums(occurrences.size());
 
-        // Fill new vector with unique values form "nums"
+        // Fill new vector with unique values from "nums"
         int i = 0;
         for (auto& entry : occurrences)
-            new_nums[i++] = entry.first;
+            uniq_nums[i++] = entry.first;
 
-        std::sort(new_nums.begin(), new_nums.end());
+        // Sort
+        std::sort(uniq_nums.begin(), uniq_nums.end());
 
         // The most important part of the Solution
+        // It uses only two variables instead of the whole vector "DP"
         int prev = 0;
-        int curr = new_nums[0] * occurrences[new_nums[0]];
-        for (int i = 1; i < new_nums.size(); i++)
+        int curr = uniq_nums[0] * occurrences[uniq_nums[0]];
+        for (int i = 1; i < uniq_nums.size(); i++)
         {
             int tmp;
-            if (new_nums[i] - 1 == new_nums[i - 1])
-                tmp = std::max(curr, new_nums[i] * occurrences[new_nums[i]] + prev);
+
+            if (uniq_nums[i] - 1 == uniq_nums[i - 1])
+                tmp = std::max(curr, uniq_nums[i] * occurrences[uniq_nums[i]] + prev);
             else
-                tmp = new_nums[i] * occurrences[new_nums[i]] + std::max(curr, prev);
+                tmp = uniq_nums[i] * occurrences[uniq_nums[i]] + std::max(curr, prev);
 
             prev = curr;
             curr = tmp;
@@ -213,6 +145,7 @@ class Solution_Messy {
 public:
     int deleteAndEarn(vector<int>& nums)
     {
+        // Red Black Tree
         std::map<int, int> map;
 
         for (int& num : nums)
@@ -222,7 +155,7 @@ public:
         for (auto& entry : map)
             uniq_nums.push_back(entry.first);
 
-        //std::vector<int> dp(uniq_nums.size());
+        // std::vector<int> dp(uniq_nums.size());
         int dp[uniq_nums.size()];
 
         int max = 0;
@@ -246,5 +179,74 @@ public:
         }
 
         return max;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This Solution doesn't use std::sort, instead it sorts elements using a
+    std::map aka "Red and Black Tree", therefore the Time Complexity is the
+    same, but I wanted to show another way of implementing this.
+
+*/
+
+/* Time  Beats: 53.65% */
+/* Space Beats: 61.38% */
+
+/* Time  Complexity: O(N * log N) */
+/* Space Complexity: O(N) */
+class Solution_Without_Using_Sort_Function { // Uses Red and Black Tree instead
+public:
+    int deleteAndEarn(std::vector<int>& nums)
+    {
+        // Red Black tree(Insertion time O(log N))
+        std::map<int, int> map;
+
+        // If there are N different numbers, there will be N insertions and
+        // every insertion is O(log N) therefore the total Time Complexity of
+        // this piece of code is: O(N * log N)
+        for (int& num : nums)
+        {
+            if (map.find(num) == map.end()) // Doesn't exist yet
+                map.insert( {num, 1} );
+            else
+                map[num]++;
+        }
+
+        // O(M), where M is the number of distinct numbers in "nums".
+        // 1 <= M <= N
+        // M, in the worst case, is the same as N
+        // Therefore we can say, the Time Complexity is:
+        // O(N)
+        std::vector<int> uniq_nums;
+        for (auto& entry : map)
+            uniq_nums.push_back(entry.first);
+
+        std::vector<int> dp(uniq_nums.size(), 0);
+        dp[0] = uniq_nums[0] * map[uniq_nums[0]];
+
+        // O(M), i.e O(N)
+        for (int i = 1; i < uniq_nums.size(); i++)
+        {
+            int tmp = uniq_nums[i] * map[uniq_nums[i]];
+
+            if (uniq_nums[i-1] == uniq_nums[i]-1)
+            {
+                if (i-2 >= 0)
+                    dp[i] = std::max(dp[i-2] + tmp, dp[i-1]);
+                else
+                    dp[i] = std::max(tmp, dp[i-1]);
+            }
+            else
+                dp[i] = tmp + dp[i-1];
+        }
+
+        return dp[uniq_nums.size() - 1];
     }
 };
