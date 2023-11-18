@@ -25,7 +25,7 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution{
+class Solution_1 {
 public:
 	int solution(std::vector<int>& T, std::vector<int>& A)
 	{
@@ -66,10 +66,70 @@ private:
 };
 
 
+
+
+/* Similar to Course Schedule(Topological Sort) */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    int solution(std::vector<int>& T, std::vector<int>& A)
+    {
+        /*
+            Assuming that T[0] is always 0, meaning the root itself is
+            certainly possible to be learned without any prerequisites.
+
+            It is said that, quote:"Skills form a tree rooted at 0".
+
+            Which means that the root itself is possible to be learned. If that
+            was not the case, the Description of this problem would tell us
+            what to return if we were to find out that we are unable to learn
+            all the skills.
+
+            Since we're not told what that value should be, I'm assuming that
+            root, 0, can always be learned without any prerequisites and that
+            it is possible to learn all the skills.
+        */
+        std::unordered_set<int> learned_skills;
+        learned_skills.insert(0); // It's certainly possible to learn the root
+
+        int total_learned_skills = 1; // It's 1 because of the root itself
+
+        for (int& a : A)
+            total_learned_skills += dfs(T, a, learned_skills);
+
+        return total_learned_skills;
+    }
+
+    int dfs(std::vector<int>& T, int skill_to_learn, std::unordered_set<int>& learned_skills)
+    {
+        if (learned_skills.find(skill_to_learn) != learned_skills.end())
+            return 0;
+
+        int count = 0;
+        
+        if (learned_skills.find(T[skill_to_learn]) != learned_skills.end())
+        {
+            count++;
+            learned_skills.insert(skill_to_learn);
+        }
+        else
+        {
+            count += 1 + dfs(T, T[skill_to_learn], learned_skills);
+            learned_skills.insert(skill_to_learn);
+        }
+
+        return count;
+    }
+};
+
+
 int
 main()
 {
-	Solution sol;
+	Solution_1 sol_1;
+	Solution_2 sol_2;
 
 	/* Example 1 */
 	// std::vector<int> T = {0, 0, 1, 1};
@@ -124,12 +184,13 @@ main()
 
 
 	/* Solution */
-	int min_to_learn = sol.solution(T, A);
+	int min_to_learn_1 = sol_1.solution(T, A);
+	int min_to_learn_2 = sol_2.solution(T, A);
 
 
 	/* Write Output */
-	std::cout << "\n\tMin to Learn: " << min_to_learn << "\n\n";
-
+	std::cout << "\n\tMin to Learn: " << min_to_learn_1 << "";
+	std::cout << "\n\tMin to Learn: " << min_to_learn_2 << "\n\n";
 
 	return 0;
 }
