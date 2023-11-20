@@ -2,7 +2,7 @@
 #include <vector>
 #include <unordered_set>
 
-class Solution{
+class Solution_1 {
 public:
 	int solution(std::vector<int>& A, std::vector<int>& B, int S)
 	{
@@ -42,10 +42,53 @@ private:
 };
 
 
+
+
+class Solution_2 {
+public:
+    bool solution (std::vector<int>& A, std::vector<int>& B, int S)
+    {
+        const int N = A.size();
+        if (N > S)
+            return false;
+
+        std::unordered_set<int> taken;
+
+        if (dfs(A, B, A[0], 1, taken)) return true;
+        if (dfs(A, B, B[0], 1, taken)) return true;
+
+        return false;
+    }
+
+private:
+    bool dfs (std::vector<int>& A,
+              std::vector<int>& B,
+              int appointment,
+              int patient,
+              std::unordered_set<int>& taken)
+    {
+        if (taken.find(appointment) != taken.end()) // Already taken
+            return false;
+        else if (patient == A.size()) // All assigned successfully
+            return true;
+
+        taken.insert(appointment);
+
+        if (dfs(A, B, A[patient], patient+1, taken)) return true;
+        if (dfs(A, B, B[patient], patient+1, taken)) return true;
+
+        taken.erase(appointment);
+
+        return false;
+    }
+};
+
+
 int
 main()
 {
-	Solution sol;
+	Solution_1 sol_1;
+	Solution_2 sol_2;
 
 	/* Example 1 */
 	// std::vector<int> A = {1, 1, 3};
@@ -125,14 +168,22 @@ main()
 
 
 	/* Solution */
-	bool possible = sol.solution(A, B, S);
+	bool possible_1 = sol_1.solution(A, B, S);
+	bool possible_2 = sol_2.solution(A, B, S);
 
 
 	/* Write Output */
-	if (possible)
-		std::cout << "\n\tOut: It's Possible!\n\n";
+	if (possible_1)
+		std::cout << "\n\tOut: It's Possible!";
 	else
-		std::cout << "\n\tOut: It's NOT Possible!\n\n";
+		std::cout << "\n\tOut: It's NOT Possible!";
+
+	if (possible_2)
+		std::cout << "\n\tOut: It's Possible!";
+	else
+		std::cout << "\n\tOut: It's NOT Possible!";
+
+    std::cout << "\n\n";
 
 	return 0;
 }
