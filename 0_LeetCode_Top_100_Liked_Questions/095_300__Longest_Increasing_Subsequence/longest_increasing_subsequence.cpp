@@ -448,6 +448,58 @@ public:
     --- IDEA ---
     ------------
 
+    The above and below Solutions are similar, however it's more difficult to
+    grasp if you hear the right name of the approach - Patience Sort.
+
+    That name comes from the playing card game called "Patience" in which the
+    goal is to have the lesat amount of piles that are all in decreasing
+    order.
+
+    However, if you do that, top of each of those piles will form the longest
+    increasing subsequences.
+
+    Similar problem called: "Decreasing Subsequences" exists(not on LeetCode).
+    The goal in that problem is the return the minimum number of piles needed,
+    where every pile MUST be a decreasing subsequence.
+
+*/
+
+/* Time  Beats:   100% */
+/* Space Beats: 80.57% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n) */
+class Solution_Patience_Sort {
+public:
+    int lengthOfLIS(std::vector<int>& nums)
+    {
+        std::vector<int> piles;
+        piles.push_back(nums[0]);
+
+        for (int i = 1; i < nums.size(); i++)
+        {
+            if (piles[piles.size() - 1] < nums[i])
+                piles.push_back(nums[i]);
+            else
+            {
+                auto upper = std::lower_bound(piles.begin(), piles.end(), nums[i]);
+                *upper = nums[i];
+            }
+        }
+
+        return piles.size();
+    }
+};
+
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     It's absolutely equivalent to the Solution above(Solution_Greedy_Binary),
     however, this one uses my own Binary Search "lower_bound" function.
 
@@ -661,6 +713,7 @@ main()
     Solution_DFS_with_Cache_DP sol_dfs_cache_dp;
     Solution_DP                sol_dp;
     Solution_Greedy_Binary     sol_grd_bin; // Efficient!
+    Solution_Patience_Sort     sol_patience; // Efficient!
     Solution_My_Binary         sol_my_bin;  // Efficient!
     Solution_BIT               sol_bit;
     Solution_BIT_Compress      sol_bit_com;
@@ -698,7 +751,8 @@ main()
     /* Solution */
     // int longest = sol_dfs_cache_dp.lengthOfLIS(nums);
     // int longest = sol_dp.lengthOfLIS(nums);
-    int longest = sol_grd_bin.lengthOfLIS(nums);
+    // int longest = sol_grd_bin.lengthOfLIS(nums);
+    int longest = sol_patience.lengthOfLIS(nums);
     // int longest = sol_my_bin.lengthOfLIS(nums);
     // int longest = sol_bit.lengthOfLIS(nums);
     // int longest = sol_bit_com.lengthOfLIS(nums);
