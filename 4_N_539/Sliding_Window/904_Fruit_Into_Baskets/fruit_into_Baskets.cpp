@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <unordered_map>
 
 /*
     ==============
@@ -70,57 +72,43 @@
     ------------
 
     TODO
-    
+
 */
 
-/* Time  Beats: 54.69% */
-/* Space Beats: 32.05% */
+/* Time  Beats: 58.40% */
+/* Space Beats: 73.02% */
 
 /* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */ // At worst 2 elements in a Hash Map
+/* Space Complexity: O(n) */
 class Solution {
 public:
     int totalFruit(vector<int>& fruits)
     {
-        if (fruits.size() == 1)
-            return 1;
-
+        int result = INT_MIN;
         std::unordered_map<int, int> umap;
 
-        if (fruits[0] == fruits[1])
-            umap.insert({fruits[0], 2});
-        else
-        {
-            umap.insert({fruits[0], 1});
-            umap.insert({fruits[1], 1});
-        }
-
         int left  = 0;
-        int right = 2;
-        int total = right - left;
+        int right = 0;
+
         while (right < fruits.size())
         {
-            if (umap.count(fruits[right]))
-                umap[fruits[right]]++;
-            else
+            umap[fruits[right]]++;
+
+            while (umap.size() > 2)
             {
-                while (umap.size() == 2)
-                {
-                    umap[fruits[left]]--;
+                umap[fruits[left]]--;
 
-                    if (umap[fruits[left]] == 0)
-                        umap.erase(fruits[left]);
+                if (umap[fruits[left]] == 0)
+                    umap.erase(fruits[left]);
 
-                    left++;
-                }
-
-                umap.insert({fruits[right], 1});
+                left++;
             }
 
-            total = std::max(total, right - left + 1);
+            result = std::max(result, right - left + 1);
+
             right++;
         }
 
-        return total;
+        return result;
     }
 };
