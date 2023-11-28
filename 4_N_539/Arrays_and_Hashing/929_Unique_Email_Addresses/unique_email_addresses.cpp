@@ -79,12 +79,16 @@
     --- IDEA ---
     ------------
 
-    Self-Explanatory.
+    Since there aren't any pitfalls after the '@', we can just append from
+    that point until the end of the string.
+
+    However, it is important not to omit that part, since that can be the
+    differing factor.
 
 */
 
-/* Time  Beats: 69.15% */
-/* Space Beats:  8.84% */
+/* Time  Beats: 49.68% */
+/* Space Beats: 10.65% */
 
 /* Time  Complexity: O(n * max_len(emails)) */
 /* Space Complexity: O(n) */
@@ -92,33 +96,27 @@ class Solution {
 public:
     int numUniqueEmails(vector<string>& emails)
     {
-        if (emails.size() == 1)
-            return 1;
-
         std::unordered_set<std::string> uset;
 
         for (int i = 0; i < emails.size(); i++)
         {
             std::ostringstream out;
+            bool plus_found = false;
 
-            int idx = 0;
-            while (emails[i][idx] != '@')
+            int j;
+            for (j = 0; emails[i][j] != '@'; j++)
             {
-                if (emails[i][idx] == '.')
-                    idx++;
-                else if (emails[i][idx] == '+')
-                {
-                    while (emails[i][idx] != '@')
-                        idx++;
-                }
-                else
-                    out << emails[i][idx++];
+                if (emails[i][j] == '.')
+                    continue;
+                else if (emails[i][j] == '+')
+                    plus_found = true;
+
+                if (!plus_found)
+                    out << emails[i][j];
             }
 
-            while (idx < emails[i].size() - 4) // Because it is certain that domain name ends with .com
-                out << emails[i][idx++];
+            out << emails[i].substr(j, emails[i].length() - j + 1);
 
-            // Insert in a Set
             uset.insert(out.str());
         }
 
