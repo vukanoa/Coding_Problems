@@ -222,6 +222,41 @@ public:
 
 
 
+
+/* Time  Beats: 71.61% */
+/* Space Beats: 14.26% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_DP_Concise {
+public:
+    int trap(vector<int>& height)
+    {
+        const int n = height.size();
+
+        std::vector<int> left (n, 0);
+        std::vector<int> right(n, 0);
+
+        left[0]    = height[0];
+        right[n-1] = height[n-1];
+
+        for (int i = 1; i < n; i++)
+        {
+            left[i]      = std::max(left[i-1],  height[i]);
+            right[n-i-1] = std::max(right[n-i], height[n-i-1]);
+        }
+
+        int result = 0;
+        for (int i = 1; i < n-1; i++)
+            result += std::min(left[i], right[i]) - height[i];
+
+        return result;
+    }
+};
+
+
+
+
 /*
 	------------
 	--- IDEA ---
