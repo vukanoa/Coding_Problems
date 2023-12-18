@@ -162,6 +162,61 @@ private:
     --- IDEA ---
     ------------
 
+    Optimizing Backtracking(DFS) approach to cache calculated work.
+
+*/
+
+/* Time  Beats: 32.79% */
+/* Space Beats: 58.52% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
+class Solution_Memoization {
+public:
+    int maxUncrossedLines(std::vector<int>& nums1, std::vector<int>& nums2)
+    {
+        int ROWS = nums1.size();
+        int COLS = nums2.size();
+
+        std::vector<std::vector<int>> dp(ROWS, std::vector<int>(COLS, -1));
+
+        return dfs(nums1, nums2, dp, 0, 0);
+    }
+
+private:
+    int dfs(std::vector<int>& nums1,
+            std::vector<int>& nums2,
+            std::vector<std::vector<int>>& dp,
+            int i,
+            int j)
+    {
+        int ROWS = nums1.size();
+        int COLS = nums2.size();
+
+        if (i == ROWS || j == COLS )
+            return 0;
+
+        if (dp[i][j] != -1)
+            return dp[i][j];
+
+        if (nums1[i] == nums2[j])
+            dp[i][j] = 1 + dfs(nums1, nums2, dp, i+1, j+1);
+        else
+            dp[i][j] = std::max(dfs(nums1, nums2, dp, i+1, j  ),
+                                dfs(nums1, nums2, dp, i  , j+1));
+
+        return dp[i][j];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     This is a common LCS problem.
 
                     1 4 2 2
@@ -194,7 +249,7 @@ private:
 
 /* Time  Complexity: O(ROWS * COLS) */
 /* Space Complexity: O(ROWS * COLS) */
-class Solution {
+class Solution_LCS{
 public:
     int maxUncrossedLines(std::vector<int>& nums1, std::vector<int>& nums2)
     {
@@ -215,5 +270,52 @@ public:
         }
 
         return dp[0][0];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above just more Space efficient. We're only using a single vector
+    instead of the whole matrix(i.e. vector of vectors).
+
+*/
+
+/* Time  Beats: 60.95% */
+/* Space Beats: 75.20% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(COLS) */
+class Solution_LCS_Space_Efficient {
+public:
+    int maxUncrossedLines(std::vector<int>& nums1, std::vector<int>& nums2)
+    {
+        int ROWS = nums1.size();
+        int COLS = nums2.size();
+
+        std::vector<int> dp(COLS+1, 0);
+
+        for (int i = ROWS-1; i >= 0; i--)
+        {
+            std::vector<int> curr_row(COLS+1, 0);
+
+            for (int j = COLS-1; j >= 0; j--)
+            {
+                if (nums1[i] == nums2[j])
+                    curr_row[j] = 1 + dp[j+1];
+
+                curr_row[j] = std::max({curr_row[j], dp[j], curr_row[j+1]});
+            }
+
+            dp.clear();
+            dp = curr_row;
+        }
+
+        return dp[0];
     }
 };
