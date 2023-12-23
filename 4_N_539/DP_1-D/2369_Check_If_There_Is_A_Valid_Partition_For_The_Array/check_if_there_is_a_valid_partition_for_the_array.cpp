@@ -232,3 +232,54 @@ private:
         return subarray[0] == subarray[1]-1 && subarray[1] == subarray[2]-1;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is reminiscent of a "Word Break" problem from Blind75.
+
+*/
+
+/* Time  Beats: 75.19% */
+/* Space Beats: 54.52% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_DP {
+public:
+    bool validPartition(std::vector<int>& nums)
+    {
+        int n = nums.size();
+
+        std::vector<int> dp(n+1, false);
+        dp[n]   = true;
+        dp[n-2] = nums[n-2] == nums[n-1];
+
+        for (int i = n-3; i >= 0; i--)
+        {
+            if ((valid_2(nums, i) && dp[i+2]) || (valid_3(nums, i) && dp[i+3]))
+                dp[i] = true;
+        }
+
+        return dp[0];
+    }
+
+private:
+    bool valid_2(std::vector<int>& nums, int i)
+    {
+        return nums[i] == nums[i+1];
+    }
+
+    bool valid_3(std::vector<int>& nums, int i)
+    {
+        if (nums[i] == nums[i+1] && nums[i+1] == nums[i+2])
+            return true;
+
+        return nums[i] == nums[i+1] - 1 && nums[i+1] == nums[i+2] - 1;
+    }
+};
