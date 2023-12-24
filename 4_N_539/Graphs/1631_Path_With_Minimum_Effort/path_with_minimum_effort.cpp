@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <climits>
 
 /*
     ==============
@@ -162,6 +163,100 @@ public:
                 int new_diff = std::max(diff, abs_diff);
 
                 min_heap.push({new_diff, neighbor_row, neighbor_col});
+            }
+        }
+
+        return 0;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    I have no idea why, but it turns out that using pair of pairs is faster
+    than using a vector inside a priority queue.
+
+    It makes a huge difference. If you don't believe, feel free to exchange
+    this:
+
+        std::priority_queue<std::pair<int, std::pair<int, int>>,
+                            std::vector<std::pair<int, std::pair<int, int>>>,
+                            std::greater<pair<int, pair<int, int>>>> min_heap;
+
+    with this:
+        std::priority_queue<std::vector<int>,
+                            std::vector<std::vector<int>>,
+                            std::greater<std::vector<int>>> min_heap;
+
+    And of course, these:
+        Line 224: min_heap.push({0, {0, 0}});
+        Line 257: min_heap.push({new_diff, {neighbor_row, neighbor_col}});
+
+    with these:
+        Line 224: min_heap.push({0, 0, 0}); // [diff, row, col]
+        Line 257: min_heap.push({new_diff, neighbor_row, neighbor_col});
+
+*/
+
+/* Time  Beats: 93.28% */
+/* Space Beats: 65.53% */
+
+/* Time  Complexity: O((M * N)^2 * log(M * N)) */
+/* Space Complexity: O((M * N))                */
+class Solution_Efficient_Implementation {
+public:
+    int minimumEffortPath(vector<vector<int>>& heights)
+    {
+        std::priority_queue<std::pair<int, std::pair<int, int>>,
+                            std::vector<std::pair<int, std::pair<int, int>>>,
+                            std::greater<pair<int, pair<int, int>>>> min_heap;
+
+        int ROWS = heights.size();
+        int COLS = heights[0].size();
+
+        std::vector<std::vector<int>> distance(ROWS, std::vector<int>(COLS, INT_MAX));
+
+        distance[0][0] = 0;
+        min_heap.push({0, {0, 0}});
+
+        std::vector<std::pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+        while (!min_heap.empty())
+        {
+            auto top = min_heap.top();
+            min_heap.pop();
+
+            int diff = top.first;
+            int row  = top.second.first;
+            int col  = top.second.second;
+
+            if (row == ROWS-1 && col == COLS-1)
+                return diff;
+
+            for (auto& dir : directions)
+            {
+                int neighbor_row = row + dir.first;
+                int neighbor_col = col + dir.second;
+
+                if (neighbor_row < 0 || neighbor_row == ROWS ||
+                    neighbor_col < 0 || neighbor_col == COLS)
+                {
+                    continue;
+                }
+
+                int abs_diff = std::abs(heights[row][col] - heights[neighbor_row][neighbor_col]);
+                int new_diff = std::max(diff, abs_diff);
+
+                if (new_diff < distance[neighbor_row][neighbor_col])
+                {
+                    distance[neighbor_row][neighbor_col] = new_diff;
+                    min_heap.push({new_diff, {neighbor_row, neighbor_col}});
+                }
             }
         }
 
