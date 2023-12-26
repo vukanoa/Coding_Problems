@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <stack>
 
 /*
     ==============
@@ -75,6 +76,82 @@
 
 */
 
+/* Time  Beats: 91.96% */
+/* Space Beats: 29.46% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Neat {
+public:
+    int maxSumMinProduct(std::vector<int>& nums)
+    {
+        const int n = nums.size();
+        long result = 0;
+
+        std::vector<long> prefix = {0};
+
+        for (int& num : nums)
+            prefix.push_back(prefix.back() + num);
+
+        std::stack<std::pair<int, int>> stack;
+
+        for (int i = 0; i < n; i++)
+        {
+            int new_start_idx = i;
+
+            while (!stack.empty() && stack.top().second > nums[i])
+            {
+                int start_idx = stack.top().first;
+                int min_val   = stack.top().second;
+                stack.pop();
+
+                /*
+                    Curr Subarray ==> [start_idx, i) ==> i.e. [start_idx, i-1]
+
+                    However, since vector prefix have 1 extra element at the
+                    beginning, we subtract prefix[start_idx] from prefix[i] and
+                    not prefix[i-1]
+                */
+                long sum_of_curr_subarray     = prefix[i] - prefix[start_idx];
+                long product_of_curr_subarray = sum_of_curr_subarray * min_val;
+
+                result = std::max(result, product_of_curr_subarray);
+
+                new_start_idx = start_idx;
+            }
+
+            stack.push( {new_start_idx, nums[i]} );
+        }
+
+        while (!stack.empty())
+        {
+            int start_idx = stack.top().first;
+            int min_val   = stack.top().second;
+            stack.pop();
+
+            // prefix[n] is the sum of all the elements in vector nums
+            long sum_of_curr_subarray     = prefix[n] - prefix[start_idx];
+            long product_of_curr_subarray = sum_of_curr_subarray * min_val;
+
+            result = std::max(result, product_of_curr_subarray);
+        }
+
+        return result % 1000000007;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
 /* Time  Beats: 94.35% */
 /* Space Beats: 67.83% */
 
@@ -82,7 +159,7 @@
 /* Space Complexity: O(n) */
 class Solution {
 public:
-    int maxSumMinProduct(vector<int>& nums)
+    int maxSumMinProduct(std::vector<int>& nums)
     {
         const int n = nums.size();
 
