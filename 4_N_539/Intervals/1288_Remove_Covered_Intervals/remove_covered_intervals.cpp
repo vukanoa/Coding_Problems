@@ -63,6 +63,7 @@ bool comparator(const std::vector<int>& a, const std::vector<int>& b)
     ------------
 
     TODO
+    Sort by 1st element in Ascending by 2nd in Descending.
 
 */
 
@@ -93,5 +94,49 @@ public:
         }
 
         return remaining;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    This one doesn't use "custom sort".
+
+*/
+
+/* Time  Beats: 60.86% */
+/* Space Beats: 89.59% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(1)        */ // Depending on the sort it can be O(n)
+class Solution {
+public:
+    int removeCoveredIntervals(vector<vector<int>>& intervals)
+    {
+        int result = 0;
+
+        std::sort(intervals.begin(), intervals.end());
+
+        int left  = -1;
+        int right = -1;
+
+        for (auto& inter : intervals)
+        {
+            if (inter[0] > left && inter[1] > right)
+            {
+                left = inter[0];
+                result++;
+            }
+
+            right = std::max(right, inter[1]);
+        }
+
+        return result;
     }
 };
