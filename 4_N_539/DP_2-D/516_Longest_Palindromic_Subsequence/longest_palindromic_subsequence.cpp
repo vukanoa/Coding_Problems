@@ -322,3 +322,64 @@ private:
         return dp[i][j];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This works similar to how "Longest Palindromic Substrings" works, but it
+    uses Memoization to cache the repeated work.
+
+*/
+
+/* Time  Beats:  5.03% */
+/* Space Beats: 62.15% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(n^2) */
+class Solution_Neat {
+public:
+    int longestPalindromeSubseq(std::string s)
+    {
+        int n = s.length();
+        std::vector<std::vector<int>> cache(n, std::vector<int>(n, -1));
+
+        int max = 0;
+        for (int i = 0; i < n; i++)
+        {
+            dfs(cache, s, max, i, i  );
+            dfs(cache, s, max, i, i+1);
+        }
+
+        return max;
+    }
+
+private:
+    int dfs(std::vector<std::vector<int>>& cache,
+            std::string& s,
+            int& max,
+            int i,
+            int j)
+    {
+        if (i < 0 || j == cache.size()) // cache.size() == n
+            return 0;
+
+        if (cache[i][j] != -1)
+            return cache[i][j];
+
+        if (s[i] == s[j])
+        {
+            int length = i == j ? 1 : 2;
+            cache[i][j] = length + dfs(cache, s, max, i-1, j+1);
+        }
+        else
+            cache[i][j] = std::max(dfs(cache, s, max, i-1, j), dfs(cache, s, max, i, j+1));
+
+        max = std::max(max, cache[i][j]);
+        return cache[i][j];
+    }
+};
