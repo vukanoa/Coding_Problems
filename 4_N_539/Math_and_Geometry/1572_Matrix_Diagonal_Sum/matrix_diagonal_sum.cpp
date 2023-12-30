@@ -97,3 +97,25 @@ public:
         return sum;
     }
 };
+
+
+
+
+/* Time  Beats: 37.88% */
+/* Space Beats: 58.74% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Short {
+public:
+    int diagonalSum(std::vector<std::vector<int>>& mat)
+    {
+        int n = mat.size();
+        int result = 0;
+
+        for(int i = 0; i < n; i++)
+            result += mat[i][i] + mat[i][n-i-1];
+
+        return (n % 2 == 1) ? result - mat[n/2][n/2] : result;
+    }
+};
