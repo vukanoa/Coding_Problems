@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <functional>
 
 /*
     ==============
@@ -74,7 +76,7 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_Memoization {
 public:
     long long countGoodStrings(int low, int high, int zero, int one)
     {
@@ -97,5 +99,47 @@ public:
         };
 
         return dfs(0);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 87.04% */
+/* Space Beats: 52.04% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Tabulation {
+public:
+    long long countGoodStrings(int low, int high, int zero, int one)
+    {
+        long long mod = 1e9 + 7;
+
+        std::vector<long long> dp(high + 1, 0);
+        dp[0] = 1;
+
+        for (int i = 1; i <= high; i++)
+        {
+            int left  = (i - zero >= 0) ? dp[i - zero] : 0;
+            int right = (i - one  >= 0) ? dp[i - one]  : 0;
+
+            dp[i] = (left + right) % mod;
+        }
+
+        long long result = 0;
+        for (int i = low; i <= high; i++)
+            result += dp[i];
+
+        return result % mod;
     }
 };
