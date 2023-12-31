@@ -113,3 +113,71 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Equivalent to the above Solution, but written in a different way.
+    This one seems to be much more efficient.
+
+*/
+
+/* Time  Beats: 92.33% */
+/* Space Beats: 88.42% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(n)   */
+class Solution {
+public:
+    int findNumberOfLIS(vector<int>& nums)
+    {
+        if (nums.size() == 1)
+            return 1;
+
+        const int n = nums.size();
+
+        std::vector<std::pair<int, int>> dp(n, std::pair<int, int>());
+
+        int result = 0;
+        int max_longest_increasing = 0;
+
+        // i = start of subseq
+        for (int i = n-1; i >= 0; i--)
+        {
+            int longest_increasing = 1;
+            int count = 1;
+
+            for (int j = i+1; j < n; j++)
+            {
+                if (nums[i] < nums[j])
+                {
+                    if (dp[j].first + 1 > longest_increasing)
+                    {
+                        longest_increasing = dp[j].first + 1;
+                        count = dp[j].second;
+                    }
+                    else if (dp[j].first + 1 == longest_increasing)
+                        count += dp[j].second;
+                }
+            }
+
+            if (longest_increasing > max_longest_increasing)
+            {
+                max_longest_increasing = longest_increasing;
+                result = count;
+            }
+            else if (longest_increasing == max_longest_increasing)
+                result += count;
+
+            dp[i].first  = longest_increasing;
+            dp[i].second = count;
+        }
+
+        return result;
+    }
+};
