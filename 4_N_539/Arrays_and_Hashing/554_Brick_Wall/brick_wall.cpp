@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 
 /*
     ==============
@@ -38,6 +39,20 @@
     ==========================================================================
 
     --- Example 1 ---
+        +-----+-----+-----+-----+-----+-----+
+        |     |           |           |     |
+        +-----+-----+-----+-----+-----+-----+
+        |                 |     |           |
+        +-----+-----+-----+-----+-----+-----+
+        |     |                 |           |
+        +-----+-----+-----+-----+-----+-----+
+        |           |                       |
+        +-----+-----+-----+-----+-----+-----+
+        |                 |     |           |
+        +-----+-----+-----+-----+-----+-----+
+        |     |                 |     |     |
+        +-----+-----+-----+-----+-----+-----+
+
     Input: wall = [[1,2,2,1],[3,1,2],[1,3,2],[2,4],[3,1,2],[1,3,1,1]]
     Output: 2
 
@@ -57,6 +72,90 @@
 
 */
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The picture makes it obvious, therefore make sure to look at it carefully.
+
+        +-----+-----+-----+-----+-----+-----+
+        #     |           |           |     #
+        +-----+-----+-----+-----+-----+-----+
+        #                 |     |           #
+        +-----+-----+-----+-----+-----+-----+
+        #     |                 |           #
+        +-----+-----+-----+-----+-----+-----+
+        #           |                       #
+        +-----+-----+-----+-----+-----+-----+
+        #                 |     |           #
+        +-----+-----+-----+-----+-----+-----+
+        #     |                 |     |     #
+        +-----+-----+-----+-----+-----+-----+
+
+    If you cannot come up with a Solution straight form the picture, here is
+    the explanation.
+
+    We are told that we should minimize crossing the row over the bricks. That
+    could also be read like this - We want to maximize the number of endings on
+    the same column.
+
+    We are told to:"Draw a vertical line from the top to the bottom and cross
+    the least bricks."
+
+    We could also read that as:"Which column has the most endpoints of bricks?"
+
+    (Left and right endings are not considered)
+
+    That question alone should give you he answer on how to solve this problem.
+    Once you've noticed that and asked that question, you're done. Now you only
+    have to code what you've jus said, which is the easy part.
+
+    We cannot use a vector of size total_width of a row since we're told in
+    the constraints:
+        1 <= sum(wall[i].length) <= 2 * 10^4
+
+    Which means that we'd get a MLE(Memory Limit Exceeded).
+
+    But even if that wasn't specified, we can notice that it's pretty possible
+    not to use some of the "points"(columns) as there can be no endings at that
+    column. Therefore, we don't have to keep the 0 value unnecessarily.
+
+    Which data structure can help us keep track of some, but not necessarily
+    all elements? Hash Map.
+
+    The only important thing to note here is this:
+
+    If we have this row: [1, 2, 2, 1]
+
+          1         2           2        1     <--- Widths of bricks
+        +-----+-----+-----+-----+-----+-----+
+        #     |           |           |     #
+        +-----+-----+-----+-----+-----+-----+
+        0     1     2     3     4     5     6  <--- Columns
+
+    It's importnat to notice that, since we're only looking at the endings of
+    bricks(i.e. right end point), we DON'T have to look at the ending of the
+    very last brick since that represents the edges of the entire wall which
+    we are told to ignore since we could always just go down the edges and have
+    the total number of crossed bricks equal 0. Therefore, we DON'T have to
+    check for the end of the last brick and that is why in the nested "for" we
+    go from:
+        j = 0; j < wall[curr_row].size() - 1;
+                                        ^^^^^
+
+    That's why we have this -1, we don't care about the last brick's end point.
+
+    At the end of processing the entire wall, our Hash Map "ending_map" will
+    have each used columns(columns that have at least one brick ending at that
+    column) and their respective number of bricks that end that that column.
+
+    So instead of just returning the highest value from the Hash Map, we must
+    subtract that value from the total number of rows since that represents the
+    number of bricks we actually had to cross.
+
+*/
+
 /* Time  Beats: 79.81% */
 /* Space Beats: 52.05% */
 
@@ -66,26 +165,24 @@ class Solution {
 public:
     int leastBricks(std::vector<std::vector<int>>& wall)
     {
-        std::unordered_map<int, int> umap;
+        int rows = wall.size();
+        std::unordered_map<int, int> endings_map;
 
-        for (int i = 0; i < wall.size(); i++)
+        for (int curr_row = 0; curr_row < rows; curr_row++)
         {
             int gap = 0;
-            for (int j = 0; j < wall[i].size() - 1; j++)
+            for (int j = 0; j < wall[curr_row].size() - 1; j++)
             {
-                gap += wall[i][j];
+                gap += wall[curr_row][j];
 
-                if (umap.count(gap))
-                    umap[gap]++;
-                else
-                    umap.insert({gap, 1});
+                endings_map[gap]++; // Initial value is 0
             }
         }
 
-        int max = 0;
-        for (auto& entry : umap)
-            max = std::max(max, entry.second);
+        int max_endings = 0;
+        for (auto& entry : endings_map)
+            max_endings = std::max(max_endings, entry.second);
 
-        return wall.size() - max;
+        return rows - max_endings;
     }
 };
