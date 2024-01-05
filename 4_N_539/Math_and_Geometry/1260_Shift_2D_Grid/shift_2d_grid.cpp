@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm> // For lambda functions
 
 /*
     ============
@@ -168,5 +169,60 @@ private:
 
         for (int i = 0; i < ROWS; i++)
             grid[i][0] = first_in_row[i];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 92.74% */
+/* Space Beats: 51.99% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
+class Solution_Neat {
+public:
+    std::vector<std::vector<int>> shiftGrid(std::vector<std::vector<int>>& grid, int k)
+    {
+        int ROWS = grid.size();
+        int COLS = grid[0].size();
+
+        std::function<int(int, int)> pos_2D_to_index_1D;
+        pos_2D_to_index_1D = [&](int row, int col) -> int
+                                {
+                                    return row * COLS + col;
+                                };
+
+        std::function<std::pair<int, int>(int)> index_1D_to_pos_2D;
+        index_1D_to_pos_2D = [&](int idx) -> std::pair<int, int>
+                                {
+                                    return {idx / COLS, idx % COLS};
+                                };
+
+        std::vector<std::vector<int>> result(ROWS, std::vector(COLS, 0));
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                int idx = (pos_2D_to_index_1D(row, col) + k) % (ROWS * COLS);
+
+                std::pair<int, int> pair = index_1D_to_pos_2D(idx);
+                int new_row = pair.first;
+                int new_col = pair.second;
+
+                result[new_row][new_col] = grid[row][col];
+            }
+        }
+
+        return result;
     }
 };
