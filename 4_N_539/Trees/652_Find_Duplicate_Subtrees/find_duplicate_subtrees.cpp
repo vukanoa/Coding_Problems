@@ -71,14 +71,13 @@
 
 */
 
-/* Time  Beats: 25.71% */
-/* Space Beats: 31.78% */
+/* Time  Beats: 72.78% */
+/* Space Beats: 31.65% */
 
 /* Time  Complexity: O(n^2) */
 /* Space Complexity: O(n^2) */
 class Solution {
 public:
-
     std::vector<TreeNode*> findDuplicateSubtrees(TreeNode* root)
     {
         std::vector<TreeNode*> result;
