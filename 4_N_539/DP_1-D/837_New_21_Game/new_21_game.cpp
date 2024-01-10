@@ -64,6 +64,56 @@
     --- IDEA ---
     ------------
 
+    This code gives TLE, but it's an important Solution to understand for this
+    problem.
+
+*/
+
+/* This code gives TLE */
+
+/* Time  Complexity: O(k^2) */
+/* Space Complexity: O(k)   */
+class Solution_TLE {
+public:
+    double new21Game(int n, int k, int maxPts)
+    {
+        std::unordered_map<int, double> cache;
+
+        return dfs(n, k, maxPts, 0, cache);
+    }
+
+private:
+    double dfs(int n,
+               int k,
+               int maxPts,
+               int score,
+               std::unordered_map<int, double>& cache)
+    {
+        if (score >= k)
+            return score <= n ? 1.0 : 0.0;
+
+        if (cache.find(score) != cache.end())
+            return cache[score];
+
+        double probability = 0;
+
+        for (int i = 1; i <= maxPts; i++)
+            probability += dfs(n, k, maxPts, score + i, cache);
+
+        cache[score] = 1.0 * probability / maxPts;
+
+        return cache[score];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     TODO
 
 */
