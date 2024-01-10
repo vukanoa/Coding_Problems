@@ -66,3 +66,62 @@
     matrix[i][j] is '0' or '1'.
 
 */
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 29.28% */
+/* Space Beats: 11.12% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(n^2) */
+class Solution {
+public:
+    int maximalSquare(std::vector<std::vector<char>> matrix)
+    {
+        int ROWS = matrix.size();
+        int COLS = matrix[0].size();
+
+        std::vector<std::vector<int>> cache_square_len(ROWS, std::vector(COLS, -1));
+
+        std::function<int(int, int)> helper;
+
+        /* LAMBDA */
+        helper = [&](int r, int c) -> int
+        {
+            if (r >= ROWS || c >= COLS)
+                return 0;
+
+            if (cache_square_len[r][c] == -1)
+            {
+                int down     = helper(r+1, c  );
+                int right    = helper(r  , c+1);
+                int diagonal = helper(r+1, c+1);
+
+                cache_square_len[r][c] = 0;
+
+                if (matrix[r][c] == '1')
+                    cache_square_len[r][c] = 1 + std::min( {down, right, diagonal} );
+            }
+
+            return cache_square_len[r][c];
+        };
+
+        helper(0, 0);
+
+        int max = INT_MIN;
+        for (int i = 0; i < ROWS; i++)
+        {
+            for (int j = 0; j < COLS; j++)
+                max = std::max(max, cache_square_len[i][j]);
+        }
+
+        return max * max;
+    }
+};
