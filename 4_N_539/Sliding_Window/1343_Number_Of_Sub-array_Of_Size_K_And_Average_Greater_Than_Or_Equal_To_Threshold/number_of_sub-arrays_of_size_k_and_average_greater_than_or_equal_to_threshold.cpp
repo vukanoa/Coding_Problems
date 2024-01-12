@@ -91,6 +91,15 @@ public:
 
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
 /* Time  Beats: 83.23% */
 /* Space Beats: 60.83% */
 
@@ -123,6 +132,48 @@ public:
 
             sum -= arr[left];
             left++;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 91.57% */
+/* Space Beats: 96.55% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    int numOfSubarrays(vector<int>& arr, int k, int threshold)
+    {
+        int result = 0;
+
+        int sum = std::accumulate(arr.begin(), arr.begin() + k - 1, 0);
+
+        int left  = 0;
+        int right = k - 1;
+
+        while (right < arr.size())
+        {
+            sum += arr[right++];
+
+            if (sum / k >= threshold)
+                result++;
+
+            sum -= arr[left++];
         }
 
         return result;
