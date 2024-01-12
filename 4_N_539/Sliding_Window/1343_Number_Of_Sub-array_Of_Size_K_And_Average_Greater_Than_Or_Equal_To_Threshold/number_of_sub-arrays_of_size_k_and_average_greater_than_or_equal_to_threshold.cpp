@@ -67,23 +67,64 @@ class Solution {
 public:
     int numOfSubarrays(std::vector<int>& arr, int k, int threshold)
     {
-        int count = 0;
-        int total = 0;
+        int result = 0;
+        int sum = 0;
 
         for (int i = 0; i < arr.size(); i++) // Sliding Window
         {
-            total += arr[i];
-            int average = total / k;
+            sum += arr[i];
+            int average = sum / k;
 
-            if (i-k+1 >= 0)
+            if (i - k + 1 >= 0)
             {
                 if (average >= threshold)
-                    count++;
+                    result++;
 
-                total -= arr[i-k+1];
+                sum -= arr[i - k + 1];
             }
         }
 
-        return count;
+        return result;
+    }
+};
+
+
+
+
+/* Time  Beats: 83.23% */
+/* Space Beats: 60.83% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    int numOfSubarrays(vector<int>& arr, int k, int threshold)
+    {
+        int result = 0;
+
+        int left  = 0;
+        int right = 0;
+
+        int sum = 0;
+        while (right < arr.size())
+        {
+            if (right < k-1)
+            {
+                sum += arr[right];
+                right++;
+                continue;
+            }
+
+            sum += arr[right];
+            right++;
+
+            if (sum / k >= threshold)
+                result++;
+
+            sum -= arr[left];
+            left++;
+        }
+
+        return result;
     }
 };
