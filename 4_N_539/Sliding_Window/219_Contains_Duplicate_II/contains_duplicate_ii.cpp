@@ -48,74 +48,6 @@
 
 */
 
-/* Time  Beats: 71.54% */
-/* Space Beats: 38.06% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_Hash_Map {
-public:
-    bool containsNearbyDuplicate(vector<int>& nums, int k)
-    {
-        std::unordered_map<int, int>umap;
-
-        int left  = 0;
-        int right = 0;
-
-        while (right < nums.size())
-        {
-            if(right > k)
-                umap[nums[left++]]--;
-
-            if(umap[nums[right]] > 0)
-                return true;
-
-            umap[nums[right++]]++;
-        }
-
-        return false;
-    }
-};
-
-
-
-
-/* Time  Beats: 72.17% */
-/* Space Beats: 97.00% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_Hash_Set_1 {
-public:
-    bool containsNearbyDuplicate(std::vector<int>& nums, int k)
-    {
-        if (k == 0)
-            return false;
-
-        int n = nums.size();
-        if (k >= n)
-            k = n - 1;
-
-        std::unordered_set<int> uset;
-
-        for (int i = 0; i < n; i++)
-        {
-            if (i > k)
-                uset.erase(nums[i - k - 1]);
-
-            if (uset.count(nums[i]))
-                return true;
-
-            uset.insert(nums[i]);
-        }
-
-        return false;
-    }
-};
-
-
-
-
 /*
     ------------
     --- IDEA ---
@@ -221,32 +153,31 @@ public:
 /* Space Beats: 93.51% */
 
 /* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_Hash_Set_2 {
+/* Space Complexity: O(k) */
+class Solution {
 public:
     bool containsNearbyDuplicate(std::vector<int>& nums, int k)
     {
         if (k == 0)
             return false;
 
-        std::unordered_set<int> uset;
-        uset.insert(nums[0]);
+        std::unordered_set<int> window;
 
         int left  = 0;
-        int right = 1;
+        int right = 0;
 
         while (right < nums.size())
         {
             if (right - left > k)
             {
-                uset.erase(nums[left]);
+                window.erase(nums[left]);
                 left++;
             }
 
-            if (uset.find(nums[right]) != uset.end())
+            if (window.find(nums[right]) != window.end())
                 return true;
             else
-                uset.insert(nums[right]);
+                window.insert(nums[right]);
 
             right++;
         }
