@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <queue>
 
 /*
     ==============
@@ -100,22 +101,90 @@ public:
             }
         }
 
-        int max = max_heap.top();
+        int max_val = max_heap.top();
         max_heap.pop();
 
-        int min_deviation = max - min_heap.top();
+        int min_val = min_heap.top(); // We DON't pop it
 
-        while (max % 2 == 0)
+        int min_deviation = max_val - min_val;
+
+        while (max_val % 2 == 0) // While max_val is Even
         {
-            max /= 2;
+            max_val /= 2;
 
-            max_heap.push(max);
-            min_heap.push(max);
+            max_heap.push(max_val);
+            min_heap.push(max_val);
 
-            max = max_heap.top();
+            max_val = max_heap.top();
             max_heap.pop();
 
-            min_deviation = std::min(min_deviation, max - min_heap.top());
+            min_val = min_heap.top(); // We DON't pop it
+
+            min_deviation = std::min(min_deviation, max_val - min_val);
+        }
+
+        return min_deviation;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 75.90% */
+/* Space Beats: 84.17% */
+
+/* Time  Complexity: O(N * logN + logM * logN) */
+/* Space Complexity: O(N)        */
+class Solution {
+public:
+    int minimumDeviation(vector<int>& nums)
+    {
+        std::priority_queue<int> max_heap;
+        int min_val = INT_MAX;
+
+        for (int num : nums)
+        {
+            if (num & 1)
+                num *= 2;
+
+            max_heap.push(num);
+            min_val = std::min(min_val, num);
+        }
+
+        int min_deviation = INT_MAX;
+        while (true)
+        {
+            int max_val = max_heap.top();
+            max_heap.pop();
+
+            min_deviation = std::min(min_deviation, max_val - min_val);
+
+            /*
+                The reason we need to break out of the loop when the maximum
+                value is odd is that we have already transformed all odd
+                numbers in the input array to even numbers by multiplying them
+                by 2. Therefore, if the maximum value in the priority queue is
+                odd, it must have been obtained by performing the "multiply by
+                2" operation on some even number. We cannot undo this operation
+                by performing the "divide by 2" operation, so we cannot reduce
+                the maximum value any further.
+            */
+            if (max_val & 1)
+                break;
+
+            max_val /= 2;
+
+            min_val = std::min(min_val, max_val);
+            max_heap.push(max_val);
         }
 
         return min_deviation;
