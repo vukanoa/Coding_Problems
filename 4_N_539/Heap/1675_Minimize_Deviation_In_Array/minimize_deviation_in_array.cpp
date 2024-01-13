@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <set>
 
 /*
     ==============
@@ -80,7 +81,7 @@
 
 /* Time  Complexity: O(N + log(M) * log(N)) */
 /* Space Complexity: O(N) */
-class Solution {
+class Solution_Two_Heaps {
 public:
     int minimumDeviation(std::vector<int> nums)
     {
@@ -144,7 +145,7 @@ public:
 
 /* Time  Complexity: O(N * logN + logM * logN) */
 /* Space Complexity: O(N)        */
-class Solution {
+class Solution_One_Heap {
 public:
     int minimumDeviation(vector<int>& nums)
     {
@@ -185,6 +186,65 @@ public:
 
             min_val = std::min(min_val, max_val);
             max_heap.push(max_val);
+        }
+
+        return min_deviation;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 98.20% */
+/* Space Beats: 25.54% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n)        */
+class Solution_Set {
+public:
+    int minimumDeviation(vector<int>& nums)
+    {
+        std::set<int> sorted_nums;
+
+        for(auto num: nums)
+            sorted_nums.insert(num);
+
+        std::set<int>::iterator         smallest = sorted_nums.begin();
+        std::set<int>::reverse_iterator greatest = sorted_nums.rbegin();
+
+        int min_deviation = (*greatest) - (*smallest);
+
+        while((*smallest) % 2 != 0) // While (*smallest) is Odd
+        {
+            int min_odd_val = *smallest;
+
+            sorted_nums.erase (min_odd_val);
+            sorted_nums.insert(min_odd_val * 2);
+
+            smallest = sorted_nums.begin();
+
+            min_deviation = std::min(min_deviation, (*greatest) - (*smallest));
+        }
+
+        while((*greatest) % 2 == 0) // While (*greatest) is Even
+        {
+            int max_even_val = *greatest;
+
+            sorted_nums.erase (max_even_val);
+            sorted_nums.insert(max_even_val / 2);
+
+            smallest = sorted_nums.begin();
+
+            min_deviation = std::min(min_deviation, (*greatest) - (*smallest));
         }
 
         return min_deviation;
