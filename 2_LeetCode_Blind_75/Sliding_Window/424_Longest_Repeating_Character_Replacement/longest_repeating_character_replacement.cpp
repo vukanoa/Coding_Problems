@@ -142,6 +142,8 @@
                                                   get a window consisted of a
                                                   same letter.
 
+    *** This is the fundamental thing of a Sliding Window technique ***
+
     if ((substring.length - max_frequent) <= k)
         // The window is INDEED valid
     else
@@ -154,6 +156,15 @@
     if ((substring.length - max_frequent) > k)
         // The window is NOT valid
 
+    It goes without saying, at this point, that we're going to use a Sliding
+    Window technique.
+
+    We're going to have "left" and "right" pointers that both start at index 0
+    at the beginning.
+
+    "right" pointer will be shifted by one in every iteration, whereas the left
+    is going to be shifted only conditionally, if a current window ISN'T valid.
+
     Also, since we are iterating through this string one-by-one, if we find out
     that the window is NOT valid, then we don't have to shrink the window in a
     "while loop", we can only do it once, in an if statement, since if it is
@@ -161,7 +172,14 @@
     we get to shrink on the left side, we're sure that our window is, again,
     destined to be valid.
 
-    So, if the window is NOT valid, i.e. this condition is true:
+    One more thing I didn't mention is that in order to find "max_frequent"
+    element we have to iterate through the entire vector. That seems to be the
+    O(n), but it is not.
+
+    Since we're told we only have 26 uppercase letters, we have to check only
+    26 elements each time which is O(1).
+
+    Anyway, if the window is NOT valid, i.e. this condition is true:
 
     if ((substring.length - max_frequent) > k) // The window is NOT valid
     {
@@ -183,6 +201,165 @@
 
     Once our "right" pointer reaches the end, we break the "for loop" and we
     return "longest".
+
+
+    Simulation:
+
+    s = "ABABBA", k = 2
+
+    1.
+        s = "A B A B B A"
+             0 1 2 3 4 5
+             l
+             r
+
+            Before: letters = [0, 0, 0, 0, ..,  0]
+                               0  1  2  3      25
+                               |
+            letters[right]++;  |
+                               v
+            After:  letters = [1, 0, 0, 0, ..,  0]
+                               0  1  2  3      25
+
+            window_len = r - l + 1 => window_len = 0 - 0 + 1 = 1
+            max_freq = 1 // 'A' at index 0 is the most frequent
+
+            if (window_len - max_freq > k) ==> (1 - 1 > 2) ==> (0 > 2) NOT true
+
+            Since it is NOT true, that means that the current window is VALID.
+
+            longest = max(longest, window_len) = max(0, 1) = 1
+
+    2.
+        s = "A B A B B A"
+             0 1 2 3 4 5
+             l r
+
+            Before: letters = [1, 0, 0, 0, ..,  0]
+                               0  1  2  3      25
+                                  |
+            letters[right]++;     |
+                                  v
+            After:  letters = [1, 1, 0, 0, ..,  0]
+                               0  1  2  3      25
+
+            window_len = r - l + 1 => window_len = 1 - 0 + 1 = 2
+            max_freq = 1 // 'A' at index 0 is the most frequent(or 'B')
+
+            if (window_len - max_freq > k) ==> (2 - 1 > 2) ==> (1 > 2) NOT true
+
+            Since it is NOT true, that means that the current window is VALID.
+
+            longest = max(longest, window_len) = max(1, 2) = 2
+
+    3.
+        s = "A B A B B A"
+             0 1 2 3 4 5
+             l   r
+
+            Before: letters = [1, 1, 0, 0, ..,  0]
+                               0  1  2  3      25
+                               |
+            letters[right]++;  |
+                               v
+            After:  letters = [2, 1, 0, 0, ..,  0]
+                               0  1  2  3      25
+
+            window_len = r - l + 1 => window_len = 2 - 0 + 1 = 3
+            max_freq = 2 // 'A' at index 0 is the most frequent
+
+            if (window_len - max_freq > k) ==> (3 - 2 > 2) ==> (1 > 2) NOT true
+
+            Since it is NOT true, that means that the current window is VALID.
+
+            longest = max(longest, window_len) = max(2, 3) = 3
+
+
+    4.
+        s = "A B A B B A"
+             0 1 2 3 4 5
+             l     r
+
+            Before: letters = [2, 1, 0, 0, ..,  0]
+                               0  1  2  3      25
+                                  |
+            letters[right]++;     |
+                                  v
+            After:  letters = [2, 2, 0, 0, ..,  0]
+                               0  1  2  3      25
+
+            window_len = r - l + 1 => window_len = 3 - 0 + 1 = 4
+            max_freq = 2 // 'A' at index 0 is the most frequent(or 'B')
+
+            if (window_len - max_freq > k) ==> (4 - 2 > 2) ==> (2 > 2) NOT true
+
+            Since it is NOT true, that means that the current window is VALID.
+
+            longest = max(longest, window_len) = max(3, 4) = 4
+
+
+    5.
+        s = "A B A B B A"
+             0 1 2 3 4 5
+             l       r
+
+            Before: letters = [2, 2, 0, 0, ..,  0]
+                               0  1  2  3      25
+                                  |
+            letters[right]++;     |
+                                  v
+            After:  letters = [2, 3, 0, 0, ..,  0]
+                               0  1  2  3      25
+
+            window_len = r - l + 1 => window_len = 4 - 0 + 1 = 5
+            max_freq = 3 // 'B' at index 0 is the most frequent
+
+            if (window_len - max_freq > k) ==> (5 - 3 > 2) ==> (2 > 2) NOT true
+
+            Since it is NOT true, that means that the current window is VALID.
+
+            longest = max(longest, window_len) = max(4, 5) = 5
+
+
+
+    5.
+        s = "A B A B B A"
+             0 1 2 3 4 5
+             l         r
+
+            Before: letters = [2, 3, 0, 0, ..,  0]
+                               0  1  2  3      25
+                               |
+            letters[right]++;  |
+                               v
+            After:  letters = [3, 3, 0, 0, ..,  0]
+                               0  1  2  3      25
+
+            window_len = r - l + 1 => window_len = 5 - 0 + 1 = 6
+            max_freq = 3 // 'A' at index 0 is the most frequent(or 'B')
+
+            if (window_len - max_freq > k) ==> (6 - 3 > 2) ==> (3 > 2) // TRUE
+            {
+                // decrement the count of the leftmost letter in this current
+                // window
+                letters[s[left] - 'A']--;
+
+                // Shrink the window to the right by one
+                left++
+            }
+
+            window_len = r - l + 1 => window_len = 5 - 1 + 1 = 6
+                                                       ^
+                                                      _|
+                                                     |
+            // Remember that in this (5th step) our left pointer incremented
+
+            Now the window is VALID AGAIN, thus we can also do:
+                longest = max(longest, window_len) = max(5, 5) = 5
+
+            (You can see that we do this nonetheless, since if the window was
+             NOT valid, it is going to become after the if statement, and if it
+             already was, then we can do it anyway)
 
 */
 
