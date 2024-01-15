@@ -1,66 +1,62 @@
 #include <iostream>
-#include <unordered_map>
 #include <vector>
 
 /*
-	==============
-	=== MEDIUM ===
-	==============
+    ==============
+    === MEDIUM ===
+    ==============
 
-	===========================
-	567) Permutation In String
-	===========================
+    ===========================
+    567) Permutation In String
+    ===========================
 
-	============
-	Description:
-	============
+    ============
+    Description:
+    ============
 
-	Given two strings s1 and s1, return true if s2 contains a permutation of
-	s1, or false otherwise.
+    Given two strings s1 and s1, return true if s2 contains a permutation of
+    s1, or false otherwise.
 
-	In other words, return true if one of s1's premutations is the substring of
-	s2.
+    In other words, return true if one of s1's premutations is the substring of
+    s2.
 
-	====================================================
-	FUNCTION: bool checkInclusion(string s1, string s2);
-	====================================================
+    ====================================================
+    FUNCTION: bool checkInclusion(string s1, string s2);
+    ====================================================
 
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
 
-	--- Example 1 ---
-	Input:  s1 = "ab", s2 = "eidbaooo"
-	Output: true
-	Explanation: s2 contains one permutation of s1 ("ba").
+    --- Example 1 ---
+    Input:  s1 = "ab", s2 = "eidbaooo"
+    Output: true
+    Explanation: s2 contains one permutation of s1 ("ba").
 
-	--- Example 2 ---
-	Input:  s1 = "ab", s2 = "eidboaoo"
-	Output: false
+    --- Example 2 ---
+    Input:  s1 = "ab", s2 = "eidboaoo"
+    Output: false
 
-	*** Constraints ***
-	1 <= s1.length, s2.length <= 10^4
-	s1 and s2 consist of lowercase English letters
+    *** Constraints ***
+    1 <= s1.length, s2.length <= 10^4
+    s1 and s2 consist of lowercase English letters
 
 */
 
-
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	Idea is **Absolutely Equivalent** to:
-		LeetCode Problem 438 "Find All Anagrams In A String"
-	
-	It's 101-st in this Folder.
+    Idea is **Absolutely Equivalent** to:
+        LeetCode Problem 438 "Find All Anagrams In A String"
 
-	The only thing that differs is the return type.
+    The only thing that differs is the return type.
 
-	In the 438-th Problem we needed to count all the anagrams, while in this
-	one we only have to tell if there is a permutation of s1 in s2.
+    In the 438-th Problem we needed to count all the anagrams, while in this
+    one we only have to tell if there is a permutation of s1 in s2.
 
-	So it's even easier.
+    So it's even easier.
 
 */
 
@@ -71,77 +67,83 @@
 /* Space Complexity: O(1) */
 class Solution_Sliding_Window {
 public:
-	bool checkInclusion(std::string s1, std::string s2)
-	{
-		if (s1.length() > s2.length())
-			return false;
+    bool checkInclusion(std::string s1, std::string s2)
+    {
+        if (s1.length() > s2.length())
+            return false;
 
-		std::vector<int> s1_map(26, 0);
-		std::vector<int> s2_map(26, 0);
+        std::vector<int> s1_map(26, 0);
+        std::vector<int> s2_map(26, 0);
 
-		/* First window */
-		for (int i = 0; i < s1.length(); i++)
-		{
-			s1_map[s1[i] - 'a']++;
-			s2_map[s2[i] - 'a']++;
-		}
+        /* First window */
+        for (int i = 0; i < s1.length(); i++)
+        {
+            s1_map[s1[i] - 'a']++;
+            s2_map[s2[i] - 'a']++;
+        }
 
-		if (s1_map == s2_map)
-			return true;
+        if (s1_map == s2_map)
+            return true;
 
-		/* Sliding Window */
-		for (int i = s1.length(); i < s2.length(); i++)
-		{
-			s2_map[s2[i - s1.length()] - 'a']--;
-			s2_map[s2[i] - 'a']++;
+        int left  = 0;
+        int right = s1.length();
 
-			if (s1_map == s2_map)
-				return true;
-		}
+        /* Sliding Window */
+        while (right < s2.length())
+        {
+            s2_map[s2[left] - 'a']--;
+            left++;
 
-		return false;
-	}
+            s2_map[s2[right] - 'a']++;
+            right++;
+
+            if (s1_map == s2_map)
+                return true;
+        }
+
+        return false;
+    }
 };
 
 
 int
 main()
 {
-	Solution_Sliding_Window sol_win;
+    Solution_Sliding_Window sol_win;
 
 
-	/* Example 1 */
-	// std::string s1 = "ab";
-	// std::string s2 = "eidbaooo";
+    /* Example 1 */
+    // std::string s1 = "ab";
+    // std::string s2 = "eidbaooo";
 
-	/* Example 2 */
-	// std::string s1 = "ab";
-	// std::string s2 = "eidboaoo";
+    /* Example 2 */
+    // std::string s1 = "ab";
+    // std::string s2 = "eidboaoo";
 
-	/* Example 3 */
-	std::string s1 = "abc";
-	std::string s2 = "bbbca";
+    /* Example 3 */
+    std::string s1 = "abc";
+    std::string s2 = "bbbca";
 
-	std::cout << "\n\t=============================";
-	std::cout << "\n\t=== PERMUTATION IN STRING ===";
-	std::cout << "\n\t=============================\n";
-
-
-	/* Write Input */
-	std::cout << "\n\ts1 = \"" << s1 << "\"";
-	std::cout << "\n\ts2 = \"" << s2 << "\"\n";
+    std::cout << "\n\t=============================";
+    std::cout << "\n\t=== PERMUTATION IN STRING ===";
+    std::cout << "\n\t=============================\n";
 
 
-	/* Solution */
-	bool b = sol_win.checkInclusion(s1, s1);
+    /* Write Input */
+    std::cout << "\n\ts1 = \"" << s1 << "\"";
+    std::cout << "\n\ts2 = \"" << s2 << "\"\n";
 
 
-	/* Write Output */
-	if (b)
-		std::cout << "\n\tOutput: True\n\n";
-	else
-		std::cout << "\n\tOutput: False\n\n";
+    /* Solution */
+    bool b = sol_win.checkInclusion(s1, s2);
 
 
-	return 0;
+    /* Write Output */
+    if (b)
+        std::cout << "\n\tOutput: True\n\n";
+    else
+        std::cout << "\n\tOutput: False\n\n";
+
+
+    return 0;
 }
