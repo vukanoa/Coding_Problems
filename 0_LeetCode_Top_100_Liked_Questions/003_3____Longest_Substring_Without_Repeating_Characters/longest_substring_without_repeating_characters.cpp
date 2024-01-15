@@ -4,84 +4,84 @@
 #include <vector>
 
 /*
-	==============
-	=== MEDIUM ===
-	==============
+    ==============
+    === MEDIUM ===
+    ==============
 
-	=================================================
-	3) Longest Substring Without Repeating Characters
-	=================================================
+    =================================================
+    3) Longest Substring Without Repeating Characters
+    =================================================
 
-	============
-	Description:
-	============
+    ============
+    Description:
+    ============
 
-	Given a string s, find the length of the longest substring(not a
-	subsequence) without a repeating characters.
+    Given a string s, find the length of the longest substring(not a
+    subsequence) without a repeating characters.
 
-	======================================================
-	FUNCTION: int lengthOfLongestSubstring(std::string s);
-	======================================================
+    ======================================================
+    FUNCTION: int lengthOfLongestSubstring(std::string s);
+    ======================================================
 
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
 
-	--- Example 1 ---
-	Input: s = "abcabcbb"
-	Output: 3
-	Explanation: The answer is "abc", with the length of 3.
+    --- Example 1 ---
+    Input: s = "abcabcbb"
+    Output: 3
+    Explanation: The answer is "abc", with the length of 3.
 
-	--- Example 2 ---
-	Input: s = "bbbbb"
-	Output: 1
-	Explanation: The answer is "b", with the length of 1.
+    --- Example 2 ---
+    Input: s = "bbbbb"
+    Output: 1
+    Explanation: The answer is "b", with the length of 1.
 
-	--- Example 3 ---
-	Input: s = "pwwkew"
-	Output: 3
-	Explanation: The answer is "wke", with the lenght of 3.
+    --- Example 3 ---
+    Input: s = "pwwkew"
+    Output: 3
+    Explanation: The answer is "wke", with the lenght of 3.
 
-	--- Example 4 ---
-	Input: s = "svesvhjzhwwj"
-	Output: 6
-	Explanation: The answer is "esvhjz", with the length of 6.
+    --- Example 4 ---
+    Input: s = "svesvhjzhwwj"
+    Output: 6
+    Explanation: The answer is "esvhjz", with the length of 6.
 
-	*** Constraints ***
-	0 <= s.length <= 5 * 10^4
-	s consists of English letters, digits, symbols and spaces.
+    *** Constraints ***
+    0 <= s.length <= 5 * 10^4
+    s consists of English letters, digits, symbols and spaces.
 
 */
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	If s[j] have a duplicate in the range [i, j) with index j', we don't need
-	to increase i by one, we can skip all the elements in the range [i, j'] and
-	let i to be j' + 1 directly.
+    If s[j] have a duplicate in the range [i, j) with index j', we don't need
+    to increase i by one, we can skip all the elements in the range [i, j'] and
+    let i to be j' + 1 directly.
 
-	In other words - when we get to s[j], we check if that element exists in
-	the map, that is, we have already considered a substring that includes
-	that character.
+    In other words - when we get to s[j], we check if that element exists in
+    the map, that is, we have already considered a substring that includes
+    that character.
 
-	If it exists in the map, just update its value to j + 1(Next to the current
-	index)
+    If it exists in the map, just update its value to j + 1(Next to the current
+    index)
 
-	and check if the current index, that is 'j', makes the longest string. The
-	length is measured by "j - i + 1".
+    and check if the current index, that is 'j', makes the longest string. The
+    length is measured by "j - i + 1".
 
-	We save that value in a variable "longest".
+    We save that value in a variable "longest".
 
-	So if we get to a character that has already been considered, it means that
-	its value is in the map and that means that we don't have to try and see
-	if next few characters are substrings at all since they certainly aren't
-	for the current character is repeated.
+    So if we get to a character that has already been considered, it means that
+    its value is in the map and that means that we don't have to try and see
+    if next few characters are substrings at all since they certainly aren't
+    for the current character is repeated.
 
-	That means we can ignore all the characters until the "right" character of
-	the index of previously appeared s[j].
+    That means we can ignore all the characters until the "right" character of
+    the index of previously appeared s[j].
 
 */
 
@@ -122,297 +122,327 @@ public:
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	Maybe the intuitive idea is:
-		Check every substring, check if it has any duplicates and if it doesn't
-		we're just gonna take the longest one.
+    Maybe the intuitive idea is:
+        Check every substring, check if it has any duplicates and if it doesn't
+        we're just gonna take the longest one.
 
-	So let's consider this first example:
-		a b c a b c b b
-		0 1 2 3 4 5 6 7
+    So let's consider this first example:
+        a b c a b c b b
+        0 1 2 3 4 5 6 7
 
-	1)
-		a b c a b c b b
-		0 1 2 3 4 5 6 7
-		L
-		R
+    1)
+        a b c a b c b b
+        0 1 2 3 4 5 6 7
+        L
+        R
 
-		"a" doens't have any duplicates
+        "a" doens't have any duplicates
 
-		if ((R - L + 1) > longest) // It Is - Update Longest to 1
-			longest = R - L + 1
+        if ((R - L + 1) > longest) // It Is - Update Longest to 1
+            longest = R - L + 1
 
-	2)
-		a b c a b c b b
-		0 1 2 3 4 5 6 7
-		L R
+    2)
+        a b c a b c b b
+        0 1 2 3 4 5 6 7
+        L R
 
-		"ab" doens't have any duplicates
+        "ab" doens't have any duplicates
 
-		if ((R - L + 1) > longest) // It Is - Update Longest to 2
-			longest = R - L + 1
+        if ((R - L + 1) > longest) // It Is - Update Longest to 2
+            longest = R - L + 1
 
-	3)
-		a b c a b c b b
-		0 1 2 3 4 5 6 7
-		L   R
+    3)
+        a b c a b c b b
+        0 1 2 3 4 5 6 7
+        L   R
 
-		"abc" doens't have any duplicates
+        "abc" doens't have any duplicates
 
-		if ((R - L + 1) > longest) // It Is - Update Longest to 3
-			longest = R - L + 1
+        if ((R - L + 1) > longest) // It Is - Update Longest to 3
+            longest = R - L + 1
 
-	4)
-		a b c a b c b b
-		0 1 2 3 4 5 6 7
-		L     R
+    4)
+        a b c a b c b b
+        0 1 2 3 4 5 6 7
+        L     R
 
-		"abca" DOES have duplicates
+        "abca" DOES have duplicates
 
-		So if we were to continue, we would most certainly do unnecessary work.
-		Since now any left substring start at position 0 and including first 4
-		characters would have duplicates and certainly would not help us with
-		our end value solution.
+        So if we were to continue, we would most certainly do unnecessary work.
+        Since now any left substring start at position 0 and including first 4
+        characters would have duplicates and certainly would not help us with
+        our end value solution.
 
-	So this is the repeated work that we will eliminate with the very
-	fundamental technique:
-		*** THE SLIDING WINDOW ***
+    So this is the repeated work that we will eliminate with the very
+    fundamental technique:
+        *** THE SLIDING WINDOW ***
 
-	So, we want to only check the substring without any repeating characters.
-	Let's make sure that our "window", our substring doesn't contain any
-	duplicates.
+    So, we want to only check the substring without any repeating characters.
+    Let's make sure that our "window", our substring doesn't contain any
+    duplicates.
 
-	So, once we get to this 2nd 'a' in 4th step, we're going to start removing
-	characters from LEFT to RIGHT until we stumble on a characters that is
-	repeating.
+    So, once we get to this 2nd 'a' in 4th step, we're going to start removing
+    characters from LEFT to RIGHT until we stumble on a characters that is
+    repeating.
 
-	In other words - We need to start shrinking window until we no longer have
-	duplicates.
+    In other words - We need to start shrinking window until we no longer have
+    duplicates.
 
-	So in our 4th step
-	4)
-		a b c a b c b b
-		0 1 2 3 4 5 6 7
-		L     R
-	          ^
-	          |
-	repeating-|
+    So in our 4th step
+    4)
+        a b c a b c b b
+        0 1 2 3 4 5 6 7
+        L     R
+              ^
+              |
+    repeating-|
 
-		Remove from the Left until we find that repeating characters(inclusive)
+        Remove from the Left until we find that repeating characters(inclusive)
 
-		Before:
-			a b c a b c b b
-			0 1 2 3 4 5 6 7
-			L     R
+        Before:
+            a b c a b c b b
+            0 1 2 3 4 5 6 7
+            L     R
 
-		After:
-			a b c a b c b b
-			0 1 2 3 4 5 6 7
-			  L   R
+        After:
+            a b c a b c b b
+            0 1 2 3 4 5 6 7
+              L   R
 
-		if ((R - L + 1) > longest) // It's not
-			longest = R - L + 1
-
-
-
-
-	5)
-		a b c a b c b b
-		0 1 2 3 4 5 6 7
-		  L     R
-	            ^
-	            |
-	repeating --|
-
-		Before:
-			a b c a b c b b
-			0 1 2 3 4 5 6 7
-			  L     R
-
-		After:
-			a b c a b c b b
-			0 1 2 3 4 5 6 7
-			    L   R
-
-		if ((R - L + 1) > longest) // It's not
-			longest = R - L + 1
-
-
-
-	6)
-		a b c a b c b b
-		0 1 2 3 4 5 6 7
-		    L     R
-	              ^
-	              |
-	repeating ----|
-
-		Before:
-			a b c a b c b b
-			0 1 2 3 4 5 6 7
-			    L     R
-
-		After:
-			a b c a b c b b
-			0 1 2 3 4 5 6 7
-			      L   R
-
-		if ((R - L + 1) > longest) // It's not
-			longest = R - L + 1
+        if ((R - L + 1) > longest) // It's not
+            longest = R - L + 1
 
 
 
 
-		*** Now this 7th step is interesting ***
-	7)
-		a b c a b c b b
-		0 1 2 3 4 5 6 7
-		      L     R
-	                ^
-	                |
-	repeating ------|
+    5)
+        a b c a b c b b
+        0 1 2 3 4 5 6 7
+          L     R
+                ^
+                |
+    repeating --|
 
-		Before:
-			a b c a b c b b
-			0 1 2 3 4 5 6 7
-			      L     R
+        Before:
+            a b c a b c b b
+            0 1 2 3 4 5 6 7
+              L     R
 
-		After:
-			a b c a b c b b
-			0 1 2 3 4 5 6 7
-			          L R
+        After:
+            a b c a b c b b
+            0 1 2 3 4 5 6 7
+                L   R
 
-		We removed both 'a' and 'b' since 'b' wasn't all the way to the left.
-
-		if ((R - L + 1) > longest) // It's not
-			longest = R - L + 1
+        if ((R - L + 1) > longest) // It's not
+            longest = R - L + 1
 
 
 
+    6)
+        a b c a b c b b
+        0 1 2 3 4 5 6 7
+            L     R
+                  ^
+                  |
+    repeating ----|
 
-	8)
-		a b c a b c b b
-		0 1 2 3 4 5 6 7
-		          L   R
-	                  ^
-	                  |
-	repeating --------|
+        Before:
+            a b c a b c b b
+            0 1 2 3 4 5 6 7
+                L     R
 
-		Before:
-			a b c a b c b b
-			0 1 2 3 4 5 6 7
-			          L   R
+        After:
+            a b c a b c b b
+            0 1 2 3 4 5 6 7
+                  L   R
 
-		After:
-			a b c a b c b b
-			0 1 2 3 4 5 6 7
-			              R
-			              L
-
-		We removed both 'c' and 'b' since 'b' wasn't all the way to the left.
-
-		if ((R - L + 1) > longest) // It's not
-			longest = R - L + 1
+        if ((R - L + 1) > longest) // It's not
+            longest = R - L + 1
 
 
-	return longest;
+
+
+        *** Now this 7th step is interesting ***
+    7)
+        a b c a b c b b
+        0 1 2 3 4 5 6 7
+              L     R
+                    ^
+                    |
+    repeating ------|
+
+        Before:
+            a b c a b c b b
+            0 1 2 3 4 5 6 7
+                  L     R
+
+        After:
+            a b c a b c b b
+            0 1 2 3 4 5 6 7
+                      L R
+
+        We removed both 'a' and 'b' since 'b' wasn't all the way to the left.
+
+        if ((R - L + 1) > longest) // It's not
+            longest = R - L + 1
+
+
+
+
+    8)
+        a b c a b c b b
+        0 1 2 3 4 5 6 7
+                  L   R
+                      ^
+                      |
+    repeating --------|
+
+        Before:
+            a b c a b c b b
+            0 1 2 3 4 5 6 7
+                      L   R
+
+        After:
+            a b c a b c b b
+            0 1 2 3 4 5 6 7
+                          R
+                          L
+
+        We removed both 'c' and 'b' since 'b' wasn't all the way to the left.
+
+        if ((R - L + 1) > longest) // It's not
+            longest = R - L + 1
+
+
+    return longest;
 
 */
-
 
 /* ====================================================================== */
 
 
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We can use a basic HashSet to check, in O(1) if a certain character exists
+    in a current window.
+
+    If it does, move the left boundary to the right and remove that leftmost
+    character from the Set.
+    Do that until we end up with a valid window(substing).
+
+    Insert the current character to the set(if it doesn't already exist).
+    Current character is pointed to by our "right" pointer.
+
+    Do that until "current character", i.e. "right" pointer goes out of bounds.
+
+*/
+
 /* Time  Beats: 40.53% */
 /* Space Beats: 19.60% */
+
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution_N{
+class Solution_N {
 public:
     int lengthOfLongestSubstring(std::string s)
     {
-		std::set<char> characters_set;
-		int longest = 0;
-		int left = 0;
+        std::unordered_set<char> characters_set;
+        int longest = 0;
+        int left = 0;
 
-		for (int right = 0; right < s.length(); right++)
-		{
-			while (characters_set.find(s[right]) != characters_set.end())
-			{
-				characters_set.erase(s[left]);
-				left++;
-			}
+        for (int right = 0; right < s.length(); right++)
+        {
+            while (characters_set.find(s[right]) != characters_set.end())
+            {
+                characters_set.erase(s[left]);
+                left++;
+            }
 
-			characters_set.insert(s[right]);
+            characters_set.insert(s[right]);
 
-			longest = std::max(longest, right - left + 1);
-		}
+            longest = std::max(longest, right - left + 1);
+        }
 
-		return longest;
-	}
+        return longest;
+    }
 };
 
 
 
 
 /*
-	Even better implementation
+    ------------
+    --- IDEA ---
+    ------------
 
-	Note: Since it is said:
-		s consists of English letters, digits, symbols and spaces.
-	that means that we can have a:
-		std::vector<int> ascii(128, -1);
+    Even better implementation
+
+    Since it is said:
+        "s consists of English letters, digits, symbols and spaces."
+
+    that means that we can have a:
+        std::vector<int> ascii(128, -1);
+
+    instead of a Hash Set.
+
 */
-
 
 /* Time  Beats: 98.50% */
 /* Space Beats: 85.65% */
-/*	Time  Complexity: O(n)	*/
+
+/* Time  Complexity: O(n) */
 /*
-	Space Complexity: O(1)
-	Since it is said that s consists only of lowercase english letters
+    Space Complexity: O(128) ==> O(1)
+    Since it is said that s consists of English letters, digits, symbols and
+    spaces.
 */
 class Solution_Efficient{
 public:
-	int lengthOfLongestSubstring(std::string s)
-	{
-		std::vector<int> ascii(128, -1);
+    int lengthOfLongestSubstring(std::string s)
+    {
+        std::vector<int> ascii(128, -1);
 
-		int left  = 0;
-		int right = 0;
+        int left  = 0;
+        int right = 0;
 
-		int longest = 0;
+        int longest = 0;
 
-		while (right < s.size())
-		{
-			char curr_char = s[right];
+        while (right < s.size())
+        {
+            char curr_char = s[right];
 
-			int index = ascii[curr_char];
-			if (index != -1 && index >= left && index < right)
-				left = index + 1;
+            int index = ascii[curr_char];
+            if (index != -1 && index >= left && index < right)
+                left = index + 1;
 
-			longest = std::max(longest, right - left + 1);
-			ascii[curr_char] = right;
-			right++;
-		}
+            longest = std::max(longest, right - left + 1);
+            ascii[curr_char] = right;
+            right++;
+        }
 
-		return longest;
-	}
+        return longest;
+    }
 };
 
 
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	My Efficient way.
-	
+    My Efficient way.
+
 */
 
 /* Time  Beats: 97.47% */
@@ -422,69 +452,69 @@ public:
 /* Space Complexity: O(1) */
 class Solution_My_Efficient {
 public:
-	int lengthOfLongestSubstring(std::string s)
-	{
-		int n = s.length();
-		std::vector<int> ascii(128, 0);
+    int lengthOfLongestSubstring(std::string s)
+    {
+        int n = s.length();
+        std::vector<int> ascii(128, 0);
 
-		int longest = 0;
+        int longest = 0;
 
-		int left  = 0;
-		int right = 0;
+        int left  = 0;
+        int right = 0;
 
-		while (right < n)
-		{
-			ascii[s[right]]++;
+        while (right < n)
+        {
+            ascii[s[right]]++;
 
-			while (ascii[s[right]] > 1)
-				ascii[s[left++]]--;
+            while (ascii[s[right]] > 1)
+                ascii[s[left++]]--;
 
-			longest = std::max(longest, right - left + 1);
+            longest = std::max(longest, right - left + 1);
 
-			right++;
-		}
+            right++;
+        }
 
-		return longest;
-	}
+        return longest;
+    }
 };
 
 
 int
 main()
 {
-	Solution              sol;
-	Solution_N            sol_n;
-	Solution_Efficient    sol_efficient;
-	Solution_My_Efficient sol_my_efficient;
+    Solution              sol;
+    Solution_N            sol_n;
+    Solution_Efficient    sol_efficient;
+    Solution_My_Efficient sol_my_efficient;
 
-	/* Example 1 */
-	// std::string s = "abcabcbb";
+    /* Example 1 */
+    // std::string s = "abcabcbb";
 
-	/* Example 2 */
-	// std::string s = "bbbbb";
+    /* Example 2 */
+    // std::string s = "bbbbb";
 
-	/* Example 3 */
-	// std::string s = "pwwkew";
+    /* Example 3 */
+    // std::string s = "pwwkew";
 
-	/* Example 4 */
-	std::string s = "svesvhjzhwwj";
+    /* Example 4 */
+    std::string s = "svesvhjzhwwj";
 
 
-	std::cout << "\n\t======================================================";
-	std::cout << "\n\t=== LONGEST SUBSTRING WITHOUT REPEATING CHARACTERS ===";
-	std::cout << "\n\t======================================================\n";
+    std::cout << "\n\t======================================================";
+    std::cout << "\n\t=== LONGEST SUBSTRING WITHOUT REPEATING CHARACTERS ===";
+    std::cout << "\n\t======================================================\n";
 
-	/* Write Input */
-	std::cout << "\n\tString: " << s << "\n";
+    /* Write Input */
+    std::cout << "\n\tString: " << s << "\n";
 
-	/* Solution */
-	// int longest = sol.lengthOfLongestSubstring(s);
-	// int longest = sol_n.lengthOfLongestSubstring(s);
-	int longest = sol_efficient.lengthOfLongestSubstring(s);
-	// int longest = sol_my_efficient.lengthOfLongestSubstring(s);
+    /* Solution */
+    // int longest = sol.lengthOfLongestSubstring(s);
+    // int longest = sol_n.lengthOfLongestSubstring(s);
+    int longest = sol_efficient.lengthOfLongestSubstring(s);
+    // int longest = sol_my_efficient.lengthOfLongestSubstring(s);
 
-	/* Write Output */
-	std::cout << "\n\tLongest: " << longest << "\n\n";
+    /* Write Output */
+    std::cout << "\n\tLongest: " << longest << "\n\n";
 
-	return 0;
+    return 0;
 }
