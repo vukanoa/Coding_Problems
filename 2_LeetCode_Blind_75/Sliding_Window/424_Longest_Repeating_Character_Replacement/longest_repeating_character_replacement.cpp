@@ -65,7 +65,7 @@
 
     But even if we're doing that, what exactly are we looking for?
 
-    Let's pick some substring from our example.
+    Let's pick consider this example:
         Input: s = "ABABBA", k = 2
 
     Let's say that, currently, we're checking this substring:
@@ -79,12 +79,13 @@
 
     "BABB", k = 2
 
-    'k' denotes that we're allowed to replace at max 2 characters in a window.
+    'k' denotes that we're allowed to replace at max 2 characters in a window,
+    i.e substing.
 
     So, which character(s) do we want to replace here?
 
     Do we want to replace B's in order to match the A?
-    Or do we want to replace the A in order to match other, surrounding, B's?
+    Or do we want to replace the A in order to match other, surrounding, Bs?
 
     Of course, we want to replace the character that occurs less frequently,
     because the number of replacements we have is limited by a variable 'k'.
@@ -203,7 +204,10 @@
     return "longest".
 
 
-    Simulation:
+
+    ************************************************************************
+    *************************** Simulation *********************************
+    ************************************************************************
 
     s = "ABABBA", k = 2
 
@@ -322,7 +326,7 @@
 
 
 
-    5.
+    6.
         s = "A B A B B A"
              0 1 2 3 4 5
              l         r
@@ -415,14 +419,166 @@ public:
     --- IDEA ---
     ------------
 
-    We can notice that if we don't decrease max_freq, once its reached some
-    value, the Solution will still work since we're Overestimating.
+    It is going to be very similar to the above Solution, however the Time
+    Complexity is not going to be: O(n * 26) -> O(n), but flat O(n * 1) -> O(n)
+
+    What makes the above Soltuion have this constant of 26?
+
+    The fact that, possibly at each iteration, we have to find max_freq value
+    from the vector(Hash Map) "letters".
+
+
+    Here, instead of doing that, we're going to maintain a global "max_freq"
+    variable that is going to denote a maximum frequent character at any given
+    point in time.
+
+    For example, if we had this situation:
+
+        letters = [3, 2, 0, 0, 0, 0, ...,  0]
+                   0  1  2  3  4  5  ...  25
+                   A  B  C  D  E  F  ...   Z
+
+        max_freq = 3
+
+    The most frequent character at this time is 'A' which occurs 3 times,
+    therefore variable "max_freq" is going to be 3.
+
+
+    Now, let's say we moved 2 characters to the right and that we have this
+    situation:
+
+        letters = [3, 4, 0, 0, 0, 0, ...,  0]
+                   0  1  2  3  4  5  ...  25
+                   A  B  C  D  E  F  ...   Z
+
+        max_freq = 4
+
+    Now, "max_freq" becomes 4, in other words - We always want "max_freq" to be
+    the most frequent character in any already considered window(substring).
+
+    (And we consider windows, i.e. substrings one-by-one by using the Sliding
+     Window technique)
+
+    One problem is, if we're trying to maintain the most frequent character,
+    what happens when we take our "left" pointer and shift it?
+
+    If we do that, let's say this happens:
+
+        ************************
+        ***** Before Shift *****
+        ************************
+
+        letters = [3, 4, 0, 0, 0, 0, ...,  0]
+                   0  1  2  3  4  5  ...  25
+                   A  B  C  D  E  F  ...   Z
+
+        max_freq = 4
+
+        ***********************
+        ***** After Shift *****
+        ***********************
+
+        letters = [3, 2, 0, 0, 0, 0, ...,  0]
+                   0  1  2  3  4  5  ...  25
+                   A  B  C  D  E  F  ...   Z
+
+        max_freq = 3
+
+    Then we'd have to "rescan" this entire HashMap(or vector in this case) and
+    find the current most frequent one for this window.
+
+    Now:
+        max_freq = 3
+
+    However, that defeats the purpose of this whole approach. We would, again,
+    have O(n * 26) and not O(n * 1) which isn't an optimization at all.
+
+   ____________________________________________________________________________
+   |                                                                          |
+   |But, and here is the crux of this Solution, it's technically true that you|
+   |DON'T HAVE TO DECREMENT max_freq once the window is shinked and it becomes|
+   |true that there is no longer any character,in a current window(substring),|
+   |that occurs 4 times.                                                      |
+   |__________________________________________________________________________|
+
+    Take the time to read this above paragraph multiple times if you don't get
+    it.
+
+    The main idea is this - The result(variable "longest") is ONLY going to be
+    maximized as we find new maximum frequent character in some window, i.e.
+    substring.
+
+    Remember what we were doing, we would do this:
+
+        window_len - max_freq
+
+    and we wanted to minimize this(since the valid number this can be is
+    bounded by variable 'k').
+
+    We want "window_len" to be maximized, because that's what our result(i.e.
+    variable "longest") is going to be set to, so therefore we also want our
+    "max_freq" variable to be maximized because we want to ensure that this:
+
+        window_len - max_freq
+
+    is MINIMIZED, i.e. less than or equal to 'k'.
+
+    Let's say that our "max_freq" was 4, but then got downgraded to 3.
+
+    I'd still want "max_freq" to be 4 because it is NOT going to change our
+    result.
+
+    For example:
+
+        window_len - max_freq  <= k
+
+               6   -   4       <= 2 (let's say that 'k' is 2)
+
+    if we LEAVE max_freq to be a 4, even if the most frequent element in a
+    current window(substring) is, say, 3, then we're OVERESTIMATING what the
+    max_freq is, but we know that at least at one given point in time, max_freq
+    was indeed 4 and were, therefore, able to take window_len(6) and set it
+    as our result(i.e. "longest").
+
+    So, now let's say that our result is:
+        longest = 6
+
+    If we were ever going to INCREASE from 6 to another greater number such as:
+    7, 8, 9, etc.
+
+    then we would REQUIRE our max_freq to INCREASE.
+
+    If it stays the same or if decreases, our result(i.e. "longest") is NEVER
+    going to change.
+
+    WE ONLY CHANGE OUR RESULT(i.e. "longest") WHEN WE INCREASE max_freq,
+    BECAUSE THAT IS THE ONLY WAY THIS CONDITION:
+
+        window_len - max_freq  <= k
+
+    IS GOING TO BE TRUE.
+
+
+    So, if the maximum frequency character in a given window(substring) becomes
+    less than the current "max_freq" value, we don't have to update it. We
+    don't have to look in the entire HashMap(vector) and find a new max.
+
+    But, if we do increase our maximum frequency character in a given window,
+    then we do want to update our max_frequency and increase it and as a result
+    we'll get a new "longest" value and we can do that in O(1) since we don't
+    have to "scan" through the entire HashMap(vector).
+
+    ************************
+    ***** TO SUMMARIZE *****
+    ************************
+
+    We can notice that if we don't decrease max_freq, once maximum frequency
+    chracter count in a current window becomes less than max_freq, then the
+    Solution will still work since we're Overestimating.
 
     If and only if we find a max_freq that is greater than the previous value,
     only then can we increase the size of the longest substring, thus we don't
     have to keep finding the max_freq for each current window.
-
-    // TODO: Explain this better
 
 */
 
