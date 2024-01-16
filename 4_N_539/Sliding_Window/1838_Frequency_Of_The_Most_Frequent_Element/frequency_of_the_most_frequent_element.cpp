@@ -290,6 +290,208 @@
     Invalid Window:
         (nums[right] * (right - left + 1)) >  (curr_window_sum + k)
 
+
+    ***************************************************************************
+    ******************************** SIMULATION *******************************
+    ***************************************************************************
+
+        nums = [1, 1, 1, 2, 2, 4], k = 2
+                0  1  2  3  4  5
+
+        // Sort
+
+        nums = [1, 1, 1, 2, 2, 4], k = 2
+                0  1  2  3  4  5
+
+
+
+        1.
+            nums = [1, 1, 1, 2, 2, 4], k = 2
+                    0  1  2  3  4  5
+                    L
+                    R
+
+            curr_sum_window = 1
+            window_len      = R - L + 1 ==>  0 - 0 + 1 ==> 1
+            current_element = nums[R]
+
+            Is (current_element * window_len > curr_sum_window + k)?
+            Is (1 * 1 > 1 + 2)?
+            Is (2 > 3)? No, therefore the window is VALID.
+
+            max_freq = max(max_freq, window_len); ==> max(0, 1) ==> 1
+            R++;
+
+
+        2.
+            nums = [1, 1, 1, 2, 2, 4], k = 2
+                    0  1  2  3  4  5
+                    L  R
+
+            curr_sum_window = 2
+            window_len      = R - L + 1 ==>  1 - 0 + 1 ==> 2
+            current_element = nums[R]
+
+            Is (current_element * window_len > curr_sum_window + k)?
+            Is (1 * 2 > 2 + 2)?
+            Is (2 > 4)? No, therefore the window is VALID.
+
+            max_freq = max(max_freq, window_len); ==> max(1, 2) ==> 2
+            R++;
+
+
+        3.
+            nums = [1, 1, 1, 2, 2, 4], k = 2
+                    0  1  2  3  4  5
+                    L     R
+
+            curr_sum_window = 3
+            window_len      = R - L + 1 ==>  2 - 0 + 1 ==> 3
+            current_element = nums[R]
+
+            Is (current_element * window_len > curr_sum_window + k)?
+            Is (1 * 3 > 3 + 2)?
+            Is (3 > 5)? No, therefore the window is VALID.
+
+            max_freq = max(max_freq, window_len); ==> max(2, 3) ==> 3
+            R++;
+
+
+        4.
+            nums = [1, 1, 1, 2, 2, 4], k = 2
+                    0  1  2  3  4  5
+                    L        R
+
+            a)
+                curr_sum_window = 5
+                window_len      = R - L + 1 ==>  3 - 0 + 1 ==> 4
+                current_element = nums[R]
+
+                Is (current_element * window_len > curr_sum_window + k)?
+                Is (2 * 4 > 5 + 2)?
+                Is (8 > 7)? Yes. Remove the leftmost element in the window.
+
+
+                // Remove the leftmost element from the current window
+                curr_sum_window -= nums[L];
+                L++;
+
+
+                nums = [1, 1, 1, 2, 2, 4], k = 2
+                        0  1  2  3  4  5
+                           L     R
+
+            b)
+                curr_sum_window = 4
+                window_len      = R - L + 1 ==>  3 - 1 + 1 ==> 3
+                current_element = nums[R]
+
+                Is (current_element * window_len > curr_sum_window + k)?
+                Is (2 * 3 > 4 + 2)?
+                Is (6 > 6)? No, therefore the window is VALID.
+
+
+            max_freq = max(max_freq, window_len); ==> max(3, 3) ==> 3
+            R++;
+
+
+        5.
+            nums = [1, 1, 1, 2, 2, 4], k = 2
+                    0  1  2  3  4  5
+                       L        R
+
+            curr_sum_window = 6
+            window_len      = R - L + 1 ==>  4 - 1 + 1 ==> 4
+            current_element = nums[R]
+
+            Is (current_element * window_len > curr_sum_window + k)?
+            Is (2 * 4 > 6 + 2)?
+            Is (8 > 8)? No, therefore the window is VALID.
+
+            max_freq = max(max_freq, window_len); ==> max(3, 4) ==> 4
+            R++;
+
+
+        6.
+            nums = [1, 1, 1, 2, 2, 4], k = 2
+                    0  1  2  3  4  5
+                       L           R
+
+            a)
+                curr_sum_window = 10
+                window_len      = R - L + 1 ==>  5 - 1 + 1 ==> 5
+                current_element = nums[R]
+
+                Is (current_element * window_len > curr_sum_window + k)?
+                Is (4 * 5 > 10 + 2)?
+                Is (20 > 12) Yes. Remove the leftmost element in the window.?
+
+                // Remove the leftmost element from the current window
+                curr_sum_window -= nums[L];
+                L++;
+
+                nums = [1, 1, 1, 2, 2, 4], k = 2
+                        0  1  2  3  4  5
+                              L        R
+
+            b)
+                curr_sum_window = 9
+                window_len      = R - L + 1 ==>  5 - 2 + 1 ==> 4
+                current_element = nums[R]
+
+                Is (current_element * window_len > curr_sum_window + k)?
+                Is (4 * 4 > 9 + 2)?
+                Is (16 > 11) Yes. Remove the leftmost element in the window?
+
+                // Remove the leftmost element from the current window
+                curr_sum_window -= nums[L];
+                L++;
+
+                nums = [1, 1, 1, 2, 2, 4], k = 2
+                        0  1  2  3  4  5
+                                 L     R
+
+            c)
+                curr_sum_window = 8
+                window_len      = R - L + 1 ==>  5 - 3 + 1 ==> 3
+                current_element = nums[R]
+
+                Is (current_element * window_len > curr_sum_window + k)?
+                Is (4 * 3 > 8 + 2)?
+                Is (12 > 10) Yes. Remove the leftmost element in the window.?
+
+                // Remove the leftmost element from the current window
+                curr_sum_window -= nums[L];
+                L++;
+
+                nums = [1, 1, 1, 2, 2, 4], k = 2
+                        0  1  2  3  4  5
+                                    L  R
+
+
+            d)
+                curr_sum_window = 6
+                window_len      = R - L + 1 ==> 5 - 4 + 1 ==> 2
+                current_element = nums[R]
+
+                Is (current_element * window_len > curr_sum_window + k)?
+                Is (4 * 2 > 6 + 2)?
+                Is (8 > 7)? No, therefore the window is VALID.
+
+
+            max_freq = max(max_freq, window_len); ==> max(4, 2) ==> 4
+            R++;
+
+
+        nums = [1, 1, 1, 2, 2, 4], k = 2
+                0  1  2  3  4  5
+                            L  R
+
+        Pointer "R" goes Out of Bounds, meaning, the "for loop" condition is
+        false, meaning we break the "for loop".
+
+        At the end we just return "max_freq".
+
 */
 
 /* Time  Beats: 74.28% */
