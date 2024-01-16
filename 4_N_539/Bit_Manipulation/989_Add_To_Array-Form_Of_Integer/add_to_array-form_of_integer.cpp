@@ -127,3 +127,43 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 82.21% */
+/* Space Beats: 90.72% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Concise_Efficient {
+public:
+    std::vector<int> addToArrayForm(vector<int> &nums, int k)
+    {
+        int i, size = nums.size();
+
+        for (i = size - 1; i >= 0 && k != 0; i--)
+        {
+            k = k + nums[i];
+            nums[i] = k % 10;
+            k = k / 10;
+        }
+
+        while (k != 0)
+        {
+            nums.insert(nums.begin(), k % 10);
+            k = k / 10;
+        }
+
+        return nums;
+    }
+};
