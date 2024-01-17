@@ -22,12 +22,16 @@
     You want to collect as much fruit as possible. However, the owner has some
     strict rules that you must follow:
 
-        You only have two baskets, and each basket can only hold a single type
-        of fruit. There is no limit on the amount of fruit each basket can
-        hold.  Starting from any tree of your choice, you must pick exactly one
-        fruit from every tree (including the start tree) while moving to the
-        right. The picked fruits must fit in one of your baskets.  Once you
-        reach a tree with fruit that cannot fit in your baskets, you must stop.
+        - You only have two baskets, and each basket can only hold a single
+          type of fruit. There is no limit on the amount of fruit each basket
+          can hold.
+
+        - Starting from any tree of your choice, you must pick exactly one
+          fruit from every tree (including the start tree) while moving to the
+          right. The picked fruits must fit in one of your baskets.
+
+        - Once you reach a tree with fruit that cannot fit in your baskets, you
+          must stop.
 
     Given the integer array fruits, return the maximum number of fruits you can
     pick.
@@ -71,7 +75,174 @@
     --- IDEA ---
     ------------
 
-    TODO
+    This entire Description can be summed-up into this:
+    "What is the maximum contigous subarray with at most 2 distinct numbers?"
+
+    Now, it's much easier.
+    This is a textbook Sliding Window problem.
+
+    We're going to convert a, Brute Force, O(n^2) Solution to a, Sliding
+    Window, O(n) Solution.
+
+    We'll have a HashMap (key=fruit_type, value=num_of_fruits_in_basket)
+
+         Hash Map
+    |  Key  :  Value |
+    +----------------+
+    |      ...       |
+    +----------------+
+    |      ...       |
+    +----------------+
+
+    We're going to be moving our "right" pointer and each time we're at some
+    tree, we're going to increment the "num_of_fruits_in_basket" for that type.
+
+    In C++, HashMaps work in a way that if you increment some yet unexistant
+    entry, the entry will be created as soon as you change the value for that
+    particular "key".
+
+    At the very beginning, we have an empty HashMap:
+
+             Hash Map
+        |  Key  :  Value |
+        +----------------+
+        |       /        |
+        +----------------+
+
+    However, if we do this:
+
+        hash_map[3]++;
+
+    Now, entry {3, 1} will be created. // Default value for each key is 0.
+
+    If we do anything with some entry in our HashMap, it will immediately
+    become "visible", or property of the Hash Map.
+
+    For example, again, if we have an empty Hash Map:
+
+             Hash Map
+        |  Key  :  Value |
+        +----------------+
+        |       /        |
+        +----------------+
+
+    And we write this line:
+        if (hash_map[5] == <w/e>)  // <w/e> stands for "whatever".
+            ...
+
+
+    At that very point, if hash_map[5] DIDN'T exist in the HashMap yet, now it
+    will. We'll have something like this now:
+
+             Hash Map
+        |  Key  :  Value  |
+        +-----------------+
+        |   5   :  <w/e>  |
+        +-----------------+
+
+    If you wish to circumvent this behavior, you could write the same if
+    statement like this:
+        if (hash_map.at(5) == <w/e>)  // <w/e> stands for "whatever".
+            ...
+
+    This accesses the value, however if it does NOT exist, it won't create a
+    NEW pair, but it will, instead, give the 'std::out_of_range' error!
+
+    So, be careful and use accordingly.
+
+    Let's get back to our Solution.
+
+    Since, by incrementing, we can "add" a new entry if it didn't already
+    exist, we can use that to our advantage.
+
+    At each iteration(at each position of "right" pointer), the very first
+    thing we'll always do is this:
+
+            hash_map[fruits[right]]++;
+
+    If that type of fruit is already present in this "window", then we'll just
+    increment it.
+
+    However, and this is the crux of this Solution, if this type of fruit
+    DOESN'T exist, then by incrementing it's value, we'll create a new entry
+    in our Hash Map.
+
+    It's important to refresh our memory with what are we being asked here:
+    "What is the maximum contiguous subarray with at most 2 distinct numbers?"
+
+    Since now, by making a new entry in our HashMap, we may have 3 entries, we
+    must remove one. Which one should it be?
+
+    Since we're doing a Sliding Window technique, it's obvious. But, how should
+    one now to use this technique in the first place?
+
+    The very first thing that should ring your bells is the word "CONTIGUOUS".
+
+    Since we are asked to find the longest CONTIGUOUS subarray that has at max
+    2 different numbers in it, we can consider this example:
+
+    fruits [1, 1, 2, 1, 3]
+            0  1  2  3  4
+            L
+            R
+
+    We begin at index 0. At this point, our "window" is of size 1:
+        window_len = R - L + 1 ===> 0 - 0 + 1 ===> 1
+
+    Then we move our "R" pointer to the right by one.
+
+    fruits [1, 1, 2, 1, 3]
+            0  1  2  3  4
+            L  R
+
+    Here, we still have at max 2 different numbers in our window. Also, our
+    window is of size 2 now:
+        window_len = R - L + 1 = 1 - 0 + 1 = 2
+
+    We're told that:"Starting from any tree of your choice, ..."
+
+    So we began considering the longest contiguous window from index 0, but
+    since now we're sure that if we start at index 0, we'll ALWAYS include a
+    tree at index 1(because they are of same type), do we actually need to
+    check what will happen if we begin at index 1?
+
+    No, because starting at index 1 will ALWAYS give us a shorter contiguous
+    subarray than if we are starting at index 0, because they are of the same
+    type and tree at index 1 is implicitly included when starting at index 0.
+
+    Therefore, we won't be having a O(n^2) Solution, but O(n) since we can
+    notice that:
+        1. They are asking us to find CONTIGUOUS subarrays
+        2. Starting at index 1(in this example) will NEVER result in longer
+           CONTINUOUS subarray than when starting at index 0.
+
+    Therefore, we can use a Sliding Window technique.
+
+    So, anytime we increment a value, we can check if that resulted in having
+    more than 2 entries(more than 2 different numbers) in our Hash Map(in our
+    current window).
+
+    If it did, then keep shrinking the left boundary. Every time we "shrink" a
+    left boundary we must decrement number of fruits, for that type of fruit,
+    by one in our HashMap.
+
+    At some point, by shrinking our left boundary, and therefore decrementing
+    the number of fruits for that type, we'll have a value of 0 for a certain
+    type.
+
+    Once that happens, evict that entry from the HashMap and we'll, again, have
+    a valid situation - Only 2 different numbers(type of fruits) are present
+    in our current window.
+
+    Now that our window is valid again, check if this window length is the
+    longest so far.
+
+    We'll do that with:
+
+        result = std::max(result, R - L + 1); // window_len = R - L + 1
+
+
+    At the end we'll just return the "result" variable.
 
 */
 
