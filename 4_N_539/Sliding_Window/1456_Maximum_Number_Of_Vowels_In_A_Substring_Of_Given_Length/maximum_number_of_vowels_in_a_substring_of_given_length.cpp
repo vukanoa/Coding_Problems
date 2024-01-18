@@ -1,5 +1,5 @@
 #include <iostream>
-#include <unordered_map>
+#include <unordered_set>
 
 /*
     ==============
@@ -14,7 +14,8 @@
     Description:
     ============
 
-    Given a string s and an integer k, return the maximum number of vowel letters in any substring of s with length k.
+    Given a string s and an integer k, return the maximum number of vowel
+    letters in any substring of s with length k.
 
     Vowel letters in English are 'a', 'e', 'i', 'o', and 'u'.
 
@@ -54,7 +55,289 @@
     --- IDEA ---
     ------------
 
-    TODO
+    This is the simplest Sliding Window problem there is. The window is fixed
+    once it gets to the point of being of that, fixed given, size.
+
+    Let's consider an example:
+
+        Input: s = "abciiidef", k = 3
+
+    We'll assign "L"(left) and "R"(right) pointers to point at index 0,
+    initially.
+
+        s = "abciiidef", k = 3
+             L
+             R
+
+    If s[R] is the vowel, increment variable "vowels".
+
+    However, we are asked to find:
+        "maximum number of vowel letters in any substring of s with length k."
+
+    It's important to emphasize - OF SIZE K.
+
+    That means we DON'T consider windows which are less than size k. That will
+    be the case only until the first window gets to size k. Afterwards we move
+    both "L" and "R" by one each iteration.
+
+    In other words, we move "R" by one EACH iteration, however we don't start
+    moving "L" by one each iteration until "right - left + 1"(aka window_len)
+    gets bigger than k.
+
+    Once it's bigger, we'll decrements "vowels" if s[L] was a vowel and we'll
+    move "L" by one to the right, since window_len is greater than the limit k.
+
+    Now our window_len is equal k and then we check if this new number of
+    vowels in the current window is the new maximum number of vowels we've had
+    so far.
+
+    At the end of each iteration we increment "R".
+
+*******************************************************************************
+********************************** SIMULATION *********************************
+*******************************************************************************
+
+                            Input: s = "abciiidef", k = 3
+
+                            result = 0;
+                            vowels = 0;
+
+===============================================================================
+
+    1. R = 0
+
+             0 1 2 3 4 5 6 7 8
+        s = "a b c i i i d e f",         k = 3
+             L
+             R
+
+        if (s[R] is vowel) // It is, 'a' is INDEED a vowel.
+            vowels++;
+
+        vowels = 1;
+        window_len = R - L + 1 ==> 0 - 0 + 1 ==> 1
+
+        if (window_len > k) // It is not
+        if (1 > 3)          // It is not
+
+        result = max(result, vowels) ==> max(0, 1) ==> 1 // New max
+
+===============================================================================
+
+    2. R = 1;
+
+             0 1 2 3 4 5 6 7 8
+        s = "a b c i i i d e f",         k = 3
+             L R
+
+        if (s[R] is vowel) // It is NOT, 'b' is NOT a vowel.
+
+        vowels = 1; // Remains 1
+        window_len = R - L + 1 ==> 1 - 0 + 1 ==> 2
+
+        if (window_len > k) // It is not
+        if (2 > 3)          // It is not
+
+        result = max(result, vowels) ==> max(1, 1) ==> 1 // Remains 1
+
+===============================================================================
+
+    3. R = 2;
+
+             0 1 2 3 4 5 6 7 8
+        s = "a b c i i i d e f",         k = 3
+             L   R
+
+        if (s[R] is vowel) // It is NOT, 'c' is NOT a vowel.
+
+        vowels = 1; // Remains 1
+        window_len = R - L + 1 ==> 2 - 0 + 1 ==> 3
+
+        if (window_len > k) // It is not
+        if (3 > 3)          // It is not
+
+        result = max(result, vowels) ==> max(1, 1) ==> 1 // Remains 1
+
+===============================================================================
+
+    4. R = 3;
+
+             0 1 2 3 4 5 6 7 8
+        s = "a b c i i i d e f",         k = 3
+               L   R
+
+        if (s[R] is vowel) // It is, 'i' is INDEED a vowel.
+            vowels++;
+
+        vowels = 2; // Updated(Incremented)
+        window_len = R - L + 1 ==> 3 - 0 + 1 ==> 4
+
+        if (window_len > k) // It is
+        if (4 > 3)          // It is
+        {
+            if (s[L] is vowel) // It is, 'a' is INDEED a vowel.
+                vowels--;
+
+            L++;
+        }
+
+             0 1 2 3 4 5 6 7 8
+        s = "a b c i i i d e f",         k = 3
+               L     R
+
+        vowels = 1; // Updated(Decremented)
+
+        result = max(result, vowels) ==> max(1, 1) ==> 1 // Remains 1
+
+===============================================================================
+
+    5. R = 4;
+
+             0 1 2 3 4 5 6 7 8
+        s = "a b c i i i d e f",         k = 3
+               L     R
+
+        if (s[R] is vowel) // It is, 'i' is INDEED a vowel.
+            vowels++;
+
+        vowels = 2; // Updated(Incremented)
+        window_len = R - L + 1 ==> 4 - 1 + 1 ==> 4
+
+        if (window_len > k) // It is
+        if (4 > 3)          // It is
+        {
+            if (s[L] is vowel) // It is NOT, 'b' is NOT a vowel.
+
+            L++;
+        }
+
+             0 1 2 3 4 5 6 7 8
+        s = "a b c i i i d e f",         k = 3
+                 L   R
+
+        vowels = 2
+
+        result = max(result, vowels) ==> max(1, 2) ==> 2 // New max
+
+===============================================================================
+
+    6. R = 5
+
+             0 1 2 3 4 5 6 7 8
+        s = "a b c i i i d e f",         k = 3
+                 L     R
+
+        if (s[R] is vowel) // It is, 'i' is INDEED a vowel.
+            vowels++;
+
+        vowels = 3; // Updated(Incremented)
+        window_len = R - L + 1 ==> 5 - 2 + 1 ==> 4
+
+        if (window_len > k) // It is
+        if (4 > 3)          // It is
+        {
+            if (s[L] is vowel) // It is NOT, 'c' is NOT a vowel.
+
+            L++;
+        }
+
+             0 1 2 3 4 5 6 7 8
+        s = "a b c i i i d e f",         k = 3
+                   L   R
+
+        vowels = 3 // Remains 3
+
+        result = max(result, vowels) ==> max(2, 3) ==> 3 // New Max
+
+===============================================================================
+
+    7. R = 6
+
+             0 1 2 3 4 5 6 7 8
+        s = "a b c i i i d e f",         k = 3
+                   L     R
+
+        if (s[R] is vowel) // It is NOT , 'd' is NOT a vowel.
+
+        vowels = 3; // Remains 1
+        window_len = R - L + 1 ==> 6 - 3 + 1==> 4
+
+        if (window_len > k) // It is
+        if (4 > 3)          // It is
+        {
+            if (s[L] is vowel) // It is INDEED, 'i' is INDEED a vowel.
+                vowels--;
+
+            L++;
+        }
+
+             0 1 2 3 4 5 6 7 8
+        s = "a b c i i i d e f",         k = 3
+                     L   R
+
+        vowels = 2 // Updated(Decremented)
+
+        result = max(result, vowels) ==> max(3, 2) ==> 3 // Remains 3
+
+===============================================================================
+
+    8. R = 7
+
+             0 1 2 3 4 5 6 7 8
+        s = "a b c i i i d e f",         k = 3
+                     L     R
+
+        if (s[R] is vowel) // It is INDEED , 'e' is INDEED a vowel.
+
+        vowels = 3; // Updated(Incremented)
+        window_len = R - L + 1 ==> 7 - 4 + 1 ==> 4
+
+        if (window_len > k) // It is
+        if (4 > 3)          // It is
+        {
+            if (s[L] is vowel) // It is INDEED, 'i' is INDEED a vowel.
+                vowels--;
+
+            L++;
+        }
+
+             0 1 2 3 4 5 6 7 8
+        s = "a b c i i i d e f",         k = 3
+                       L   R
+
+        vowels = 2 // Updated(Decremented)
+
+        result = max(result, vowels) ==> max(3, 2) ==> 3 // Remains 3
+
+===============================================================================
+    8. R = 8
+
+             0 1 2 3 4 5 6 7 8
+        s = "a b c i i i d e f",         k = 3
+                       L     R
+
+        if (s[R] is vowel) // It is NOT , 'f' is NOT a vowel.
+
+        vowels = 2; // Remains 2
+        window_len = R - L + 1 ==> 8 - 5 + 1 ==> 4
+
+
+        if (window_len > k) // It is
+        if (4 > 3)          // It is
+        {
+            if (s[L] is vowel) // It is INDEED, 'i' is INDEED a vowel.
+                vowels--;
+
+            L++;
+        }
+
+        vowels = 1 // Updated(Decremented)
+
+        result = max(result, vowels) ==> max(3, 1) ==> 3 // Remains 3
+
+===============================================================================
+
+    At the end, just return "result" variable.
 
 */
 
