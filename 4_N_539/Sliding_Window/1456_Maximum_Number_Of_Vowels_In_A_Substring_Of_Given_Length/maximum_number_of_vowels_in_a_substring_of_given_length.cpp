@@ -54,12 +54,12 @@
     --- IDEA ---
     ------------
 
-    Self-Explanatory
+    TODO
 
 */
 
-/* Time  Beats: 30.75% */
-/* Space Beats: 20.93% */
+/* Time  Beats: 53.84% */
+/* Space Beats: 27.15% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -67,34 +67,33 @@ class Solution_Sliding_Window_1 {
 public:
     int maxVowels(string s, int k)
     {
-        std::unordered_set<char> uset = {'a', 'e', 'i', 'o', 'u'};
+        std::unordered_set<char> uset_vowels = {'a', 'e', 'i', 'o', 'u'};
 
-        int max_vowels = 0;
+        int result = 0;
         int vowels = 0;
-        for (int i = 0; i < k; i++)
-        {
-            if (uset.find(s[i]) != uset.end())
-                vowels++;
-        }
-
-        max_vowels = std::max(max_vowels, vowels);
 
         int left  = 0;
-        int right = k;
+        int right = 0;
+
         while (right < s.length())
         {
-            if (uset.count(s[right]))
+            if (uset_vowels.count(s[right]))
                 vowels++;
 
-            if (uset.count(s[left]))
-                vowels--;
+            if (right - left + 1 > k)
+            {
+                if (uset_vowels.count(s[left]))
+                    vowels--;
 
-            max_vowels = std::max(max_vowels, vowels);
-            left++;
+                left++;
+            }
+
+            result = std::max(result, vowels);
+
             right++;
         }
 
-        return max_vowels;
+        return result;
     }
 };
 
