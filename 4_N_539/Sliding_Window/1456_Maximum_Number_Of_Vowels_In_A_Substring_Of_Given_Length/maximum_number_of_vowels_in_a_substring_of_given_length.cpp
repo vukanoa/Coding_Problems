@@ -63,7 +63,7 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Sliding_Window_1 {
 public:
     int maxVowels(string s, int k)
     {
@@ -106,8 +106,67 @@ public:
     --- IDEA ---
     ------------
 
+    TODO
+
+*/
+
+/* Time  Beats: 65.85% */
+/* Space Beats: 97.69% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Sliding_Window_2 {
+public:
+    int max_vowelsVowels(std::string s, int k)
+    {
+        int max_vowels = 0;
+        int vowels = 0;
+
+        int left  = 0;
+        int right = 0;
+
+        while (right < s.length())
+        {
+            if (is_vowel(s[right]))
+                vowels++;
+
+            if (right - left + 1 == k)
+            {
+                max_vowels = std::max_vowels(max_vowels, vowels);
+
+                if (is_vowel(s[left]))
+                    vowels--;
+
+                left++;
+            }
+
+            right++;
+        }
+
+        return max_vowels;
+    };
+
+private:
+    bool is_vowel(char& c)
+    {
+        return (c == 'a' ||
+                c == 'e' ||
+                c == 'i' ||
+                c == 'o' ||
+                c == 'u');
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     Self-Explanatory
-    
+
 */
 
 /* Time  Beats: 27.51% */
