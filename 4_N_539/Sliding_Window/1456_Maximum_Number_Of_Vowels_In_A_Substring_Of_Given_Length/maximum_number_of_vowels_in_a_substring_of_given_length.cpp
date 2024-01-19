@@ -491,7 +491,7 @@ private:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Sliding_Window_3 {
 public:
     int maxVowels(std::string s, int k)
     {
@@ -559,7 +559,7 @@ public:
         +----------+-----------+------+
     'o' |   111    |  0 1111   |   F  |
         +----------+-----------+------+
-    'u' |   117    |  1 0101   |  21  |
+    'u' |   117    |  1 0101   |  15  |
         +----------+-----------+------+
 
     Since we need only first 5 bits(5 LSb - Least Significant bits), we need to
@@ -597,7 +597,7 @@ public:
         +----------+-----------+------+
     'o' |   111    |  0 1111   |   F  |
         +----------+-----------+------+
-    'u' |   117    |  1 0101   |  21  |
+    'u' |   117    |  1 0101   |  15  |
         +----------+-----------+------+
 
     How can this help us determine if some letters is a vowel or not?
@@ -778,7 +778,7 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution{
+class Solution_Bitwise_1 {
 public:
     int maxVowels(std::string s, int k)
     {
@@ -812,4 +812,60 @@ public:
 
         return result;
     };
+};
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The idea is almost equivalent to the one above, however instead of checking
+    if the character c is a vowel and then, if it is, incrementing, we can just
+    immediately say:
+
+            vowels += (mask >> (s[i] - 'a')) & 1U;
+
+    Since if it is, the last bit will be 1, as we've concluded.
+
+    The only impportant difference here is that we're using a differnt mask
+    because we don't "AND" with 0x1F.
+
+    I think it's easier to read the above Solution's explanation and to grasp
+    it than this one, but it's not a big difference.
+
+    The result will be the same, however this one is less explicit, but a bit
+    more elegant in terms of code.
+
+*/
+
+/* Time  Beats: 98.69% */
+/* Space Beats:  5.27% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Bitwise_2 {
+public:
+    int maxVowels(std::string s, int k)
+    {
+        uint32_t mask = 0x104111;
+        int vowels = 0;
+
+        for(int i = 0; i < k; i++)
+            vowels += (mask >> (s[i] - 'a')) & 1U;
+
+        int result = vowels;
+        for(int i = k; i < s.length(); i++)
+        {
+            if(vowels == k)
+                return k;
+
+            vowels += (mask >> (s[i]   - 'a')) & 1U;
+            vowels -= (mask >> (s[i-k] - 'a')) & 1U;
+
+            result = std::max(result, vowels);
+        }
+
+        return result;
+    }
 };
