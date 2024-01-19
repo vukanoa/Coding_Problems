@@ -56,23 +56,25 @@
     ------------
 
     This is the simplest Sliding Window problem there is. The window is fixed
-    once it gets to the point of being of that, fixed given, size.
+    once it gets to the point of being of that, fixed, given size k.
 
     Let's consider an example:
 
-        Input: s = "abciiidef", k = 3
+                    0 1 2 3 4 5 6 7 8
+        Input: s = "a b c i i i d e f", k = 3
 
     We'll assign "L"(left) and "R"(right) pointers to point at index 0,
     initially.
 
-        s = "abciiidef", k = 3
+             0 1 2 3 4 5 6 7 8
+        s = "a b c i i i d e f", k = 3
              L
              R
 
     If s[R] is the vowel, increment variable "vowels".
 
     However, we are asked to find:
-        "maximum number of vowel letters in any substring of s with length k."
+        "maximum number of vowel letters in any substring of with length k."
 
     It's important to emphasize - OF SIZE K.
 
@@ -97,10 +99,11 @@
 ********************************** SIMULATION *********************************
 *******************************************************************************
 
-                            Input: s = "abciiidef", k = 3
+                            0 1 2 3 4 5 6 7 8
+                       s = "a b c i i i d e f", k = 3
 
-                            result = 0;
-                            vowels = 0;
+                       result = 0;
+                       vowels = 0;
 
 ===============================================================================
 
@@ -388,7 +391,19 @@ public:
     --- IDEA ---
     ------------
 
-    TODO
+    The Idea is almost equivalent to the one above, but it's written in a bit
+    different way.
+
+    I wanted to have both imlementations here in case someone finds this one
+    easier to grasp.
+
+    Here we, at the beginning of each iteration, increment "vowels" if S[R] is
+    a vowel, however, if we find out that the window_len is equal to k we
+    immediately calculate if this number of vowels is the new maximum within a
+    window of size k and we shrink the left boundary, decrementing if necessary
+    of course.
+
+    At the end of each iteration we move "right" pointer by one, always.
 
 */
 
@@ -447,7 +462,27 @@ private:
     --- IDEA ---
     ------------
 
-    Self-Explanatory
+    Pretty much the same as both Solutions above. However this one doesn't use:
+    1. if (window_len > k), nor
+    2. if (window_len == k)
+
+    It uses a third variation to check a similar thing.
+
+    if the current character index minus the length k is still within the
+    string s(i.e. it's NOT out of bounds), then it means that we've exceeded
+    the size k of our window which further suggests that we should get right of
+    the leftmost element within the current window.
+
+    We decrement conditionally with this line:
+        vowels -= uset.find(s[i - k]) != uset.end() ? 1 : 0;
+
+    In other words: If a leftmost character within this window, of size k+1, is
+    a vowel, decrement total number of vowels.
+
+    At the end of each iteration, calculate if this number of vowels in the
+    window is the new maximum.
+
+    At the end, return varible "max_vowels".
 
 */
 
@@ -486,10 +521,254 @@ public:
     --- IDEA ---
     ------------
 
-    TODO
+    At first glance these numbers seem as "magic numbers".
 
-    (Same approach, but this uses Bit Mask instead of a Hash Set)
+    Where did they come from?
+    Let's write down all 5 vowels in: Decimal, binary and hexadecimal
 
+    ********************** ASCII values of vowels ****************************
+
+        | Decimal  |  Binary   | Hexa |
+        +----------+-----------+------+
+    'a' |    97    | 0110 0001 |  61  |
+        +----------+-----------+------+
+    'e' |   101    | 0110 0101 |  65  |
+        +----------+-----------+------+
+    'i' |   105    | 0110 1001 |  69  |
+        +----------+-----------+------+
+    'o' |   111    | 0110 1111 |  6F  |
+        +----------+-----------+------+
+    'u' |   117    | 0111 0101 |  75  |
+        +----------+-^^^-------+------+
+                      |
+                      ---------------------------------
+                                                      |
+    Now we can notice something. We can notice that these 3 bits(MSb - Most
+    Significant bits) in each Byte(8 bits) are exactly the same. Since that is
+    the case we can ignore them.
+
+    Let's, again, write this table, but without those 3 bits.
+
+        | Decimal  |  Binary   | Hexa |
+        +----------+-----------+------+
+    'a' |    97    |  0 0001   |   1  |
+        +----------+-----------+------+
+    'e' |   101    |  0 0101   |   5  |
+        +----------+-----------+------+
+    'i' |   105    |  0 1001   |   9  |
+        +----------+-----------+------+
+    'o' |   111    |  0 1111   |   F  |
+        +----------+-----------+------+
+    'u' |   117    |  1 0101   |  21  |
+        +----------+-----------+------+
+
+    Since we need only first 5 bits(5 LSb - Least Significant bits), we need to
+    somehow "cut" 3 MSb(Most Significan bits).
+
+    How are we going to do that?
+
+    By using Bitwise operation called "AND". We're going to AND the original
+    ASCII calues of these characters and "AND" it with 0x1F.
+
+    Why with 0x1F?
+    Let's write it down:
+
+       Hexa      Binary
+        1F   =  0001 1111
+
+    So, if we take, say, letter 'e' and we "AND" it with 0x1F, we get this:
+
+            0110 0101 // 0x65, aka 'e'
+       AND  0001 1111 // 0x1F
+       --------------
+            0000 0101 // 0x05
+
+       0000 0101 is equal to 5 in Decimal.
+
+    Okay, now we have this:
+
+        | Decimal  |  Binary   | Hexa |
+        +----------+-----------+------+
+    'a' |    97    |  0 0001   |   1  |
+        +----------+-----------+------+
+    'e' |   101    |  0 0101   |   5  |
+        +----------+-----------+------+
+    'i' |   105    |  0 1001   |   9  |
+        +----------+-----------+------+
+    'o' |   111    |  0 1111   |   F  |
+        +----------+-----------+------+
+    'u' |   117    |  1 0101   |  21  |
+        +----------+-----------+------+
+
+    How can this help us determine if some letters is a vowel or not?
+    First, we need to "notice" that there are a total of 5 vowels.
+
+    Let's say we want to check if a letter 'i' is a vowel or not.
+
+    We'll take it's ASCII value and "AND" it with 0x1F, as we previously
+    explained why.
+
+            0110 1001 // 0x69, aka 'i'
+       AND  0001 1111 // 0x1F
+       --------------
+            0000 1001 // 0x09
+
+       0000 1001 is equal to 9 in Decimal.
+
+    So now we are left with a value of 9. How can that help us to determine if
+    it's a vowel or not?
+
+    Let's mention again that we should keep in mind there are a total of 5
+    vowels, but for now, let's just focus on vowel 'i'.
+
+    We'll need a "mask" that we can SHIFT to the right by certain amount of
+    time in order to confirm it's a letter 'i'.
+
+    After AND-ing with 0x1F, Hexa value of 'i' is now 0x09.
+
+    So we need a Mask that if we SHIFT 9 times to the right, we get an
+    indicator that confirms it's an 'i' character.
+
+    Let me show you successful and unsuccessful examples and it will be much
+    more clear:
+
+        Mask = 0010 0000 0000 // 1 is at 10-th LSb.
+
+        ----------------------------------------------------------------------
+        --------------------- SUCCESSFUL: (char c = 'i') ---------------------
+        ----------------------------------------------------------------------
+
+                                ASCII 'i' = 105
+
+            orig_'i' = 0110 1001 // Original ASCII value of 'i' in Binary
+
+            Now we "AND" 'i' with 0x1F and we get:
+
+            new__'i' = 0000 1001 // We get 9 in Decimal
+
+
+            We SHIFT our Mask to the right by new__'i'
+
+                Mask >> (new__'i')
+
+                0010 0000 0000 >> 9   ====>  0000 0000 0001
+
+
+            In order to check if the character we passed is a vowel, we now
+            just need to check if the LSb(Least Significant bit) is 1.
+
+            How are we going to check if the LSb is 1?
+
+            By "AND"-ing with 0x1
+
+                0000 0000 0001 // Leftover of Mask >> new__'i'
+            AND 0000 0000 0001 // 0x1
+            ------------------
+                0000 0000 0001 // 0x1
+
+            Since the result of the last "AND" is 0x1, we know that passed
+            character c was INDEED a character 'i'.
+
+
+        ----------------------------------------------------------------------
+        -------------------- UNSUCCESSFUL: (char c = 'g') --------------------
+        ----------------------------------------------------------------------
+
+                                ASCII 'g' = 103
+
+            orig_'g' = 0110 0111 // Original ASCII value of 'g' in Binary
+
+            Now we "AND" 'g' with 0x1F and we get:
+
+            new__'g' = 0000 0111 // We get 7 in Decimal
+
+                Mask >> (new__'g')
+
+                0010 0000 0000 >> 7   ====>  0000 0000 0100
+
+
+            In order to check if the character we passed is a vowel, we now
+            just need to check if the LSb(Least Significant bit) is 1.
+
+            How are we going to check if the LSb is 1?
+
+            By "AND"-ing with 0x1
+
+                0000 0000 0100 // Leftover of Mask >> new__'g'
+            AND 0000 0000 0001 // 0x1
+            ------------------
+                0000 0000 0000 // 0x0
+
+            Since the result of the last "AND" is NOT 0x1, we know that passed
+            character c was NOT a character 'i'.
+
+
+
+    The only different thing we do in this whole problem is - We don't only
+    check if a passed character c is a character 'i', but we want to check if
+    it is any of the vowels.
+
+    Therefore, our Mask won't only be so that we can only check for letters 'i'
+    but all 5 of the vowels.
+
+    Howe are we going to do that?
+
+    I don't know if you've notice, but in our example where we were checking if
+    passed character c is a letter 'i', we've had a mask have a bit 1 at 10th
+    LSb.
+
+    Why exactly 10th?
+
+    Because ASCII letter 'i' "AND"-ed with 0x1F gives us a 0x09
+
+    Therefore, we need to put a bit 1 at "0x09 + 1"-th LSb position.
+
+    Since we have our table:
+
+        | Decimal  |  Binary   | Hexa |
+        +----------+-----------+------+
+    'a' |    97    |  0 0001   |   1  |  // 0x1  + 0x1 =  0x2  = 2nd LSb
+        +----------+-----------+------+
+    'e' |   101    |  0 0101   |   5  |  // 0x5  + 0x1 =  0x6  = 6th LSb
+        +----------+-----------+------+
+    'i' |   105    |  0 1001   |   9  |  // 0x9  + 0x1 =  0xA  = 10th LSb
+        +----------+-----------+------+
+    'o' |   111    |  0 1111   |   F  |  // 0xF  + 0x1 =  0x10 = 16th LSb
+        +----------+-----------+------+
+    'u' |   117    |  1 0101   |  15  |  // 0x15 + 0x1 =  0x16 = 22th LSb
+        +----------+-----------+------+
+
+    Our Mask will have 1 at bits(counting from LSb): 2, 6, 10, 16, 22
+
+    MSb
+     |
+     |      0  1  0  0    0  0  0  1     0  0  0  0    0  1  0  0
+     ----> 23 22 21 20   19 18 17 16    15 14 13 12   11 10  9  8
+
+            0  6  0  0    0  2  0  0
+            7  6  5  4    3  2  1  0 <------------------------
+                                                             |
+                                                             |
+                                                            LSb
+
+    Or written concisely:
+
+    Mask = 0010 0000   1000 0010   0010 0010 // Binary
+    Mask =  2    0       8   2      2    2
+
+    Mask =   0x20         0x82        0x22
+
+    Mask = 0x208222
+
+
+    If passed character c is one of the vowels('a', 'e', 'i', 'o', 'u') then
+    after SHIFTING we'll get 0x1, i.e. LSb will be 1.
+
+    Otherwise, it won't.
+
+    That's how we know if it is a vowel or not.
+
+    Everything else is similar to other Solutions.
     Computers are much better at performing bitwise operations.
 
 */
@@ -499,30 +778,38 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution{
 public:
     int maxVowels(std::string s, int k)
     {
-        auto is_vowel = [](char c)
+        auto is_vowel = [](char ascii_character_value)
         {
-            static const uint32_t b1 = 0x208222;
-            static const uint8_t  b2 = 0x1f;
-            static const uint8_t  b3 = 0x1;
+            static const uint32_t mask     = 0x208222;
+            static const uint8_t  five_LSb = 0x1f; // 5 Least Significant bits
+            static const uint8_t  one      = 0x1;
 
-            return (b1 >> (c & b2)) & b3;
+            return (mask >> (ascii_character_value & five_LSb)) & one;
         };
 
-        int max_vowels = 0;
+        int result = 0;
         int vowels = 0;
-        for(int i = 0, j = i - k; i < s.size(); ++i, ++j)
-        {
-            vowels += is_vowel(s[i]);
-            if (i >= k)
-                vowels -= is_vowel(s[j]);
 
-            max_vowels = max(max_vowels, vowels);
+        int right = 0;
+        int left  = right - k; // Negative value initially, i.e. out of bounds
+
+        while (right < s.length())
+        {
+            vowels += is_vowel(s[right]);
+
+            if (right >= k)
+                vowels -= is_vowel(s[left]);
+
+            result = std::max(result, vowels);
+
+            left++;
+            right++;
         }
 
-        return max_vowels;
+        return result;
     };
 };
