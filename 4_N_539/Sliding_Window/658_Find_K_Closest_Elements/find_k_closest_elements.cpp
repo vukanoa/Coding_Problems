@@ -55,16 +55,15 @@
     ------------
 
     Basic Sliding Window technique.
-    
+
 */
 
-
-/* Time  Beats: 90.46% */
-/* Space Beats: 30.43% */
+/* Time  Beats: 95.34% */
+/* Space Beats: 17.73% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(k) */
-class Solution {
+class Solution_Sliding_Window {
 public:
     std::vector<int> findClosestElements(std::vector<int>& arr, int k, int x)
     {
@@ -85,5 +84,44 @@ public:
         std::vector<int> results(deque.begin(), deque.end());
 
         return results;
+    }
+};
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+   Note that, you SHOULD NOT compare the absolute value of:
+       abs(x - A[mid]) and abs(A[mid + k] - x).
+
+   It fails at cases like arr = [1,1,2,2,2,2,2,3,3], x = 3, k = 3
+
+*/
+
+/* Time  Beats: 98.93% */
+/* Space Beats: 26.20% */
+
+/* Time  Complexity: O(log(N - K)) */
+/* Space Complexity: O(K) */
+class Solution_Binary_Search {
+public:
+    std::vector<int> findClosestElements(std::vector<int>& arr, int k, int x)
+    {
+        int left  = 0;
+        int right = arr.size() - k;
+
+        while (left < right)
+        {
+            int mid = (left + right) / 2;
+
+            if (x - arr[mid] > arr[mid + k] - x)
+                left = mid + 1;
+            else
+                right = mid;
+        }
+
+        return std::vector<int>(arr.begin() + left, arr.begin() + left + k);
     }
 };
