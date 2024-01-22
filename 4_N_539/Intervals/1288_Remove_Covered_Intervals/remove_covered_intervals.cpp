@@ -72,7 +72,7 @@ bool comparator(const std::vector<int>& a, const std::vector<int>& b)
 
 /* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(1)        */ // Depending on the sort it can be O(n)
-class Solution {
+class Solution_1 {
 public:
     int removeCoveredIntervals(vector<vector<int>>& intervals)
     {
@@ -115,7 +115,7 @@ public:
 
 /* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(1)        */ // Depending on the sort it can be O(n)
-class Solution {
+class Solution_2 {
 public:
     int removeCoveredIntervals(vector<vector<int>>& intervals)
     {
@@ -135,6 +135,50 @@ public:
             }
 
             right = std::max(right, inter[1]);
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 89.46% */
+/* Space Beats:  9.15% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(1) */
+class Solution_3 {
+public:
+    int removeCoveredIntervals(std::vector<std::vector<int>>& intervals)
+    {
+        std::sort(intervals.begin(),intervals.end());
+
+        int x1 = intervals[0][0];
+        int x2 = intervals[0][1];
+
+        int result = 1;
+
+        for(int i = 1; i < intervals.size(); i++)
+        {
+            if(intervals[i][0] > x1 && intervals[i][1] > x2)
+                result++;
+
+            if(intervals[i][1] > x2)
+            {
+                x1 = intervals[i][0];
+                x2 = intervals[i][1];
+            }
         }
 
         return result;
