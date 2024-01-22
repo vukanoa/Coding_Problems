@@ -147,9 +147,63 @@ public:
 /*
     ------------
     --- IDEA ---
-    ------------
 
-    TODO
+
+    The interval [a, b) is covered by the interval [c, d) if and only if:
+
+        c <= a and b <= d
+
+        Example 1: intervals = [[1,4],[3,6],[2,8]]
+
+                1  2  3  4  5  6  7  8
+                1--------4
+                      3--------6
+                   2-----------------8
+
+    We can see here that interval [3, 6] is covered by [2,8] and therefore it
+    should be removed.
+
+    However, if we were to go through these intervals in the way they were
+    given to us, we'd consider interval [3,6] before interval [2,8]. Imagine
+    that there is a much longer example, we'd quickly find out that it would be
+    either impossible or very difficutl to approach this problem this way.
+
+    Therefore, to make our lives easier, we should sort the Input by the
+    starting point.
+
+    Now we'd have something like this:
+
+                1  2  3  4  5  6  7  8
+                1--------4
+                   2-----------------8
+                      3--------6
+
+    Now it's not that difficult to think of the Solution. Just explain to
+    yourself how would you know that some interval is covered by another,
+    looking at this picture(from top to bottom and from left to right).
+
+    You'd certainly say something like this:"I look at the first interval and
+    then see if the second interval is within the range of the first one."
+
+    But then ask yourself - How do you know if one interval is within the other
+    one?
+
+    It is very obvious, but here it is:
+        For an interval to be covered its startting points has to be greater
+        than or equal to the starting point of the "fixed"(leftier) interval
+        and its ending point has to be less than or equal to the ending point
+        of the same "fixed"(leftier) interval.
+
+        If we find the violation of the above, then that means the interval
+        we're currently checking is NOT covered and therefore we should
+        increment the result.
+
+
+    If the current interval we're checking, the i-th interval, has the "ending"
+    point farther to the right than our currently "fixed" interval, then update
+    "fixed" pointers to represent the current interval.
+
+    We are allowed to do that since we've sorted the Input.
 
 */
 
@@ -171,6 +225,7 @@ public:
 
         for(int i = 1; i < intervals.size(); i++)
         {
+            // If they are overlapping, count as a non-covered interval
             if(intervals[i][0] > x1 && intervals[i][1] > x2)
                 result++;
 
