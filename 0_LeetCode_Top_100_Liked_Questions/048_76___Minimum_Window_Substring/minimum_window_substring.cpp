@@ -15,7 +15,7 @@
     Description:
     ============
 
-    Given two strings 's' and 't' lenghts 'm' and 'n' respectively, return the
+    Given two strings 's' and 't' lengths 'm' and 'n' respectively, return the
     minimum window substring of 's' such that every character in 't'(including
     duplicates) is included in the window. If there is no such substring,
     return the empty string "".
@@ -190,7 +190,8 @@ private:
            pointer ahead one by one. If the window is still a desirable one we
            keep on updating the minimum window size.
 
-        4. If the window is not desirable any more, we repeat step 2 onwards.
+        4. If the window is not the desired one anymore, we repeat from step 2
+           onward.
 
 
     1)
@@ -288,8 +289,8 @@ public:
             {
                 if (right - left < min_length)
                 {
-                    min_length   = right - left;
-                    min_start = left;
+                    min_start  = left;
+                    min_length = right - left;
                 }
 
                 if (++occurrences[s[left++]] > 0)
@@ -324,7 +325,7 @@ public:
 /*
     Space Complexity: O(1)
 */
-class Solution_readable{
+class Solution_Readable {
 public:
     std::string minWindow(std::string s, std::string t)
     {
@@ -385,7 +386,7 @@ public:
 /* Space Beats: 9.47% */
 
 /* Time  Complexity: O(m * 58 + n) --> O(m + n) */
-/* Space Complexity: O(58) ----------> O(n)     */
+/* Space Complexity: O(58) ----------> O(1)     */
 class Solution_M58_N {
 public:
     string minWindow(string s, string t)
@@ -441,6 +442,76 @@ private:
         }
 
         return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 24.14% */
+/* Space Beats:  5.50% */
+
+/* Time  Complexity: O(m + n) */
+/* Space Complexity: O(1) */
+class Solution_Neat {
+public:
+    std::string minWindow(std::string s, std::string t)
+    {
+        if (t == "")
+            return "";
+
+        std::unordered_map<char, int> t_map;
+        std::unordered_map<char, int> window_map;
+
+        for (char chr : t)
+            t_map[chr] = 1 + (t_map.count(chr) ? t_map[chr] : 0);
+
+        int have = 0;
+        int need = t_map.size();
+
+        int start = -1;
+        int min_window_len = INT_MAX;
+
+        int left  = 0;
+        int right = 0;
+        while (right < s.length())
+        {
+            char chr = s[right];
+            window_map[chr] = 1 + (window_map.count(chr) ? window_map[chr] : 0);
+
+            if (t_map.count(chr) && window_map[chr] == t_map[chr])
+                have++;
+
+            while (have == need)
+            {
+                // current_window_length = right - left + 1
+                if (right - left + 1 < min_window_len)
+                {
+                    start = left;
+                    min_window_len = right - left + 1;
+                }
+
+                // Pop from the left of our window
+                window_map[s[left]]--;
+                if (t_map.count(s[left]) && window_map[s[left]] < t_map[s[left]])
+                    have--;
+
+                left++;
+            }
+
+            right++;
+        }
+
+        return min_window_len != INT_MAX ? s.substr(start, min_window_len) : "";
     }
 };
 
