@@ -104,7 +104,7 @@
         Before we push an element into the deque, we first pop everything
         smaller than it out of the deque.
 
-    This enfroces the decreasing order.
+    This enforces the decreasing order.
 
     The overall time complexity is O(N). This is because each element in the
     original array can be pushed into and popped out of the deque only once.
@@ -385,6 +385,51 @@ public:
         }
 
         return results;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The exact same IDEA as above, however the implementation is different for
+    it is done on another occasion.
+
+*/
+
+/* Time  Beats: 96.33% */
+/* Space Beats: 34.97% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    std::vector<int> maxSlidingWindow(std::vector<int>& nums, int k)
+    {
+        std::vector<int> result;
+        std::deque<int> deque; // Monotonically decreasing
+
+        for (int i = 0; i < nums.size(); i++)
+        {
+            while (!deque.empty() && nums[deque.back()] < nums[i])
+                deque.pop_back();
+
+            deque.push_back(i);
+
+            if (i >= k-1) // Once we have exactly k elements
+            {
+                result.push_back(nums[deque.front()]);
+
+                if (deque.front() == i - k + 1)
+                    deque.pop_front();
+            }
+        }
+
+        return result;
     }
 };
 
