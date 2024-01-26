@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 /*
 	============
@@ -132,10 +133,109 @@ public:
 };
 
 
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This Idea uses std::upper_bound function.
+
+    std::upper_bound returns the first element that is GREATER than the target.
+    If there is no element that is GREATER than the target, then iterator will
+    point to nums.end().
+
+    So it's important to emphasize that by using std::upper_bound function we
+    will NOT find our target, but we WILL find the first element that is
+    GREATER than target or nums.end().
+
+        nums = [1, 4, 5, 7, 9], target = 6
+                         ^
+                         |
+                         |
+        iter -------------
+
+    First, since we will find the next greater and not the target, if iterator
+    points to nums.begin(), then we're 100% sure out "target" value DOES NOT
+    exist in the array nums.
+
+        nums.begin()            nums.end()
+                |               _|
+                |              |  
+                v              |  
+        nums = [3, 4, 6, 7, 9] v       , target = 1
+                0  1  2  3  4  5
+                ^              ^
+                |              |
+                |              ------ Out of Bounds
+        iter ----
+    
+    However, if that is not the case, then if we check one element to the left
+    of our iterator, we can check if that is our desired "target" value.
+    (If iter points to nums.begin() there is no point in checking anyway, but
+     we MUST NOT check in the first place since that will be out of bounds)
+
+           nums.begin()            nums.end()
+                   |               _|
+                   |              |  
+                   v              |  
+        nums =    [3, 4, 6, 7, 9] v       , target = 1
+               -1  0  1  2  3  4  5
+                ^  ^              ^
+                |  |              |
+    iter-1 ------  |              |
+                   |              ------ Out of Bounds
+           iter ----
+
+    Value of the element to the left of our iterator is: *(iter - 1)
+
+    So:
+        if ((*iter - 1) != target)
+            // Then there is no "target" value in our array "nums".
+        else
+            // There IS and we want to return it's index, which is:
+            (iter - 1) - nums.begin();
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+                  distance
+
+
+        distance = (iter - 1) - nums.begin() ==> 2 - 0 ==> 2 (index of target)
+
+        nums = [1,  4,  8, 12, 19, 22], target = 8
+                0   1   2   3   4   5
+                ^       ^   ^
+             ___|       |   |
+             |          |   |
+     nums.begin()       |   |
+                        |   |
+      iter - 1 ----------   |
+      (target)              ----- iter
+
+*/
+
+/* Time  Beats: 89.01% */
+/* Space Beats: 11.00% */
+
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(1) */
+class Solution_Upper_Bound {
+public:
+    int search(std::vector<int>& nums, int target)
+    {
+        auto iter = std::upper_bound(nums.begin(), nums.end(), target);
+
+        if (iter == nums.begin() || *(iter - 1) != target)
+            return -1;
+        
+        return (iter - 1) - nums.begin();
+    }
+};
+
 int
 main()
 {
-	Solution sol;
+	Solution             sol;
+    Solution_Upper_Bound sol_upper_bound;
 
 
 	/* Example 1 */
@@ -169,7 +269,8 @@ main()
 
 
 	/* Solution */
-	int result = sol.search(nums, target);
+	// int result = sol.search(nums, target);
+	int result = sol_upper_bound.search(nums, target);
 
 
 	/* Write Output */
