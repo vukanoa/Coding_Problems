@@ -156,13 +156,12 @@ out of bounds _________|
 
 */
 
-
-/* Time  Beats: 100% */
-/* Space Beats: 35.98% */
+/* Time  Beats: 100.00% */
+/* Space Beats:   6.47% */
 
 /* Time  Complexity: O(logn) */
 /* Space Complexity: O(1) */
-class Solution{
+class Solution_1 {
 public:
     int searchInsert(std::vector<int>& nums, int target)
     {
@@ -173,18 +172,65 @@ public:
 
         while (left <= right)
         {
-            int mid = (left + right) / 2;
+            int mid = left + (right - left) / 2;
 
             if (target == nums[mid])
                 return mid;
 
-            if (target < nums[mid])
-                right = mid - 1;
+            if (nums[mid] < target)
+                left  = mid + 1;
             else
-                left = mid + 1;
+                right = mid - 1;
         }
 
         return left;
+    }
+};
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    It is the same idea as the above one, however, this is another way of
+    implementing Binary Search.
+
+    If we take that the "right" boundary is NOT inclusive, then:
+
+        1. We must assign right to "n" and not "n - 1"
+
+        2. While loop condition is not "left < right" and not "left <= right"
+
+        3. When "right" pointer shrinks, it shrink to "mid" instead of "mid-1"
+           because, as stated above, the "right" pointer is NOT inclusive! 
+
+*/
+
+/* Time  Beats: 78.41% */
+/* Space Beats:  6.47% */
+
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(1)    */
+class Solution_2 {
+public:
+    int searchInsert(std::vector<int>& nums, int target)
+    {
+        int n = nums.size();
+
+        int left  = 0;
+        int right = n; // [left, right), "right" boundary is NOT inclusive
+
+        while (left < right) // Because "right" is NOT inclusive, we do "l < r"
+        {
+            int mid = left + (right - left) / 2;
+
+            if (nums[mid] < target)
+                left  = mid + 1;
+            else
+                right = mid; // Because "right" is NOT inclusive
+        }
+
+        return left; // We always return "left"
     }
 };
 
@@ -552,7 +598,8 @@ public:
 int
 main()
 {
-    Solution             sol;
+    Solution_1           sol_1;
+    Solution_2           sol_2;
     Solution_Upper_Bound sol_upper_bound;
     Solution_Lower_Bound sol_lower_bound;
 
@@ -610,9 +657,10 @@ main()
 
 
     /* Solution */
-    // int output = sol.searchInsert(nums, target);
+    // int output = sol_1.searchInsert(nums, target);
+    int output = sol_2.searchInsert(nums, target);
     // int output = sol_upper_bound.searchInsert(nums, target);
-    int output = sol_lower_bound.searchInsert(nums, target);
+    // int output = sol_lower_bound.searchInsert(nums, target);
 
 
     /* Write Output */
