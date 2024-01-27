@@ -107,7 +107,7 @@
 
 /* Time  Complexity: O(logn) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_1 {
 public:
     int search(std::vector<int>& nums, int target)
     {
@@ -129,6 +129,47 @@ public:
         }
 
         return -1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of implementing Binary Serach.
+
+    TODO Detailed explanation of Binary Search.
+
+*/
+
+/* Time  Beats: 94.02% */
+/* Space Beats:  9.71% */
+
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(1)    */
+class Solution_2 {
+public:
+    int search(std::vector<int>& nums, int target)
+    {
+        int left  = 0;
+        int right = nums.size() - 1;
+
+        while (left < right)
+        {
+            // DON'T write it like this: mid = (l + r) / 2; It can Overflow!!!
+            int mid = left + (right - left) / 2;
+
+            if (nums[mid] < target)
+                left  = mid + 1;
+            else
+                right = mid;
+        }
+
+        return nums[left] == target ? left : -1;
     }
 };
 
@@ -303,7 +344,8 @@ public:
 int
 main()
 {
-    Solution             sol;
+    Solution_1           sol_1;
+    Solution_2           sol_2;
     Solution_Upper_Bound sol_upper_bound;
     Solution_Lower_Bound sol_lower_bound;
 
@@ -339,9 +381,10 @@ main()
 
 
     /* Solution */
-    // int result = sol.search(nums, target);
+    // int result = sol_1.search(nums, target);
+    int result = sol_2.search(nums, target);
     // int result = sol_upper_bound.search(nums, target);
-    int result = sol_lower_bound.search(nums, target);
+    // int result = sol_lower_bound.search(nums, target);
 
 
     /* Write Output */
