@@ -92,7 +92,7 @@
     So the answer lays somewhere between: 1 and n.
 
     But why do we need Gaus' formula? What's the use of that?
-    Well with a bit of observation we can conclude, that to be able to build
+    Well, with a bit of observation we can conclude that, to be able to build
     i-th row, we need: i/2 * (i+1) coins
 
     It's not that easy to observe that if you are seeing the problem for the
@@ -101,11 +101,12 @@
     As we've concluded, our answer lays somewhere between: 1 and n.
 
     Now let's do a Binary Search on that range. Each time we'll work with "mid"
-    value which represents the number of rows.
+    value which represents the current row we're considering.
 
-    So how can we know if we can build row of value "mid"?
+    So, how can we know if we can build "mid" row?
+    (i.e. if "mid" is 4, we want to check if we can build 4-th row)
 
-    As we've said, in order to build a i-th row(mid in this case), we need:
+    As we've said, in order to build an i-th row(i.e. "mid" row), we need:
         (mid / 2) * (mid + 1)
     coins.
 
@@ -145,10 +146,11 @@
     coins. Therefore, we conclude that in order to build a staircase of 5 rows
     we need 15 coins.
 
-    Which fruther indicates that our "integer divison" gave us an incorrect
+    That further indicates that our "integer division" gave us an incorrect
     result.
 
     So, how are we going to fix this?
+
     Just use "decimal division" when dividing by 2.
     (In C++ you either divide by 2.0 or you multiply by 1.0)
 
@@ -158,7 +160,7 @@
 
     Again, imagine that "mid" is equal to 5.
 
-    If we did a "decimal divison" we'd get:
+    If we did a "decimal division" we'd get:
         coins = 5/2.0 * 6
               = 2.5   * 6
               = 15
@@ -188,7 +190,7 @@
     mid =  1   +      3
     mid =  4
 
-    As we've said, variable "mid" denotes the rows for which we're trying to
+    As we've said, variable "mid" denotes the row for which we're trying to
     see if we can fully build it.
 
     So to calculate that we do:
@@ -219,8 +221,8 @@
     mid = left + (right - left) / 2
     mid =  1   +      2 / 2
     mid =  1   +        1
-    mid =  2
-
+    mid =  2 <------------------------------------------------
+                                                             |
     Now we are trying to see if we can build 2 rows(because mid == 2).
 
     How many coins do we need:
@@ -233,15 +235,15 @@
             right = mid - 1;
         else
         {
-            res = std::max(res, mid);
+            result = std::max(result, mid);
             left = mid + 1;
         }
 
     Now since the first condition is not true, we enter the "else" block.
     Since we are able to build this "mid" row, we have to ask if this is the
-    biggest row we've managed to build. If it is - Update "res"(which we will
-    return at the end as a result of this whole problem).
-    If it's not, "res" will retain current value.
+    biggest row we've managed to build. If it is - Update "result"(which we
+    will return at the end as a result of this whole problem).
+    If it's not, "result" will retain current value.
 
     But, why do we update our left point now to:
         left = mid + 1
@@ -291,14 +293,14 @@
 
 /* Time  Complexity: O(logn) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_1{
 public:
     int arrangeCoins(int n)
     {
         int left  = 1;
         int right = n;
 
-        int res = 0;
+        int result = 0;
         while (left <= right)
         {
             int mid = left + (right - left) / 2;
@@ -310,10 +312,56 @@ public:
             else
             {
                 left = mid + 1;
-                res = std::max(res, mid);
+                result = std::max(result, mid);
             }
         }
 
-        return res;
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    It's almost equivalent, but it's implemented a bit differently. This one
+    makes more sense to me.
+
+    The crux, i.e. the Math formula and the entire approach, is the same.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  13.19% */
+
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(1)    */
+class Solution_2 {
+public:
+    int arrangeCoins(int n)
+    {
+        int left  = 1;
+        int right = n;
+
+        while (left <= right)
+        {
+            int mid = left + (right - left) / 2;
+
+            double coins = (mid / 2.0) * (mid + 1);
+
+            if (coins == n * 1.0)
+                return mid;
+
+            if (coins < n * 1.0)
+                left = mid + 1;
+            else
+                right = mid - 1;
+        }
+
+        return left - 1;
     }
 };
