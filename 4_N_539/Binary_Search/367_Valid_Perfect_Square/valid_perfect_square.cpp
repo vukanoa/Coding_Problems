@@ -172,3 +172,134 @@ public:
         return left == 1 ? true : false;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is a similar idea, however this one will work for squared values
+    that are even greater than "unsigned long long" since it doesn't have the
+    upper bound.
+
+    (The upper bound would is whichever type they give us for "num". The could
+     use any of these and it would still work:
+        #include <boost/multiprecision/cpp_int.hpp>
+
+        using namespace boost::multiprecision;
+
+        int128_t   num;
+        uint128_t  num;
+        int256_t   num;
+        uint256_t  num;
+        int512_t   num;
+        uint512_t  num;
+        int1024_t  num;
+        uint1024_t num;
+    )
+
+    We are dividing "num" by "mid" and not multiplying "mid" by "mid" as
+    in the previous Solution.
+
+    Also, here, I've written a Binary Search in a slightly different way.
+    Initially both "left" and "right" point to elements that COULD be answers,
+    whereas the above Solution doesn't. (In the above Solution "right" pointer
+    points to a value that CANNOT be a result)
+
+    In the above Solution our range was: [left, right)
+                                         ^           ^
+                                         |           |
+                                    Inclusive     NON-Inclusive
+
+
+    However, in this Solution, both "left" and "right" point to values that
+    could, in theory, be the answer we are looking for.
+
+    Therefore, our range is always like this [left, right]
+                                             ^           ^
+                                             |           |
+                                          Inclusive    Inclusive
+
+
+    Because our range is Inclusive on both pointers, our while loop has this
+    condition:
+
+        while (left <= right) // Less than OR EQUALS TO
+
+    The "OR EQUALS TO" part is precisely because both "left" and "right" are
+    both Inclusive.
+
+    In the above Solution, since our "right" pointer was NOT Inclusive, we had
+    a while loop with this condition:
+
+        while (left < right) // Less than, because "right" is NON-Inslusive
+
+
+    One more thing differs because of our Initialization values - In this
+    Solution our if-else pair looks like this:
+
+            if (1.0*mid < num_div_mid)
+                left  = mid + 1;
+            else
+                right = mid - 1;
+
+    Since we either have to move our "left" or our "right" pointer and since
+    BOTH "left" and "right are pointing to Inclusive values, we MUST exclude
+    the "mid" value since we've just concluded that "mid" is NOT the answer.
+
+    However, in the above Solution, we had this:
+
+            if (mid * mid < num)
+                left = mid + 1;
+            else
+                right = mid;     // Because "right" is NON-Inclusive
+
+
+    Also, in both Solutions we are using "Left leaning" calculation of "mid"
+    pointer.
+
+    As explained above, we could calculate "mid" pointer in two ways:
+        1. Left  leaning:   mid = left + (right - left) / 2;
+        2. Right leaning:   mid = left + std::floor((right - left + 1) / 2);
+
+    You could write "Left leaning" with std::floor as well, it wouldn't make
+    any difference and it's maybe easier to visuallize the difference and
+    remember it:
+        1. Left  leaning:   mid = left + std::floor((right - left    ) / 2);
+        2. Right leaning:   mid = left + std::floor((right - left + 1) / 2);
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  13.40% */
+
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(1)    */
+class Solution_2 {
+public:
+    bool isPerfectSquare(int num)
+    {
+        int left  = 1;
+        int right = num;
+
+        while (left <= right)
+        {
+            int mid = left + (right - left) / 2; // Left leaning
+
+            double num_div_mid = 1.0 * num / mid;
+
+            if (1.0*mid == num_div_mid)
+                return true;
+
+            if (1.0*mid < num_div_mid)
+                left  = mid + 1;
+            else
+                right = mid - 1;
+        }
+
+        return false;
+    }
+};
