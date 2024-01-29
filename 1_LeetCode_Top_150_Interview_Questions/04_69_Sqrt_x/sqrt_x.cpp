@@ -166,13 +166,59 @@ public:
             if (mid * mid == x)
                 return mid;
 
-            if (mid * mid > x)
-                right = mid;
-            else
+            if (mid * mid < x)
                 left = mid + 1;
+            else
+                right = mid;
         }
 
         return left - 1; // Or right - 1 it's the same
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  12.97% */
+
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(1)    */
+class Solution_Binary_Search_3 {
+public:
+    int mySqrt(int x)
+    {
+        if (x < 2)
+            return x;
+
+        int left  = 0;
+        int right = x;
+
+        while (left <= right)
+        {
+            int mid = left + (right - left) / 2;
+
+            double x_div_mid = 1.0 * x / mid;
+
+            if (1.0*mid == x_div_mid)
+                return mid;
+
+            if (1.0*mid < x_div_mid)
+                left  = mid + 1;
+            else
+                right = mid - 1;
+        }
+
+        return left - 1;
     }
 };
 
@@ -182,6 +228,7 @@ main()
 {
     Solution_Binary_Search   sol;
     Solution_Binary_Search_2 sol_2;
+    Solution_Binary_Search_3 sol_3;
 
     /* Example 1 */
     // int x = 4;
@@ -208,6 +255,7 @@ main()
     /* Solution */
     int result = sol.mySqrt(x);
     // int result = sol_2.mySqrt(x);
+    // int result = sol_3.mySqrt(x);
 
 
     /* Write Output */
