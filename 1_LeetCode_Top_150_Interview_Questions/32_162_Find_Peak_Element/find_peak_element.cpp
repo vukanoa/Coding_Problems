@@ -315,13 +315,14 @@ public:
             int mid = left + (right - left) / 2;
 
             bool left_is_smaller  = mid-1 == -1 || nums[mid-1] < nums[mid];
-            bool right_is_smaller = mid+1 ==  n || nums[mid]   > nums[mid+1];
+            bool right_is_smaller = mid+1 ==  n || nums[mid+1] < nums[mid];
 
             if (left_is_smaller && right_is_smaller)
                 return mid;
-            else if (left_is_smaller) // Go to the right
+
+            if (left_is_smaller) // Go to the right
                 left  = mid + 1;
-            else // If none is smaller or the right one is smaller - Go to the left
+            else // If none is smaller or the right one is smaller - Go left
                 right = mid -1;
         }
 
@@ -352,11 +353,10 @@ public:
     {
         int left  = 0;
         int right = nums.size() - 1;
-        int mid;
 
         while (left < right)
         {
-            mid = (left + right) / 2;
+            int mid = left + (right - left) / 2;
 
             if (nums[mid] < nums[mid + 1])
                 left  = mid + 1;
@@ -365,5 +365,52 @@ public:
         }
 
         return left;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Almsot equivalent to the "Solution_Verbose", however this one is solved on
+    another occassion and it's slightly different so I wanted to keep them both
+    here in case someone finds it easier to read and grasp.
+
+*/
+
+/* Time  Beats: 69.26% */
+/* Space Beats:  8.22% */
+
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(1)    */
+class Solution_Another {
+public:
+    int findPeakElement(vector<int>& nums)
+    {
+        int n = nums.size();
+
+        int left  = 0;
+        int right = n-1;
+
+        while (left <= right)
+        {
+            int mid = left + (right - left) / 2;
+
+            // If element at index "mid" is a local peak
+            if ((mid == 0   || nums[mid-1] < nums[mid]) &&
+                (mid == n-1 || nums[mid+1] < nums[mid]))
+                return mid;
+
+            if (mid > 0 && nums[mid-1] > nums[mid]) // If left one is greater
+                right = mid - 1;
+            else
+                left  = mid + 1;
+        }
+
+        return -1;
     }
 };
