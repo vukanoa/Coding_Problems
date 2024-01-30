@@ -305,3 +305,71 @@ public:
         return -1; // Since we are sure there will be a single non-duplicate
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    More or less similar to the above Solution, however it's implemented in a
+    different way.
+
+    Some people may prefer this implementation instead.
+
+*/
+
+/* Time  Beats: 90.49% */
+/* Space Beats: 19.78% */
+
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(1)    */
+class Solution_2 {
+public:
+    int singleNonDuplicate(std::vector<int>& nums)
+    {
+        if (1 == nums.size())
+            return nums[0];
+
+        int left  = 0;
+        int right = nums.size() - 1;
+
+        while (left <= right)
+        {
+            int mid = left + (right - left) / 2;
+
+            if (is_non_duplicate(nums, mid))
+                return nums[mid];
+
+            if (mid % 2 == 0)
+            {
+                if (nums[mid] == nums[mid + 1])
+                    left  = mid + 1;
+                else
+                    right = mid - 1;
+            }
+            else
+            {
+                if (nums[mid] == nums[mid + 1])
+                    right = mid - 1;
+                else
+                    left  = mid + 1;
+            }
+        }
+
+        return -1;
+    }
+
+private:
+    bool is_non_duplicate(std::vector<int>& nums, int mid)
+    {
+        int n = nums.size();
+
+        bool left_not_same  = (mid == 0   || nums[mid-1] != nums[mid]);
+        bool right_not_same = (mid == n-1 || nums[mid+1] != nums[mid]);
+
+        return left_not_same && right_not_same;
+    }
+};
