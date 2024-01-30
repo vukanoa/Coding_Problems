@@ -50,119 +50,6 @@
     --- IDEA ---
     ------------
 
-    For some reason, this implementation has better Beating times than the 2nd
-    Solution down below(than the bottom one) even if this one has 3 additional
-    check-ups.
-
-    I've submitted both Solution more than 10 times, but for some reason this
-    one runs faster. I have no idea why.
-
-*/
-
-/* Time  Beats: 90.62% */
-/* Space Beats: 46.33% */
-
-/* Time  Complexity: O(logn) */
-/* Space Complexity: O(1) */
-class Solution {
-public:
-    int singleNonDuplicate(std::vector<int>& nums)
-    {
-        int n = nums.size();
-
-        int left  = 0;
-        int right = n - 1;
-
-        while (left < right)
-        {
-            int mid = left + (right - left) / 2;
-
-            if (
-                ((mid-1 ==-1) || (mid-1 >= 0 && nums[mid - 1] != nums[mid])) &&
-                ((mid+1 == n) || (mid+1 <  n && nums[mid + 1] != nums[mid]))
-               )
-                return nums[mid];
-
-            int left_one;
-            if (mid-1 >= 0 && nums[mid-1] == nums[mid])
-                left_one = mid-1;
-            else if (mid+1 < n && nums[mid] == nums[mid+1]) // Or just else
-                left_one = mid;
-
-            /*
-                Now if from the left one of two appearances, to the end of the
-                vector there are EVEN number of elements, we are certain that
-                the "single number" is in the left portion since we're told
-                that it's guaranteed that there is only one single element in
-                the entire array.
-            */
-            if ((n - left_one) % 2 == 0)
-                right = mid;
-            else
-                left = mid + 1;
-        }
-
-        return nums[left];
-    }
-};
-
-
-
-
-/* Time  Beats: 80.82% */
-/* Space Beats: 46.33% */
-
-/* Time  Complexity: O(logn) */
-/* Space Complexity: O(1) */
-class Solution_2 {
-public:
-    int singleNonDuplicate(std::vector<int>& nums)
-    {
-        int n = nums.size();
-
-        int left  = 0;
-        int right = n - 1;
-
-        while (left < right)
-        {
-            int mid = left + (right - left) / 2;
-
-            if (
-                ((mid-1 == -1) || (nums[mid - 1] != nums[mid])) &&
-                ((mid+1 ==  n) || (nums[mid + 1] != nums[mid]))
-               )
-                return nums[mid];
-
-            int left_one;
-            if (mid-1 >= 0 && nums[mid-1] == nums[mid])
-                left_one = mid-1;
-            else // if (mid+1 < n && nums[mid] == nums[mid+1])
-                left_one = mid;
-
-            /*
-                Now if from the left one of two appearances, to the end of the
-                vector there are EVEN number of elements, we are certain that
-                the "single number" is in the left portion since we're told
-                that it's guaranteed that there is only one single element in
-                the entire array.
-            */
-            if ((n - left_one) % 2 == 0)
-                right = mid;
-            else
-                left = mid + 1;
-        }
-
-        return nums[left];
-    }
-};
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
     ********************************
     *** Explanation for the Code ***
     ********************************
@@ -383,7 +270,7 @@ public:
 
 /* Time  Complexity: O(logn) */
 /* Space Complexity: O(1)    */
-class Solution_3 {
+class Solution {
 public:
     int singleNonDuplicate(std::vector<int>& nums)
     {
