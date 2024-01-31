@@ -69,44 +69,141 @@
     --- IDEA ---
     ------------
 
-    TODO
+    First thing to notice in this problem is that pairs[i] represents how many
+    potions combined with spells[i] are success.
+
+    They tell us that up-front, but it's important.
+    Why is it so important?
+
+    It's important because that implicitly means we are NOT allowed to reorder,
+    or sort, "spells".
+
+    However, when you understand what are they asking us to do you'll realize
+    they don't care in which order and which potions exactly are success with
+    certain spells, they ONLY care about HOW MUCH potions are success with
+    certain spells.
+
+    Therefore, we can conclude that the order of potions is NOT imporant, which
+    further means we are allowed to reorder/rearrange potions, i.e. we can
+    sort them if we think that is going to help us.
+
+    Let's see if that is going to be of any help to us.
+
+    Consider this example:
+
+        spells = [7,1,3], potions = [8,5,3,2,5], success = 20
+                  0 1 2
+
+        Output = [4,0,1]
+                  0 1 2
+
+    What would be the Brute force way to do this?
+    For every spell in "spells", iterate through all the "potions" and check if
+    the current spell multiplies by current potions is greater than or equal to
+    "success".
+
+    Iterating through all of the "spells" would take O(N), however iterating
+    through all the "potions" would take O(M), therefore total Time Complexity
+    would be:
+        O(N * M)
+
+    Since both N and M are within the same range:
+        1 <= n, m <= 10^5
+
+    We can consider this Time Complexity quadratic, which is inefficient.
+
+    So, is there anything we could do to reduce this Time Complexity?
+    Let's check if we can reduce O(N) part to O(logN) or even O(1).
+
+    We can quickly realize that we cannot since we must, at least once, check
+    the current spell. Also, to build our "pairs"(result) vector, it takes us
+    at least O(N), therefore reducing the O(N) part is out of the question.
+
+    Now let's see if we can reduce O(M) to O(logM) or even to O(1).
+    Let's consider the same example as above:
+
+        spells = [7,1,3], potions = [8,5,3,2,5], success = 20
+                  0 1 2
+
+        Output = [4,0,1]
+                  0 1 2
+
+    Is there a way to check how many potions multiplied by the current spell
+    would give us success without checking each and every potion?
+
+    What if we sort potions? (Remember that we can reorder of potions?)
+
+        spells = [7,1,3], potions = [2,3,5,5,8], success = 20
+                  0 1 2
+
+    Let's ask the same question - Can we check how many potions multiplied by
+    the current spell would give us success without checking each and every
+    potion?
+
+    Yes, we can.
+    How?
+
+    Let's say we pick a value in the middle(index 2, element 5 in this case).
+    Is 7 * 5 >= success(20)?
+
+    Yes!
+    Then that means that all the elements from the current one(Inclusive) until
+    the end of the array would give success as well.
+
+    We know that since we've sorted the elements and if:
+        current_element * current_potion
+
+    gives success, then it is guarantted that:
+        current_element * value_greater_than_current_potion
+
+    will also be >= success.
+
+
+    This screams "Binary Search".
+    From now on, it is a basic Binary Search that is implemented for "potions".
 
 */
 
-/* Time  Beats: 81.66% */
-/* Space Beats: 25.73% */
+/* Time  Beats: 86.64% */
+/* Space Beats: 17.37% */
 
 /* Time  Complexity: O(N * logM + M * logM) */
 /* Space Complexity: O(max(N, M)) */
-class Solution_1 {
+class Solution {
 public:
-    std::vector<int> successfulPairs(std::vector<int>& spells, std::vector<int>& potions, long long success)
+    std::vector<int> successfulPairs(std::vector<int>& spells,
+                                     std::vector<int>& potions,
+                                     long long success)
     {
-        const int N = spells.size();
-        const int M = potions.size();
-        std::vector<int> pairs;
+        int N = spells.size();
+        int M = potions.size();
+        std::vector<int> pairs(N);
 
+        // O(M * logM)
         std::sort(potions.begin(), potions.end());
 
+        // O(N * logM)
         for (int i = 0; i < N; i++)
         {
+            int max_potions = 0;
+
             int left  = 0;
             int right = M-1;
 
-            while (left < right)
+            while (left <= right)
             {
-                unsigned long long mid = left + (right - left) / 2;
+                int mid = left + (right - left) / 2;
 
-                if (static_cast<unsigned long long>(spells[i]) * static_cast<unsigned long long>(potions[mid]) >= success)
-                    right = mid  - 1;
+                if ((long long)spells[i] * (long long)potions[mid] >= success)
+                {
+                    max_potions = std::max(max_potions, M - mid);
+                    right = mid - 1;
+                }
                 else
                     left  = mid + 1;
             }
 
-            if (static_cast<unsigned long long>(spells[i]) * static_cast<unsigned long long>(potions[left]) >= success)
-                pairs.push_back(M - left);
-            else
-                pairs.push_back(M - (left + 1));
+            pairs[i] = max_potions;
         }
 
         return pairs;
@@ -125,21 +222,25 @@ public:
 
 */
 
-/* Time  Beats: 83.34% */
-/* Space Beats: 58.94% */
+/* Time  Beats: 94.59% */
+/* Space Beats: 12.42% */
 
 /* Time  Complexity: O(N * logM + M * logM) */
 /* Space Complexity: O(max(N, M)) */
 class Solution_2 {
 public:
-    std::vector<int> successfulPairs(std::vector<int>& spells, std::vector<int>& potions, long long success)
+    std::vector<int> successfulPairs(std::vector<int>& spells,
+                                     std::vector<int>& potions,
+                                     long long success)
     {
         const int N = spells.size();
         const int M = potions.size();
         std::vector<int> pairs;
 
+        // O(M * logM)
         std::sort(potions.begin(), potions.end());
 
+        // O(N * logM)
         for (int& spell : spells)
         {
             int left  = 0;
@@ -149,7 +250,7 @@ public:
             {
                 int mid = left + (right - left) / 2;
 
-                if (static_cast<unsigned long long>(spell) * static_cast<unsigned long long>(potions[mid]) >= success)
+                if ((long long)spell * (long long)potions[mid] >= success)
                     right = mid - 1;
                 else
                     left  = mid + 1;
