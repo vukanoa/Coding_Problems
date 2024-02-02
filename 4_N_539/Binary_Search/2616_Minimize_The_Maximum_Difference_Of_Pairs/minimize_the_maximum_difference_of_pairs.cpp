@@ -72,7 +72,10 @@
 /* Time  Beats: 5.36% */
 /* Space Beats: 79.96% */
 
-/* Time  Complexity: O(n * logn) */
+/*
+    Time  Complexity: O(N * logX)
+    Where X is the Constraint of nums[i], which is 10^9 in this case.
+*/
 /* Space Complexity: O(1)        */ // Depending on the sort
 class Solution {
 public:
@@ -124,6 +127,78 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, but different implementation. This one is easier to read and
+    a bit faster.
+
+*/
+
+/* Time  Beats: 87.06% */
+/* Space Beats: 14.77% */
+
+/*
+    Time  Complexity: O(N * logX)
+    Where X is the Constraint of nums[i], which is 10^9 in this case.
+*/
+/* Space Complexity: O(1)        */ // Depending on the sort
+class Solution {
+public:
+    int minimizeMax(std::vector<int>& nums, int p)
+    {
+        std::sort(nums.begin(), nums.end());
+
+        int left  = 0;
+        int right = std::pow(10, 9);
+
+        int result = 0;
+
+        while (left <= right)
+        {
+            int mid = left + (right - left) / 2;
+
+            if (able_to_make_p_pairs_with_difference(mid, nums, p))
+            {
+                result = mid;
+                right = mid - 1;
+            }
+            else
+                left  = mid + 1;
+        }
+
+        return result;
+    }
+
+private:
+    bool able_to_make_p_pairs_with_difference(int& mid, std::vector<int>&nums, int& p)
+    {
+        int count = 0;
+        int i = 0;
+
+        while (i+1 < nums.size())
+        {
+            if (std::abs(nums[i] - nums[i+1]) <= mid)
+            {
+                count++;
+                i += 2;
+            }
+            else
+                i++;
+
+            if (count == p)
+                return true;
+        }
+
+        return false;
     }
 };
 
