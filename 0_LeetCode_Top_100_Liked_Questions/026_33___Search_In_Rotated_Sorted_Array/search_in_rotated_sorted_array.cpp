@@ -63,82 +63,6 @@
 
 */
 
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    We have to use Binary Search, though there are a lot of cases we have to
-    cover. Fortunately there is a XOR operator so the code looks a lot neater.
-
-    Here is how the "if statement" inside the "while loop" would look like if
-    there was no XOR operator.
-
-    if ((nums[0] < target) && (nums[0] < nums[mid]) && (nums[mid] > target))
-        low = mid + 1;
-    else if (nums[0] < target) && (nums[0] > nums[mid]) && (nums[mid] > target)
-        low = mid + 1;
-    else if ((nums[0] < target) && (nums[0] < nums[mid]) && (nums[mid] < target))
-        low = mid + 1;
-    else
-        high = mid
-
-
-    Examples for every if above:
-    if ((nums[0] < target) && (nums[0] < nums[mid]) && (nums[mid] > target))
-        low = mid + 1;
-        //  l        m        r
-        // [4, 5, 6, 7, 0, 1, 2]
-                           ^
-                           |
-        //              target
-
-
-    else if (nums[0] < target) && (nums[0] > nums[mid]) && (nums[mid] > target)
-        // Contradiction
-
-
-    else if ((nums[0] < target) && (nums[0] < nums[mid]) && (nums[mid] < target))
-        low = mid + 1;
-        //  l        m        r
-        // [0, 1, 2, 4, 5, 6, 7]
-                           ^
-                           |
-        //               target
-
-
-*/
-
-
-/* Time  Beats: 80.49% */
-/* Space Beats: 82.44% */
-
-/* Time  Complexity: O(log n) */
-/* Space Complexity: O(1) */
-class Solution{
-public:
-    int search(std::vector<int>& nums, int target)
-    {
-        int low = 0;
-        int high = nums.size() - 1;
-
-        while (low < high)
-        {
-            int mid = (low + high) / 2;
-
-            if ((target < nums[0]) ^ (nums[mid] < nums[0]) ^ (nums[mid] < target))
-                low = mid + 1;
-            else
-                high = mid;
-        }
-
-        return low == high && nums[low] == target ? low : -1;
-    }
-};
-
-
-
 /*
     ------------
     --- IDEA ---
@@ -402,7 +326,7 @@ public:
             if (target == nums[mid])
                 return mid;
 
-            // Left sorted portion
+            // Left of "mid" is LOWER part of the rotation
             if (nums[left] <= nums[mid])
             {
                 if (target > nums[mid] || target < nums[left])
@@ -410,7 +334,7 @@ public:
                 else
                     right = mid - 1;
             }
-            // Right sorted portion
+            // Left of "mid" is UPPER part of the rotation (It's again "Left")
             else
             {
                 if (target < nums[mid] || target > nums[right])
@@ -434,7 +358,7 @@ public:
 
     This is much simpler.
 
-    First use Binary Search to find pivot.
+    First use Binary Search to find pivot(First element BEFORE the rotation)
     Then  use Binary Search to find target.
 
 */
@@ -574,7 +498,6 @@ private:
 int
 main()
 {
-    Solution                sol;
     Solution_Verbose        sol_ver;
     Solution_Trick          sol_trick;
     Solution_Same_Trick_2   sol_same_trick_2;
@@ -635,7 +558,6 @@ main()
 
 
     /* Solution */
-    // int index = sol.search(nums, target);
     // int index = sol_ver.search(nums, target);
     // int index = sol_trick.search(nums, target);
     int index = sol_same_trick_2.search(nums, target);
