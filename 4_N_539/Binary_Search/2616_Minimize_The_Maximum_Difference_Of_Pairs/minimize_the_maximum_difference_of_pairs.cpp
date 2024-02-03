@@ -63,83 +63,41 @@
     --- IDEA ---
     ------------
 
-    TODO
+    LOOK AT THE CONSTRAINTS!!!
 
-    Down there are two Solutions. The bottom one is a lot faster.
+    In this problem it would be very difficult to come up with a Binary Search
+    if you didn't read the "Constraints".
 
-*/
-
-/* Time  Beats: 5.36% */
-/* Space Beats: 79.96% */
-
-/*
-    Time  Complexity: O(N * logX)
-    Where X is the Constraint of nums[i], which is 10^9 in this case.
-*/
-/* Space Complexity: O(1)        */ // Depending on the sort
-class Solution {
-public:
-    int minimizeMax(std::vector<int>& nums, int p)
-    {
-        if (p == 0)
-            return 0;
-
-        std::function<bool(int)> valid = [&](int threshold) -> bool
-        {
-            int count = 0;
-
-            int i = 0;
-            while (i < nums.size()-1)
-            {
-                if (std::abs(nums[i] - nums[i+1]) <= threshold)
-                {
-                    count++;
-                    i += 2;
-                }
-                else
-                    i++;
-
-                if (count == p)
-                    return true;
-            }
-
-            return false;
-        };
-
-        std::sort(nums.begin(), nums.end());
-
-        unsigned long long  left  = 0;
-        unsigned long long  right = std::pow(10, 9);
-
-        unsigned long long  result = std::pow(10, 9);
-
-        while (left <= right)
-        {
-            unsigned long long mid = left + (right - left) / 2;
-
-            if (valid(mid))
-            {
-                result = mid;
-                right  = mid - 1;
-            }
-            else
-                left   = mid + 1;
-        }
-
-        return result;
-    }
-};
+        1 <= nums.length <= 105     // N
+        0 <= nums[i] <= 109         // M
+        0 <= p <= (nums.length)/2
 
 
+    Which means that O(N * logX) is much much better than O(N^2)
 
+    Since we want to find p pairs with a certain difference:
+        1. Sort the array
+        2. Take "mid" from range 1 - M
+        3. Try to find p pairs with that "mid" difference
 
-/*
-    ------------
-    --- IDEA ---
-    ------------
+            nums = [4, 5, 7, 9, 17]
 
-    Same as above, but different implementation. This one is easier to read and
-    a bit faster.
+        Always check the very next one to the one you're currently on
+        because if they are sorted it means that the next one will make the
+        LEAST absolute difference.
+
+        If you're on index 0(element 4), with which number will element 4
+        make the smallest ABSOLUTE difference out of the remaining ones?
+
+        Well, it's certainly not going to be the last element in this SORTED
+        array since that would MAXIMIZE the difference.
+
+        Similarly, to MINIMIZE we just want to take the very next element
+        and try to see if it makes a difference less than or equal to mid.
+
+        If we get to find 'p' of such pairs, then update "result" and
+        move "right" pointer to point to the left so that we can try some
+        other "difference" from range 1 - 10^9, using Binary Search of course.
 
 */
 
@@ -147,11 +105,33 @@ public:
 /* Space Beats: 14.77% */
 
 /*
-    Time  Complexity: O(N * logX)
-    Where X is the Constraint of nums[i], which is 10^9 in this case.
+    Time  Complexity: O(N * logM)
+
+    N is the length of "nums", whereas M is the upper bound of nums[i].
+
+    As stated in the constraints:
+        1 <= nums.length <= 10^5
+        0 <= nums[i] <= 10^9
+
+    One way to solve this problem is to do it in O(N^2) by doing nested loops.
+    However, which one is more efficient?
+
+        O(N^2) or (N * logM)?
+
+        N = 100000       // sqrt(N) = 316
+        M = 1000000000   // log(M)  = 9
+
+    In other words - "log" grows MUCH MUCH slower than "sqrt" function.
+    Therefore, in this problem(at least for these values), we can say with
+    confidence that O(N * logM) is faster than O(N^2)
+
 */
-/* Space Complexity: O(1)        */ // Depending on the sort
-class Solution {
+/*
+    Space Complexity: O(1)
+
+    Depending on the sort
+*/
+class Solution_Readable {
 public:
     int minimizeMax(std::vector<int>& nums, int p)
     {
@@ -220,8 +200,33 @@ private:
 /* Time  Beats: 87.78% */
 /* Space Beats: 31.40% */
 
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(1)        */ // Depending on the sort
+/*
+    Time  Complexity: O(N * logM)
+
+    N is the length of "nums", whereas M is the upper bound of nums[i].
+
+    As stated in the constraints:
+        1 <= nums.length <= 10^5
+        0 <= nums[i] <= 10^9
+
+    One way to solve this problem is to do it in O(N^2) by doing nested loops.
+    However, which one is more efficient?
+
+        O(N^2) or (N * logM)?
+
+        N = 100000       // sqrt(N) = 316
+        M = 1000000000   // log(M)  = 9
+
+    In other words - "log" grows MUCH MUCH slower than "sqrt" function.
+    Therefore, in this problem(at least for these values), we can say with
+    confidence that O(N * logM) is faster than O(N^2)
+
+*/
+/*
+    Space Complexity: O(1)
+
+    Depending on the sort
+*/
 class Solution_Efficient_Implementation {
 public:
     int minimizeMax(std::vector<int>& nums, int p)
