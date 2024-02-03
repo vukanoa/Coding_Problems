@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <iterator>
 
 /*
     ==============
@@ -248,11 +247,54 @@ public:
 };
 
 
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is the same as the one above (CPP_WAY), however this one better
+    illustrates how iterators work and what can:
+        1. "std::lower_bound", and
+        2. "std::upper_bound"
+
+    return.
+
+    Also it shows that you don't have to calculate the distance using STL
+    function std::distance.
+
+*/
+
+/* Time  Beats: 92.32% */
+/* Space Beats: 13.40% */
+
+/* Time  Complexity: O(log n) */
+/* Space Complexity: O(1) */
+class Solution_CPP_Way_2 {
+public:
+    std::vector<int> searchRange(std::vector<int>& nums, int target)
+    {
+        if (nums.size() == 0)
+            return {-1, -1};
+
+        auto start = std::lower_bound(nums.begin(), nums.end(), target);
+        auto end   = std::upper_bound(nums.begin(), nums.end(), target);
+
+        if (start == nums.end() || *start != target || *(end - 1) != target)
+            return {-1, -1};
+
+        return {(int)(start - nums.begin()), (int)(end-1 - nums.begin())};
+    }
+};
+
+
 int
 main()
 {
-    Solution         sol;
-    Solution_CPP_Way sol_cpp;
+    Solution           sol;
+    Solution_CPP_Way   sol_cpp;
+    Solution_CPP_Way_2 sol_cpp_2;
 
     /* Example 1 */
     std::vector<int> nums = {5, 7, 7, 8, 8, 10};
@@ -319,7 +361,8 @@ main()
 
     /* Solution */
     // std::vector<int> result = sol.searchRange(nums, target);
-    std::vector<int> result = sol_cpp.searchRange(nums, target);
+    //  std::vector<int> result = sol_cpp.searchRange(nums, target);
+    std::vector<int> result = sol_cpp_2.searchRange(nums, target);
 
 
     /* Write Output */
