@@ -341,3 +341,49 @@ public:
         return root;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is by far the most Elegant way of solving this problem. And it's as
+    efficient as any in this file. (Except for "true" O(1) where we don't even
+    use Recursion)
+
+*/
+
+/* Time  Beats: 84.75% */
+/* Space Beats: 65.05% */
+
+/* Time  Complexity: O(n) */
+/*
+    Space Complexity: O(1)
+    In description we're told that Recursion doesn't count as additional memory
+    in this problem.
+*/
+class Solution_Elegant {
+public:
+    Node* connect(Node* root)
+    {
+        dfs(root);
+
+        return root;
+    }
+
+private:
+    void dfs(Node* root)
+    {
+        if (!root || !root->left || !root->right) // If NULL Or Leaf - return
+            return;
+
+        root->left->next  = root->right;
+        root->right->next = root->next ? root->next->left : nullptr;
+
+        dfs(root->left);
+        dfs(root->right);
+    }
+};
