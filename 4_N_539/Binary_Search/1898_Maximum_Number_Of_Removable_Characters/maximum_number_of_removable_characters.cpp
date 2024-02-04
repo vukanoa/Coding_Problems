@@ -78,75 +78,129 @@
     --- IDEA ---
     ------------
 
-    There are two Implementations down below out of which the bottom one is a
-    lot faster since we do not use a Hash Set, but an additional string that
-    represents a modified stirng s.
+    There are three Implementations down below out of which
+    "Solution_Modified_String_S" is a lot faster since we do not use a Hash Set
+    as in the first two Solutions, but an additional string that represents a
+    modified stirng s.
 
 */
 
-/* Time  Beats: 12.70% */
-/* Space Beats: 16.19% */
+/*
+    ------------
+    --- IDEA ---
+    ------------
 
-/* Time  Complexity: O(n * logk) */
+    There are two Implementations down below out of which the bottom one is a
+    lot faster since we do not use a Hash Set as in the first two Solutions,
+    but an additional string that represents a modified stirng s.
+
+    Since we know that the desired 'k' is in the range: [0, removable.size()],
+    we can notice that we don't have to try every 'k' value and check if p is
+    still a subsequence of s and then take the biggest 'k' values where that is
+    true.
+
+    Since there is a range, we can simply use a Binary Search within that range
+    and check only those 'k' values.
+    If we find out that some 'k' value(which will be a 'mid' in Binary Search)
+    is indeed a subsequence, then we can move our "left" pointer to mid+1(i.e.
+    k + 1) and check the next range.
+
+    In O(log n) we'll have our result.
+    (Of course, in every iteration of our outer O(log n) loop, we'll have O(n)
+     nested loop that cheks if tmp_s(modified s) string is still a subsequence
+     of p, which, in total, makes this Solution a O(n * logn))
+
+*/
+
+/* Time  Beats: 19.33% */
+/* Space Beats: 11.97% */
+
+/* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(n) */
 class Solution_Hash_Set {
 public:
     int maximumRemovals(std::string s, std::string p, std::vector<int>& removable)
     {
+        if (s.length() < p.length())
+            return 0;
+
         int result = 0;
 
         int left  = 0;
         int right = removable.size() - 1;
 
+        // O(logn)
         while (left <= right)
         {
-            int mid = left + (right - left) / 2;
+            int mid_k = left + (right - left) / 2;
 
-            std::unordered_set<int> uset_removed;
-            for (int x = 0; x < mid+1; x++)
-                uset_removed.insert(removable[x]);
+            // O(n)
+            std::unordered_set<int> uset;
+            for (int i = 0; i <= mid_k; i++)
+                uset.insert(removable[i]);
 
-            if (is_subsequence(s, p, uset_removed))
+            // O(n)
+            std::string tmp_s;
+            for (int i = 0; i < s.length(); i++)
             {
-                result = std::max(result, mid+1);
-                left  = mid + 1;
+                if (uset.count(i))
+                    continue;
+
+                tmp_s += s[i];
+            }
+
+            // O(n)
+            if (is_subsequence(tmp_s, p))
+            {
+                left = mid_k + 1;
+                result = std::max(result, mid_k + 1);
             }
             else
-                right = mid - 1;
+                right = mid_k - 1;
         }
 
         return result;
     }
 
 private:
-    bool is_subsequence(std::string& s, std::string& p, std::unordered_set<int>& uset_removed)
+    bool is_subsequence(std::string& tmp_s, std::string& p)
     {
-        int i = 0;
-        int j = 0;
-
-        while (i < s.length() && j < p.length())
+        int j = -1;
+        for (int i = 0; i < p.length(); i++)
         {
-            if (uset_removed.count(i) || s[i] != p[j])
+            while (++j < tmp_s.length())
             {
-                i++;
-                continue;
+                if (tmp_s[j] == p[i])
+                    break;
             }
 
-            i++;
-            j++;
+            if (j == tmp_s.length())
+                return false;
         }
 
-        return j == p.length();
+        return true;
     }
 };
 
 
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is an optimzed version of the above Solution. The optimization comes
+    from the facts that we don't have to make a HashSet and then construct
+    the new string, we can just construct the modified_s by replacing '#' over
+    the characters which should be "removed" based by first 'k'(mid) values.
+
+*/
+
 /* Time  Beats: 87.30% */
 /* Space Beats: 71.75% */
 
-/* Time  Complexity: O(n * logk) */
+/* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(n) */
 class Solution_Modified_String_S {
 public:
