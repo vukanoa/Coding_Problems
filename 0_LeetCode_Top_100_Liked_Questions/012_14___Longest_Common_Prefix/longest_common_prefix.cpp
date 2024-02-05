@@ -99,10 +99,60 @@ public:
 };
 
 
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The big brained concept here seems to be this:
+
+    If the array is sorted alphabetically then you can assume that the first
+    element of the array and the last element of the array will have most
+    different prefixes of all comparisons that could be made between strings in
+    the array. If this is true, you only have to compare these two strings.
+
+*/
+
+/* Time  Beats:   100% */
+/* Space Beats: 61.24% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(1)        */ // Depends on the sort
+class Solution_2 {
+public:
+    std::string longestCommonPrefix(std::vector<std::string>& strs)
+    {
+        int n = strs.size();
+        string result = "";
+
+        // Sort lexicographically
+        std::sort(strs.begin(), strs.end());
+
+        std::string first = strs[0];
+        std::string last  = strs[n-1];
+
+        // What if ["flower", "hat", "something", "zebra"]
+        // What if ["flower", "flp", "flq", "flzzz"]
+        for(int i = 0; i < std::min(first.size(), last.size()); i++)
+        {
+            if(first[i] != last[i])
+                return result;
+
+            result += first[i];
+        }
+
+        return result;
+    }
+};
+
+
 int
 main()
 {
-    Solution sol;
+    Solution   sol;
+    Solution_2 sol_2;
 
     /* Example 1 */
     std::vector<std::string> strs = {"flower", "flow", "flight"};
@@ -137,7 +187,8 @@ main()
     std::cout << "]\n";
 
     /* Solution */
-    std::string prefix = sol.longestCommonPrefix(strs);
+    // std::string prefix = sol.longestCommonPrefix(strs);
+    std::string prefix = sol_2.longestCommonPrefix(strs);
 
     /* Write Output */
     std::cout << "\n\tLongest Common Prefix is: \"" << prefix << "\"\n\n";
