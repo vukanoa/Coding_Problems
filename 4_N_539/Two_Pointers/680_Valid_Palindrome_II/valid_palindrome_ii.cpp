@@ -49,16 +49,45 @@
     ------------
 
     Once left and right pointer point to different characters, check:
-        1. The remaining string without the char "left"  pointers points to
-        2. The remaining string without the char "right" pointers points to
+        1. Substring [left, right] without the char "left"  pointers points to.
+        2. Substring [left, right] without the char "right" pointers points to.
 
-    If either of them is a palindrome - return true.
+    Note that we are not checking the entire remaining of the string, only the
+    substring between "left" and "right" pointer, inclusive.
 
-    Otherwise, return false.
+    Example:
+        a b x d e d t b a
 
-    These two examples are important:
-        1. a b d f g g f d b c a
-        2. a b c f g g f c b c a
+    Since prefix "ab" and suffix "ba" are the same, we do NOT consider them.
+
+*******************************************************************************
+********************************** SIMULATION *********************************
+*******************************************************************************
+
+                                s = "a b x d e d t b a"
+
+-------------------------------------------------------------------------------
+
+    1) s = "a b x d e d t b a"  // S[L] == S[R] --> L++; R--;
+            L               R
+
+-------------------------------------------------------------------------------
+
+    2) s = "a b x d e d t b a"  // S[L] == S[R] --> L++; R--;
+              L           R
+
+-------------------------------------------------------------------------------
+
+    3) s = "a b x d e d t b a"  // S[L] != S[R] --> Check w/o s[L] and w/o s[R]
+                L       R
+
+            without_left  = "dedt" // s.substr(L+1, R - L);
+            without_right = "xded" // s.substr(L  , R - L);
+
+        If either of these two substrings IS INDEED a palindrome - return true.
+        Else, return false;
+
+-------------------------------------------------------------------------------
 
 */
 
@@ -67,9 +96,35 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Neat {
 public:
-    bool validPalindrome(string s)
+    bool validPalindrome(std::string s)
+    {
+        if (palindrome(s))
+            return true;
+
+        int left  = 0;
+        int right = s.length() - 1;
+
+        while(left < right)
+        {
+            if (s[left] != s[right])
+            {
+                std::string without_left  = s.substr(left+1, right - left);
+                std::string without_right = s.substr(left  , right - left);
+
+                return palindrome(without_left) || palindrome(without_right);
+            }
+
+            left++;
+            right--;
+        }
+
+        return false;
+    }
+
+private:
+    bool palindrome(std::string s)
     {
         int left  = 0;
         int right = s.length() - 1;
@@ -77,14 +132,7 @@ public:
         while (left < right)
         {
             if (s[left] != s[right])
-            {
-                // Skip left
-                if (is_palindrome(s, left+1, right))
-                    return true;
-
-                // Skip Right
-                return is_palindrome(s, left, right-1);
-            }
+                return false;
 
             left++;
             right--;
@@ -92,28 +140,7 @@ public:
 
         return true;
     }
-
-private:
-    bool is_palindrome(std::string& s, int left, int right)
-    {
-        bool palindrome = true;
-
-        while (left < right)
-        {
-            if (s[left] != s[right])
-            {
-                palindrome = false;
-                break;
-            }
-
-            left++;
-            right--;
-        }
-
-        return palindrome;
-    }
 };
-
 
 
 
