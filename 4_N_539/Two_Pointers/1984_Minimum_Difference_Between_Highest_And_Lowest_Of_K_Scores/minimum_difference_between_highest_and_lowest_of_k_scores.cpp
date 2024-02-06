@@ -58,6 +58,42 @@
 
 */
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Sorting will greatly simplify this problem.
+
+        nums = [9, 3, 5, 8, 4, 1, 7], k = 3
+                0  1  2  3  4  5  6
+
+    Becomes:
+        nums = [1, 3, 4, 5, 7, 8, 9], k = 3
+                0  1  2  3  4  5  6
+                      ^
+                      |
+                      |__
+                        |
+    We begin at index (k-2) because from that point onward we are able to
+    consider previous 'k' numbers because:
+
+        (current_index - k + 1) // +1 because indexing start at 0
+         ~~~~~~~~~~~~~~~~~~~~~
+                   |
+                   |
+                   v
+        ----------------------------------------------------------
+        |Gives us the leftmost element in current range of size k|
+        ----------------------------------------------------------
+
+    We know that won't be out of bounds once the i points to index k-1 or
+    greater.
+
+    That's why we, simply, begin at that index and we don't have to worry about
+    anything else.
+*/
+
 /* Time  Beats: 82.29% */
 /* Space Beats: 23.67% */
 
@@ -65,17 +101,16 @@
 /* Space Complexity: O(1)        */ // Depending on the Sort. Can be O(n)
 class Solution_1 {
 public:
-    int minimumDifference(vector<int>& nums, int k)
+    int minimumDifference(std::vector<int>& nums, int k)
     {
         if (k == 1)
             return 0;
 
         std::sort(nums.begin(), nums.end());
-
-        int n = nums.size();
         int min_diff = INT_MAX;
-        for (int i = 0; i < n-k+1; i++)
-            min_diff = std::min(min_diff, nums[i+k-1] - nums[i]);
+
+        for (int i = k-1; i < nums.size(); i++)
+            min_diff = std::min(min_diff, nums[i] - nums[i+1 - k]);
 
         return min_diff;
     }
@@ -83,6 +118,19 @@ public:
 
 
 
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same idea, implemented using while loop where "Two Pointers" technique is
+    a bit more explicit.
+
+    Usually "Two Pointers" technique is written using "left" and "right"
+    pointer, therefore I wanted to have this Implementation as well.
+
+*/
 
 /* Time  Beats: 82.29% */
 /* Space Beats: 42.82% */
@@ -97,8 +145,8 @@ public:
             return 0;
 
         std::sort(nums.begin(), nums.end());
-
         int min_diff = INT_MAX;
+
         int left  = 0;
         int right = k-1;
 
