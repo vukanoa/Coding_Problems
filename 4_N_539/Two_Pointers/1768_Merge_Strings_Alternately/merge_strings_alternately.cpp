@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 
 /*
     ============
@@ -59,12 +60,67 @@
 
 */
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This first comes to mind when implementing this Solution, however there is
+    a more elegant way using std::ostringstream.
+
+    Anyway, wanted to have both ways here.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  27.28% */
+
+/* Time  Complexity: O(word1.length() + word2.length()) */
+/* Space Complexity: O(word1.length() + word2.length()) */
+class Solution_Standard_Way {
+public:
+    string mergeAlternately(std::string word1, std::string word2)
+    {
+        std::string result_str;
+
+        int i = 0;
+        int j = 0;
+
+        while (i < word1.length() && j < word2.length())
+        {
+            result_str += word1[i++];
+            result_str += word2[j++];
+        }
+
+        result_str += word1.substr(i, word1.length() - i); // It can be ""
+        result_str += word2.substr(j, word2.length() - j); // It can be ""
+
+        return result_str;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same Idea, however this one is more elegant because it uses:
+
+        std::ostringstream.
+
+    See for yourself.
+
+*/
+
 /* Time  Beats:  100% */
 /* Space Beats: 17.43% */
 
 /* Time  Complexity: O(word1.length() + word2.length()) */
 /* Space Complexity: O(word1.length() + word2.length()) */
-class Solution {
+class Solution_String_Stream_1 {
 public:
     string mergeAlternately(string word1, string word2)
     {
@@ -91,12 +147,21 @@ public:
 
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of implementing using std::ostringstream.
+
+*/
+
 /* Time  Beats:   100% */
 /* Space Beats: 19.16% */
 
 /* Time  Complexity: O(word1.length() + word2.length()) */
 /* Space Complexity: O(word1.length() + word2.length()) */
-class Solution {
+class Solution_String_Stream_2 {
 public:
     std::string mergeAlternately(std::string word1, std::string word2)
     {
