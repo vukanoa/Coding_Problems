@@ -169,8 +169,6 @@ public:
 
 
 
-
-
 /*
     ------------
     --- IDEA ---
@@ -384,11 +382,11 @@ class Solution_Efficient_2{
 public:
     void moveZeroes(std::vector<int>& nums)
     {
-        int lastNonZeroFoundAt = 0;
+        int left_zero = 0;
         for (int i = 0; i < nums.size(); i++)
         {
             if (nums[i] != 0)
-                std::swap(nums[lastNonZeroFoundAt++], nums[i]);
+                std::swap(nums[left_zero++], nums[i]);
         }
     }
 };
@@ -401,184 +399,29 @@ public:
     --- IDEA ---
     ------------
 
-    It's the same IDEA as the one above, just written on another occasion so I
-    wanted to have both here. It is a LOT less elegant, but wanted to save it
-    so that I can show how many edge cases you have to cover if you don't see
-    that index of zero can, at worst, be at the same index as a non_zero
-    element, but usually it's to the right.
-
-    That's why, the above solution can do swaps if nums[curr] != 0.
-    We're guaranteed that:
-        "lastNonZeroFoundAt" is equal to "curr" at worst, thus the swap just
-        won't do anything.
-
-    However this Solution is as Efficient as the above one, so I wanted to list
-    it here.
-
-    In my own words:
-    Start both "non_zero_index" and "zero_index" from index 0.
-
-    The idea is to find the first non_zero and first zero and then swap them.
-    However, swap only if non_zero_index is greater than zero, otherwise we
-    don't have to swap since that would mean we are bringing zero element to
-    the beginning of the array and we, obviously, don't want that.
-
-    So if non_zero_index is at index that is less than first zero, then find
-    next non_zero element and check if index of that element is less than the
-    leftmost zero in the array.
-    Repeat the process until the condition is fulfilled.
-
-    Once it is fulfilled, swap non_zero element with a zero element, that will
-    keep the relative order and bring the non_zero element to the front while
-    simultaneously bringing zeroes to the back.
-
-    ==================
-    === Simulation === (N = non_zero, Z = zero)
-    ==================
-
-     Z
-     N
-    [13, 0, 0, 5, 1, 0, 3, 12, 0, 7, 0]
-     0   1  2  3  4  5  6  7   8  9  10
-
-
-    Z = Find index of leftmost zero
-    N = Find index of leftmost non_zero
-
-     N   Z
-    [13, 0, 0, 5, 1, 0, 3, 12, 0, 7, 0]
-     0   1  2  3  4  5  6  7   8  9  10
-
-     Since N < Z, find closest new non_zero element such that its index < Z
-
-
-         Z     N
-    [13, 0, 0, 5, 1, 0, 3, 12, 0, 7, 0]
-     0   1  2  3  4  5  6  7   8  9  10
-
-     ~~~ Swap ~~~
-
-         Z     N
-    [13, 5, 0, 0, 1, 0, 3, 12, 0, 7, 0]
-     0   1  2  3  4  5  6  7   8  9  10
-
-    Z = Find index of leftmost zero
-    N = Find index of leftmost non_zero
-
-            Z     N
-    [13, 5, 0, 0, 1, 0, 3, 12, 0, 7, 0]
-     0   1  2  3  4  5  6  7   8  9  10
-
-     ~~~ Swap ~~~
-
-            Z     N
-    [13, 5, 1, 0, 0, 0, 3, 12, 0, 7, 0]
-     0   1  2  3  4  5  6  7   8  9  10
-
-    Z = Find index of leftmost zero
-    N = Find index of leftmost non_zero
-
-               Z        N
-    [13, 5, 1, 0, 0, 0, 3, 12, 0, 7, 0]
-     0   1  2  3  4  5  6  7   8  9  10
-
-     ~~~ Swap ~~~
-
-               Z        N
-    [13, 5, 1, 3, 0, 0, 0, 12, 0, 7, 0]
-     0   1  2  3  4  5  6  7   8  9  10
-
-    Z = Find index of leftmost zero
-    N = Find index of leftmost non_zero
-
-                  Z        N
-    [13, 5, 1, 3, 0, 0, 0, 12, 0, 7, 0]
-     0   1  2  3  4  5  6  7   8  9  10
-
-     ~~~ Swap ~~~
-
-                   Z        N
-    [13, 5, 1, 3, 12, 0, 0, 0, 0, 7, 0]
-     0   1  2  3  4   5  6  7  8  9  10
-
-    Z = Find index of leftmost zero
-    N = Find index of leftmost non_zero
-
-                      Z           N
-    [13, 5, 1, 3, 12, 0, 0, 0, 0, 7, 0]
-     0   1  2  3  4   5  6  7  8  9  10
-
-     ~~~ Swap ~~~
-
-                      Z           N
-    [13, 5, 1, 3, 12, 7, 0, 0, 0, 0, 0]
-     0   1  2  3  4   5  6  7  8  9  10
-
-    Z = Find index of leftmost zero
-    N = Find index of leftmost non_zero
-
-    N becomes -1 since it cannot find a non_zero elements within the array nums
-    Thus, this is the end.
+    Same as above.
+    Implementation is more in the spirit of Two Pointers technique.
 
 */
 
-/* Time  Beats: 93.25% */
-/* Space Beats: 81.93% */
+/* Time  Beats: 89.22% */
+/* Space Beats: 30.33% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_Efficient_3 {
+class Solution_Efficient_In_Spirit_Of_Two_Pointers {
 public:
     void moveZeroes(std::vector<int>& nums)
     {
-        /* Lambda */
-        auto index_of_first_zero = [&](int zero){
-            int i = zero;
-            while (nums[i] != 0 && i < nums.size() - 1)
-                i++;
+        int left  = 0; // zero
+        int right = 0; // non-zero
 
-            return nums[i] == 0 ? i : -1;
-        };
-
-        /* Lambda */
-        auto index_of_first_non_zero = [&](int non_zero){
-            int i = non_zero;
-            while (nums[i] == 0 && i < nums.size() - 1)
-                i++;
-
-            return nums[i] != 0 ? i : -1;
-        };
-
-        int zero     = 0; // Index
-        int non_zero = 0; // Index
-
-        for(;;)
+        while (right < nums.size())
         {
-            zero     = index_of_first_zero(zero);
-            non_zero = index_of_first_non_zero(non_zero);
-
-            if (zero == -1 || non_zero == -1)
-                return;
-
-            /*
-               We can put this "while" and next "if" above "for" because this
-               is only relevant until we find first non_zero_index > zero_index
-
-               But for some reason it's a bit more readable to me in this way.
-            */
-            while (
-                   non_zero != -1 &&
-                   non_zero < zero &&
-                   non_zero + 1 < nums.size() - 1
-                  )
-            {
-                non_zero = index_of_first_non_zero(non_zero + 1);
-            }
-
-            if (non_zero == -1 || non_zero < zero)
-                return;
-
-            std::swap(nums[zero], nums[non_zero]);
+            if (nums[right]) // If nums[right] is indeed a non-zero
+                std::swap(nums[left++], nums[right]);
+            
+            right++; // Increment everytime, even if we didn't swap anything
         }
     }
 };
@@ -672,82 +515,15 @@ public:
 };
 
 
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Find first zero, if there are no zeroes - return.
-
-    Iterate through "nums", once you are on a non-zero check if that index
-    is greater than the index of the leftmost zero position, if it is then
-    swap them and find next leftmost zero. If there are no more remaining
-    zeroes - return.
-
-*/
-
-/* Time  Beats: 95.21% */
-/* Space Beats: 45.28% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution_My_Efficient {
-public:
-    void moveZeroes(std::vector<int>& nums)
-    {
-        if (nums.size() == 1 || (nums.size() == 2 && nums[1] == 0))
-            return;
-
-        int n = nums.size();
-
-        int zero = -1;
-        for (int i = 0; i < n; i++)
-        {
-            if (nums[i] == 0)
-            {
-                zero = i;
-                break;
-            }
-        }
-
-        if (zero == -1)
-            return;
-
-        for (int i = 0; i < n; i++)
-        {
-            if (nums[i] != 0 && zero < i)
-            {
-                std::swap(nums[zero], nums[i]);
-
-                for(int z = zero+1; z < n; z++)
-                {
-                    if (nums[z] == 0)
-                    {
-                        zero = z;
-                        break;
-                    }
-                }
-
-                if (nums[zero] != 0) // It's the just swapped one
-                    return; // There are no more zeroes left
-            }
-        }
-    }
-};
-
-
 int
 main()
 {
-    Solution_inefficient       sol_ineff;
-    Solution_Space_Inefficient sol_space;
-    Solution_Efficient_1       sol_eff_1;
-    Solution_Efficient_2       sol_eff_2;
-    Solution_Efficient_3       sol_eff_3;
-    Solution_Snowball          sol_snowball;
-    Solution_My_Efficient      sol_my_eff;
+    Solution_inefficient                          sol_ineff;
+    Solution_Space_Inefficient                    sol_space;
+    Solution_Efficient_1                          sol_eff_1;
+    Solution_Efficient_2                          sol_eff_2;
+    Solution_Efficient_In_Spirit_Of_Two_Pointers  sol_two_p;
+    Solution_Snowball                             sol_snowball;
 
 
     /* Example 1 */
@@ -787,9 +563,8 @@ main()
     // sol_space.moveZeroes(nums);
     // sol_eff_1.moveZeroes(nums);
     // sol_eff_2.moveZeroes(nums);
-    // sol_eff_3.moveZeroes(nums);
-    // sol_snowball.moveZeroes(nums);
-    sol_my_eff.moveZeroes(nums);
+    // sol_two_p.moveZeroes(nums);
+    sol_snowball.moveZeroes(nums);
 
     std::cout << "\t\t*** MOVE ZEROES ***\n";
 
