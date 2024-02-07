@@ -127,6 +127,9 @@ public:
     --- IDEA ---
     ------------
 
+    "last_unfilled" is going to be reffered, down there, simply as "x".
+
+
     What is, instead of starting from the beginning, we started from the back?
 
     Luckily, we've been told that nums1 has m+n elements, where last n are 0's.
@@ -178,23 +181,23 @@ class Solution_Efficient {
 public:
     void merge(std::vector<int>& nums1, int m, std::vector<int>& nums2, int n)
     {
-        int x = m + n - 1;
+        int last_unfilled = m + n - 1;
 
         int one = m - 1;
         int two = n - 1;
 
-        while (x >= 0)
+        while (last_unfilled >= 0)
         {
             if (one < 0)
-                nums1[x] = nums2[two--];
+                nums1[last_unfilled] = nums2[two--];
             else if (two < 0)
-                nums1[x] = nums1[one--];
+                nums1[last_unfilled] = nums1[one--];
             else if (nums1[one] > nums2[two])
-                nums1[x] = nums1[one--];
+                nums1[last_unfilled] = nums1[one--];
             else
-                nums1[x] = nums2[two--];
+                nums1[last_unfilled] = nums2[two--];
 
-            x--;
+            last_unfilled--;
         }
     }
 };
@@ -211,13 +214,13 @@ public:
     'i' is the pointer of nums1.
     'j' is the pointer of nums2.
 
-    'x' is the pointer at which we want to store the greater element, since we
-    are "merging them" from the back.
+    "last_unfilled" is the pointer at which we want to store the greater
+    element, since we are "merging them" from the back.
 
 */
 
-/* Time  Beats: 100% */
-/* Space Beats: 25.30% */
+/* Time  Beats:   100% */
+/* Space Beats: 22.41% */
 
 /* Time  Complexity: O(m + n) */
 /* Space Complexity: O(1) */
@@ -228,25 +231,25 @@ public:
         if (n == 0)
             return;
 
-        int x = m + n - 1;
+        int one = m-1;
+        int two = n-1;
 
-        int i = m-1;
-        int j = n-1;
-        while (x >= 0)
+        int last_unfilled = m + n - 1;
+
+        while (last_unfilled >= 0)
         {
-            if (i < 0)
-                break;
-            else if (j < 0)
-                return;
-
-            if (nums1[i] <= nums2[j])
-                nums1[x--] = nums2[j--];
+            if (one >= 0 && two >= 0)
+            {
+                if (nums1[one] <= nums2[two])
+                    nums1[last_unfilled--] = nums2[two--];
+                else
+                    nums1[last_unfilled--] = nums1[one--];
+            }
+            else if (two >= 0)
+                nums1[last_unfilled--] = nums2[two--];
             else
-                nums1[x--] = nums1[i--];
+                break; // If only one >= 0 then everything is already okay
         }
-
-        while (x >= 0)
-            nums1[x--] = nums2[j--];
     }
 };
 
@@ -322,8 +325,8 @@ main()
 
 
     /* Solution */
-    // sol_eff.merge(nums1, m, nums2, n);
-    sol_3.merge(nums1, m, nums2, n);
+    sol_eff.merge(nums1, m, nums2, n);
+    // sol_3.merge(nums1, m, nums2, n);
 
 
 
