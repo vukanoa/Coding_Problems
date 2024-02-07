@@ -82,36 +82,191 @@
 
 */
 
-
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Self_Explanatory
+    If you go through the code and through one example, it will be
+    self-explanatory.
+
+    This is the fundamental problem for Two Pointers technique, so make sure
+    you understand it properly.
+
+    Anyway, here is the Simulation.
+
+*******************************************************************************
+********************************** SIMULATION *********************************
+*******************************************************************************
+
+                    nums = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4]
+                            0  1  2  3  4  5  6  7  8  9
+
+-------------------------------------------------------------------------------
+    1.
+        nums = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4]       (nums[L] == nums[R])
+                0  1  2  3  4  5  6  7  8  9
+                L
+                R
+
+-------------------------------------------------------------------------------
+    2.
+        nums = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4]       (nums[L] == nums[R])
+                0  1  2  3  4  5  6  7  8  9                 |
+                L  R                                         |
+                                                             |
+                                                             |
+                ----------------------------------------------
+                |
+                v
+            1. R++;
+
+-------------------------------------------------------------------------------
+    3.
+        nums = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4]       (nums[L] != nums[R])
+                0  1  2  3  4  5  6  7  8  9                 |
+                L     R                                      |
+                                                             |
+                                                             |
+                ----------------------------------------------
+                |
+                v
+            1. L++; // Note that this is BEFORE(!) we assign nums[R] to nums[L]
+            2. nums[L] = nums[R];
+            3. R++;
+
+-------------------------------------------------------------------------------
+    3.
+        nums = [0, 1, 1, 1, 1, 2, 2, 3, 3, 4]       (nums[L] == nums[R])
+                0  1  2  3  4  5  6  7  8  9                 |
+                   L     R                                   |
+                                                             |
+                                                             |
+                ----------------------------------------------
+                |
+                v
+            1. R++;
+
+-------------------------------------------------------------------------------
+    4.
+        nums = [0, 1, 1, 1, 1, 2, 2, 3, 3, 4]       (nums[L] == nums[R])
+                0  1  2  3  4  5  6  7  8  9                 |
+                   L        R                                |
+                                                             |
+                                                             |
+                ----------------------------------------------
+                |
+                v
+            1. R++;
+
+-------------------------------------------------------------------------------
+    5.
+        nums = [0, 1, 1, 1, 1, 2, 2, 3, 3, 4]       (nums[L] != nums[R])
+                0  1  2  3  4  5  6  7  8  9                 |
+                   L           R                             |
+                                                             |
+                                                             |
+                ----------------------------------------------
+                |
+                v
+            1. L++; // Note that this is BEFORE(!) we assign nums[R] to nums[L]
+            2. nums[L] = nums[R];
+            3. R++;
+
+-------------------------------------------------------------------------------
+    6.
+        nums = [0, 1, 2, 1, 1, 2, 2, 3, 3, 4]       (nums[L] == nums[R])
+                0  1  2  3  4  5  6  7  8  9                 |
+                      L           R                          |
+                                                             |
+                                                             |
+                ----------------------------------------------
+                |
+                v
+            1. R++;
+
+-------------------------------------------------------------------------------
+    7.
+        nums = [0, 1, 2, 1, 1, 2, 2, 3, 3, 4]       (nums[L] != nums[R])
+                0  1  2  3  4  5  6  7  8  9                 |
+                      L              R                       |
+                                                             |
+                                                             |
+                ----------------------------------------------
+                |
+                v
+            1. L++; // Note that this is BEFORE(!) we assign nums[R] to nums[L]
+            2. nums[L] = nums[R];
+            3. R++;
+
+-------------------------------------------------------------------------------
+    8.
+        nums = [0, 1, 2, 3, 1, 2, 2, 3, 3, 4]       (nums[L] == nums[R])
+                0  1  2  3  4  5  6  7  8  9                 |
+                         L              R                    |
+                                                             |
+                                                             |
+                ----------------------------------------------
+                |
+                v
+            1. R++;
+
+-------------------------------------------------------------------------------
+    9.
+        nums = [0, 1, 2, 3, 1, 2, 2, 3, 3, 4]       (nums[L] != nums[R])
+                0  1  2  3  4  5  6  7  8  9                 |
+                         L                 R                 |
+                                                             |
+                                                             |
+                ----------------------------------------------
+                |
+                v
+            1. L++; // Note that this is BEFORE(!) we assign nums[R] to nums[L]
+            2. nums[L] = nums[R];
+            3. R++;
+
+-------------------------------------------------------------------------------
+    9.
+        nums = [0, 1, 2, 3, 4, 2, 2, 3, 3, 4]            Out of Bounds
+                0  1  2  3  4  5  6  7  8  9              (index 10)
+                            L                 R                |
+                                              ^                |
+                                              |________________|
+
+-------------------------------------------------------------------------------
+
+    Since we have to return first 'k' unique and since our 'L' pointers points
+    to index 4, we need to return (L + 1), because index starts from 0.
+
+    Anyway, you can always look at the array anotice that there are 5 unique
+    elements and then ask yourself what is the most efficient way to obtain
+    that value. In this case it's just to add 1 to 'L'.
+
+-------------------------------------------------------------------------------
 
 */
 
-/* Time  Beats: 97.65% */
-/* Space Beats: 34.27% */
+/* Time  Beats: 100.00% */
+/* Space Beats: 20.31% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_1 {
+class Solution_Two_Pointers {
 public:
     int removeDuplicates(std::vector<int>& nums)
     {
-        int i = 0;
-        for (int j = 1; j < nums.size(); j++)
+        int left  = 0;
+        int right = 0;
+
+        while (right < nums.size())
         {
-            if (nums[i] != nums[j])
-            {
-                i++;
-                nums[i] = nums[j];
-            }
+            if (nums[left] != nums[right])
+                nums[++left] = nums[right];
+
+            right++;
         }
 
-        return i + 1;
+        return left + 1;
     }
 };
 
@@ -124,6 +279,7 @@ public:
     ------------
 
     Another way of implementing it.
+    It's easier to grasp for some people.
 
 */
 
@@ -132,7 +288,7 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_2 {
+class Solution_Other {
 public:
     int removeDuplicates(std::vector<int>& nums)
     {
@@ -155,9 +311,8 @@ public:
 int
 main()
 {
-    Solution_1 sol_1;
-    Solution_2 sol_2;
-
+    Solution_Two_Pointers sol_two_p;
+    Solution_Other        sol_other;
 
 
     /* Example 1 */
@@ -189,8 +344,8 @@ main()
 
 
     /* Solution */
-    // int result = sol_1.removeDuplicates(nums);
-    int result = sol_2.removeDuplicates(nums);
+    int result = sol_two_p.removeDuplicates(nums);
+    // int result = sol_other.removeDuplicates(nums);
 
 
     /* Write Output */
@@ -205,7 +360,7 @@ main()
 
         if (x < result)
             std::cout << nums[x];
-        else 
+        else
             std::cout << "_";
 
         first = false;
