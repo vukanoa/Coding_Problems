@@ -80,7 +80,59 @@
     --- IDEA ---
     ------------
 
-    Self-Explanatory.
+    I wanted to check if a Solution that uses HashMap will even work. It turns
+    out that it does.
+
+    So here is it.
+
+*/
+
+/* Time  Beats: 78.52% */
+/* Space Beats: 13.73% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_HashMap {
+public:
+    int removeDuplicates(vector<int>& nums)
+    {
+        int left  = 0;
+        int right = 0;
+
+        std::unordered_map<int, int> umap;
+
+        while (right < nums.size())
+        {
+            if (umap[nums[right]] < 2)
+            {
+                nums[left++] = nums[right];
+                umap[nums[right]]++;
+            }
+
+            right++;
+        }
+
+        return left;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is what they actually want. It's O(1) Space Complexity.
+
+    We are starting at index 2 and everytime we only check if element at
+    curr_index is different than element at curr_index - 2.
+
+    If it is, then we can place nums[right](i.e. curren element) at nums[left]
+    and increment the left.
+
+    Being different or not, we always increment "right" pointer.
 
 */
 
@@ -89,7 +141,7 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Space_O1 {
 public:
     int removeDuplicates(vector<int>& nums)
     {
