@@ -76,25 +76,25 @@
 /* Space Complexity: O(n) */
 class Solution {
 public:
-    std::string frequencySort(string s)
+    std::string frequencySort(std::string s)
     {
         auto cmp = [](const pair<char, int>& a, const pair<char, int>& b)
         {
             return a.second < b.second;
         };
-        
+
         std::priority_queue<std::pair<char, int>,
                             std::vector<std::pair<char, int>>,
                             decltype(cmp)> heap(cmp);
-        
+
         std::unordered_map<char, int> umap;
-        
+
         for (char& chr : s)
             umap[chr]++;
-        
+
         for (const auto& entry : umap)
             heap.push(std::make_pair(entry.first, entry.second));
-        
+
         std::string result = "";
         while (!heap.empty())
         {
@@ -103,7 +103,55 @@ public:
 
             result.append(pair.second, pair.first);
         }
-        
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 89.80% */
+/* Space Beats: 42.80% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    std::string frequencySort(std::string s)
+    {
+        std::vector<std::pair<int, char>> bucket;
+        std::unordered_map<char, int> umap;
+
+        std::string result = "";
+
+        // Count character frequency
+        for(auto ch: s)
+            umap[ch]++;
+
+        // Push from umap to bucket
+        for(auto i: umap)
+            bucket.push_back({i.second, i.first});
+
+        // Sort "bucket" in decreasing order
+        sort(bucket.begin(), bucket.end(), std::greater<std::pair<int, char>>());
+
+        // Add to final result string
+        for(auto& i : bucket)
+        {
+            while(i.first--)
+                result += i.second;
+        }
+
         return result;
     }
 };
