@@ -61,8 +61,84 @@
     --- IDEA ---
     ------------
 
-    Sort "nums", put smallest n/2 elements at even positions.
-    Put remaining elements on the odd positions.
+    The first thing that comes to mind is the naive approach which is: Find one
+    permutation that fulfills all the conditions.
+
+    However, that would take us O(n!) time, which is way too inefficient.
+
+    Since we're realizing that the Brute Force is not something close to (n^2),
+    but O(n!), that suggests that if we sort, nothing will happen. Meaning the
+    Time Complexity wouldn't get worse.
+
+    Is that going to help us?
+
+    Well, we don't know, however it's certainly an option.
+    Next question we can pose to ourselves is: How can we be sure that the
+    average sum of "left" and "right" is not equal to the current element?
+
+    Let's look at the basic example:
+
+        nums = [1, 2, 3, 4, 5]
+
+        _ 2 _ _ _
+          ^
+          |
+          |
+    If we put 2 here, how can we make sure that 2 isn't the average sum of
+    elements left and right to it?
+
+    One way that certain works is to make both left and right elements GREATER
+    than 2. For example:
+
+        4 2 5 _ _
+
+    This way we are 100% certain that 2 cannot be the average sum of its left
+    and right element.
+
+    However, if we take the greatest element in our array "nums", element 5,
+    how can we put its left and right elements to be greater than the 5 if
+        1) All elements are distinct
+        2) 5 is the greatest element in our array
+    ?
+
+    Well, the answer is we can't. However, making both left and right elements
+    to be greater is not the only way to ensure that the current elements is
+    NOT the average sum of its left and right element.
+
+    Another way to ensure that would be to make both left and right elements
+    SMALLER than the current element.
+
+    For example:
+
+        _ _ 2 5 3
+
+
+    Okay, now we know 2 things:
+        1) We are allowed to sort
+        2) In order to ensure that the element is at the right spot we either
+           have to make its left and right neighbor:
+             a) Greater than him
+             b) Lower   than him
+
+
+    Therefore, we'll construct a new array of n empty slots and we'll put first
+    n/2 elements and even positions.
+    Then, we'll put the remaining elements at the odd positions.
+
+    So, an example like:
+        nums = [4, 2, 1, 5, 3]
+
+
+    Is solved like this:
+        1) Sort it
+            nums = [1, 2, 3, 4, 5]
+
+        2) Construct new array "results" with n empty slots
+            std::vector<int> results(n);
+
+        3) Put first n/2 elements from "nums" at even positions in "results"
+
+        4) Put the remaining elements from "nums" at odd positions in "results"
 
 */
 
@@ -102,12 +178,136 @@ public:
 
 
 
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, implemented differently.
+
+*/
+
+/* Time  Beats: 69.89% */
+/* Space Beats: 35.05% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(1)        */ // Depending on the sort
+class Solution_2 {
+public:
+    std::vector<int> rearrangeArray(vector<int>& nums)
+    {
+        int n = nums.size();
+
+        std::sort(nums.begin(), nums.end());
+        std::vector<int> result(n);
+
+        int left = 0;
+
+        for (int i = 0; i < n; i+=2)
+            result[i] = nums[left++];
+
+        for (int i = 1; i < n; i+=2)
+            result[i] = nums[left++];
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Read the "IDEA" of the first Solution in this file.
+
+    Up to here:
+
+    Okay, now we know 2 things:
+        1) We are allowed to sort
+        2) In order to ensure that the element is at the right spot we either
+           have to make its left and right neighbor:
+             a) Greater than him
+             b) Lower   than him
+
+
+    is the same.
+
+
+    However, now, instead of putting first half of elements at even positions,
+    we'll construct the "results" array by alternating smallest and largest
+    elements and put them consecutively.
+
+    Therefore:
+        1) Sort it
+            nums = [1, 2, 3, 4, 5]
+
+        2) Construct new array "results" with n empty slots
+            std::vector<int> results(n);
+
+        3) Push the element at the "left" pointer to "results" and increment
+           the "left" pointer.
+
+        4) If (left <= right) Push the element at the "right" pointer to
+           "results" and decrement the "right" pointer.
+
+               The purpose of this conditional push of the "right" pointers is
+               this:
+
+                   nums    = [1, 2, 3, 4, 5, 6]
+                                    L  R
+
+                   results = [1, 6, 2, 5, 0, 0]
+
+
+               We now push 'L' and the INCREMENT the 'L'.
+
+                   nums    = [1, 2, 3, 4, 5, 6]
+                                       L
+                                       R
+
+                   results = [1, 6, 2, 5, 3, 0]
+
+                And now we want to push the element at 'R' as well. Therefore
+                if (L <= R)
+                    results.push_back(nums[R--]);
+
+                We MUST put '<=' and not '<' because after we put 'L' we indeed
+                INCREMENT. Therefore, before putting 'R', our 'L' is already
+                INCREMENTED.
+
+
+                Also, another reason we do it like this is if we have an odd
+                number of elements in "nums":
+
+                   nums    = [1, 2, 3, 4, 5]
+                                    L
+                                    R
+
+                   results = [1, 5, 2, 4, 0]
+
+                Now if we put element at 'L' and INCREMENT it, we'll be at this
+                position:
+
+                   nums    = [1, 2, 3, 4, 5]
+                                    R  L
+
+                   results = [1, 5, 2, 4, 3]
+
+                Meaning, we DO NOT have any more elements to process, therefore
+                just stop. Putting a 'R' element would be a mistake.
+
+*/
+
 /* Time  Beats: 27.45% */
 /* Space Beats: 10.49% */
 
 /* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(1)        */ // Depending on the sort
-class Solution {
+class Solution_3 {
 public:
     std::vector<int> rearrangeArray(vector<int>& nums)
     {
@@ -126,36 +326,5 @@ public:
         }
 
         return results;
-    }
-};
-
-
-
-
-
-/* Time  Beats: 79.37% */
-/* Space Beats: 77.10% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1)        */ // Depending on the sort
-class Solution {
-public:
-    std::vector<int> rearrangeArray(vector<int>& nums)
-    {
-        int x = 0;
-        int y = 1;
-
-        for(int i = 2; i < nums.size(); i++)
-        {
-            if((nums[i]<nums[y] && nums[y]<nums[x]) ||
-               (nums[i]>nums[y] && nums[y]>nums[x]))
-            {
-                std::swap(nums[i], nums[y]);
-            }
-
-            y++;
-            x++;
-        }
-        return nums;
     }
 };
