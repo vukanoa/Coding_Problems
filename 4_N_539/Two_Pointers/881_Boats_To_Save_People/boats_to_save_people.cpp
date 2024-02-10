@@ -59,7 +59,34 @@
     --- IDEA ---
     ------------
 
-    This implementation is easier to read, however it uses the same code twice.
+    This implementation is easier to read, however it uses the same code as
+    in the other solution, Solution_2.
+
+    Since we are told that:
+        1 <= people[i] <= limit <= 3 * 10^4
+
+    We know that at worst we needs people.size() boats. Therefore, a Binary
+    Search comes to mind immediately, but upon further thinking it's easy to
+    realize that it is unnecessary.
+
+    If we sort the Input array:
+
+        nums = [3, 3, 1, 2, 2], limit = 3 // Original
+
+        nums = [1, 2, 2, 3, 3], limit = 3 // Sorted
+
+    We'll realize that, since we have another limitation other than the "limit"
+    size, which is that at most there can be 2 people in any boat, if we want
+    to smuggle another human alongside the one with the greatest weight, the
+    best chance of not exceeding the limit is to take the lightest person with
+    him.
+
+    Therefore, each time check if the heaviest person and the lightest person
+    can be shipped together. If they can, cool, increment "left" and decrement
+    "right" and ship them in one boat.
+
+    Otheriwse, ship the heaviest and decrement only "right" pointer, while the
+    "left" pointer remains untouched.
 
 */
 
@@ -70,7 +97,7 @@
 /* Space Complexity: O(1)        */ // Depending on the sort
 class Solution_1 {
 public:
-    int numRescueBoats(vector<int>& people, int limit)
+    int numRescueBoats(std::vector<int>& people, int limit)
     {
         std::sort(people.begin(), people.end());
 
@@ -78,22 +105,18 @@ public:
         int right = people.size() - 1;
 
         int boats = 0;
-        while (left < right)
+        while (left <= right)
         {
             if (people[left] + people[right] > limit)
-            {
-                boats++;
                 right--;
-            }
             else
             {
-                boats++;
                 left++;
                 right--;
             }
-        }
 
-        boats += left == right ? 1 : 0;
+            boats++;
+        }
 
         return boats;
     }
@@ -112,14 +135,14 @@ public:
 
 */
 
-/* Time  Beats: 91.78% */
-/* Space Beats: 64.35% */
+/* Time  Beats: 95.17% */
+/* Space Beats: 15.56% */
 
 /* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(1)        */ // Depending on the sort
 class Solution_2 {
 public:
-    int numRescueBoats(vector<int>& people, int limit)
+    int numRescueBoats(std::vector<int>& people, int limit)
     {
         std::sort(people.begin(), people.end());
 
@@ -127,16 +150,15 @@ public:
         int right = people.size() - 1;
 
         int boats = 0;
-        while (left < right)
+
+        while (left <= right)
         {
             if (people[left] + people[right] <= limit)
                 left++;
 
-            boats++;
             right--;
+            boats++;
         }
-
-        boats += left == right ? 1 : 0;
 
         return boats;
     }
