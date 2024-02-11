@@ -2,6 +2,7 @@
 #include <vector>
 #include <queue>
 #include <unordered_map>
+#include <map>
 
 /*
     ==============
@@ -153,5 +154,43 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO (Uses Multimap)
+
+*/
+
+/* Time  Beats: 64.16% */
+/* Space Beats: 11.08% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n) */
+class Solution_Multimap {
+public:
+    std::string frequencySort(std::string s)
+    {
+        std::unordered_map<char, int> ascii;
+        for (char& chr : s)
+            ascii[chr]++;
+
+        std::multimap<int, char, std::greater<int>> map;
+
+        for (const auto& entry : ascii)
+            map.insert({entry.second, entry.first});
+
+        std::ostringstream out;
+        for (const auto& entry : map)
+            out << std::string(entry.first, entry.second);
+
+        return out.str();
     }
 };
