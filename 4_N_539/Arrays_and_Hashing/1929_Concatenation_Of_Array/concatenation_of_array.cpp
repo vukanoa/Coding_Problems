@@ -68,7 +68,7 @@
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    vector<int> getConcatenation(vector<int>& nums)
+    vector<int> getConcatenation(std::vector<int>& nums)
     {
         int n = nums.size();
 
@@ -102,13 +102,41 @@ public:
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    vector<int> getConcatenation(vector<int>& nums)
+    vector<int> getConcatenation(std::vector<int>& nums)
     {
         int n = nums.size();
 
         std::vector<int> ans(2 * n);
         for (int i = 0; i < n; i++)
             ans[i] = ans[i+n] = nums[i];
+
+        return ans;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one uses a "concatenation" feature of vectors.
+
+*/
+
+/* Time  Beats: 93.66% */
+/* Space Beats: 24.92% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Using_Vectors {
+public:
+    std::vector<int> getConcatenation(std::vector<int>& nums)
+    {
+        std::vector<int> ans = nums;
+        ans.insert(ans.end(), nums.begin(), nums.end());
 
         return ans;
     }
