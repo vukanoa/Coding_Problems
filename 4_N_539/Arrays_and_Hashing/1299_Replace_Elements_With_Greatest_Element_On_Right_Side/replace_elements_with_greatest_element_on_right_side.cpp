@@ -53,6 +53,22 @@
 
 */
 
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    One of the most basic uses of Dynamic Programming. Instead of calculating
+    the max element to the right of every position "manually" and "repeatedly"
+    we memorize the result of the previous(right one) and use that to determine
+    the new maximum.
+
+    That way we do it in O(n) instead of O(n^2).
+
+*/
+
 /* Time  Beats: 92.45% */
 /* Space Beats: 55.42% */
 
@@ -60,7 +76,7 @@
 /* Space Complexity: O(n) */
 class Solution {
 public:
-    vector<int> replaceElements(vector<int>& arr)
+    std::vector<int> replaceElements(std::vector<int>& arr)
     {
         int n = arr.size();
         std::vector<int> dp(n, -1);
@@ -75,25 +91,75 @@ public:
 
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Idea equivalent as above, however we can notice that we don't need to use
+    a whole vector "dp" because at each index 'i' we are iterating, we only use
+    the dp[i+1], therefore, we don't need to keep an entire vector, but a
+    single variable. We'll call it dp_next;
+
+*/
+
 /* Time  Beats: 92.45% */
 /* Space Beats: 48.18% */ // Somehow I cannot get better numbers than above
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Space_Efficient {
 public:
-    vector<int> replaceElements(vector<int>& arr)
+    std::vector<int> replaceElements(std::vector<int>& arr)
     {
         int n = arr.size();
-        int next = arr[n-1];
+        int dp_next = arr[n-1];
 
         for (int i = n-2; i >= 0; i--)
         {
             int tmp = arr[i];
-            arr[i] = std::max(arr[i+1], next);
-            next = tmp;
+            arr[i]  = std::max(arr[i+1], dp_next);
+
+            dp_next = tmp;
         }
         arr[n-1] = -1;
+
+        return arr;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Someone might find this one easier to read than the first Space_Efficient
+    Solution.
+
+*/
+
+/* Time  Beats: 95.24% */
+/* Space Beats: 45.66% */ // Somehow I cannot get better numbers than above
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Space_Efficient_2 {
+public:
+    std::vector<int> replaceElements(std::vector<int>& arr)
+    {
+        int n = arr.size();
+        int right_max = -1;
+
+        for (int i = n-1; i >= 0; i--)
+        {
+            int new_max = std::max(arr[i], right_max);
+
+            arr[i] = right_max;
+            right_max = new_max;
+        }
 
         return arr;
     }
