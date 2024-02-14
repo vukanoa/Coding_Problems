@@ -14,8 +14,6 @@
     Description:
     ============
 
-    Companies
-
     Given an integer array nums and an integer val, remove all occurrences of
     val in nums in-place. The order of the elements may be changed. Then return
     the number of elements in nums which are not equal to val.
@@ -23,34 +21,11 @@
     Consider the number of elements in nums which are not equal to val be k, to
     get accepted, you need to do the following things:
 
-    Change the array nums such that the first k elements of nums contain
-    the elements which are not equal to val. The remaining elements of nums
-    are not important as well as the size of nums.
+        Change the array nums such that the first k elements of nums contain
+        the elements which are not equal to val. The remaining elements of nums
+        are not important as well as the size of nums.
 
-    Return k.
-
-
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Custom Judge:
-
-    The judge will test your solution with the following code:
-
-    int[] nums = [...]; // Input array
-    int val = ...; // Value to remove
-    int[] expectedNums = [...]; // The expected answer with correct length.
-                                // It is sorted with no values equaling val.
-
-    int k = removeElement(nums, val); // Calls your implementation
-
-    assert k == expectedNums.length;
-    sort(nums, 0, k); // Sort the first k elements of nums
-    for (int i = 0; i < actualLength; i++) {
-        assert nums[i] == expectedNums[i];
-    }
-
-    If all assertions pass, then your solution will be accepted.
-
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        Return k.
 
     ========================================================
     FUNCTION: int removeElement(vector<int>& nums, int val);
@@ -78,14 +53,14 @@
 
 
     *** Constraints ***
-    0 <= nums.length <= 100
+    0 <= nums.length() <= 100
     0 <= nums[i] <= 50
     0 <= val <= 100
 
 */
 
 /* Time  Beats:   100% */
-/* Space Beats: 37.63% */
+/* Space Beats: 87.49% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -104,3 +79,47 @@ public:
         return left;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This seems it's going to be slower than the above Solution because it has
+    a while loop within the for loop, however, it's still going to be O(1 * n).
+
+    A single pass. The difference lays in the fact there are two pointers
+    iterating instead of only one.
+
+*/
+
+/* Time  Beats:   100% */
+/* Space Beats: 33.42% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Messy {
+public:
+    int removeElement(vector<int>& nums, int val)
+    {
+        if (nums.size() == 0)
+            return 0;
+
+        int last = nums.size() - 1;
+
+        for (int i = 0; i < nums.size(); i++)
+        {
+            while (i < last && nums[i] == val)
+                std::swap(nums[i], nums[last--]);
+
+            if (i == last)
+                break;
+        }
+
+        return nums[last] == val ? last : last+1;
+    }
+};
+
