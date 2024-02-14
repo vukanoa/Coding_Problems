@@ -67,7 +67,7 @@
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    int lengthOfLastWord(string s)
+    int lengthOfLastWord(std::string s)
     {
         int i = s.length() - 1;
 
@@ -79,5 +79,40 @@ public:
             length++;
 
         return length;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of thinking about it. This one makes more sense to me.
+
+*/
+
+/* Time  Beats:   100% */
+/* Space Beats: 24.26% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    int lengthOfLastWord(std::string s)
+    {
+        int i = s.length() - 1;
+
+        while (i >= 0 && s[i] == ' ')
+            i--;
+        int last_chr_idx = i;
+
+        while (i >=0 && s[i] != ' ')
+            i--;
+        int one_before_first_chr_idx = i;
+
+        return last_chr_idx - one_before_first_chr_idx;
     }
 };
