@@ -116,3 +116,45 @@ public:
         return last_chr_idx - one_before_first_chr_idx;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Third way of solving this problem. This one is reminiscent of the first
+    Solution, however it's implemented all in one for loop. Some people find
+    this Solution easier to read.
+
+    I prefer the first one over this one.
+
+*/
+
+/* Time  Beats:   100% */
+/* Space Beats: 24.26% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_3 {
+public:
+    int lengthOfLastWord(std::string s)
+    {
+        int last_word_length = 0;
+
+        for (int i = s.length() - 1; i >= 0; i--)
+        {
+            if (s[i] == ' ')
+            {
+                if (last_word_length >= 1)
+                    return last_word_length;
+            }
+            else
+                last_word_length++;
+        }
+
+        return last_word_length;
+    }
+};
