@@ -91,7 +91,7 @@
 /* Space Beats: 10.65% */
 
 /* Time  Complexity: O(n * max_len(emails)) */
-/* Space Complexity: O(n) */
+/* Space Complexity: O(unique_emails) */
 class Solution {
 public:
     int numUniqueEmails(vector<string>& emails)
@@ -116,6 +116,58 @@ public:
             }
 
             out << emails[i].substr(j, emails[i].length() - j + 1);
+
+            uset.insert(out.str());
+        }
+
+        return uset.size();
+    }
+};
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This Solution is much more in spirit of C++. It uses various C++ features
+    such as:
+        1. std::string's find(),
+        2. std::string's constructor,
+        3. std::ostringstream
+
+*/
+
+/* Time  Beats: 63.22% */
+/* Space Beats:  7.80% */
+
+/* Time  Complexity: O(n * max_len(emails)) */
+/* Space Complexity: O(unique_emails) */
+class Solution_CPP_Way {
+public:
+    int numUniqueEmails(vector<string>& emails)
+    {
+        std::unordered_set<std::string> uset;
+
+        for (int i = 0; i < emails.size(); i++)
+        {
+            std::string remaining(emails[i].begin() + emails[i].find('@') + 1, emails[i].end());
+
+            std::ostringstream out;
+
+            for (int j = 0; emails[i][j] != '@'; j++)
+            {
+                if (emails[i][j] == '.')
+                    continue;
+                else if (emails[i][j] == '+')
+                    break;
+                else
+                    out << emails[i][j];
+            }
+
+            out << '@';
+            out << remaining;
 
             uset.insert(out.str());
         }
