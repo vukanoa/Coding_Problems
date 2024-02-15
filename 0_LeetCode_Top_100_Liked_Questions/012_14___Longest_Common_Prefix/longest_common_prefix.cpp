@@ -125,7 +125,7 @@ public:
     std::string longestCommonPrefix(std::vector<std::string>& strs)
     {
         int n = strs.size();
-        string result = "";
+        std::string result = "";
 
         // Sort lexicographically
         std::sort(strs.begin(), strs.end());
@@ -133,8 +133,10 @@ public:
         std::string first = strs[0];
         std::string last  = strs[n-1];
 
-        // What if ["flower", "hat", "something", "zebra"]
-        // What if ["flower", "flp", "flq", "flzzz"]
+        // Try these, it'll give you a better understanding of why this works
+        // ["flower", "hat", "something", "zebra"] // Sorted
+        // ["flower", "flp", "flq", "flzzz"]       // Sorted
+        // ["fl", "flower", "flp", "flq", "flzzz"] // Sorted
         for(int i = 0; i < std::min(first.size(), last.size()); i++)
         {
             if(first[i] != last[i])
@@ -148,11 +150,87 @@ public:
 };
 
 
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We're going to have "chr_idx" variable which denotes number of characters
+    that are the same among all strings in vectors of strings "strs".
+
+    At the beginning it's 0 because we assume non of them are the same.
+
+    At the beginning of the "while" loop we are checking:
+        if (chr_idx == strs[0].size())
+
+    and if it is true, then we return first chr_idx characters of strs[0]:
+        return strs[0].substr(0, chr_idx);
+
+    If that's not the case, then we need to check every two adjacent strings in
+    vector of strings "strs".
+
+    Since we've already checked if (chr_idx == strs[0].size()), we don't have
+    to do it again, however, we must start out 'i' pointer from 0.
+
+    However, now we have to keep checking, while iterating in "for" loop:
+        if (chr_idx == strs[i+1].size())
+
+    If at any point that condition is fulfilled, it's over, we must return the
+    substring of any of the strings of size "chr_idx" starting from index 0.
+
+    Or if (strs[i][chr_idx] != strs[i+1][chr_idx]) then we do the same since
+    that means some two characters among the strings in vector of strings
+    "strs" are NOT the same. In that case, we, also, return the substring of
+    any of the stirngs of size "chr_idx" starting from index 0.
+
+    However, if we check every two adjacent strings and no two string's chr_idx
+    character differ, then we can increment "chr_idx" by one, denoting that we
+    have one more common consecutive character among all of the strings.
+
+    Note that we must return the substring at some point of our iteration in
+    the "while" loop. We will never return an empty string outside the "while"
+    loop. That's just so the compiler doesn't give us an error and/or warning.
+
+*/
+
+/* Time  Beats: 73.11% */
+/* Space Beats: 35.95% */
+
+/* Time  Complexity: O( min_len_str(strs) * n ) */
+/* Space Complexity: O(1) */
+class Solution_3 {
+public:
+    std::string longestCommonPrefix(std::vector<std::string>& strs)
+    {
+        int chr_idx = 0;
+
+        while (1)
+        {
+            if (chr_idx == strs[0].size())
+                return strs[0].substr(0, chr_idx);
+
+            for (int i = 0; i < strs.size() - 1; i++)
+            {
+                if (chr_idx == strs[i+1].size() || strs[i][chr_idx] != strs[i+1][chr_idx])
+                    return strs[0].substr(0, chr_idx);
+            }
+
+            chr_idx++;
+        }
+
+        return "";
+    }
+};
+
+
 int
 main()
 {
     Solution   sol;
     Solution_2 sol_2;
+    Solution_3 sol_3;
 
     /* Example 1 */
     std::vector<std::string> strs = {"flower", "flow", "flight"};
@@ -189,6 +267,7 @@ main()
     /* Solution */
     // std::string prefix = sol.longestCommonPrefix(strs);
     std::string prefix = sol_2.longestCommonPrefix(strs);
+    // std::string prefix = sol_3.longestCommonPrefix(strs);
 
     /* Write Output */
     std::cout << "\n\tLongest Common Prefix is: \"" << prefix << "\"\n\n";
