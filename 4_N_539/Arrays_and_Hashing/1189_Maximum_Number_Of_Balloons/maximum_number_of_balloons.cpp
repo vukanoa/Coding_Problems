@@ -64,7 +64,6 @@ public:
             return 0;
 
         std::vector<int> balloon(26, INT_MAX);
-
         std::vector<int> letters(26, 0);
 
         // O(n)
@@ -78,5 +77,52 @@ public:
         balloon['n' - 'a'] = letters['n' - 'a'];
 
         return *std::min_element(balloon.begin(), balloon.end());
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Edge cases are taken care of properly even without explicitly covering
+    them.
+
+*/
+
+/* Time  Beats: 72.19% */
+/* Space Beats: 48.64% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    int maxNumberOfBalloons(std::string text)
+    {
+        std::vector<int> balloon(26, 0);
+        balloon['b' - 'a'] = 1;
+        balloon['a' - 'a'] = 1;
+        balloon['l' - 'a'] = 2;
+        balloon['o' - 'a'] = 2;
+        balloon['n' - 'a'] = 1;
+
+        std::vector<int> letters(26, 0);
+        for (char& chr : text)
+            letters[chr - 'a']++;
+
+        letters['b' - 'a'] /= balloon['b' - 'a'];
+        letters['a' - 'a'] /= balloon['a' - 'a'];
+        letters['l' - 'a'] /= balloon['l' - 'a'];
+        letters['o' - 'a'] /= balloon['o' - 'a'];
+        letters['n' - 'a'] /= balloon['n' - 'a'];
+
+        int result = std::min({letters['b' - 'a'], letters['a' - 'a'],
+                               letters['l' - 'a'], letters['o' - 'a'],
+                               letters['n' - 'a']});
+
+        return result;
     }
 };
