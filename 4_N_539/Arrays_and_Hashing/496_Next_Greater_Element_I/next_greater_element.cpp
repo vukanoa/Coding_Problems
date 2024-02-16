@@ -82,61 +82,63 @@
 
 */
 
-/* Time  Beats: 90.46% */
-/* Space Beats:  9.37% */
+/* Time  Beats: 89.77% */
+/* Space Beats:  7.60% */
 
 /* Time  Complexity: O(M + N) */
 /* Space Complexity: O(N) */
-class Solution_Verbose {
+class Solution_1 {
 public:
     std::vector<int> nextGreaterElement(std::vector<int>& nums1, std::vector<int>& nums2)
     {
-        const int M = nums1.size();
-        const int N = nums2.size();
+        int m = nums1.size();
+        int n = nums2.size();
 
-        std::stack<int> monotonic_stack;
-        monotonic_stack.push(nums2[N-1]);
+        std::stack<int> stack; // Monotonicly Decreasing Stack
 
-        std::vector<int> dp(N, -1);
-        for (int i = N-2; i >= 0; i--)
+        std::unordered_map<int, int> umap; // Element from nums2 to its index
+        std::vector<int> next_greater(n, -1);
+
+        for (int j = n-1; j >=0; j--)
         {
-            while (!monotonic_stack.empty())
-            {
-                if (monotonic_stack.top() < nums2[i])
-                    monotonic_stack.pop();
-                else
-                    break;
-            }
+            umap.insert({nums2[j], j}); // Every element is distinct
 
-            if (monotonic_stack.empty())
-                dp[i] = -1;
-            else
-                dp[i] = monotonic_stack.top();
+            while (!stack.empty() && nums2[j] > stack.top())
+                stack.pop();
 
-            monotonic_stack.push(nums2[i]);
+            if (!stack.empty())
+                next_greater[j] = stack.top();
+
+            stack.push(nums2[j]);
         }
 
-        std::unordered_map<int, int> umap;
-        for (int i = 0; i < N; i++)
-            umap.insert( {nums2[i], i} );
+        std::vector<int> result(m, -1);
 
-        std::vector<int> results;
-        for (int& num : nums1)
-            results.push_back(dp[umap[num]]);
+        for (int i = 0; i < m; i++)
+            result[i] = next_greater[umap[nums1[i]]];
 
-        return results;
+        return result;
     }
 };
 
 
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, written in a bit different way.
+
+*/
+
 /* Time  Beats:   100% */
 /* Space Beats: 58.84% */
 
 /* Time  Complexity: O(M + N) */
 /* Space Complexity: O(N) */
-class Solution_Elegant {
+class Solution_2 {
 public:
     std::vector<int> nextGreaterElement(std::vector<int>& nums1, std::vector<int>& nums2)
     {
@@ -148,6 +150,7 @@ public:
 
         std::vector<int> monotonic_stack;
         std::unordered_map<int, int> umap;
+
         for (int i = N - 1; i >= 0; i--)
         {
             while (!monotonic_stack.empty() && monotonic_stack.back() < nums2[i])
