@@ -27,13 +27,13 @@
         nums[left] + nums[left + 1] + ... + nums[right]).
 
     ===============================
-    FUNCTION: 
+    FUNCTION:
     class NumArray {
     public:
         NumArray(vector<int>& nums)
         {
         }
-        
+
         int sumRange(int left, int right)
         {
         }
@@ -55,7 +55,7 @@
     NumArray numArray = new NumArray([-2, 0, 3, -5, 2, -1]);
     numArray.sumRange(0, 2); // return (-2) + 0 + 3 = 1
     numArray.sumRange(2, 5); // return 3 + (-5) + 2 + (-1) = -1
-    numArray.sumRange(0, 5); // return (-2) + 0 + 3 + (-5) + 2 + (-1) = -3 
+    numArray.sumRange(0, 5); // return (-2) + 0 + 3 + (-5) + 2 + (-1) = -3
 
 
     *** Constraints ***
@@ -71,7 +71,14 @@
     --- IDEA ---
     ------------
 
-    TODO
+    This is a standard "trick" of how to, efficiently, calculate sum of some
+    contiguous range in vector "nums".
+
+    If we already have a prefix_sum vector, then we can retrieve the result in
+    O(1).
+
+    It's very handy if we are asked to do multiple different ranges on the same
+    vector.
 
 */
 
@@ -83,20 +90,60 @@
 class NumArray {
 public:
     NumArray(vector<int>& nums)
-        : vec(nums)
+        : helper(nums), prefix(nums.size(), 0)
     {
-        prefix = std::vector<int>(nums.size(), 0);
-
         for (int i = 1; i < nums.size(); i++)
             prefix[i] = prefix[i-1] + nums[i-1];
     }
-    
+
     int sumRange(int left, int right)
     {
-        return prefix[right] - prefix[left] + vec[right];
+        return prefix[right] - prefix[left] + helper[right];
     }
 
 private:
-    std::vector<int> vec;
+    std::vector<int> helper;
+    std::vector<int> prefix;
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of implementing "sumRange" function. This is more intuitive to
+    me.
+
+    This one doesn't use any additonal "helper" vector. This one is elegant.
+
+*/
+
+/* Time  Beats: 84.11% */
+/* Space Beats: 22.29% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class NumArray {
+public:
+    NumArray(vector<int>& nums)
+        :prefix(nums.size(), 0)
+    {
+        prefix[0] = nums[0];
+        for (int i = 1; i < nums.size(); i++)
+            prefix[i] = prefix[i-1] + nums[i];
+    }
+
+    int sumRange(int left, int right)
+    {
+        if (left == 0)
+            return prefix[right];
+
+        return prefix[right] - prefix[left - 1];
+    }
+
+private:
     std::vector<int> prefix;
 };
