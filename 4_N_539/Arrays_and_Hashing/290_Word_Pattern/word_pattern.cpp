@@ -167,3 +167,62 @@ public:
         return true;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of obtaining a vector of words from a string with single-space
+    separated words.
+
+*/
+
+/* Time  Beats: 40.73% */
+/* Space Beats: 19.10% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_3 {
+public:
+    bool wordPattern(string pattern, string s)
+    {
+        std::vector<std::string> words;
+        std::stringstream ss(s); // Not istringstream, but stringstream (w/o i)
+
+        /* Tokenize words separated by a single space character */
+        std::string word;
+        while (std::getline(ss, word, ' '))
+            words.push_back(word);
+
+
+        /* If they are not of the same length it is certainly not a bijection */
+        if (pattern.length() != words.size())
+            return false; // Braks surjection
+
+        std::unordered_map<char, std::string> umap;
+        std::unordered_set<std::string> uset;
+
+        for (int i = 0; i < pattern.length(); i++)
+        {
+            if (umap.find(pattern[i]) != umap.end())
+            {
+                if (umap[pattern[i]] != words[i])
+                    return false;
+            }
+            else
+            {
+                if (uset.count(words[i]))
+                    return false;
+
+                umap.insert({pattern[i], words[i]});
+                uset.insert(words[i]);
+            }
+        }
+
+        return true;
+    }
+};
