@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <unordered_set>
 
 /*
     ============
@@ -59,35 +61,37 @@
 
 */
 
-/* Time  Beats: 94.82% */
-/* Space Beats: 60.48% */
+/* Time  Beats: 97.31% */
+/* Space Beats: 33.77% */
 
 /* Time  Complexity: O(m + n) */
 /* Space Complexity: O(m + n) */
 class Solution {
 public:
-    std::vector<std::vector<int>> findDifference(std::vector<int>& nums1, std::vector<int>& nums2)
+    std::vector<std::vector<int>>
+    findDifference(std::vector<int>& nums1, std::vector<int>& nums2)
     {
-        std::unordered_set<int> uset1;
-        std::unordered_set<int> uset2;
+        std::vector<std::vector<int>> answer(2, std::vector<int>());
 
-        for (int& num1 : nums1)
-            uset1.insert(num1);
+        std::unordered_set<int> uset_1;
+        std::unordered_set<int> uset_2;
 
-        for (int& num2: nums2)
-            uset2.insert(num2);
+        for (const int& num : nums1)
+            uset_1.insert(num);
 
-        std::vector<std::vector<int>> answer(2);
-        for (auto& num1 : uset1)
+        for (const int& num : nums2)
+            uset_2.insert(num);
+
+        for (const int& num : uset_1)
         {
-            if (uset2.count(num1) == 0) // Doesn't exist in Set_2
-                answer[0].push_back(num1);
+            if (!uset_2.count(num))
+                answer[0].push_back(num);
         }
 
-        for (auto& num2 : uset2)
+        for (const int& num : uset_2)
         {
-            if (uset1.count(num2) == 0)
-                answer[1].push_back(num2);
+            if (!uset_1.count(num))
+                answer[1].push_back(num);
         }
 
         return answer;
