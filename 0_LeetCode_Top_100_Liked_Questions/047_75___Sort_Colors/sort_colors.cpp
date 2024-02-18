@@ -164,6 +164,101 @@
     swap value of 2 with the most right value of 1(color white) and decrement
     the position of "one" to point at the current right most value of 1.
 
+*******************************************************************************
+********************************** SIMULATION *********************************
+*******************************************************************************
+
+
+    [2, 0, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 0]
+     i                                      j
+
+
+    [0, 0, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 2]
+     i                                   j
+
+
+    [0, 0, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 2]
+     i                                   j
+
+
+    [0, 0, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 2]
+        i                                j
+
+
+    [0, 0, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 2]
+           i                             j
+
+
+    [0, 0, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 2]
+           i                             j
+
+
+    [0, 0, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 2]
+           i                          j
+
+
+    [0, 0, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 2] one = 11 // Denoted as O
+           i                          j
+                                      O
+
+    [0, 0, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 2]
+           i                       j  O
+
+
+    [0, 0, 1, 2, 0, 2, 2, 1, 0, 2, 1, 1, 2, 2]
+           i                    j     O
+
+
+    [0, 0, 2, 2, 0, 2, 2, 1, 0, 1, 1, 1, 2, 2]
+           i                 j        O
+
+
+    [0, 0, 1, 2, 0, 2, 2, 1, 0, 1, 1, 2, 2, 2]
+           i                 j     O
+
+
+    [0, 0, 0, 2, 0, 2, 2, 1, 1, 1, 1, 2, 2, 2]
+           i              j        O
+
+
+    [0, 0, 0, 2, 0, 2, 2, 1, 1, 1, 1, 2, 2, 2]
+              i           j        O
+
+
+    [0, 0, 0, 1, 0, 2, 2, 1, 1, 1, 2, 2, 2, 2]
+              i           j     O
+
+
+    [0, 0, 0, 1, 0, 2, 2, 1, 1, 1, 2, 2, 2, 2]
+              i        j        O
+
+
+    [0, 0, 0, 2, 0, 2, 1, 1, 1, 1, 2, 2, 2, 2]
+              i     j           O
+
+
+    [0, 0, 0, 1, 0, 2, 1, 1, 1, 2, 2, 2, 2, 2]
+              i     j        O
+
+
+    [0, 0, 0, 2, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2]
+              i  j           O
+
+
+    [0, 0, 0, 1, 0, 1, 1, 1, 2, 2, 2, 2, 2, 2]
+              i  j        O
+
+
+    [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2]
+              i           O
+              j
+
+
+    [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2]
+              j  i        O
+
+-------------------------------------------------------------------------------
+
 */
 
 /* Time  Beats: 100% */
@@ -171,7 +266,7 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution{
+class Solution_Complicated_Messy {
 public:
     void sortColors(std::vector<int>& nums)
     {
@@ -237,7 +332,7 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_2_passes {
+class Solution_Simple_Two_passes {
 public:
     void sortColors(std::vector<int>& nums)
     {
@@ -260,28 +355,110 @@ public:
 
 
 
-void
-print_array(std::vector<int>& nums)
-{
-    bool first = true;
-    std::cout << ": [";
-    for (auto x: nums)
-    {
-        if (!first)
-            std::cout << ", ";
 
-        std::cout << x;
-        first = false;
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Different IDEA than the first one above that also uses a single pass. This
+    one is much more clean and concise.
+
+    Instead of putting 0's at the right place and the 1's in second loop, we
+    can do both at the same time.
+
+    However, there are some cases where simple:
+        if (nums[i] == 0)
+            std::swap(nums[i], nums[left++]);
+
+        if (nums[i] == 2)
+            std::swap(nums[i], nums[right--]);
+
+    Won't be enough.
+
+
+    Examples where it wouldn't work:
+
+        1. nums = [1, 2, 0]
+        2. nums = [2, 1, 2]
+
+    In the 1. example it wouldn't work because once we put 2 all the way to the
+    right, we're left with a 0 in the middle of the array, therefore we must
+    move 0 as well, if it was swapped during the placement of 2 all the way to
+    the right.
+
+    For the 1. example it would work to use:
+
+        if (nums[i] == 0)
+            std::swap(nums[i], nums[left++]);
+
+        if (nums[i] == 2 && i <= right)              // If statement
+        {
+            std::swap(nums[i], nums[right--]);
+
+            if (nums[i] == 0)
+                std::swap(nums[i], nums[left++]);
+        }
+
+
+    However, for the 2. example it WOULD NOT!
+    Therefore, we must use a "while loop" instead. (Because of that we, also,
+    must use an additional condition "i <= right" since those two can move past
+    each other)
+
+    Now we have:
+
+        if (nums[i] == 0)
+            std::swap(nums[i], nums[left++]);
+
+        while (nums[i] == 2 && i <= right)
+        {
+            std::swap(nums[i], nums[right--]);
+
+            if (nums[i] == 0)
+                std::swap(nums[i], nums[left++]);
+        }
+
+    That part is IN the outer "for loop". That DOES NOT mean it's an O(n^2)
+    Solution, it's still O(n).
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  35.81% */
+
+/* Time  Complexity: O(n) */ // SINGLE PASS!
+/* Space Complexity: O(1) */
+class Solution_Simple_Elegant_Single_Pass {
+public:
+    void sortColors(std::vector<int>& nums)
+    {
+        int left  = 0;
+        int right = nums.size()-1;
+
+        for (int i = 0; i <= right; i++)
+        {
+            if (nums[i] == 0)
+                std::swap(nums[i], nums[left++]);
+
+            while (nums[i] == 2 && i <= right)
+            {
+                std::swap(nums[i], nums[right--]);
+
+                if (nums[i] == 0)
+                    std::swap(nums[i], nums[left++]);
+            }
+        }
     }
-    std::cout << "]\n";
-}
+};
 
 
 int
 main()
 {
-    Solution          sol;
-    Solution_2_passes sol_2;
+    Solution_Complicated_Messy            sol_mess;
+    Solution_Simple_Two_passes            sol_two_pass;
+    Solution_Simple_Elegant_Single_Pass   sol_eleg_one_pass;
 
     /* Example 1 */
     // std::vector<int> nums = {2, 0, 2, 1, 1, 0};
@@ -307,20 +484,39 @@ main()
 
 
     /* Write Input */
-    std::cout << "\n\tArray ";
-    print_array(nums);
+    bool first = true;
+    std::cout << "\n\tArray:  [";
+    for (auto x: nums)
+    {
+        if (!first)
+            std::cout << ", ";
+
+        std::cout << x;
+        first = false;
+    }
+    std::cout << "]";
+
 
 
     /* Solution */
-    sol.sortColors(nums);
-    // sol.sortColors(nums);
+    // sol_mess.sortColors(nums);
+    // sol_two_pass.sortColors(nums);
+    sol_eleg_one_pass.sortColors(nums);
 
 
     /* Write Output */
-    std::cout << "\n\tSorted";
-    print_array(nums);
-    std::cout << "\n";
+    first = true;
+    std::cout << "\n\tSorted: [";
+    for (auto x: nums)
+    {
+        if (!first)
+            std::cout << ", ";
 
+        std::cout << x;
+        first = false;
+    }
+    std::cout << "]";
+    std::cout << "\n\n";
 
     return 0;
 }
