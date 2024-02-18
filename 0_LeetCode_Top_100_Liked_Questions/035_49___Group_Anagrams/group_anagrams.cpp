@@ -5,84 +5,82 @@
 #include <cstring>
 
 /*
-	==============
-	=== MEDIUM ===
-	==============
+    ==============
+    === MEDIUM ===
+    ==============
 
-	===========================
-	49) Group Anagrams
-	===========================
+    ===========================
+    49) Group Anagrams
+    ===========================
 
-	============
-	Description:
-	============
+    ============
+    Description:
+    ============
 
-	Given an array of strings 'strs', group the anagrams together. You can
-	return the answer in any order.
+    Given an array of strings 'strs', group the anagrams together. You can
+    return the answer in any order.
 
-	An Anagram is a word or phrase formed by rearranging the letters of a
-	different word or phrase, typically using all the original letters exactly
-	once.
+    An Anagram is a word or phrase formed by rearranging the letters of a
+    different word or phrase, typically using all the original letters exactly
+    once.
 
-	=====================================================================
-	FUNCTION: vector<vector<string>> groupAnagrams(vector<string>& strs);
-	=====================================================================
+    =====================================================================
+    FUNCTION: vector<vector<string>> groupAnagrams(vector<string>& strs);
+    =====================================================================
 
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
 
-	--- Example 1 ---
-	Input:  strs = ["eat", "tea", "tan", "ate", "nat", "bat"]
-	Output: [["bat"], ["nat", "tan"], ["ate", "eat", "tea"]]
+    --- Example 1 ---
+    Input:  strs = ["eat", "tea", "tan", "ate", "nat", "bat"]
+    Output: [["bat"], ["nat", "tan"], ["ate", "eat", "tea"]]
 
-	--- Example 2 ---
-	Input:  strs = [""]
-	Output: [[""]]
+    --- Example 2 ---
+    Input:  strs = [""]
+    Output: [[""]]
 
-	--- Example 3 ---
-	Input:  strs = ["a"]
-	Output: [["a"]]
+    --- Example 3 ---
+    Input:  strs = ["a"]
+    Output: [["a"]]
 
-	*** Constraints ***
-	1 <= strs.length <= 10^4
-	0 <= strs[i].length <= 100
-	strs[i] consists of lowercase English letters
+    *** Constraints ***
+    1 <= strs.length <= 10^4
+    0 <= strs[i].length <= 100
+    strs[i] consists of lowercase English letters
 
 */
 
 
 /*
 
-	**************************************************************************
-	***************************** IMPORTANT NOTE *****************************
-	**************************************************************************
+    **************************************************************************
+    ***************************** IMPORTANT NOTE *****************************
+    **************************************************************************
 
-	Theoretical Time Complexity is better in 2nd Solution, however due to many
-	optimizations of C++, in practice, 1st code runs faster on Leetcode.
+    Theoretical Time Complexity is better in 2nd Solution, however due to many
+    optimizations of C++, in practice, 1st code runs faster on Leetcode.
 
-	There are various factors for that. One thing is that when we're using a
-	small to mid sized array, it's better to use vector.
+    There are various factors for that. One thing is that when we're using a
+    small to mid sized array, it's better to use vector.
 
-	Also, sort() is highly highly optimized, and thus, for these small examples
-	it works faster than going each time(i.e. for each string) through 26
-	characters and incrementing values of correct letters.
+    Also, sort() is highly highly optimized, and thus, for these small examples
+    it works faster than going each time(i.e. for each string) through 26
+    characters and incrementing values of correct letters.
 
-	But, overall, Time Complexity of 2nd Solution is indeed better.
+    But, overall, Time Complexity of 2nd Solution is indeed better.
 */
-
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	Two strings are anagrams if and only if their sorted strings are equal.
+    Two strings are anagrams if and only if their sorted strings are equal.
 
-	We have a Hash Map with lexicographically sorted string as a "key" and
-	original strings(in a vector) as "values"
+    We have a Hash Map with lexicographically sorted string as a "key" and
+    original strings(in a vector) as "values"
 */
-
 
 /* Time  Beats: 86.53% */
 /* Space Beats: 82.3% */
@@ -93,50 +91,52 @@
    string. Then, we sort each string in O(k * logk) time.
 */
 /* Space Complexity: O(n * k) */
-class Solution{
+class Solution_Verbose {
 public:
-	std::vector<std::vector<std::string>>
-	groupAnagrams(std::vector<std::string>& strs)
-	{
-		std::vector<std::vector<std::string>> results;
-		std::unordered_map<std::string, std::vector<std::string>> umap;
+    std::vector<std::vector<std::string>> groupAnagrams(std::vector<std::string>& strs)
+    {
+        std::unordered_map<std::string, std::vector<std::string>> umap;
 
-		for (const auto& str: strs)
-		{
-			std::string key = str;
-			std::sort(key.begin(), key.end());
+        for (int i = 0; i < strs.size(); i++)
+        {
+            std::string original_str = strs[i];
+            std::string sorted_str   = strs[i]; // We'll sort this one
 
-			umap[key].push_back(str);
-		}
+            std::sort(sorted_str.begin(), sorted_str.end());
 
-		for (const auto& m : umap)
-			results.push_back(m.second);
+            umap[sorted_str].push_back(original_str);
+        }
 
-		return results;
-	}
+        std::vector<std::vector<std::string>> results;
+        for (auto& entry : umap)
+            results.push_back(entry.second);
+
+        return results;
+    }
 };
 
 
+
+
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	Two strings are anagrams if and only if their character counts(respective
-	number of occurrences of each character) are the same.
+    Two strings are anagrams if and only if their character counts(respective
+    number of occurrences of each character) are the same.
 
-	We have an array "counter" which counts number of occurrences of each
-	letter in a current string.
+    We have an array "counter" which counts number of occurrences of each
+    letter in a current string.
 
-	Once we've done that, we transform that array into a string and we use it
-	as a key for our Hash Map.
-	As for "values" we keep a vector of original strings.
+    Once we've done that, we transform that array into a string and we use it
+    as a key for our Hash Map.
+    As for "values" we keep a vector of original strings.
 
-	At the end we iterate through Hash Map's keys and add each "value"(entire
-	vector) to our vector of vector "results" and we return that.
+    At the end we iterate through Hash Map's keys and add each "value"(entire
+    vector) to our vector of vector "results" and we return that.
 
 */
-
 
 /* Time  Beats: 60.19% */
 /* Space Beats: 24.28% */
@@ -149,44 +149,44 @@ public:
 /* Space Complexity: O(n * k) */
 class Solution_improved{
 public:
-	std::vector<std::vector<std::string>>
-	groupAnagrams(std::vector<std::string>& strs)
-	{
-		std::vector<std::vector<std::string>> results;
-		std::unordered_map<std::string, std::vector<std::string>> umap;
+    std::vector<std::vector<std::string>>
+    groupAnagrams(std::vector<std::string>& strs)
+    {
+        std::vector<std::vector<std::string>> results;
+        std::unordered_map<std::string, std::vector<std::string>> umap;
 
-		int counter[26];
+        int counter[26];
 
-		for (const std::string& str : strs)
-		{
-			memset(counter, 0, sizeof(counter));
+        for (const std::string& str : strs)
+        {
+            memset(counter, 0, sizeof(counter)); // sizeof(int) * 26
 
-			for (const char& c : str)
-				counter[c - 'a']++;
+            for (const char& chr : str)
+                counter[chr - 'a']++;
 
-			std::string key;
-			for (int i = 0; i < 26; i++)
-				key += counter[i];
+            std::string key;
+            for (int i = 0; i < 26; i++)
+                key += counter[i];
 
-			umap[key].push_back(str);
-		}
+            umap[key].push_back(str);
+        }
 
-		for (const auto& m : umap)
-			results.push_back(m.second);
+        for (const auto& m : umap)
+            results.push_back(m.second);
 
-		return results;
-	}
+        return results;
+    }
 };
 
 
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	Similar to first solution, just in one pass.
+    Similar to first solution(Solution_Verbose), just in one pass.
 
 */
 
@@ -197,107 +197,107 @@ public:
 /* Space Complexity: O(k * n)     */
 class Solution_Efficient {
 public:
-	std::vector<std::vector<std::string>>
-	groupAnagrams(std::vector<std::string>& strs)
-	{
-		std::unordered_map<std::string, int> umap;
-		std::vector<std::vector<std::string>> results;
-		
-		for (const std::string& str: strs)
-		{
-			std::string key = str;
-			std::sort(key.begin(), key.end());
-			
-			if (umap.find(key) == umap.end()) // New Anagram
-			{
-				umap[key] = results.size();
-				results.push_back({});
-			}
+    std::vector<std::vector<std::string>>
+    groupAnagrams(std::vector<std::string>& strs)
+    {
+        std::unordered_map<std::string, int> umap;
+        std::vector<std::vector<std::string>> results;
 
-			results[umap[key]].push_back(str);
-		}
+        for (const std::string& str: strs)
+        {
+            std::string key = str;
+            std::sort(key.begin(), key.end());
 
-			return results;
-	}
+            if (umap.find(key) == umap.end()) // New Anagram
+            {
+                umap[key] = results.size();
+                results.push_back({});
+            }
+
+            results[umap[key]].push_back(str);
+        }
+
+        return results;
+    }
 };
 
 
 int
 main()
 {
-	// Solution          sol;
-	// Solution_improved sol_improved;
-	Solution_Efficient sol_eff;
+    // Solution_Verbose  sol_verbose;
+    // Solution_improved sol_improved;
+    Solution_Efficient sol_eff;
 
-	/* Example 1 */
-	std::vector<std::string> strs = {"eat", "tea", "tan", "ate", "nat", "bat"};
+    /* Example 1 */
+    std::vector<std::string> strs = {"eat", "tea", "tan", "ate", "nat", "bat"};
 
-	/* Example 2 */
-	// std::vector<std::string> strs = {""};
+    /* Example 2 */
+    // std::vector<std::string> strs = {""};
 
-	/* Example 3 */
-	// std::vector<std::string> strs = {"a"};
+    /* Example 3 */
+    // std::vector<std::string> strs = {"a"};
 
-	/* Example 4 */
-	// std::vector<std::string> strs = {"", "b"};
+    /* Example 4 */
+    // std::vector<std::string> strs = {"", "b"};
 
-	/* Example 5 */
-	// std::vector<std::string> strs = {"", ""};
+    /* Example 5 */
+    // std::vector<std::string> strs = {"", ""};
 
-	/* Example 6 */
-	// std::vector<std::string> strs = {"hhhhu","tttti","tttit","hhhuh","hhuhh","tittt"};
+    /* Example 6 */
+    // std::vector<std::string> strs = {"hhhhu","tttti","tttit","hhhuh","hhuhh","tittt"};
 
-	/* Example 7 */
-	// std::vector<std::string> strs = {"ddddddddddg","dgggggggggg"};
+    /* Example 7 */
+    // std::vector<std::string> strs = {"ddddddddddg","dgggggggggg"};
 
-	std::cout << "\n\t======================";
-	std::cout << "\n\t=== GROUP ANAGRAMS ===";
-	std::cout << "\n\t======================\n";
-
-
-	/* Write Input */
-	bool first = true;
-	std::cout << "\n\tCandidates: [";
-	for (auto x: strs)
-	{
-		if (!first)
-			std::cout << ", ";
-
-		std::cout << "\"" << x << "\"";
-		first = false;
-	}
-	std::cout << "]\n";
+    std::cout << "\n\t======================";
+    std::cout << "\n\t=== GROUP ANAGRAMS ===";
+    std::cout << "\n\t======================\n";
 
 
-	/* Solution */
-	// std::vector<std::vector<std::string>> results = sol.groupAnagrams(strs);
-	// std::vector<std::vector<std::string>> results = sol_improved.groupAnagrams(strs);
-	std::vector<std::vector<std::string>> results = sol_eff.groupAnagrams(strs);
+    /* Write Input */
+    bool first = true;
+    std::cout << "\n\tCandidates: [";
+    for (auto x: strs)
+    {
+        if (!first)
+            std::cout << ", ";
+
+        std::cout << "\"" << x << "\"";
+        first = false;
+    }
+    std::cout << "]\n";
 
 
-	/* Write Output */
-	first = true;
-	std::cout << "\n\tResults: [";
-	for (auto x: results)
-	{
-		if (!first)
-			std::cout << ", ";
+    /* Solution */
+    // std::vector<std::vector<std::string>> results = sol_verbose.groupAnagrams(strs);
+    // std::vector<std::vector<std::string>> results = sol_improved.groupAnagrams(strs);
+    std::vector<std::vector<std::string>> results = sol_eff.groupAnagrams(strs);
 
-		bool first_first = true;
-		std::cout << "[";
-		for (const auto& xx : x)
-		{
-			if (!first_first)
-				std::cout << ", ";
 
-			std::cout << "\"" << xx << "\"";
-			first_first = false;
-		}
-		std::cout << "]";
+    /* Write Output */
+    first = true;
+    std::cout << "\n\tResults: [";
+    for (auto x: results)
+    {
+        if (!first)
+            std::cout << ", ";
 
-		first = false;
-	}
-	std::cout << "]\n\n";
+        bool first_first = true;
+        std::cout << "[";
+        for (const auto& xx : x)
+        {
+            if (!first_first)
+                std::cout << ", ";
 
-	return 0;
+            std::cout << "\"" << xx << "\"";
+            first_first = false;
+        }
+        std::cout << "]";
+
+        first = false;
+    }
+    std::cout << "]\n\n";
+
+    return 0;
 }
