@@ -214,6 +214,73 @@ private:
 
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Just another way of implementing Merge Sort. This one is more intuitive to
+    me.
+
+*/
+
+/* Time  Beats: 6.11% */
+/* Space Beats: 6.08% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n) */
+class Solution_Another_Merge_Sort {
+public:
+    std::vector<int> sortArray(std::vector<int>& nums)
+    {
+        return merge_sort(nums);
+    }
+
+private:
+    std::vector<int> merge_sort(std::vector<int> nums)
+    {
+        if (nums.size() == 1)
+            return nums;
+
+        int half = nums.size() / 2;
+
+        std::vector<int> left_half (nums.begin()       , nums.begin() + half);
+        std::vector<int> right_half(nums.begin() + half, nums.end());
+
+        std::vector<int> a = sortArray(left_half);
+        std::vector<int> b = sortArray(right_half);
+
+        return merge_two_vectors(a, b);
+    }
+
+private:
+    std::vector<int> merge_two_vectors(std::vector<int>& a, std::vector<int>& b)
+    {
+        int i = 0;
+        int j = 0;
+
+        std::vector<int> result;
+
+        while (i < a.size() && j < b.size())
+        {
+            if (a[i] <= b[j])
+                result.push_back(a[i++]);
+            else
+                result.push_back(b[j++]);
+        }
+
+        if (i == a.size())
+            result.insert(result.end(), b.begin() + j, b.end());
+        else
+            result.insert(result.end(), a.begin() + i, a.end());
+
+        return result;
+    }
+};
+
+
+
+
 /* Time  Beats: 74.23% */
 /* Space Beats: 60.80% */
 
