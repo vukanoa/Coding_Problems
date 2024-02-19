@@ -185,75 +185,27 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution{
+class Solution_Linear_1 {
 public:
     int longestConsecutive(std::vector<int>& nums)
     {
-        std::unordered_set<int> uset;
-
-        for (int num: nums)
-            uset.insert(num);
-
-        int max = 0;
+        int longest = 0;
+        std::unordered_set<int> uset(nums.begin(), nums.end());
 
         // O(n)
         for (int i = 0; i < nums.size(); i++)
         {
-            int current_num = nums[i];
-            int current_sequence_length = 1;
-
-            if (uset.find(current_num - 1) == uset.end())
+            // If it DOESN'T exist --> It' a start of sequence
+            if (uset.count(nums[i] - 1) == 0)
             {
-                while (uset.find(current_num + 1) != uset.end())
-                {
-                    current_num++;
-                    current_sequence_length++;
-                }
+                int length = 1;
+                int number = nums[i];
+
+                while (uset.count(++number))
+                    length++;
+
+                longest = std::max(longest, length);
             }
-
-            max = std::max(max, current_sequence_length);
-        }
-
-        return max;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Equivalent Solution implemented more in the Spirit of C++.
-
-*/
-
-/* Time  Beats: 23.43% */
-/* Space Beats: 70.15% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_Spirit_CPP {
-public:
-    int longestConsecutive(std::vector<int>& nums)
-    {
-        std::unordered_set<int> uset(nums.begin(), nums.end());
-
-        int longest = 0;
-        for (const int& num : nums)
-        {
-            if (uset.count(num - 1)) // Not a start of the sequence
-                continue;
-
-            int next_num = num + 1;
-            int curr_sequence_len = 1;
-
-            while (uset.count(next_num++)) // Exists in the set
-                curr_sequence_len++;
-
-            longest = std::max(longest, curr_sequence_len);
         }
 
         return longest;
@@ -268,7 +220,7 @@ public:
     --- IDEA ---
     ------------
 
-    Same idea, but written concisely.
+    Same idea, but written in another way, it's maybe easier to grasp.
 
     Note that nowadays all these Solutoins aren't beating more than 5% for some
     reason. They used to beat more than 30%.
@@ -286,7 +238,7 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution_Concise {
+class Solution_Linear_2 {
 public:
     int longestConsecutive(std::vector<int>& nums)
     {
@@ -298,7 +250,7 @@ public:
             if (uset.count(nums[i] - 1) == 0)
             {
                 int count = 1;
-                while (uset.count(nums[i] + count))
+                while (uset.count(nums[i] + count)) // This part is different
                     count++;
 
                 longest = std::max(longest, count);
@@ -327,7 +279,7 @@ public:
 
 /* Time  Complexity: O(n * logn) */ // This is faster than O(n) somehow
 /* Space Complexity: O(n)        */
-class Solution {
+class Solution_Sort_1 {
 public:
     int longestConsecutive(vector<int>& nums)
     {
@@ -376,7 +328,7 @@ public:
 
 /* Time  Complexity: O(n * logn) */ // This is faster than O(n) somehow
 /* Space Complexity: O(n)        */
-class Solution {
+class Solution_Sort_2 {
 public:
     int longestConsecutive(vector<int>& nums)
     {
@@ -410,9 +362,10 @@ public:
 int
 main()
 {
-    Solution            sol;
-    Solution_Spirit_CPP sol_cpp;
-    Solution_Concise    sol_concise;
+    Solution_Linear_1   sol_linear_1;
+    Solution_Linear_2   sol_linear_2;
+    Solution_Sort_1     sol_sort_1;
+    Solution_Sort_2     sol_sort_2;
 
     /* Example 1 */
     std::vector<int> nums = {100, 4, 200, 1, 3, 2};
@@ -449,9 +402,10 @@ main()
 
 
     /* Solution */
-    // int max = sol.longestConsecutive(nums);
-    // int max = sol_cpp.longestConsecutive(nums);
-    int max = sol_concise.longestConsecutive(nums);
+    // int max = sol_linear_1.longestConsecutive(nums);
+    // int max = sol_linear_2.longestConsecutive(nums);
+    // int max = sol_sort_1.longestConsecutive(nums);
+    int max = sol_sort_2.longestConsecutive(nums);
 
 
     /* Write Output */
