@@ -278,6 +278,48 @@ public:
     --- IDEA ---
     ------------
 
+    Similar to the above Solution, however there is one important difference.
+
+    We don't begin at index 0 since we are sure that whichever element is at
+    index 0, at the beginning, it's going to stay there. Therefore, we begin at
+    index 1 both for "left" pointer(it points to the position at which the next
+    element is going to be placed at) and for 'i' in the "for" loop.
+
+    I think this is the cleanest way, though usually Two Pointers is
+    implemented using "left" and "right" pointers and a "while" loop, as above,
+    but it's better to have both ways implemented so that people can choose the
+    one they prefer.
+
+*/
+
+/* Time  Beats: 61.50% */
+/* Space Beats: 28.71% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Two_Pointers_For_Loop {
+public:
+    int removeDuplicates(vector<int>& nums)
+    {
+        int left = 1; // Starts at 1
+        for (int i = 1; i < nums.size(); i++) // Starts at 1
+        {
+            if (nums[i-1] != nums[i])
+                nums[left++] = nums[i];
+        }
+
+        return left;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     Another way of implementing it.
     It's easier to grasp for some people.
 
