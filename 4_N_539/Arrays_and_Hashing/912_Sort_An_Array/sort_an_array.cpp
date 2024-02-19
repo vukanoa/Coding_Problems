@@ -109,8 +109,60 @@ private:
 
 
 
+// TLE - Time Limit Exceeded
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n) */
+class Solution_Another_QuickSort {
+public:
+    std::vector<int> sortArray(std::vector<int>& nums)
+    {
+        quick_sort(nums, 0, nums.size()-1);
+
+        return nums;
+    }
+
+private:
+    void quick_sort(std::vector<int>& nums, int start, int end)
+    {
+        if (start >= end)
+            return;
+
+        int pivot = partition(nums, start, end);
+
+        quick_sort(nums,     0    , pivot - 1);
+        quick_sort(nums, pivot + 1,    end   );
+    }
+
+    int partition(std::vector<int>& nums, int start, int end)
+    {
+        int pivot = end;
+
+        int i = start-1;
+        int j = start;
+
+        while (j < pivot)
+        {
+            if (nums[j] <= nums[pivot])
+                std::swap(nums[++i], nums[j]);
+
+            j++;
+        }
+
+        std::swap(nums[i+1], nums[pivot]);
+
+        return i+1;
+    }
+};
+
+
+
+
+
 /* Time  Beats: 9.82% */
 /* Space Beats: 5.93% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n) */
 class Solution_Merge_Sort {
 public:
     std::vector<int> sortArray(std::vector<int>& nums)
@@ -135,25 +187,25 @@ private:
         return merge(left_part, right_part);
     }
 
-    std::vector<int> merge(std::vector<int>& left_part, std::vector<int>& right_part)
+    std::vector<int> merge(std::vector<int>& a, std::vector<int>& b)
     {
         std::vector<int> sorted;
 
         int i = 0;
         int j = 0;
 
-        while (i < left_part.size() && j < right_part.size())
+        while (i < a.size() && j < b.size())
         {
-            if (left_part[i] <= right_part[j])
-                sorted.push_back(left_part[i++]);
+            if (a[i] <= b[j])
+                sorted.push_back(a[i++]);
             else
-                sorted.push_back(right_part[j++]);
+                sorted.push_back(b[j++]);
         }
 
-        if (i == left_part.size())
-            sorted.insert(sorted.end(), right_part.begin() + j, right_part.end());
-        else if (j == right_part.size())
-            sorted.insert(sorted.end(), left_part.begin() + i, left_part.end());
+        if (i == a.size())
+            sorted.insert(sorted.end(), b.begin() + j, b.end());
+        else if (j == b.size())
+            sorted.insert(sorted.end(), a.begin() + i, a.end());
 
         return sorted;
     }
