@@ -60,7 +60,32 @@
     --- IDEA ---
     ------------
 
-    Self-Explanatory.
+    We're told that "the number of nodes in the list is in the rnage [1, 100]",
+    therefore, we don't check if (!head), only if (!head->next).
+
+    Also, notice which node do they want us to return as a "middle node".
+
+    It depends on that if we need to start our "fast" pointer from "head" or
+    from "head->next".
+
+    In this case, since they are asking us to return this one, from the list:
+                                                      |
+                                                      |
+                                   ___________________|
+                                   |
+                                   v
+                    1 -> 2 -> 3 -> 4 -> 5 -> 6
+
+
+    It's important to node that this is DIFFERENT than the usual function we're
+    writing for Linked List problems when we are looking for the "middle node".
+
+    Usually we have a need to "unlink" two parts and thus the "middle node" is
+    not 4, but 3, since we want to have two equals halves.
+
+    In that usual function we'd initialize our "fast" pointer to "head->next",
+    however now, since they want us to return 4 from this list, we have to
+    initialize "fast" to "head->next".
 
 */
 
@@ -73,7 +98,7 @@ class Solution {
 public:
     ListNode* middleNode(ListNode* head)
     {
-        if (!head || !head->next)
+        if (!head->next)
             return head;
 
         ListNode* slow = head;
