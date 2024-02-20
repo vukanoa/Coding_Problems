@@ -63,12 +63,38 @@
     --- IDEA ---
     ------------
 
-    Self-Explanatory.
+    The only "tricky" thing here is if the "val" is at the beginning and/or it
+    repeats multiple times.
+
+    If it is at the beginning we must "cut off" all of those elements first.
+    We do that with:
+
+        while (head && head->val == val)
+            head = head->next;
+
+    Once that is done, all we do is - While tmp->next is not nullptr(tmp also
+    since we don't want to get a Segmentation Fault) we are checking if the
+
+        tmp->next->val
+
+    is the value we want to skip.
+
+    One more thing that needs to be noted here is that there can be multiple
+    **consecutive** values that we want to skip, therefore we must have an
+    inner "while loop".
+
+    That won't make it O(n^2) since we will, still, iterate through the entire
+    Linked List only once.
+
+    Example:
+        1 -> 2 -> 3 -> -> 3 -> -> 3 -> 4 -> 5
+
+    If we want to remove Element '3', we must do it within an inner loop.
 
 */
 
-/* Time  Beats: 66.58% */
-/* Space Beats: 22.29% */
+/* Time  Beats: 98.93% */
+/* Space Beats: 44.73% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
