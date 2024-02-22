@@ -61,6 +61,7 @@
     ------------
 
     Classical Two-Pointers technique for Linked Lists.
+
     It's important to say that we CAN modify values, we don't have to relink
     this Linked List.
 
@@ -89,6 +90,48 @@ public:
         {
             right = right->next;
             tmp = tmp->next;
+        }
+
+        std::swap(left->val, right->val);
+
+        return head;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Equivalent idea, slightly different implementation.
+
+*/
+
+/* Time  Beats: 95.26% */
+/* Space Beats: 51.20% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    ListNode* swapNodes(ListNode* head, int k)
+    {
+        ListNode dummy(0);
+        dummy.next = head;
+
+        ListNode* curr = &dummy;
+        for (int i = 0; i < k; i++)
+            curr = curr->next;
+
+        ListNode* left  = curr;
+        ListNode* right = &dummy;
+        while (curr)
+        {
+            curr  = curr->next;
+            right = right->next;
         }
 
         std::swap(left->val, right->val);
