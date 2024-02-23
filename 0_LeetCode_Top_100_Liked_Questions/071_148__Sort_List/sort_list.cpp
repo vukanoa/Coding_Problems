@@ -58,6 +58,77 @@ struct ListNode {
 
 
 
+/* Quick Sort */
+/* This Solution Gives TLE(Time Limit Exceeded)*/
+
+/*
+    Time  Complexity: O(n^2)
+    The average Time Complexity is O(n * logn), however the absolute worst Time
+    Complexity is O(n^2) and that happens when the chosen pivot in each
+    partitioning step is either the smallest or the lagest element in the
+    subarray, which causes the partition function to split the array into two
+    subarrays of size 1 and n-1. This leads to n recursive calls, each with a
+    subarray of size n-1, resulting in a worst-case Time Complexity of O(n^2).
+
+    The worst case scenario for Quick Sort:
+    [50000, 49999, 49998, 49997, ..., 3, 2, 1]
+
+*/
+/* Space Complexity: O(n) */
+class Solution_Quick_Sort {
+public:
+    ListNode* sortList(ListNode* head)
+    {
+        if (head == nullptr)
+            return nullptr;
+
+        ListNode *tmp = head;
+        while (tmp->next)
+            tmp = tmp->next;
+
+        ListNode *tail = tmp;
+
+        return quick_sort(head, tail);
+    }
+
+private:
+    ListNode* partition(ListNode* left, ListNode* right)
+    {
+        ListNode* front = NULL;
+        ListNode* first_node = left;
+
+        while(left != right)
+        {
+            if (left->val < right->val)
+            {
+                front = front ? front->next : first_node;
+
+                if (front != left)
+                    std::swap(front->val, left->val);
+            }
+            left = left->next;
+        }
+        std::swap(front ? front->next->val : first_node->val, right->val);
+
+        return front ? front : first_node;
+    }
+
+    ListNode* quick_sort(ListNode* head, ListNode* tail)
+    {
+        if (head == NULL || tail == NULL || head == tail)
+            return head;
+
+        ListNode* pivot = partition(head, tail);
+
+        quick_sort(head, pivot);
+        quick_sort(pivot->next, tail);
+
+        return head;
+    }
+};
+
+
+
 
 /*
     ------------
@@ -100,22 +171,22 @@ struct ListNode {
 /* Space Complexity: O(logn) */
 class Solution_Merge_Sort_Classic{
 public:
-    struct ListNode* sortList(struct ListNode* head)
+    ListNode* sortList(ListNode* head)
     {
-        if (head == nullptr || head->next == nullptr)
+        if (!head || !head->next)
             return head;
 
-        struct ListNode* mid   = mid_node(head);
-        struct ListNode* left  = sortList(head);
-        struct ListNode* right = sortList(mid);
+        ListNode* mid   = middle(head);
+        ListNode* left  = sortList(head);
+        ListNode* right = sortList(mid);
 
         return merge(left, right);
     }
 
-    struct ListNode* merge(struct ListNode* list1, struct ListNode* list2)
+    ListNode* merge(ListNode* list1, ListNode* list2)
     {
         struct ListNode dummy_head(0);
-        struct ListNode* ptr = &dummy_head;
+        ListNode* ptr = &dummy_head;
 
         while (list1 && list2)
         {
@@ -141,17 +212,17 @@ public:
         return dummy_head.next;
     }
 
-    struct ListNode* mid_node(struct ListNode* head)
+    ListNode* middle(ListNode* head)
     {
-        struct ListNode* slow = head;
-        struct ListNode* fast = head->next;
+        ListNode* slow = head;
+        ListNode* fast = head->next;
 
         while (fast != nullptr && fast->next != nullptr)
         {
             slow = slow->next;
             fast = fast->next->next;
         }
-        struct ListNode* mid = slow->next;
+        ListNode* mid = slow->next;
         slow->next = nullptr;
 
         return mid;
@@ -182,7 +253,23 @@ public:
     {
         if (!head || !head->next)
             return head;
+        
+        ListNode* mid = middle(head);
 
+        ListNode* a = head;
+        ListNode* b = mid->next;
+
+        mid->next = nullptr;
+
+        a = sortList(a);
+        b = sortList(b);
+
+        return merge_two_sorted_lists(a, b);
+    }
+
+private:
+    ListNode* middle(ListNode* head)
+    {
         ListNode* slow = head;
         ListNode* fast = head->next;
 
@@ -192,24 +279,17 @@ public:
             fast = fast->next->next;
         }
 
-        ListNode* head_2 = slow->next;
-        slow->next = nullptr; // Unlink
-
-        ListNode* a = sortList(head);
-        ListNode* b = sortList(head_2);
-
-        return mergeTwoSortedLists(a, b);
+        return slow;
     }
 
-private:
-    ListNode* mergeTwoSortedLists(ListNode* l1, ListNode* l2)
+    ListNode* merge_two_sorted_lists(ListNode* l1, ListNode* l2)
     {
         ListNode dummy(0);
         ListNode* tail = &dummy;
 
         while (l1 && l2)
         {
-            if (l1->val < l2->val)
+            if (l1->val <= l2->val)
             {
                 tail->next = l1;
                 l1 = l1->next;
@@ -227,10 +307,12 @@ private:
             tail->next = l2;
         else
             tail->next = l1;
-
+        
         return dummy.next;
     }
 };
+
+
 
 
 /*
@@ -307,10 +389,10 @@ public:
 
     ListNode* sortList(ListNode* head)
     {
-        if (head == nullptr || head->next == nullptr)
+        if (!head || !head->next)
             return head;
 
-        int n = get_count(head);
+        int n = count_nodes(head);
 
         ListNode* start = head;
         ListNode dummy_head(0);
@@ -401,7 +483,7 @@ public:
         tail = new_tail;
     }
 
-    int get_count(ListNode* head)
+    int count_nodes(ListNode* head)
     {
         int cnt = 0;
 
@@ -417,86 +499,6 @@ public:
 };
 
 
-
-
-/* Quick Sort */
-/* This Solution Gives TLE */
-
-/*
-    Time  Complexity: O(n^2)
-    The average Time Complexity is O(n * logn), however the absolute worst Time
-    Complexity is O(n^2) and that happens when the chosen pivot in each
-    partitioning step is either the smallest or the lagest element in the
-    subarray, which causes the partition function to split the array into two
-    subarrays of size 1 and n-1. This leads to n recursive calls, each with a
-    subarray of size n-1, resulting in a worst-case Time Complexity of O(n^2).
-
-    The worst case scenario for Quick Sort:
-    [50000, 49999, 49998, 49997, ..., 3, 2, 1]
-
-*/
-/* Space Complexity: O(n) */
-class Solution_Quick_Sort{
-private:
-    void
-    swap(ListNode *a, ListNode *b)
-    {
-        int tmp = a->val;
-        a->val = b->val;
-        b->val = tmp;
-    }
-
-    ListNode*
-    partition(ListNode* left, ListNode* right)
-    {
-        ListNode* front = NULL;
-        ListNode* first_node = left;
-
-        while(left != right)
-        {
-            if (left->val < right->val)
-            {
-                front = front ? front->next : first_node;
-
-                if (front != left)
-                    swap(front, left);
-            }
-            left = left->next;
-        }
-        swap(front ? front->next : first_node, right);
-
-        return front ? front : first_node;
-    }
-
-    ListNode*
-    quick_sort(ListNode* head, ListNode* tail)
-    {
-        if (head == NULL || tail == NULL || head == tail)
-            return head;
-
-        ListNode* pivot = partition(head, tail);
-
-        quick_sort(head, pivot);
-        quick_sort(pivot->next, tail);
-
-        return head;
-    }
-
-public:
-    ListNode* sortList(ListNode* head)
-    {
-        if (head == nullptr)
-            return nullptr;
-
-        ListNode *tmp = head;
-        while (tmp->next)
-            tmp = tmp->next;
-
-        ListNode *tail = tmp;
-
-        return quick_sort(head, tail);
-    }
-};
 
 
 void
@@ -523,10 +525,10 @@ print_list(struct ListNode* head)
 int
 main()
 {
+    Solution_Quick_Sort          sol_quick;
     Solution_Merge_Sort_Classic  sol_merge_classic;
     Solution_Efficient_Merge     sol_efficient_merge;
     Solution_Merge_Sort_Improved sol_merge_improved;
-    Solution_Quick_Sort          sol_quick;
 
 
     /* Example 1 */
@@ -574,10 +576,10 @@ main()
 
 
     /* Solution */
+    // head = sol_quick.sortList(head);
     // head = sol_merge_classic.sortList(head);
     head = sol_efficient_merge.sortList(head);
     // head = sol_merge_improved.sortList(head);
-    // head = sol_quick.sortList(head);
 
 
     /* After */
