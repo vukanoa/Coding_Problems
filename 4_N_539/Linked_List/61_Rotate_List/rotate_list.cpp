@@ -70,13 +70,12 @@
  * };
  */
 
-
 /* Time  Beats: 95.21% */
 /* Space Beats: 25.37% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Elegant {
 public:
     ListNode* rotateRight(ListNode* head, int k)
     {
@@ -113,6 +112,7 @@ public:
     ------------
 
     I believe this one is easier to read and grasp than the above one.
+    However, the above one is much more elegant!
 
 */
 
@@ -121,41 +121,55 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Verbose {
 public:
     ListNode* rotateRight(ListNode* head, int k)
     {
-        if (!head)
-            return nullptr;
+        if (k == 0 || !head || !head->next)
+            return head;
 
-        int n = 1;
-        ListNode* tail = head;
+        int n = count_nodes(head);
 
-        while (tail->next)
-        {
-            n++;
-            tail = tail->next;
-        }
-
-        k %= n;
+        k = k % n;
         if (k == 0)
             return head;
 
+        ListNode dummy(0);
+        dummy.next = head;
+
         ListNode* right = head;
-        while (k--)
+        for (int i = 0; i < k; i++)
             right = right->next;
 
-        ListNode* left = head;
-        while (right->next)
+        ListNode* left = &dummy;
+
+        while (right)
         {
             left  = left->next;
             right = right->next;
         }
 
-        tail->next = head;
-        head = left->next;
-        left->next = nullptr;
+        ListNode* tail = left;
+        for (int i = 0; i < k; i++)
+            tail = tail->next;
 
-        return head;
+        dummy.next = left->next;
+        left->next = nullptr; // Unlink
+        tail->next = head;
+
+        return dummy.next;
+    }
+
+private:
+    int count_nodes(ListNode* head)
+    {
+        int count = 0;
+        while (head)
+        {
+            count++;
+            head = head->next;
+        }
+
+        return count;
     }
 };
