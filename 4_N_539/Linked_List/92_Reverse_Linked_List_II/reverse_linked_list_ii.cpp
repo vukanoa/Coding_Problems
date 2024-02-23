@@ -68,7 +68,7 @@
 */
 
 /* Time  Beats: 100.00% */
-/* Space Beats:   6.00% */
+/* Space Beats:  52.39% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -76,38 +76,23 @@ class Solution {
 public:
     ListNode* reverseBetween(ListNode* head, int left, int right)
     {
-        if (!head->next) // Since:  1 <= n <= 500
+        if (!head || !head->next || left == right)
             return head;
 
         ListNode dummy(0);
         dummy.next = head;
 
-        ListNode* before_left = &dummy;
-        ListNode* left_node   = head;
+        ListNode* tmp = &dummy;
+        for (int i = 1; i < left; i++)
+            tmp = tmp->next;
 
-        int count = 1;
-        while (left_node && count < left)
-        {
-            before_left = before_left->next;
-            left_node   = left_node->next;
-            count++;
-        }
+        ListNode* before = tmp; // One node before the reversion starting point
 
-        if (!left_node)
-            return dummy.next;
+        ListNode* prev = tmp;
+        ListNode* curr = tmp->next;
 
-        ListNode* right_node = left_node;
-        while (right_node && count++ < right)
-            right_node = right_node->next;
-
-        if (!right_node)
-            return dummy.next;
-
-        ListNode* after_right = right_node->next;
-
-        ListNode* prev = after_right;
-        ListNode* curr = left_node;
-        while (curr != after_right)
+        int count = right - left + 1;
+        while (count--)
         {
             ListNode* next = curr->next;
 
@@ -116,7 +101,8 @@ public:
             curr = next;
         }
 
-        before_left->next = prev;
+        before->next->next = curr;
+        before->next = prev;
 
         return dummy.next;
     }
