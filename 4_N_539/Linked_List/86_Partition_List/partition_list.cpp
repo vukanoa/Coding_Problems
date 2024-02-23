@@ -52,8 +52,8 @@
 
 */
 
-/* Time  Beats: 79.99% */
-/* Space Beats: 9.94% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  33.05% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -64,38 +64,37 @@ public:
         if (!head || !head->next)
             return head;
 
-        ListNode dummy_left(0);
-        ListNode dummy_right(0);
-        dummy_left.next = &dummy_right;
+        ListNode dummy_head(0);
+        ListNode dummy_x(x);
 
-        ListNode* left  = &dummy_left;
-        ListNode* right = &dummy_right;
+        dummy_head.next = &dummy_x;
 
-        ListNode* curr = head;
-        while (curr)
+        ListNode* left_tail  = &dummy_head;
+        ListNode* right_tail = &dummy_x;
+
+        while (head)
         {
-            ListNode* next;
-            next = curr->next;
+            ListNode* next = head->next;
 
-            if (curr->val < x)
+            if (head->val < x)
             {
-                curr->next = left->next;
-                left->next = curr;
+                head->next = &dummy_x;
+                left_tail->next = head;
 
-                left = left->next;
+                left_tail = left_tail->next;
             }
             else
             {
-                curr->next = nullptr;
-                right->next = curr;
+                head->next = nullptr;
+                right_tail->next = head;
 
-                right = right->next;
+                right_tail = right_tail->next;
             }
 
-            curr = next;
+            head = next;
         }
-        left->next = left->next->next; // Remove dummy_right from the Linked List
+        left_tail->next = dummy_x.next;
 
-        return dummy_left.next;
+        return dummy_head.next;
     }
 };
