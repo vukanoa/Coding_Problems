@@ -191,9 +191,9 @@ local_head --     |
                 |         |    |
         local_head        |    |
                           |    |
-                  tail ---     |
+                  tail ----    |
                                |
-                       rem ----
+                       rem -----
 
         We have linked tail's next to the rest of the list denotes with pointer
         "rem".
@@ -320,6 +320,7 @@ public:
 
 
 
+
 /*
     ------------
     --- IDEA ---
@@ -386,6 +387,60 @@ private:
         }
 
         return tmp;
+    }
+};
+
+
+
+
+/* Time  Beats: 89.26% */
+/* Space Beats: 57.87% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Another_way {
+public:
+    ListNode* reverseKGroup(ListNode* head, int k)
+    {
+        ListNode dummy(0);
+        dummy.next = head;
+
+        ListNode* before = &dummy;
+        while (before->next)
+        {
+            /* Check if there are k nodes */
+            ListNode* iter = before->next;
+
+            int count = k;
+            while (iter && count--)
+                iter = iter->next;
+
+            if (count > 0) // We were NOt able to count all k nodes
+                break;
+
+            /* Reverse nodes in k group */
+            ListNode* prev = before;
+            ListNode* curr = before->next;
+
+            count = k;
+            while (curr && count--)
+            {
+                ListNode* next = curr->next;
+
+                curr->next = prev;
+                prev = curr;
+                curr = next;
+            }
+
+            before->next->next = curr;
+
+            /* Swap */
+            ListNode* tmp = before->next;
+            before->next = prev;
+            before = tmp;
+        }
+
+        return dummy.next;
     }
 };
 
