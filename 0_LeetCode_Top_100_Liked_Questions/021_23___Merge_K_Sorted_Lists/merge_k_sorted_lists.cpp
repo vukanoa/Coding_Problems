@@ -2,7 +2,6 @@
 #include <vector>
 #include <climits>
 
-
 /*
     ============
     === HARD ===
@@ -94,8 +93,6 @@
     our dummy node.
 */
 
-
-
 // Definition for singly-linked list.
 struct ListNode {
     int val;
@@ -112,7 +109,7 @@ struct ListNode {
 
 /* Time  Complexity: O(totalNumberOfNodes * k) */
 /* Space Complexity: O(1) */
-class Solution{
+class Solution_Brute {
 public:
     ListNode* mergeKLists(std::vector<ListNode*>& lists)
     {
@@ -134,8 +131,6 @@ public:
                 {
                     idx = i;
                     min = lists[i]->val;
-
-                    std::cout << "\n\tOvde sam: " << lists[i]->val << "\n";
                 }
             }
 
@@ -180,7 +175,7 @@ public:
     Thus the time Complexity is O(n * logk)
 */
 /* Space Complexity: O(n) */
-class Solution_Divide_And_Conquer{
+class Solution_Divide_And_Conquer {
 public:
     ListNode* mergeKLists(std::vector<ListNode*>& lists)
     {
@@ -195,42 +190,42 @@ public:
         std::vector<ListNode*> left(lists.begin(), lists.begin() + mid);
         std::vector<ListNode*> right(lists.begin() + mid, lists.end());
 
-        ListNode* l1 = mergeKLists(left);
-        ListNode* l2 = mergeKLists(right);
+        ListNode* list1 = mergeKLists(left);
+        ListNode* list2 = mergeKLists(right);
 
-        return mergeTwoLists(l1, l2);
+        return mergeTwoLists(list1, list2);
     }
 
 private:
-    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2)
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2)
     {
-        ListNode dummy(0);
+        ListNode  dummy(0);
         ListNode* tail = &dummy;
 
-        while (l1 && l2)
+        while (list1 && list2)
         {
-            if (l1->val < l2->val)
+            if (list1->val <= list2->val)
             {
-                tail->next = l1;
-                l1 = l1->next;
+                tail->next = list1;
+                list1 = list1->next;
             }
             else
             {
-                tail->next = l2;
-                l2 = l2->next;
+                tail->next = list2;
+                list2 = list2->next;
             }
 
             tail = tail->next;
         }
 
-        if (l1)
-            tail->next = l1;
-
-        if (l2)
-            tail->next = l2;
+        if (!list1)
+            tail->next = list2;
+        else
+            tail->next = list1;
 
         return dummy.next;
     }
+
 };
 
 
@@ -263,10 +258,10 @@ public:
 
             for (int i = 0; i < lists.size(); i+=2)
             {
-                ListNode* list_1 = lists[i];
-                ListNode* list_2 = i+1 < lists.size() ? lists[i+1] : nullptr;
+                ListNode* list1 = lists[i];
+                ListNode* list2 = i+1 < lists.size() ? lists[i+1] : nullptr;
 
-                tmp_merged_lists.push_back(mergeTwoSortedLists(list_1, list_2));
+                tmp_merged_lists.push_back(mergeTwoLists(list1, list2));
             }
 
             lists.clear();
@@ -277,36 +272,118 @@ public:
     }
 
 private:
-    ListNode* mergeTwoSortedLists(ListNode* list_1, ListNode* list_2)
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2)
     {
-        ListNode* dummy = new ListNode(0);
-        ListNode* tail  = dummy;
+        ListNode  dummy(0);
+        ListNode* tail = &dummy;
 
-        while (list_1 && list_2)
+        while (list1 && list2)
         {
-            if (list_1->val <= list_2->val)
+            if (list1->val <= list2->val)
             {
-                tail->next = list_1;
-                list_1 = list_1->next;
+                tail->next = list1;
+                list1 = list1->next;
             }
             else
             {
-                tail->next = list_2;
-                list_2 = list_2->next;
+                tail->next = list2;
+                list2 = list2->next;
             }
 
             tail = tail->next;
         }
 
-        if (!list_1)
-            tail->next = list_2;
+        if (!list1)
+            tail->next = list2;
         else
-            tail->next = list_1;
+            tail->next = list1;
 
-        ListNode* ret = dummy->next;
-        delete dummy; // Prevent Memory Leak
+        return dummy.next;
+    }
 
-        return ret;
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    My own way, very similar to the one above. Wanted to have both of them here
+    since some may find one easier to read.
+
+*/
+
+/* Time  Beats: 77.07% */
+/* Space Beats: 51.62% */
+
+/* Time  Complexity: O(n * logk) */
+/* Space Complexity: O(n) */
+class Solution_My_Way {
+public:
+    ListNode* mergeKLists(std::vector<ListNode*>& lists)
+    {
+        if (lists.empty())
+            return nullptr;
+        
+        while (lists.size() != 1)
+        {
+            std::vector<ListNode*> tmp;
+
+            while (!lists.empty())
+            {
+                ListNode* list1 = lists.back();
+                lists.pop_back();
+
+                ListNode* list2;
+                if (!lists.empty())
+                {
+                    list2 = lists.back();
+                    lists.pop_back();
+                }
+                else
+                    list2 = nullptr;
+                
+                ListNode* merged = mergeTwoLists(list1, list2);
+                tmp.push_back(merged);
+            }
+
+            lists = tmp;
+        }
+
+        return lists.back();
+    }
+
+private:
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2)
+    {
+        ListNode  dummy(0);
+        ListNode* tail = &dummy;
+
+        while (list1 && list2)
+        {
+            if (list1->val <= list2->val)
+            {
+                tail->next = list1;
+                list1 = list1->next;
+            }
+            else
+            {
+                tail->next = list2;
+                list2 = list2->next;
+            }
+
+            tail = tail->next;
+        }
+
+        if (!list1)
+            tail->next = list2;
+        else
+            tail->next = list1;
+
+        return dummy.next;
     }
 };
 
@@ -314,7 +391,7 @@ private:
 
 
 void
-print_list(struct ListNode* head)
+print_list(ListNode* head)
 {
     std::cout << "\n\t[";
 
@@ -337,21 +414,22 @@ print_list(struct ListNode* head)
 int
 main()
 {
-    Solution                          sol;
+    Solution_Brute                    sol_brute;
     Solution_Divide_And_Conquer       sol_divide_and_conquer;
     Solution_Divide_And_Conquer_Neat  sol_divide_and_conquer_neat;
+    Solution_My_Way                   sol_my_way;
 
     /* Example 1 */
-    struct ListNode five1(5);
-    struct ListNode four1(4, &five1);
-    struct ListNode one1 (1, &four1);
+    ListNode five1(5);
+    ListNode four1(4, &five1);
+    ListNode one1 (1, &four1);
 
-    struct ListNode four2 (4);
-    struct ListNode three2(3, &four2);
-    struct ListNode one2  (1, &three2);
+    ListNode four2 (4);
+    ListNode three2(3, &four2);
+    ListNode one2  (1, &three2);
 
-    struct ListNode two3(2);
-    struct ListNode six3(1, &two3);
+    ListNode two3(2);
+    ListNode six3(1, &two3);
 
     std::vector<struct ListNode*> lists;
     lists.push_back(&one1);
@@ -372,9 +450,10 @@ main()
         print_list(x);
 
     /* Solution */
-    // struct ListNode* head = sol.mergeKLists(lists);
+    // struct ListNode* head = sol_brute.mergeKLists(lists);
     // struct ListNode* head = sol_divide_and_conquer.mergeKLists(lists);
-    struct ListNode* head = sol_divide_and_conquer_neat.mergeKLists(lists);
+    // struct ListNode* head = sol_divide_and_conquer_neat.mergeKLists(lists);
+    ListNode* head = sol_my_way.mergeKLists(lists);
 
     /* Write Output */
     std::cout << "\n\n\n\tMerged k Sorted Lists:";
