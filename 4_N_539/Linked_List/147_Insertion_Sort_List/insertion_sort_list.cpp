@@ -74,7 +74,7 @@
 /* Time  Beats: 60.20% */
 /* Space Beats: 49.09% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(n^2) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
@@ -86,22 +86,13 @@ public:
         while (curr)
         {
             ListNode* next = curr->next;
-            ListNode* tmp  = &dummy;
+            ListNode* prev = &dummy;
 
-            while (tmp->next && tmp->next->val < curr->val)
-                tmp = tmp->next;
+            while (prev->next && prev->next->val < curr->val)
+                prev = prev->next;
 
-            if (!tmp->next)
-            {
-                curr->next = nullptr;
-                tmp->next = curr;
-            }
-            else
-            {
-                curr->next = tmp->next;
-                tmp->next = curr;
-            }
-
+            curr->next = prev->next;
+            prev->next = curr;
             curr = next;
         }
 
