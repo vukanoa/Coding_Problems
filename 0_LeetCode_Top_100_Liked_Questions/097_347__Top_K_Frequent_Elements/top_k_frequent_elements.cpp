@@ -275,14 +275,14 @@ public:
 
         // Step 2: Bucket Sort's first step
         // O(N)
-        std::vector<std::vector<int>> freq(nums.size() + 1);
+        std::vector<std::vector<int>> freq(nums.size() + 1); // nums.size()==n
         for (const auto& it: map)
             freq[it.second].push_back(it.first);
 
         // Step 3: Take every item from the back until k elements are taken
         // O(K)
         std::vector<int> ret;
-        for (int i = freq.size() - 1; i >= 0; i--)
+        for (int i = freq.size() - 1; i >= 0; i--) // freq.size()-1 <==> n
         {
             for (int& elem : freq[i])
             {
@@ -294,6 +294,65 @@ public:
         }
 
         return ret;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, implemented a bit differently. This one is easier to read in
+    my opinion.
+
+*/
+
+/* Time  Beats: 80.51% */
+/* Space Beats:  7.13% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Bucket_2 {
+public:
+    std::vector<int> topKFrequent(std::vector<int>& nums, int k)
+    {
+        int n = nums.size();
+        std::unordered_map<int, int> umap;
+
+        // Step 1: Store frequence of all elements in map
+        // O(N)
+        for (const int& num : nums)
+            umap[num]++;
+
+        // Step 2: Bucket Sort's first, main, step
+        // O(N)
+        std::vector<std::vector<int>> bucket(n+1, std::vector<int>());
+        for (auto& entry : umap)
+            bucket[entry.second].push_back(entry.first);
+
+        // Step 3: Take every item from the back until k elements are taken
+        // O(K)
+        std::vector<int> results;
+        for (int i = n; i > 0; i--)
+        {
+            if (bucket[i].empty())
+                continue;
+
+            while (k > 0 && !bucket[i].empty())
+            {
+                results.push_back(bucket[i].back());
+                bucket[i].pop_back();
+                k--;
+            }
+
+            if (k == 0)
+                break;
+        }
+
+        return results;
     }
 };
 
@@ -394,6 +453,8 @@ public:
 
     Now sort this Hash Map(vector of pairs). Since there are M elements in this
     Hash Map(vector of pairs), sorting takes O(M * logM) Time Complexity.
+
+    *** We are sorting it by VALUE(occurrences) in the pair ***
 
     After Sorting:
 
@@ -516,13 +577,13 @@ public:
 };
 
 
-
 int
 main()
 {
     Solution_Heap_1    sol_heap_1;
     Solution_Heap_2    sol_heap_2;
     Solution_Bucket    sol_bucket;
+    Solution_Bucket_2  sol_bucket_2;
     Solution_Efficient sol_eff;
 
     /* Example 1 */
@@ -563,6 +624,7 @@ main()
     // std::vector ret = sol_heap_1.topKFrequent(nums, k);
     // std::vector ret = sol_heap_2.topKFrequent(nums, k);
     // std::vector ret = sol_bucket.topKFrequent(nums, k);
+    // std::vector ret = sol_bucket_2.topKFrequent(nums, k);
     std::vector ret = sol_eff.topKFrequent(nums, k);
 
 
