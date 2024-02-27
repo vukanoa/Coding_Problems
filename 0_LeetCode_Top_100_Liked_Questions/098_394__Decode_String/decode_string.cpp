@@ -120,19 +120,27 @@
 /* Space Complexity: O(n) */
 class Solution{
 public:
+    std::string decodeString(std::string s)
+    {
+        int i = 0;
+
+        return decodeString(s, i);
+    }
+
+private:
     std::string decodeString(const std::string& s, int& i)
     {
         std::string result;
 
         while (i < s.length() && s[i] != ']')
         {
-            if (!isdigit(s[i]))
+            if (!std::isdigit(s[i]))
                 result += s[i++];
             else
             {
                 int n = 0;
 
-                while (i < s.length() && isdigit(s[i]))
+                while (i < s.length() && std::isdigit(s[i]))
                     n = n * 10 + s[i++] - '0';
 
                 i++; // '['
@@ -145,13 +153,6 @@ public:
         }
 
         return result;
-    }
-
-    std::string decodeString(std::string s)
-    {
-        int i = 0;
-
-        return decodeString(s, i);
     }
 };
 
@@ -249,7 +250,7 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_Stack{
+class Solution_Stack_1 {
 public:
     std::string decodeString(std::string s)
     {
@@ -293,11 +294,77 @@ public:
 };
 
 
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same IDEA as above, implemented differently.
+
+    It uses:
+        substr.insert(0, 1, stack.back());
+
+    instead of:
+        substr = stack.back() + substr;
+
+
+    substr.insert(0, 1, stack.back()) means "at offset 0,
+                                             put 1 character,
+                                             character is stack.back()"
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  69.84% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */ // We won't count "result" as additional space
+class Solution_Stack_2 {
+public:
+    std::string decodeString(std::string s)
+    {
+        std::string stack;
+
+        for (int i = 0; i < s.length(); i++)
+        {
+            if (s[i] != ']')
+                stack.push_back(s[i]);
+            else
+            {
+                std::string substr = "";
+                while (stack.back() != '[')
+                {
+                    substr.insert(0, 1, stack.back());
+                    stack.pop_back();
+                }
+                stack.pop_back(); // Pop '[' itself.
+
+                std::string k;
+                while (!stack.empty() && std::isdigit(stack.back()))
+                {
+                    k.insert(0, 1, stack.back());
+                    stack.pop_back();
+                }
+
+                int number = std::stoi(k); // stoi == string_to_int
+                for (int j = 0; j < number; j++)
+                    stack += substr;
+            }
+        }
+
+        return stack;
+    }
+};
+
+
 int
 main()
 {
     Solution sol;
-    Solution_Stack sol_stack;
+    Solution_Stack_1 sol_stack_1;
+    Solution_Stack_2 sol_stack_2;
 
     /* Example 1 */
     // std::string s = "3[a]2[bc]";
@@ -322,7 +389,8 @@ main()
 
     /* Solution */
     // std::string result = sol.decodeString(s);
-    std::string result = sol_stack.decodeString(s);
+    std::string result = sol_stack_1.decodeString(s);
+    // std::string result = sol_stack_2.decodeString(s);
 
 
     /* Write Output */
