@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <map>
 
 /*
     ==============
@@ -491,6 +493,46 @@ public:
 
             if (stack.size() >= 2 && stack[stack.size() - 1] <= stack[stack.size() - 2])
                 stack.pop_back();
+        }
+
+        return stack.size();
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 22.54% */
+/* Space Beats: 11.71% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n)        */
+class Solution {
+public:
+    int carFleet(int target, vector<int>& position, vector<int>& speed)
+    {
+        std::map<int, std::pair<int, int>> map;
+
+        for (int i = 0; i < position.size(); i++)
+            map.insert({position[i], {position[i], speed[i]}});
+
+        for (auto& entry : map)
+            entry.second.first = target - entry.second.first;
+
+        std::stack<double> stack;
+        for (auto iter = map.rbegin(); iter != map.rend(); ++iter)
+        {
+            if (stack.empty() || stack.top() < (1.0 * iter->second.first / iter->second.second))
+                stack.push(1.0 * iter->second.first / iter->second.second);
         }
 
         return stack.size();
