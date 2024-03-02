@@ -94,3 +94,47 @@ public:
         return stack != "" ? stack : "0";
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Absolutely equivalent to the one above, however this one makes sure there
+    aren't any leading zeroes to begin with, whereas the above Solution has
+    leading zeroes but removes them before returning the string, i.e. "stack".
+
+*/
+
+/* Time  Beats: 95.52% */
+/* Space Beats: 40.73% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    std::string removeKdigits(std::string num, int k)
+    {
+        std::string stack;
+
+        for (int i = 0; i < num.length(); i++)
+        {
+            while (k > 0 && !stack.empty() && stack.back() > num[i])
+            {
+                stack.pop_back();
+                k--;
+            }
+
+            if (!(stack.empty() && num[i] == '0')) // To prevent leading zeroes
+                stack.push_back(num[i]);
+        }
+
+        while (k-- > 0 && !stack.empty())
+            stack.pop_back();
+
+        return stack != "" ? stack : "0";
+    }
+};
