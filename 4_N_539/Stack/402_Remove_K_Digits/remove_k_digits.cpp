@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <sstream>
 
 /*
     ==============
@@ -55,8 +54,17 @@
 
 */
 
-/* Time  Beats: 83.43% */
-/* Space Beats: 17.54% */
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 98.30% */
+/* Space Beats: 51.91% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
@@ -64,95 +72,25 @@ class Solution {
 public:
     std::string removeKdigits(std::string num, int k)
     {
-        if (num.length() == k)
-            return "0";
+        std::string stack;
 
-        std::vector<char> stack;
-        int i = 0;
-        while (i < num.length())
-        {
-            while (k > 0 && !stack.empty() && stack.back() > num[i]) // We can compare characters
-            {
-                k--;
-                stack.pop_back();
-            }
-
-            if (!stack.empty())
-                stack.push_back(num[i]);
-            else if (num[i] != '0') // Make sure there aren't any leading zeros
-                stack.push_back(num[i]);
-
-            i++;
-        }
-
-        // If, say, all the numbers were increasing: num="12345", k=2
-        while (!stack.empty() && k-- > 0)
-            stack.pop_back();
-
-        // Make a string
-        std::ostringstream out;
-        for (char& c : stack)
-            out << c;
-
-        return out.str() == "" ? "0" : out.str();
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Same IDEA, different handling of leading zeros.
-
-*/
-
-/* Time  Beats: 87.38% */
-/* Space Beats: 17.54% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_2 {
-public:
-    std::string removeKdigits(std::string num, int k)
-    {
-        if (num.length() == k)
-            return "0";
-
-        std::vector<char> stack;
         for (int i = 0; i < num.length(); i++)
         {
-            while (k > 0 && !stack.empty() && stack.back() > num[i]) // We can compare characters
+            while (k > 0 && !stack.empty() && stack.back() > num[i])
             {
-                k--;
                 stack.pop_back();
+                k--;
             }
 
             stack.push_back(num[i]);
         }
 
-        // If, say, all the numbers were increasing: num="12345", k=2
-        while (!stack.empty() && k-- > 0)
+        while (k-- > 0 && !stack.empty())
             stack.pop_back();
 
-        // Make sure leading zeros are ignored
-        int i = 0;
-        while (i < stack.size())
-        {
-            if (stack[i] == '0')
-                i++;
-            else
-                break;
-        }
+        // Remove leading zeroes
+        stack.erase(0, stack.find_first_not_of('0'));
 
-        // Make a string
-        std::ostringstream out;
-        while (i < stack.size())
-            out << stack[i++];
-
-        return out.str() == "" ? "0" : out.str();
+        return stack != "" ? stack : "0";
     }
 };
