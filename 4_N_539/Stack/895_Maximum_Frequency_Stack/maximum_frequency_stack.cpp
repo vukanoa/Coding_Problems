@@ -107,40 +107,40 @@
 class FreqStack {
 public:
     FreqStack()
-        : group_stack(1)
-    {
-
-    }
+        : group_stacks(1)
+    {}
 
     void push(int val)
     {
         umap_count[val]++;
 
-        if (group_stack.size() < umap_count[val] + 1)
+        if (group_stacks.size() < umap_count[val] + 1)
         {
             std::stack<int> stack;
             stack.push(val);
 
-            group_stack.push_back(std::make_pair(umap_count[val], stack));
+            group_stacks.push_back(std::make_pair(umap_count[val], stack));
         }
         else
-            group_stack[umap_count[val]].second.push(val);
+            group_stacks[umap_count[val]].second.push(val);
     }
 
     int pop()
     {
-        int ret = group_stack.back().second.top();
-        group_stack.back().second.pop();
+        int val = group_stacks.back().second.top();
+        group_stacks.back().second.pop();
 
-        if (group_stack.back().second.empty())
-            group_stack.pop_back();
+        umap_count[val]--;
 
-        return ret;
+        if (group_stacks.back().second.empty())
+            group_stacks.pop_back();
+
+        return val;
     }
 
 private:
     std::unordered_map<int, int> umap_count;
-    std::vector<std::pair<int, std::stack<int>>> group_stack;
+    std::vector<std::pair<int, std::stack<int>>> group_stacks;
 };
 
 /**
@@ -149,3 +149,66 @@ private:
  * obj->push(val);
  * int param_2 = obj->pop();
  */
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of solving it.
+
+    This one uses a HashMap of stacks instead of vector of stacks.
+    When we are using the vector we're always retrieving from:
+
+        group_stacks.back()
+
+    whereas here, we retrieve from:
+
+        group_stacks[max_count]
+
+    That's why we have to maintain and update "max_count".
+
+*/
+
+/* Time  Beats: 96.06% */
+/* Space Beats: 47.77% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class FreqStack {
+public:
+    FreqStack()
+        : group_stacks(1), max_count(0)
+    {}
+
+    void push(int val)
+    {
+        umap_count[val]++;
+
+        if (umap_count[val] > max_count)
+            max_count = umap_count[val];
+
+        group_stacks[umap_count[val]].push(val);
+    }
+
+    int pop()
+    {
+        int val = group_stacks[max_count].top();
+        group_stacks[max_count].pop();
+
+        umap_count[val]--;
+
+        if (group_stacks[max_count].empty())
+            max_count--;
+
+        return val;
+    }
+
+private:
+    std::unordered_map<int, int> umap_count;
+    std::unordered_map<int, std::stack<int>> group_stacks;
+    int max_count;
+};
