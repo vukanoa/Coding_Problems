@@ -156,8 +156,8 @@
 
 */
 
-/* Time  Beats: 79.81% */
-/* Space Beats: 52.05% */
+/* Time  Beats: 97.89% */
+/* Space Beats: 25.85% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
@@ -165,24 +165,23 @@ class Solution {
 public:
     int leastBricks(std::vector<std::vector<int>>& wall)
     {
-        int rows = wall.size();
-        std::unordered_map<int, int> endings_map;
+        std::unordered_map<int, int> uncrossed_bricks;
 
-        for (int curr_row = 0; curr_row < rows; curr_row++)
+        for (int row = 0; row < wall.size(); row++)
         {
             int gap = 0;
-            for (int j = 0; j < wall[curr_row].size() - 1; j++)
+            for (int col = 0; col < wall[row].size() - 1; col++)
             {
-                gap += wall[curr_row][j];
+                gap += wall[row][col]; // wall[row][col] <==> brick_width
 
-                endings_map[gap]++; // Initial value is 0
+                uncrossed_bricks[gap]++; // Initial value is 0
             }
         }
 
-        int max_endings = 0;
-        for (auto& entry : endings_map)
-            max_endings = std::max(max_endings, entry.second);
+        int max_uncrossed_bricks = 0;
+        for (auto& entry : uncrossed_bricks)
+            max_uncrossed_bricks = std::max(max_uncrossed_bricks, entry.second);
 
-        return rows - max_endings;
+        return wall.size() - max_uncrossed_bricks; // Least crossed bricks
     }
 };
