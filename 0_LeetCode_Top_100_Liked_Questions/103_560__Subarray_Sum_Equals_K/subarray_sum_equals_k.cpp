@@ -501,25 +501,24 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution{
+class Solution {
 public:
     int subarraySum(std::vector<int>& nums, int k)
     {
         int result = 0;
-        int curr_sum = 0;
 
-        std::unordered_map<int, int> prefix_sums;
-        prefix_sums = {{0, 1}};
+        std::unordered_map<int, int> prefix_sum;
+        prefix_sum.insert({0, 1});
 
-        for (const auto& n : nums)
+        int sum = 0;
+        for (int i = 0; i < nums.size(); i++)
         {
-            curr_sum += n;
-            int diff = curr_sum - k;
+            sum += nums[i];
 
-            if (prefix_sums.find(diff) != prefix_sums.end())
-                result += prefix_sums[diff];
+            if (prefix_sum.find(sum - k) != prefix_sum.end())
+                result += prefix_sum[sum - k];
 
-            prefix_sums[curr_sum]++;
+            prefix_sum[sum]++;
         }
 
         return result;
