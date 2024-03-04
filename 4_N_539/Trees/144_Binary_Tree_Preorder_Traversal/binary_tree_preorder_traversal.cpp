@@ -94,7 +94,7 @@ private:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution_Iterative {
+class Solution_Iterative_1 {
 public:
     std::vector<int> preorderTraversal(TreeNode* root)
     {
@@ -117,6 +117,64 @@ public:
 
             if (root->left)
                 stack.push(root->left);
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, implemented differently.
+
+    This one is reminiscent of "Iterative Inorder" implementation.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  61.40% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Iterative_1 {
+public:
+    std::vector<int> preorderTraversal(TreeNode* root)
+    {
+        std::vector<int> result;
+        std::stack<TreeNode*> stack;
+
+        while (true)
+        {
+            if (root)
+            {
+                result.push_back(root->val);
+
+                if (root->right)
+                    stack.push(root->right);
+
+                root = root->left;
+            }
+            else
+            {
+                if (stack.empty())
+                    break;
+
+                root = stack.top();
+                stack.pop();
+
+                result.push_back(root->val);
+
+                if (root->right)
+                    stack.push(root->right);
+
+                root = root->left;
+            }
         }
 
         return result;
