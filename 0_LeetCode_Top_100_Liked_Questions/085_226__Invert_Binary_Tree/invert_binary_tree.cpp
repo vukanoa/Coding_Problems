@@ -2,43 +2,43 @@
 #include <queue>
 
 /*
-	============
-	=== EASY ===
-	============
+    ============
+    === EASY ===
+    ============
 
-	===========================
-	226) Invert Binary Tree
-	===========================
+    ===========================
+    226) Invert Binary Tree
+    ===========================
 
-	============
-	Description:
-	============
+    ============
+    Description:
+    ============
 
-	Given the "root" of a binary Tree, invert the tree, and return its root.
+    Given the "root" of a binary Tree, invert the tree, and return its root.
 
-	===============================================
-	FUNCTION: TreeNode* invertTree(TreeNode* root);
-	===============================================
+    ===============================================
+    FUNCTION: TreeNode* invertTree(TreeNode* root);
+    ===============================================
 
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
 
-	--- Example 1 ---
-	Input:  root = [4, 2, 7, 1, 3, 6, 9]
-	Output: [4, 7, 2, 9, 6, 3, 1]
+    --- Example 1 ---
+    Input:  root = [4, 2, 7, 1, 3, 6, 9]
+    Output: [4, 7, 2, 9, 6, 3, 1]
 
-	--- Example 2 ---
-	Input:  root = [2, 1, 3]
-	Output: [2, 1, 3]
+    --- Example 2 ---
+    Input:  root = [2, 1, 3]
+    Output: [2, 1, 3]
 
-	--- Example 3 ---
-	Input:  []
-	Output: []
+    --- Example 3 ---
+    Input:  []
+    Output: []
 
-	*** Constraints ***
-	The number of nodes in the tree is in the range [0, 100].
-	-100 <= Node.val <= 100
+    *** Constraints ***
+    The number of nodes in the tree is in the range [0, 100].
+    -100 <= Node.val <= 100
 
 */
 
@@ -55,295 +55,293 @@ struct TreeNode {
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	This is a classic tree problem that is best-suited for a recursive approach
+    This is a classic tree problem that is best-suited for a recursive approach
 
-	Algorithm
-	The inverse of an empty tree is empty tree. The inverse of a tree with root
-	"t", and subtrees "right" and "left", is a tree with root "r", whose right
-	subtree is the inverse of "left", and whose left subtree is the inverse of
-	"right".
+    Algorithm
+    The inverse of an empty tree is empty tree. The inverse of a tree with root
+    "t", and subtrees "right" and "left", is a tree with root "r", whose right
+    subtree is the inverse of "left", and whose left subtree is the inverse of
+    "right".
 */
 
 
 /* Time  Beats:   100% */
 /* Space Beats: 77.34% */
 
-/*	Time  Complexity: O(n) */
+/*    Time  Complexity: O(n) */
 /*
-	Space Complexity: O(h)
-	where 'h' is the height of the tree. At worst 'h' can be 'n' and that makes
-	it O(n)
+    Space Complexity: O(h)
+    where 'h' is the height of the tree. At worst 'h' can be 'n' and that makes
+    it O(n)
 */
 class Solution{
 public:
-	TreeNode* invertTree(TreeNode* root)
-	{
-		if (root == nullptr)
-			return nullptr;
+    TreeNode* invertTree(TreeNode* root)
+    {
+        if (!root)
+            return nullptr;
 
-		TreeNode* left  = invertTree(root->left);
-		TreeNode* right = invertTree(root->right);
-		root->left  = right;
-		root->right = left;
+        TreeNode* left  = invertTree(root->left);
+        TreeNode* right = invertTree(root->right);
 
-		return root;
-	}
+        root->left  = right;
+        root->right = left;
+
+        return root;
+    }
 };
 
 
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	The same as above, but implemented on another occasion so I wanted to have
-	another implementation of it.
-	
+    The same as above, but implemented on another occasion so I wanted to have
+    another implementation of it.
+
 */
 
 /* Time  Beats:  100% */
 /* Space Beats: 77.34% */
 
-/*	Time  Complexity: O(n) */
+/*    Time  Complexity: O(n) */
 /*
-	Space Complexity: O(h)
-	In the worst case the queue will contain all nodes in one level of the
-	binary tree. For a full binary tree, the leaf level has ceil(n / 2) = O(n)
-	leaves.
+    Space Complexity: O(h)
+    In the worst case the queue will contain all nodes in one level of the
+    binary tree. For a full binary tree, the leaf level has ceil(n / 2) = O(n)
+    leaves.
 */
-class Solution_Another{
+class Solution_Another {
 public:
-	TreeNode* invertTree(TreeNode* root)
-	{
-		if (root == nullptr)
-			return nullptr;
+    TreeNode* invertTree(TreeNode* root)
+    {
+        if (!root)
+            return nullptr;
 
-		/* Leaf node */
-		if (root->left == nullptr && root->right == nullptr)
-			return root;
+        /* Invert (Swap) */
+        TreeNode* tmp = root->left;
+        root->left = root->right;
+        root->right = tmp;
 
-		/* Invert (Swap) */
-		TreeNode* tmp = root->left;
-		root->left = root->right;
-		root->right = tmp;
+        invertTree(root->left);
+        invertTree(root->right);
 
-		invertTree(root->left);
-		invertTree(root->right);
-		
-		return root;
-	}
+        return root;
+    }
 };
 
 
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	Alternatively, we can solve the problem iteratively, in a manner similar
-	to Breadth-first search(BFS). (Or DFS as well)
+    Alternatively, we can solve the problem iteratively, in a manner similar
+    to Breadth-first search(BFS). (Or DFS as well)
 
-	Algorithm
-	The idea is that we need to swap the left and right child of all nodes in
-	the tree. So we create a queue to store nodes whose left and right child
-	have not been swapped yet. Initially, only the root is in the queue. As
-	long as the queue is not empty, remove the next node from the queue, swap
-	its children, and add the children to the queue. Null nodes are not added
-	to the queue. Eventually, the queue will be empty and all the children
-	swapped, and we return the original root.
+    Algorithm
+    The idea is that we need to swap the left and right child of all nodes in
+    the tree. So we create a queue to store nodes whose left and right child
+    have not been swapped yet. Initially, only the root is in the queue. As
+    long as the queue is not empty, remove the next node from the queue, swap
+    its children, and add the children to the queue. Null nodes are not added
+    to the queue. Eventually, the queue will be empty and all the children
+    swapped, and we return the original root.
 
-	Though, this Solution is a lot less Space efficient.
+    Though, this Solution is a lot less Space efficient.
 
 */
 
 /* Time  Beats:  100% */
 /* Space Beats: 5.27% */
 
-/*	Time  Complexity: O(n) */
+/*    Time  Complexity: O(n) */
 /*
-	Space Complexity: O(h)
-	In the worst case the queue will contain al nodes in one level of the
-	binary tree. For a full binary tree, the leaf level has ceil(n / 2) = O(n)
-	leaves.
+    Space Complexity: O(h)
+    In the worst case the queue will contain al nodes in one level of the
+    binary tree. For a full binary tree, the leaf level has ceil(n / 2) = O(n)
+    leaves.
 */
-class Solution_iterative{
+class Solution_iterative {
 public:
-	TreeNode* invertTree(TreeNode* root)
-	{
-		if (root == nullptr)
-			return nullptr;
+    TreeNode* invertTree(TreeNode* root)
+    {
+        if (!root)
+            return nullptr;
 
-		std::queue<TreeNode*> queue;
-		queue.push(root);
+        std::queue<TreeNode*> queue;
+        queue.push(root);
 
-		while (!queue.empty())
-		{
-			TreeNode* curr = queue.front();
-			queue.pop();
-			TreeNode* tmp  = curr->left;
+        while (!queue.empty())
+        {
+            TreeNode* curr = queue.front();
+            queue.pop();
 
-			curr->left  = curr->right;
-			curr->right = tmp;
+            /* Invert (Swap) */
+            TreeNode* tmp  = curr->left;
+            curr->left  = curr->right;
+            curr->right = tmp;
 
-			if (curr->left != nullptr)
-				queue.push(curr->left);
+            if (curr->left)
+                queue.push(curr->left);
 
-			if (curr->right != nullptr)
-				queue.push(curr->right);
-		}
+            if (curr->right)
+                queue.push(curr->right);
+        }
 
-		return root;
-	}
+        return root;
+    }
 };
 
 
 /*
-	=============================
-	=== This is just printing ===
-	=============================
+    =============================
+    === This is just printing ===
+    =============================
 */
 
 void
 print_array(std::vector<std::string>& nums)
 {
-	bool first = true;
-	std::cout << "\n\t\tTree: [";
-	for (auto x: nums)
-	{
-		if (!first)
-			std::cout << ", ";
+    bool first = true;
+    std::cout << "\n\t\tTree: [";
+    for (auto x: nums)
+    {
+        if (!first)
+            std::cout << ", ";
 
-		std::cout << x;
-		first = false;
-	}
-	std::cout << "]";
+        std::cout << x;
+        first = false;
+    }
+    std::cout << "]";
 }
 
 
 void
 print_levelorder(TreeNode* root)
 {
-	if (root == nullptr)
-		return;
-	
-	std::queue<TreeNode*> queue;
-	queue.push(root);
+    if (!root)
+        return;
 
-	std::vector<std::string> vector_print;
+    std::queue<TreeNode*> queue;
+    queue.push(root);
 
-	while (!queue.empty())
-	{
-		int size = queue.size();
+    std::vector<std::string> vector_print;
 
-		for (int i = 0; i < size; i++)
-		{
-			TreeNode* node = queue.front();
-			queue.pop();
+    while (!queue.empty())
+    {
+        int size = queue.size();
 
-			if (node == nullptr)
-			{
-				vector_print.push_back("null");
-				continue;
-			}
-			else
-				vector_print.push_back(std::to_string(node->val));
+        for (int i = 0; i < size; i++)
+        {
+            TreeNode* node = queue.front();
+            queue.pop();
 
-			if (node->left != nullptr)
-				queue.push(node->left);
-			else
-				queue.push(nullptr);
+            if (!node)
+            {
+                vector_print.push_back("null");
+                continue;
+            }
+            else
+                vector_print.push_back(std::to_string(node->val));
 
-			if (node->right != nullptr)
-				queue.push(node->right);
-			else
-				queue.push(nullptr);
-		}
-	}
+            if (node->left)
+                queue.push(node->left);
+            else
+                queue.push(nullptr);
 
-	int x = vector_print.size() - 1;
-	while (vector_print[x] == "null")
-	{
-		vector_print.pop_back();
-		x--;
-	}
+            if (node->right)
+                queue.push(node->right);
+            else
+                queue.push(nullptr);
+        }
+    }
 
-	print_array(vector_print);
+    int x = vector_print.size() - 1;
+    while (vector_print[x] == "null")
+    {
+        vector_print.pop_back();
+        x--;
+    }
+
+    print_array(vector_print);
 }
 
 
 int
 main()
 {
-	Solution sol;
-	Solution_Another sol_another;
-	Solution_iterative sol_iter;
+    Solution           sol;
+    Solution_Another   sol_another;
+    Solution_iterative sol_iter;
 
-	/* Example 1 */
-	TreeNode four(4);
-	TreeNode two(2);
-	TreeNode seven(7);
-	TreeNode one(1);
-	TreeNode three(3);
-	TreeNode six(6);
-	TreeNode nine(9);
+    /* Example 1 */
+    TreeNode four(4);
+    TreeNode two(2);
+    TreeNode seven(7);
+    TreeNode one(1);
+    TreeNode three(3);
+    TreeNode six(6);
+    TreeNode nine(9);
 
-	four.left   = &two;
-	four.right  = &seven;
-	two.left    = &one;
-	two.right   = &three;
-	seven.left  = &six;
-	seven.right = &nine;
+    four.left   = &two;
+    four.right  = &seven;
+    two.left    = &one;
+    two.right   = &three;
+    seven.left  = &six;
+    seven.right = &nine;
 
-	TreeNode* root = &four;
-
-
-
-	/* Example 2 */
-	// TreeNode two(2);
-	// TreeNode one(1);
-	// TreeNode three(3);
-
-	// two.left  = &one;
-	// two.right = &three;
-
-	// TreeNode* root = &two;
+    TreeNode* root = &four;
 
 
 
-	/* Example 3 */
-	// TreeNode* root = nullptr;
+    /* Example 2 */
+    // TreeNode two(2);
+    // TreeNode one(1);
+    // TreeNode three(3);
 
-	std::cout << "\n\t==========================";
-	std::cout << "\n\t=== INVERT BINARY TREE ===";
-	std::cout << "\n\t==========================\n";
+    // two.left  = &one;
+    // two.right = &three;
 
-
-	/* Write Input */
-	std::cout << "\n\t\t\t(TODO: Implement a Visual representation of a Binary Tree)\n\n";
-	std::cout << "\n\tBefore: ";
-	print_levelorder(root);
-	std::cout << "\n";
+    // TreeNode* root = &two;
 
 
-	/* Solution */
-	// sol.invertTree(root);
-	sol_another.invertTree(root);
-	// sol_iter.invertTree(root);
+
+    /* Example 3 */
+    // TreeNode* root = nullptr;
+
+    std::cout << "\n\t==========================";
+    std::cout << "\n\t=== INVERT BINARY TREE ===";
+    std::cout << "\n\t==========================\n";
 
 
-	/* Write Output */
-	std::cout << "\n\tAfter:  ";
-	print_levelorder(root);
-	std::cout << "\n\n\n";
+    /* Write Input */
+    std::cout << "\n\t\t\t(TODO: Implement a Visual representation of a Binary Tree)\n\n";
+    std::cout << "\n\tBefore: ";
+    print_levelorder(root);
+    std::cout << "\n";
 
 
-	return 0;
+    /* Solution */
+    // sol.invertTree(root);
+    sol_another.invertTree(root);
+    // sol_iter.invertTree(root);
+
+
+    /* Write Output */
+    std::cout << "\n\tAfter:  ";
+    print_levelorder(root);
+    std::cout << "\n\n\n";
+
+
+    return 0;
 }
