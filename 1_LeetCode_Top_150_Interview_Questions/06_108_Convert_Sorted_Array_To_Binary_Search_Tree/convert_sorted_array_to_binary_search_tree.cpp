@@ -1,72 +1,63 @@
 #include <iostream>
 #include <vector>
-#include <functional>
-
 #include <queue>
 
 /*
-	============
-	=== EASY ===
-	============
+    ============
+    === EASY ===
+    ============
 
-	===============================================
-	108) Convert Sorted Array To Binary Search Tree
-	===============================================
+    ===============================================
+    108) Convert Sorted Array To Binary Search Tree
+    ===============================================
 
-	============
-	Description:
-	============
+    ============
+    Description:
+    ============
 
-	Given an integer array nums where the elements are sorted in ascending
-	order, convert it to a height-balanced binary search tree.
+    Given an integer array nums where the elements are sorted in ascending
+    order, convert it to a height-balanced binary search tree.
 
-	=====
-	Node: <++>
-	=====
+    =============================================================
+    FUNCTION: TreeNode* sortedArrayToBST(std::vector<int>& nums);
+    =============================================================
 
-	===============================
-	FUNCTION: <++>
-	===============================
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
 
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
+    --- Example 1 ---
+    ___________
+    _____0_____
+    _-3_____9__
+    10____5____
 
-	--- Example 1 ---
-	___________
-	_____0_____
-	_-3_____9__
-	10____5____
-
-	Input:  [-10, -3, 0, 5, 9]
-	Output: [0, -3, 9, -10, null, 5] // Level-order
-	Explanation: [0, -10, 5, null, -3, null, 9] is also accepted:
-	___________
-	_____0_____
-	_-10____5__
-	___-3_____9
+    Input:  [-10, -3, 0, 5, 9]
+    Output: [0, -3, 9, -10, null, 5] // Level-order
+    Explanation: [0, -10, 5, null, -3, null, 9] is also accepted:
+    ___________
+    _____0_____
+    _-10____5__
+    ___-3_____9
 
 
 
 
-	--- Example 2 ---
-	_____      _____
-	__3__      __1__
-	1____      ____3
+    --- Example 2 ---
+    _____      _____
+    __3__      __1__
+    1____      ____3
 
-	Input: [1, 3] 
-	Output: [3, 1]
-	Explanation: [1, null, 3] and [3, 1] are both height-balanced BSTs.
+    Input: [1, 3]
+    Output: [3, 1]
+    Explanation: [1, null, 3] and [3, 1] are both height-balanced BSTs.
 
-	*** Constraints ***
-	1 <= nums.length <= 104
-	-104 <= nums[i] <= 104
-	nums is sorted in a strictly increasing order.
+    *** Constraints ***
+    1 <= nums.length <= 10^4
+    -104 <= nums[i] <= 10^4
+    nums is sorted in a strictly increasing order.
 
 */
-
-
-
 
 // Definition for a binary tree node.
 struct TreeNode {
@@ -78,70 +69,13 @@ struct TreeNode {
     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
-
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	Just part it and make recursively a BST.
-	
-*/
+    TODO
 
-/* Time  Beats: 79.42% */
-/* Space Beats: 65.30% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution {
-public:
-	TreeNode* sortedArrayToBST(std::vector<int>& nums)
-	{
-		if (nums.size() == 1)
-			return new TreeNode(nums[0]);
-
-		int left  = 0;
-		int right = nums.size() - 1;
-
-		return construct_BST(nums, left, right);
-	}
-
-private:
-	TreeNode* construct_BST(std::vector<int>& nums, int left, int right)
-	{
-		if (left == right)
-			return new TreeNode(nums[left]);
-		else if (right - left == 1)
-		{
-			TreeNode* subroot = new TreeNode(nums[right]);
-			TreeNode* leaf    = new TreeNode(nums[left]);
-
-			subroot->left = leaf;
-
-			return subroot;
-		}
-
-		int mid = (left + right) / 2;
-
-		TreeNode* root = new TreeNode(nums[mid]);
-
-		root->left  = construct_BST(nums, left, mid - 1);
-		root->right = construct_BST(nums, mid+1, right);
-
-		return root;
-	}
-};
-
-
-
-
-/*
-	------------
-	--- IDEA ---
-	------------
-
-	Much more neatly written.
-	
 */
 
 /* Time  Beats: 98.21% */
@@ -149,202 +83,147 @@ private:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution_Neat{
+class Solution {
 public:
-	TreeNode* sortedArrayToBST(std::vector<int>& nums)
-	{
-		if (nums.size() == 1)
-			return new TreeNode(nums[0]);
-
-		return construct_BST(nums, 0, nums.size() - 1);
-	}
+    TreeNode* sortedArrayToBST(std::vector<int>& nums)
+    {
+        return construct_BST(nums, 0, nums.size()-1);
+    }
 
 private:
-	TreeNode* construct_BST(std::vector<int>& nums, int left, int right)
-	{
-		if (left > right)
-			return nullptr;
+    TreeNode* construct_BST(std::vector<int>& nums, int left, int right)
+    {
+        if (right < left)
+            return nullptr;
 
-		int mid = (left + right) / 2;
+        int mid = left + (right - left) / 2;
 
-		TreeNode* root = new TreeNode(nums[mid]);
+        TreeNode* node = new TreeNode(nums[mid]);
+        node->left  = construct_BST(nums, left , mid-1);
+        node->right = construct_BST(nums, mid+1, right);
 
-		root->left  = construct_BST(nums, left,  mid-1);
-		root->right = construct_BST(nums, mid+1, right);
-
-		return root;
-	}
+        return node;
+    }
 };
 
 
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
-
-	Implemented using recursive Lambda function.
-	
-*/
-
-/* Time  Beats: 24.85% */
-/* Space Beats: 17.93% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_Lambda {
-public:
-	TreeNode* sortedArrayToBST(std::vector<int>& nums)
-	{
-		if (nums.size() == 1)
-			return new TreeNode(nums[0]);
-
-		std::function<TreeNode*(int, int)> construct_BST;
-
-		/* Lambda */
-		construct_BST = [&](int left, int right) -> TreeNode* {
-			if (left > right)
-				return nullptr;
-
-			int mid = (left + right) / 2;
-
-			TreeNode* root = new TreeNode(nums[mid]);
-
-			root->left  = construct_BST(left,  mid-1);
-			root->right = construct_BST(mid+1, right);
-
-			return root;
-		};
-
-			return construct_BST(0, nums.size() - 1);
-		}
-};
-
-
-
-
-/*
-	=============================
-	=== This is just printing ===
-	=============================
+    =============================
+    === This is just printing ===
+    =============================
 */
 
 void
 print_array(std::vector<std::string>& nums)
 {
-	bool first = true;
-	std::cout << "\n\tTree: [";
-	for (auto x: nums)
-	{
-		if (!first)
-			std::cout << ", ";
+    bool first = true;
+    std::cout << "\n\tTree: [";
+    for (auto x: nums)
+    {
+        if (!first)
+            std::cout << ", ";
 
-		std::cout << x;
-		first = false;
-	}
-	std::cout << "]  *** LEVEL ORDER ***\n\n";
+        std::cout << x;
+        first = false;
+    }
+    std::cout << "]  *** LEVEL ORDER ***\n\n";
 }
 
 
 void
 print_levelorder(TreeNode* root)
 {
-	if (root == nullptr)
-		return;
-	
-	std::queue<TreeNode*> queue;
-	queue.push(root);
+    if (!root)
+        return;
 
-	std::vector<std::string> vector_print;
+    std::queue<TreeNode*> queue;
+    queue.push(root);
 
-	while (!queue.empty())
-	{
-		int size = queue.size();
+    std::vector<std::string> vector_print;
 
-		for (int i = 0; i < size; i++)
-		{
-			TreeNode* node = queue.front();
-			queue.pop();
+    while (!queue.empty())
+    {
+        int size = queue.size();
 
-			if (node == nullptr)
-			{
-				vector_print.push_back("null");
-				continue;
-			}
-			else
-				vector_print.push_back(std::to_string(node->val));
+        for (int i = 0; i < size; i++)
+        {
+            TreeNode* node = queue.front();
+            queue.pop();
 
-			if (node->left != nullptr)
-				queue.push(node->left);
-			else
-				queue.push(nullptr);
+            if (!node)
+            {
+                vector_print.push_back("null");
+                continue;
+            }
+            else
+                vector_print.push_back(std::to_string(node->val));
 
-			if (node->right != nullptr)
-				queue.push(node->right);
-			else
-				queue.push(nullptr);
-		}
-	}
+            if (node->left)
+                queue.push(node->left);
+            else
+                queue.push(nullptr);
 
-	int x = vector_print.size() - 1;
-	while (vector_print[x] == "null")
-	{
-		vector_print.pop_back();
-		x--;
-	}
+            if (node->right)
+                queue.push(node->right);
+            else
+                queue.push(nullptr);
+        }
+    }
 
-	print_array(vector_print);
+    int x = vector_print.size() - 1;
+    while (vector_print[x] == "null")
+    {
+        vector_print.pop_back();
+        x--;
+    }
+
+    print_array(vector_print);
 }
-
 
 
 int
 main()
 {
-	Solution        sol;
-	Solution_Neat   sol_neat;
-	Solution_Lambda sol_lambda;
+    Solution sol;
+
+    /* Example 1 */
+    std::vector<int> nums = {-10, -3, 0, 5, 9};
+
+    /* Example 2 */
+    // std::vector<int> nums = {1, 3};
+
+    /* Example 3 */
+    // std::vector<int> nums = {-10};
 
 
-	/* Example 1 */
-	std::vector<int> nums = {-10, -3, 0, 5, 9};
-
-	/* Example 2 */
-	// std::vector<int> nums = {1, 3};
-
-	/* Example 3 */
-	// std::vector<int> nums = {-10};
+    std::cout << "\n\t==================================================";
+    std::cout << "\n\t=== CONVERT SORTED ARRAY TO BINARY SEARCH TREE ===";
+    std::cout << "\n\t==================================================\n";
 
 
-	std::cout << "\n\t==================================================";
-	std::cout << "\n\t=== CONVERT SORTED ARRAY TO BINARY SEARCH TREE ===";
-	std::cout << "\n\t==================================================\n";
+    /* Write Input */
+    bool first = true;
+    std::cout << "\n\tNums: [";
+    for (auto x: nums)
+    {
+        if (!first)
+            std::cout << ", ";
+
+        std::cout << x;
+        first = false;
+    }
+    std::cout << "]\n";
 
 
-	/* Write Input */
-	bool first = true;
-	std::cout << "\n\tNums: [";
-	for (auto x: nums)
-	{
-		if (!first)
-			std::cout << ", ";
-
-		std::cout << x;
-		first = false;
-	}
-	std::cout << "]\n";
+    /* Solution */
+    TreeNode* root = sol.sortedArrayToBST(nums);
 
 
-	/* Solution */
-	// TreeNode* root = sol.sortedArrayToBST(nums);
-	TreeNode* root = sol_neat.sortedArrayToBST(nums);
-	// TreeNode* root = sol_lambda.sortedArrayToBST(nums);
+    /* Write Output */
+    print_levelorder(root);
 
 
-	/* Write Output */
-	print_levelorder(root);
-
-
-	return 0;
+    return 0;
 }
