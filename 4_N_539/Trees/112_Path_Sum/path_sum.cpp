@@ -67,6 +67,22 @@
  * };
  */
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    One of the fundamental techniques - DFS. It's nothing tricky of fancy or
+    advanced.
+
+    If you know how DFS works and if you know how to implement it recursively,
+    you should be able to solve this.
+
+    If not, make sure to figure out DFS first, that is definitely a
+    prerequisite for this problem.
+
+*/
+
 /* Time  Beats: 96.44% */
 /* Space Beats: 89.80% */
 
@@ -76,27 +92,19 @@ class Solution {
 public:
     bool hasPathSum(TreeNode* root, int targetSum)
     {
-        if (!root)
-            return false;
-
         return dfs(root, targetSum, 0);
     }
 
 private:
-    bool dfs(TreeNode* root, int targetSum, int sum)
+    bool dfs(TreeNode* root, int& targetSum, int currSum)
     {
         if (!root)
             return false;
 
         if (!root->left && !root->right)
-            return sum + root->val == targetSum;
+            return (currSum + root->val) == targetSum;
 
-        if (dfs(root->left,  targetSum, sum + root->val))
-            return true;
-
-        if (dfs(root->right, targetSum, sum + root->val))
-            return true;
-
-        return false;
+        return dfs(root->left,  targetSum, currSum + root->val) ||
+               dfs(root->right, targetSum, currSum + root->val);
     }
 };
