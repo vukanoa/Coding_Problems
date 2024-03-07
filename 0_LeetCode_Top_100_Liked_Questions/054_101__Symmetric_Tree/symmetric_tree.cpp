@@ -94,10 +94,10 @@ struct TreeNode {
     Space Complexity: O(h)
     Where 'h' is the height of tree
 */
-class Solution{
+class Solution {
     void preorder(TreeNode* root, std::vector<int>& left)
     {
-        if (root == nullptr)
+        if (!root)
         {
             left.push_back(-101); // Push null-nodes as -101
             return;
@@ -110,13 +110,13 @@ class Solution{
 
     void postorder(TreeNode* root, std::vector<int>& right)
     {
-        if (root == nullptr)
+        if (!root)
         {
             right.push_back(-101); // Push null-nodes as -101
             return;
         }
 
-        postorder(root->left, right);
+        postorder(root->left,  right);
         postorder(root->right, right);
         right.push_back(root->val);
     }
@@ -124,7 +124,7 @@ class Solution{
 public:
     bool isSymmetric(TreeNode* root)
     {
-        if (root == nullptr)
+        if (!root)
             return true;
 
         std::vector<int> left;
@@ -168,6 +168,31 @@ public:
     Where 'h' is the height of tree
 */
 class Solution_Iter{
+public:
+    bool isSymmetric(TreeNode* root)
+    {
+        if (root == nullptr)
+            return true;
+
+        std::vector<int> left;
+        std::vector<int> right;
+
+        preorder_iter (root->left, left);
+        postorder_iter(root->right, right);
+
+        if (left.size() != right.size())
+            return false;
+
+        for (int i = 0; i < left.size(); i++)
+        {
+            if (left[i] != right[left.size() - 1 - i])
+                return false;
+        }
+
+        return true;
+    }
+
+private:
     void preorder_iter(TreeNode* root, std::vector<int>& left)
     {
         std::stack<TreeNode*> stack;
@@ -290,29 +315,6 @@ class Solution_Iter{
         }
     }
 
-public:
-    bool isSymmetric(TreeNode* root)
-    {
-        if (root == nullptr)
-            return true;
-
-        std::vector<int> left;
-        std::vector<int> right;
-
-        preorder_iter (root->left, left);
-        postorder_iter(root->right, right);
-
-        if (left.size() != right.size())
-            return false;
-
-        for (int i = 0; i < left.size(); i++)
-        {
-            if (left[i] != right[left.size() - 1 - i])
-                return false;
-        }
-
-        return true;
-    }
 };
 
 
@@ -334,13 +336,10 @@ public:
             and
         p->right subtree with q->left  subtree
 
-    Because that's how you properly check if two trees are mirrors.
-
     Look at a Visual representation of a Tree and go through the code and it'll
     be super obvious and easy to understand.
 
 */
-
 
 /* Time  Beats: 88.40% */
 /* Space Beats: 58.50% */
@@ -348,9 +347,10 @@ public:
 /*    Time  Complexity: O(n) */
 /*
     Space Complexity: O(h)
-    Where 'h' is the height of tree
+    Where 'h' is the height of tree and 'h' is, at worst, equals to 'n',
+    therefore we could consider it O(n).
 */
-class Solution_Recursive_1 {
+class Solution_Elegant {
 public:
     bool isSymmetric(TreeNode* root)
     {
@@ -358,53 +358,15 @@ public:
     }
 
 private:
-    bool dfs(TreeNode* p, TreeNode* q)
+    bool dfs(TreeNode* p, TreeNode* q) // p == left, q == right
     {
-        if (!p && !q)
-            return true;
-
-        if (!p || !q) // Only one is null
-            return false;
+        if (!p && !q) return true;
+        if (!p || !q) return false;
 
         if (p->val != q->val)
             return false;
 
         return (dfs(p->left, q->right) && dfs(p->right, q->left));
-    }
-};
-
-
-
-
-/* Time  Beats:  100% */
-/* Space Beats: 77.37% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_Recursive_2 {
-public:
-    bool isSymmetric(TreeNode* root)
-    {
-        return dfs(root->left, root->right);
-    }
-
-private:
-    bool dfs(TreeNode* root_1, TreeNode* root_2)
-    {
-        if (!root_1 && !root_2)
-            return true;
-        else if (!root_1 || !root_2)
-            return false;
-        else if (root_1->val != root_2->val)
-            return false;
-
-        if (!dfs(root_1->left, root_2->right))
-            return false;
-
-        if (!dfs(root_1->right, root_2->left))
-            return false;
-
-        return true;
     }
 };
 
@@ -438,7 +400,7 @@ print_array(std::vector<std::string>& nums)
 void
 print_levelorder(TreeNode* root)
 {
-    if (root == nullptr)
+    if (!root)
         return;
 
     std::queue<TreeNode*> queue;
@@ -455,7 +417,7 @@ print_levelorder(TreeNode* root)
             TreeNode* node = queue.front();
             queue.pop();
 
-            if (node == nullptr)
+            if (!node)
             {
                 vector_print.push_back("null");
                 continue;
@@ -463,12 +425,12 @@ print_levelorder(TreeNode* root)
             else
                 vector_print.push_back(std::to_string(node->val));
 
-            if (node->left != nullptr)
+            if (node->left)
                 queue.push(node->left);
             else
                 queue.push(nullptr);
 
-            if (node->right != nullptr)
+            if (node->right)
                 queue.push(node->right);
             else
                 queue.push(nullptr);
@@ -491,8 +453,7 @@ main()
 {
     Solution sol;
     Solution_Iter sol_iter;
-    Solution_Recursive_1 sol_rec_1;
-    Solution_Recursive_2 sol_rec_2;
+    Solution_Elegant sol_elegant;
 
     /* Example 1 */
     TreeNode three1(3);
@@ -549,8 +510,7 @@ main()
     /* Solution */
     // bool symmetric = sol.isSymmetric(root);
     // bool symmetric = sol_iter.isSymmetric(root);
-    // bool symmetric = sol_rec_1.isSymmetric(root);
-    bool symmetric = sol_rec_2.isSymmetric(root);
+    bool symmetric = sol_elegant.isSymmetric(root);
 
 
     /* Write Output */
