@@ -61,7 +61,14 @@
  */
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
 
+    Messy way of implementing.
+
+*/
 
 /* Time  Beats: 75.62% */
 /* Space Beats:  7.71% */
@@ -90,7 +97,6 @@ public:
 
 
 
-
 /* Time  Beats: 96.08% */
 /* Space Beats: 54.94% */
 
@@ -109,5 +115,28 @@ public:
         root1->right = mergeTrees(root1->right, root2->right);
 
         return root1;
+    }
+};
+
+
+
+
+/* Time  Beats: 93.56% */
+/* Space Beats: 62.59% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_3 {
+public:
+    TreeNode* mergeTrees(TreeNode* root1, TreeNode* root2)
+    {
+        if (!root1 && !root2) return nullptr;
+        if (!root1 || !root2) return root1 ? root1 : root2;
+
+        TreeNode* node = new TreeNode(root1->val + root2->val);
+        node->left  = mergeTrees(root1->left,  root2->left);
+        node->right = mergeTrees(root1->right, root2->right);
+
+        return node;
     }
 };
