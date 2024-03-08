@@ -89,3 +89,64 @@ private:
         dfs(root, root->right, min, root,       right_bound);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  37.14% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    int minDiffInBST(TreeNode* root)
+    {
+        int result = INT_MAX;
+        dfs(root, result);
+
+        return result;
+    }
+
+private:
+    std::pair<int, int> dfs(TreeNode* root, int& result)
+    {
+        if (!root->left && !root->right)
+            return {root->val, root->val};
+
+        std::pair<int, int> left;
+        std::pair<int, int> right;
+
+        if (root->left)
+        {
+            left = dfs(root->left, result);
+            result = std::min(result, root->val - left.second);
+        }
+
+        if (root->right)
+        {
+            right = dfs(root->right, result);
+            result = std::min(result, right.first - root->val);
+        }
+
+        /* Current Node has only Left Child */
+        if (root->left && !root->right)
+            return {left.first, root->val};
+
+        /* Current Node has only Right Child */
+        if (!root->left && root->right)
+            return {root->val, right.second};
+
+        /* Current Node has both Left and Right Child */
+        return {left.first, right.second};
+    }
+};
