@@ -150,3 +150,47 @@ private:
         return {left.first, right.second};
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  37.14% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_3 {
+public:
+    int minDiffInBST(TreeNode* root)
+    {
+        int result = INT_MAX;
+
+        std::vector<int> vec;
+        dfs(root, vec);
+
+        for (int i = 0; i < vec.size() - 1; i++)
+            result = std::min(result, vec[i+1] - vec[i]);
+
+        return result;
+    }
+
+private:
+    void dfs(TreeNode* root, std::vector<int>& vec)
+    {
+        if (!root)
+            return;
+
+        dfs(root->left, vec);
+        vec.push_back(root->val);
+        dfs(root->right, vec);
+    }
+};
