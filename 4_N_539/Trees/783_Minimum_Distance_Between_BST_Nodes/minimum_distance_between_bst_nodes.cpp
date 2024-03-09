@@ -240,3 +240,53 @@ private:
         dfs(root->right, prev, result);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Instead of passing a pointer by reference, we're passing a pointer by
+    pointer.
+
+    It's the same as the one above(Solution_4).
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  37.14% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_5 {
+public:
+    int minDiffInBST(TreeNode* root)
+    {
+        int result = INT_MAX;
+        TreeNode* prev = nullptr;
+
+        dfs(root, &prev, result);
+
+        return result;
+    }
+
+private:
+    void dfs(TreeNode* root, TreeNode** prev, int& result)
+    {
+        if (!root)
+            return;
+
+        /* Left */
+        dfs(root->left, prev, result);
+
+        if (*prev)
+            result = std::min(result, root->val - (*prev)->val);
+
+        /* Right */
+        *prev = root;
+        dfs(root->right, prev, result);
+    }
+};
