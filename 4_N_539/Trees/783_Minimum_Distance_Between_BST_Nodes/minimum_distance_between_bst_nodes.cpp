@@ -194,3 +194,49 @@ private:
         dfs(root->right, vec);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    I wanted to show that in C++, you can pass a pointer as a reference:
+        fun (TreeNode* &prev) {...}
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  37.14% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_4 {
+public:
+    int minDiffInBST(TreeNode* root)
+    {
+        int result = INT_MAX;
+        TreeNode* prev = nullptr;
+
+        dfs(root, prev, result);
+
+        return result;
+    }
+
+private:
+    void dfs(TreeNode* root, TreeNode*& prev, int& result)
+    {
+        if (!root)
+            return;
+
+        dfs(root->left, prev, result);
+
+        if (prev)
+            result = std::min(result, root->val - prev->val);
+
+        prev = root;
+        dfs(root->right, prev, result);
+    }
+};
