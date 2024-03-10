@@ -62,8 +62,17 @@
  * };
  */
 
-/* Time  Beats: 95.06% */
-/* Space Beats: 64.11% */
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 72.10% */
+/* Space Beats: 64.96% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
@@ -80,31 +89,22 @@ public:
     }
 
 private:
-    bool insert(TreeNode* root, int val)
+    void insert(TreeNode* root, int val)
     {
-        if (val < root->val)
+        if (!root->left && val < root->val)
         {
-            if (!root->left)
-            {
-                root->left = new TreeNode(val);
-                return true;
-            }
-
-            if (insert(root->left, val))
-                return true;
+            root->left = new TreeNode(val);
+        }
+        else if (!root->right && val > root->val)
+        {
+            root->right = new TreeNode(val);
         }
         else
         {
-            if (!root->right)
-            {
-                root->right = new TreeNode(val);
-                return true;
-            }
-
-            if (insert(root->right, val))
-                return true;
+            if (val < root->val)
+                insert(root->left, val);
+            else
+                insert(root->right, val);
         }
-
-        return false;
     }
 };
