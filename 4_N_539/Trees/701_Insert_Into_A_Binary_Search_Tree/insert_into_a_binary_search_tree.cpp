@@ -108,3 +108,36 @@ private:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 76.54% */
+/* Space Beats: 64.96% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Elegant {
+public:
+    TreeNode* insertIntoBST(TreeNode* root, int val)
+    {
+        if (!root)
+            return new TreeNode(val);
+
+        if (val < root->val)
+            root->left  = insertIntoBST(root->left,  val);
+        else
+            root->right = insertIntoBST(root->right, val);
+
+        return root;
+    }
+};
