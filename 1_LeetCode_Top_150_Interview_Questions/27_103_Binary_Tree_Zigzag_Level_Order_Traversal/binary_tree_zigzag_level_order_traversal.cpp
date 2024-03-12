@@ -81,182 +81,88 @@ struct TreeNode {
     --- IDEA ---
     ------------
 
-    _______________________
-    ___________1___________
-    _____2___________3_____
-    __4_____5_____6_____7__
-    8___9_10_11_12_13_14_15
+    Very similar to classical "Level order" Traversal, however, we must use a
+    deque instead of a queue, since we have to push elements in different order
+    based on the level we're on.
 
-    There's this IDEA out there that this problem should be done using only
-    one deque in which you push an entire level and you reverse it at every
-    odd level. However, that's unnecessary.
+    If the "results" vector's size is an EVEN number, we're going to do the
+    same thing as we did in classical "Level order" Traversal.
 
-    The Time Complexity is still O(n), but you have more operations. The wall
-    time clock is longer.
+    However, once the "results" vector's size is an ODD number, we're going to
+    be popping elements form the back instead of front and we're going to be
+    checking current node's right first and the current node's left.
 
-    Instead, we can use two vectors.
-    In one we're pushing only when we are at the odd level and in the other we
-    only push when we are at the even level.
+    Also we won't push "left" and "right" nodes(if they exist) to the end of
+    the "deque", instead we're going to be pushing it to the front.
 
-    We always take the elements from the back of the vector.
+    Summary:
+        Once the results.size() is EVEN, we do the same as in "Level order":
+            pop elements  from the front
+            push elements to   the back  // Push "left" & "right" if they exist
 
-    When we're at the ODD  level, we first push Left  child and then the Right.
-    When we're at the EVEN level, we first push Right child and then the Left.
-
-    That's it. This is faster.
-
-*/
-
-/* Time  Beats:  100% */
-/* Space Beats: 27.23% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(max nodes at a single level) */
-class Solution{
-public:
-    std::vector<std::vector<int>> zigzagLevelOrder(TreeNode* root)
-    {
-        if (root == nullptr)
-            return {};
-
-        std::vector<std::vector<int>> results;
-        results.push_back({root->val});
-
-        std::vector<TreeNode*> left_to_right;
-        std::vector<TreeNode*> right_to_left;
-
-        bool zag = true;
-
-        // Left
-        if (root->left != nullptr)
-            right_to_left.push_back(root->left);
-
-        // Right
-        if (root->right != nullptr)
-            right_to_left.push_back(root->right);
-
-        while (!left_to_right.empty() || !right_to_left.empty())
-        {
-            if (zag)
-            {
-                std::vector<int> level;
-
-                while (!right_to_left.empty())
-                {
-                    TreeNode* tmp = right_to_left.back();
-                    right_to_left.pop_back();
-
-                    level.push_back(tmp->val);
-
-                    // Right
-                    if (tmp->right != nullptr)
-                        left_to_right.push_back(tmp->right);
-
-                    // Left
-                    if (tmp->left != nullptr)
-                        left_to_right.push_back(tmp->left);
-                }
-
-                results.push_back(level);
-                zag = false;
-            }
-            else // left_to_right
-            {
-                std::vector<int> level;
-
-                while (!left_to_right.empty())
-                {
-                    TreeNode* tmp = left_to_right.back();
-                    left_to_right.pop_back();
-
-                    level.push_back(tmp->val);
-
-                    // Left
-                    if (tmp->left != nullptr)
-                        right_to_left.push_back(tmp->left);
-
-                    // Right
-                    if (tmp->right != nullptr)
-                        right_to_left.push_back(tmp->right);
-                }
-
-                results.push_back(level);
-                zag = true;
-            }
-        }
-
-        return results;
-    }
-};
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Similar IDEA, this one uses deque and, therefore, is cleaner.
+        Once the results.size() is ODD,  we do the opposite:
+            pop  elements from the back
+            push elements to   the front // Push "left" & "right" if they exist
 
 */
 
-/* Time  Beats: 100% */
-/* Space Beats: 54.21% */
+/* Time  Beats: 100.00% */
+/* Space Beats:   7.93% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(max nodes at a single level) */
-class Solution_Deque{
+class Solution {
 public:
     std::vector<std::vector<int>> zigzagLevelOrder(TreeNode* root)
     {
         if (!root)
             return {};
 
+        std::vector<std::vector<int>> results;
+
         std::deque<TreeNode*> deque;
         deque.push_back(root);
 
-        std::vector<std::vector<int>> results;
-
-        bool from_left_to_right = true;
-
         while (!deque.empty())
         {
-            int size = deque.size();
-            std::vector<int> tmp;
+            std::vector<int> curr_level;
 
+            int size = deque.size();
             for (int i = 0; i < size; i++)
             {
-                if (from_left_to_right)
+                if (results.size() % 2 == 0) // From left to right
                 {
                     TreeNode* node = deque.front();
                     deque.pop_front();
 
-
-                    tmp.push_back(node->val);
-
+                    /* Left First */
                     if (node->left)
                         deque.push_back(node->left);
 
+                    /* Right Second*/
                     if (node->right)
                         deque.push_back(node->right);
+
+                    curr_level.push_back(node->val);
                 }
                 else
                 {
                     TreeNode* node = deque.back();
                     deque.pop_back();
 
-                    tmp.push_back(node->val);
-
+                    /* Right First */
                     if (node->right)
                         deque.push_front(node->right);
 
+                    /* Left Second */
                     if (node->left)
                         deque.push_front(node->left);
+
+                    curr_level.push_back(node->val);
                 }
             }
 
-            results.push_back(tmp);
-
-            // Change from Zig to Zag and vice versa
-            from_left_to_right = !from_left_to_right;
+            results.push_back(curr_level);
         }
 
         return results;
@@ -344,8 +250,7 @@ print_levelorder(TreeNode* root)
 int
 main()
 {
-    Solution       sol;
-    Solution_Deque sol_deque;
+    Solution sol;
 
 
     /* Example 1 */
@@ -436,8 +341,7 @@ main()
 
 
     /* Solution */
-    // std::vector<std::vector<int>> results = sol.zigzagLevelOrder(root);
-    std::vector<std::vector<int>> results = sol_deque.zigzagLevelOrder(root);
+    std::vector<std::vector<int>> results = sol.zigzagLevelOrder(root);
 
 
     /* Write Output */
@@ -467,4 +371,3 @@ main()
 
     return 0;
 }
-
