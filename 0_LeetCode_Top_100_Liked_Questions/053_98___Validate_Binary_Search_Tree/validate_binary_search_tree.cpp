@@ -1,7 +1,9 @@
 #include <iostream>
-#include <stack>
+#include <vector>
+#include <unordered_set>
+
+// For Printing
 #include <queue>
-#include <string>
 
 /*
     ==============
@@ -55,18 +57,110 @@
     --- IDEA ---
     ------------
 
-    It's self-explanatory.
+    It's obvious that if you go to the right subtree, that all the elements
+    must be greater than the root node. However, it's not so obvious to notice
+    almost the same thing - The lowest value that is allowed to appear in the
+    right subtree is bounded by the root node's value.
 
-    "return" at Line 97 is the most important thing.
 
-    1) If you are checking the Left subtree, you have to pass current node as
-       the right bound.
+    For example:
+                        _______________________
+                        ___________5___________
+                        _____1___________8_____
+                        __0_____3_____7_____9__
+                        ______2___4_X__________
+                                    ^
+                                    |
+                                  this value MUST BE GREATER than 5.
 
-    2) If you are checking the Right subtree, you have to pass current node as
-       the left bound.
+    It must be greater than 5 because otherwise it would NOT be a BST anymore.
+
+    So whenever we are going to the right subtree of current's root node, we
+    must say that the current node is the LEFT or LOWER_BOUND.
+
+    Similarly, whenever we are going to the left subtree of current's root node
+    we must say that the current node is the RIGHT or UPPER_BOUND.
+                        _______________________
+                        ___________5___________
+                        _____1___________8_____
+                        __0_____3_____7_____9__
+                        ______2___X_6__________
+                                  ^
+                                  |
+                         this value MUST BE LOWER than 5.
+                         (and since it's a right subtree of root node 3, it
+                          also must be GREATER than value 3)
+
+    However, we can't pass simple values since maybe there is no constraint
+    for either lower or upper bound and we don't want to erroneously check
+    when we don't have to since it could lead to a incorrect result.
+
+    Therefore, instead of passing a value as an lower_bound or upper_bound, we
+    are going to pass a pointer to entire node that represents the bound.
+
+    In that case, if there is not lower or upper bound, we won't be checking
+    if the rule is infringed and will just continue as normal.
+
+    Here is an example where we don't have a limit for how low values can be.
+    I.e. there is no lower_bound, it's nullptr.
+
+
+                        _______________________
+                        ___________5___________
+                        _____1___________8_____
+                        __0_____3_____7_____9__
+                        X_____2___4_6__________
+                        ^
+                        |
+                This value does NOT have a lower_bound.
+
+    You are, hopefully, noticing a pattern.
+
+    If we go to the right subtree, lower_bound becomes the current root.
+    However, upper_bound is INHERITED. Meaning, if it's nullptr, there is no
+    upper_bound.
+
+    If we go to the left  subtree, upper_bound becomes the current root.
+    However, lower_bound is INHERITED. Meaning, if it's nullptr, there is no
+    lower_bound.
+
+
+    In the 2nd Example in this IDEA, we had this Tree.
+
+                        _______________________
+                        ___________5___________
+                        _____1___________8_____
+                        __0_____3_____7_____9__
+                        ______2___X_6__________
+
+    Once we are at node 3 and we want to go to its right subtree, then the
+    lower_bound becomes 3 itself, however upper_bound is INHERITED. What does
+    that mean?
+
+    It means that if there is any upper_bound so far, it will persist. When we
+    are going to the right, we are never going to update the "upper_bound" in
+    that step, therefore if there is any upper_bound, use it.
+
+
+
+    Let's see an example where upper_bound is INHERITED, but is a nullptr.
+
+                        _______________________
+                        ___________5___________
+                        _____1___________8_____
+                        __0_____3_____7_____X__
+                        ______2___4_6__________
+
+    Once we are at node 8 and we go to the right, again we'll say that our
+    lower_bound is equal to 8, however the upper_bound is inherited.
+
+    Since at this point, upper_bound is nullptr, we will use that. That means
+    that in the right subtree of root 8, there are no limits in how big values
+    can be found in nodes to the right.
+
+    However, as we've already concluded the left bound is value 8.
 
 */
-
 
 // Definition for a binary tree node.
 struct TreeNode {
@@ -84,28 +178,27 @@ struct TreeNode {
 /* Recursive Traversal with Valid Range */
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution{
-    bool validate(TreeNode* root, TreeNode* low, TreeNode* high)
+class Solution {
+public:
+    bool isValidBST(TreeNode* root)
     {
-        if (root == nullptr)
+        return dfs(root, nullptr, nullptr);
+    }
+
+private:
+    bool dfs(TreeNode* root, TreeNode* lower_bound, TreeNode* upper_bound)
+    {
+        if (!root)
             return true;
 
-        // Check lower bound
-        if (low != nullptr && low->val >= root->val)
+        if (lower_bound && lower_bound->val >= root->val)
             return false;
 
-        // Check higher bound
-        if (high != nullptr && high->val <= root->val)
+        if (upper_bound && upper_bound->val <= root->val)
             return false;
 
-        return validate(root->left,  low,  root) &&
-               validate(root->right, root, high);
-    }
-
-public:
-    bool isValidBST(TreeNode* root)
-    {
-        return validate(root, nullptr, nullptr);
+        return dfs(root->left,  lower_bound,   root     ) &&
+               dfs(root->right,    root    , upper_bound);
     }
 };
 
@@ -117,112 +210,17 @@ public:
     --- IDEA ---
     ------------
 
-    Essentially the same Idea, just implemented Iteratively.
+    The crux of this idea is to visit every node in an "inorder" fashion and
+    while visiting, store values in vector "vec".
 
-*/
+    Once you return from that "inorder" traversal, check if at any point the
+    description of what constitutes a BST is infringed or not.
 
-/* Time  Beats: 95.81% */
-/* Space Beats: 14.13% */
-
-/* Iterative Traversal with Valid Range */
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_2{
-    std::stack<TreeNode*> stack, lower_limits, upper_limits;
-
-public:
-    void update(TreeNode* root, TreeNode* low, TreeNode* high)
-    {
-        stack.push(root);
-        lower_limits.push(low);
-        upper_limits.push(high);
-    }
-
-    bool isValidBST(TreeNode* root)
-    {
-        TreeNode *low = nullptr;
-        TreeNode *high = nullptr;
-        update(root, low, high);
-
-        while (!stack.empty())
-        {
-            root = stack.top();
-            stack.pop();
-
-            low = lower_limits.top();
-            lower_limits.pop();
-
-            high = upper_limits.top();
-            upper_limits.pop();
-
-            if (root == nullptr)
-                continue;
-
-            TreeNode* val_node = root;
-            if (low != nullptr && low->val >= val_node->val)
-                return false;
-
-            if (high != nullptr && high->val <= val_node->val)
-                return false;
-
-            update(root->right, val_node, high);
-            update(root->left, low, val_node);
-        }
-
-        return true;
-    }
-};
+    It must NOT have duplicates and since we've done an "inorder" traversal,
+    all the elements must be in strictly increasing order. (The first thing is
+    implicit in the second, but wanted to be explicit here).
 
 
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Do an inorder traversal and check if at any point order is not valid.
-    You have to go through the code a few times to "get it". It's not intuitive
-    to write this. At least it wasn't intuitive to me.
-
-*/
-
-/* Time  Beats: 86.47% */
-/* Space Beats: 56.36% */
-
-/* Recursive Inorder Traversal */
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_3{
-    TreeNode* prev = nullptr;
-public:
-    bool isValidBST(TreeNode* root)
-    {
-        return inorder(root);
-    }
-
-    bool inorder(TreeNode* root)
-    {
-        if (root == nullptr)
-            return true;
-
-        if (!inorder(root->left))
-            return false;
-
-        if (prev != nullptr && prev->val >= root->val)
-            return false;
-
-        prev = root;
-
-        return inorder(root->right);
-    }
-};
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
 
     It's important to note that this will work only because this is not a
     usual BST. What do I mean with that?
@@ -274,7 +272,7 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution_4{
+class Solution_2 {
 public:
     bool isValidBST(TreeNode* root)
     {
@@ -334,7 +332,7 @@ print_array(std::vector<std::string>& nums)
 void
 print_levelorder(TreeNode* root)
 {
-    if (root == nullptr)
+    if (!root)
         return;
 
     std::queue<TreeNode*> queue;
@@ -351,7 +349,7 @@ print_levelorder(TreeNode* root)
             TreeNode* node = queue.front();
             queue.pop();
 
-            if (node == nullptr)
+            if (!node)
             {
                 vector_print.push_back("null");
                 continue;
@@ -359,12 +357,12 @@ print_levelorder(TreeNode* root)
             else
                 vector_print.push_back(std::to_string(node->val));
 
-            if (node->left != nullptr)
+            if (node->left)
                 queue.push(node->left);
             else
                 queue.push(nullptr);
 
-            if (node->right != nullptr)
+            if (node->right)
                 queue.push(node->right);
             else
                 queue.push(nullptr);
@@ -380,8 +378,6 @@ main()
 {
     Solution sol;
     // Solution_2 sol_2;
-    // Solution_3 sol_3;
-    // Solution_4 sol_4;
 
     /* Example 1 */
     TreeNode three(3);
@@ -416,7 +412,6 @@ main()
     /* Solution */
     bool valid = sol.isValidBST(root);
     // bool valid = sol_2.isValidBST(root);
-    // bool valid = sol_3.isValidBST(root);
 
 
     /* Write Output */
