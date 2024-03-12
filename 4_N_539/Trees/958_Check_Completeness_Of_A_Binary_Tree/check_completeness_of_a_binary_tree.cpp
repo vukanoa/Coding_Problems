@@ -106,3 +106,62 @@ public:
         return true;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of implementing it.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  22.66% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    bool isCompleteTree(TreeNode* root)
+    {
+        std::queue<TreeNode*> queue;
+        queue.push(root);
+
+        bool null_popped = false;
+
+        /* BFS */
+        while (!queue.empty())
+        {
+            std::vector<TreeNode*> curr_level;
+
+            int size = queue.size();
+            for (int i = 0; i < size; i++)
+            {
+                TreeNode* node = queue.front();
+                queue.pop();
+
+                if (node)
+                {
+                    /*
+                        If we've already popped a nullptr and now we found a
+                        non-null node --> It's certainly not a Complete Binary
+                        Tree, therefore return "false".
+                    */
+                    if (null_popped)
+                        return false;
+
+                    queue.push(node->left);
+                    queue.push(node->right);
+                }
+                else
+                    null_popped = true;
+            }
+        }
+
+        return true;
+    }
+};
