@@ -115,3 +115,48 @@ private:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Anothery way of implementing the same idea.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  29.15% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+    int sumNumbers(TreeNode* root)
+    {
+        int number = 0;
+        int sum = 0;
+
+        dfs(root, number, sum);
+
+        return sum;
+    }
+
+private:
+    void dfs(TreeNode* root, int number, int& sum)
+    {
+        if (!root)
+            return;
+        else if (!root->left && !root->right)
+        {
+            sum += number * 10 + root->val;
+            return;
+        }
+
+        dfs(root->left,  number * 10 + root->val, sum);
+        dfs(root->right, number * 10 + root->val, sum);
+    }
+};
