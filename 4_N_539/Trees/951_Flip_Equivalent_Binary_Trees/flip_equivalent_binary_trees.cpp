@@ -273,3 +273,47 @@ public:
         return true;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of implementing, however this one has a different concept.
+
+    Here, we are specifically asking if at any point two trees are the same or
+    if they are flippable.
+
+    In the above Solution it's not as excplicit, so choose to your liking.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  65.59% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+    bool flipEquiv(TreeNode* root1, TreeNode* root2)
+    {
+        if (!root1 && !root2) return true;
+        if (!root1 || !root2) return false;
+
+        if (root1->val != root2->val)
+            return false;
+
+        bool same_tree = flipEquiv(root1->left, root2->left) && flipEquiv(root1->right, root2->right);
+        if (same_tree)
+            return true;
+
+        bool flippable = flipEquiv(root1->left, root2->right) && flipEquiv(root1->right, root2->left);
+        if (flippable)
+            return true;
+
+        return false;
+    }
+};
