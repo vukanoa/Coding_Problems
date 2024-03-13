@@ -70,29 +70,26 @@ class Solution_BFS {
 public:
     int findBottomLeftValue(TreeNode* root)
     {
-        if (!root->left && !root->right)
-            return root->val;
-        
         std::queue<TreeNode*> queue;
         queue.push(root);
 
         int left_most = root->val;
 
+        /* BFS */
         while (!queue.empty())
         {
             int size = queue.size();
-
             for (int i = 0; i < size; i++)
             {
                 if (i == 0)
                     left_most = queue.front()->val;
-                
+
                 TreeNode* curr_node = queue.front();
                 queue.pop();
 
                 if (curr_node->left)
                     queue.push(curr_node->left);
-                
+
                 if (curr_node->right)
                     queue.push(curr_node->right);
             }
@@ -123,20 +120,16 @@ class Solution_DFS {
 public:
     int findBottomLeftValue(TreeNode* root)
     {
-        if (!root->left && !root->right)
-            return root->val;
-
-        int left_most;
-        int level = 0;
+        int left_most = root->val; // For Inputs where root is the entire tree
         int max_level = 0;
 
-        dfs(root, max_level, level+1, left_most);
+        dfs(root, 0, max_level, left_most);
 
         return left_most;
     }
 
 private:
-    void dfs(TreeNode* root, int& max_level, int curr_level, int& left_most)
+    void dfs(TreeNode* root, int curr_level, int& max_level, int& left_most)
     {
         if (!root)
             return;
@@ -147,7 +140,7 @@ private:
             left_most = root->val;
         }
 
-        dfs(root->left,  max_level, curr_level+1, left_most);
-        dfs(root->right, max_level, curr_level+1, left_most);
+        dfs(root->left,  curr_level+1, max_level, left_most);
+        dfs(root->right, curr_level+1, max_level, left_most);
     }
 };
