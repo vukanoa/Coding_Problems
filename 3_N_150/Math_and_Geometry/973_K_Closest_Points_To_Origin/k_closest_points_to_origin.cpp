@@ -4,81 +4,81 @@
 #include <queue>
 
 /*
-	==============
-	=== MEDIUM ===
-	==============
+    ==============
+    === MEDIUM ===
+    ==============
 
-	===============================
-	973) K Closest Points to Origin
-	===============================
+    ===============================
+    973) K Closest Points to Origin
+    ===============================
 
-	============
-	Description:
-	============
+    ============
+    Description:
+    ============
 
-	Given an array of points where points[i] = [xi, yi] represents a point on
-	the X-Y plane and an integer k, return the k closest points to the origin
-	(0, 0).
+    Given an array of points where points[i] = [xi, yi] represents a point on
+    the X-Y plane and an integer k, return the k closest points to the origin
+    (0, 0).
 
-	The distance between two points on the X-Y plane is the Euclidean distance
-	(i.e., √(x1 - x2)^2 + (y1 - y2)^2).
+    The distance between two points on the X-Y plane is the Euclidean distance
+    (i.e., √(x1 - x2)^2 + (y1 - y2)^2).
 
-	You may return the answer in any order. The answer is guaranteed to be
-	unique (except for the order that it is in).
+    You may return the answer in any order. The answer is guaranteed to be
+    unique (except for the order that it is in).
 
-	===========================================================================
-	FUNCTION: vector<vector<int>> kClosest(vector<vector<int>>& points, int k);
-	===========================================================================
+    ===========================================================================
+    FUNCTION: vector<vector<int>> kClosest(vector<vector<int>>& points, int k);
+    ===========================================================================
 
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
 
-	--- Example 1 ---
-	Input: points = [[1,3],[-2,2]], k = 1
-	Output: [[-2,2]]
-	Explanation:
-	The distance between (1, 3) and the origin is sqrt(10).
-	The distance between (-2, 2) and the origin is sqrt(8).
-	Since sqrt(8) < sqrt(10), (-2, 2) is closer to the origin.
-	We only want the closest k = 1 points from the origin, so the answer is
-	just [[-2,2]].
-
-
-	--- Example 2 ---
-	Input: points = [[3,3],[5,-1],[-2,4]], k = 2
-	Output: [[3,3],[-2,4]]
-	Explanation: The answer [[-2,4],[3,3]] would also be accepted.
+    --- Example 1 ---
+    Input: points = [[1,3],[-2,2]], k = 1
+    Output: [[-2,2]]
+    Explanation:
+    The distance between (1, 3) and the origin is sqrt(10).
+    The distance between (-2, 2) and the origin is sqrt(8).
+    Since sqrt(8) < sqrt(10), (-2, 2) is closer to the origin.
+    We only want the closest k = 1 points from the origin, so the answer is
+    just [[-2,2]].
 
 
-	*** Constraints ***
-	1 <= k <= points.length <= 10^4
-	-10^4 <= xi, yi <= 104
+    --- Example 2 ---
+    Input: points = [[3,3],[5,-1],[-2,4]], k = 2
+    Output: [[3,3],[-2,4]]
+    Explanation: The answer [[-2,4],[3,3]] would also be accepted.
+
+
+    *** Constraints ***
+    1 <= k <= points.length <= 10^4
+    -10^4 <= xi, yi <= 104
 
 */
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	Since we're looking for the distance between point P and Origin(0, 0), we
-	don't really have to use this formula: √(x1 - x2)^2 + (y1 - y2)^2).
+    Since we're looking for the distance between point P and Origin(0, 0), we
+    don't really have to use this formula: √(x1 - x2)^2 + (y1 - y2)^2).
 
-	Actually we do, but we don't need to pass x2 and y2 since they are always
-	going to be 0.
+    Actually we do, but we don't need to pass x2 and y2 since they are always
+    going to be 0.
 
-	So when we're calculating the distance between point P and Origin(0, 0), we
-	can do it like this: √x1^2 + y1^2).
+    So when we're calculating the distance between point P and Origin(0, 0), we
+    can do it like this: √x1^2 + y1^2).
 
-	We calculate the distance for each point and store it in a vector of pairs
-	named "distances":
-	distances = ( {<distance>, [xi, yi]}, {<distance>, [xi, yi]}, ...)
+    We calculate the distance for each point and store it in a vector of pairs
+    named "distances":
+    distances = ( {<distance>, [xi, yi]}, {<distance>, [xi, yi]}, ...)
 
-	After we're doing processing each point, we sort it by the first value,
-	i.e. "distance".
+    After we're doing processing each point, we sort it by the first value,
+    i.e. "distance".
 
-	Then just iterate from 0 to k and push Points to vector "results".
+    Then just iterate from 0 to k and push Points to vector "results".
 
 */
 
@@ -89,95 +89,207 @@
 /* Space Complexity: O(n) */
 class Solution {
 public:
-	std::vector<std::vector<int>> kClosest(std::vector<std::vector<int>>& points, int k)
-	{
-		std::vector<std::pair<double, std::vector<int>>> distances;
+    std::vector<std::vector<int>> kClosest(std::vector<std::vector<int>>& points, int k)
+    {
+        std::vector<std::pair<double, std::vector<int>>> distances;
 
-		for (auto& point : points)
-			distances.push_back({euclidean_distance(point[0], point[1]), point});
+        for (auto& point : points)
+            distances.push_back({euclidean_distance(point[0], point[1]), point});
 
-		std::sort(distances.begin(), distances.end());
+        std::sort(distances.begin(), distances.end());
 
-		std::vector<std::vector<int>> results;
-		int i = 0;
-		while (i < k)
-			results.push_back(distances[i++].second);
+        std::vector<std::vector<int>> results;
+        int i = 0;
+        while (i < k)
+            results.push_back(distances[i++].second);
 
-		return results;
-	}
+        return results;
+    }
 
 private:
-	double euclidean_distance(int& x1, int& y1)
-	{
-		return sqrt(x1*x1 + y1*y1);
-	}
+    double euclidean_distance(int& x1, int& y1)
+    {
+        return sqrt(x1*x1 + y1*y1);
+    }
 };
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	We can notice 2 thing2:
-	    1. We don't need to calculate the SQRT. The "higher" values are going
-	       to be "higher" anyway. So don't need to compute that. We can just do
-	       this: x1*x1 + y1*y1
+    We can notice 2 things:
+        1. We don't need to calculate the SQRT. The "higher" values are going
+           to be "higher" anyway. So don't need to compute that. We can just do
+           this: x1*x1 + y1*y1
 
-	    2. Since we don't need all n points, we don't have to sort all the
-	       computed distances. Imagine if we had a million of points and also
-	       imagine that k = 3.
+        2. Since we don't need all n points, we don't have to sort all the
+           computed distances. Imagine if we had a million of points and also
+           imagine that k = 3.
 
-	       Why would we had to sort the entire array of million elements if we
-	       only need top 3?
+           Why would we had to sort the entire array of million elements if we
+           only need top 3?
 
-	       To get top 3, we need to use a Max Heap.
-	       Each time we calculate the distance between point Pi and Origin(0,0)
-	       we can push the pair of {distance, Point Pi} and if the number of
-	       distances(i.e. pairs) is greater than k, since we are inserting in a
-	       Max Heap, the biggest distance, i.e. the Point Pi that is farthest
-	       from the Origin(0, 0) can be evicted from our Max Heap, thus leaving
-	       us with exactly K closest points to Origin.
+           To get top 3, we need to use a Max Heap.
+           Each time we calculate the distance between point Pi and Origin(0,0)
+           we can push the pair of {distance, Point Pi} and if the number of
+           distances(i.e. pairs) is greater than k, since we are inserting in a
+           Max Heap, the biggest distance, i.e. the Point Pi that is farthest
+           from the Origin(0, 0) can be evicted from our Max Heap, thus leaving
+           us with exactly K closest points to Origin.
 */
 
 /* Time  Beats: 35.28% */
 /* Space Beats: 37.94% */
 
 /*
-	Time  Complexity: O(n * logk)
-	k is less than or equal to n. Usually it's less than n, which makes this
-	Solution faster than O(n * logn)
+    Time  Complexity: O(n * logk)
+    k is less than or equal to n. Usually it's less than n, which makes this
+    Solution faster than O(n * logn)
 
-	This one in theory is faster, however on LeetCode, this Solution has a
-	worse Time Complexity than the one above.
+    This one in theory is faster, however on LeetCode, this Solution has a
+    worse Time Complexity than the one above.
 */
 /*
-	Space Complexity: O(n)
+    Space Complexity: O(n)
 */
+class Solution_2 {
+public:
+    std::vector<std::vector<int>> kClosest(std::vector<std::vector<int>>& points, int k)
+    {
+        std::priority_queue<std::pair<int, std::vector<int>>> max_heap;
+        for (auto& point : points)
+        {
+            int x = point[0];
+            int y = point[1];
+
+            max_heap.push({x*x + y*y, point});
+
+            // O(log k)
+            if (max_heap.size() > k)
+                max_heap.pop();
+        }
+
+        std::vector<std::vector<int>> results;
+        for (int i = 0; i < k; ++i)
+        {
+            results.push_back(max_heap.top().second);
+            max_heap.pop();
+        }
+
+        return results;
+    }
+};
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    
+
+
+    Time complexity:
+        Calculating the distance for each point: O(n)
+        Heapify operation: O(n log n)
+        Extracting K smallest distances: O(k log n)
+        Overall time complexity: O(n + k log n)
+    Space complexity: O(n) for the min-heap.
+
+*/
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n) */
 class Solution {
 public:
-	std::vector<std::vector<int>> kClosest(std::vector<std::vector<int>>& points, int k)
-	{
-		std::priority_queue<std::pair<int, std::vector<int>>> max_heap;
-		for (auto& point : points)
-		{
-			int x = point[0];
-			int y = point[1];
+    vector<vector<int>> kClosest(vector<vector<int>>& points, int k) {
+        // Create a vector to store triples containing distance, x-coordinate, and y-coordinate
+        vector<vector<int>> triples;
+        // Calculate distance and store each point as a triple
+        for (auto& x : points)
+            triples.push_back({x[0] * x[0] + x[1] * x[1], x[0], x[1]});
+        
+        // Create a min-heap using priority_queue with custom comparison function
+        // Initialize the min-heap with the triples
+        priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>> minHeap(triples.begin(), triples.end());
+        
+        // Create a vector to store the result
+        vector<vector<int>> res;
+        // Extract K closest points from the min-heap
+        while (k--){
+            // Get the top element from the min-heap
+            vector<int> top = minHeap.top();
+            // Pop the top element from the min-heap
+            minHeap.pop();
+            // Add the coordinates of the top element to the result vector
+            res.push_back({top[1], top[2]});
+        }
+        // Return the result vector containing the K closest points
+        return res;
+    }
+};
 
-			max_heap.push({x*x + y*y, point});
 
-			// O(log k)
-			if (max_heap.size() > k)
-				max_heap.pop();
-		}
 
-		std::vector<std::vector<int>> results;
-		for (int i = 0; i < k; ++i)
-		{
-			results.push_back(max_heap.top().second);
-			max_heap.pop();
-		}
 
-		return results;
-	}
+
+
+
+
+/* Quick select */
+class Solution {
+public:
+    std::vector<std::vector<int>> kClosest(std::vector<std::vector<int>>& points, int k)
+    {
+        int n = points.size();
+
+        int left  = 0;
+        int right = n - 1;
+
+        while (left <= right)
+        {
+            int mid = helper(points, left, right);
+
+            if (mid == k)
+                break;
+
+            if (mid < k)
+                left  = mid + 1;
+            else
+                right = mid - 1;
+        }
+
+        return std::vector<std::vector<int>>(points.begin(), points.begin() + k);
+    }
+
+private:
+    int helper(std::vector<std::vector<int>>& points, int left, int right)
+    {
+        std::vector<int> pivot_point = points[left];
+
+        while (left < right)
+        {
+            while (left < right && compare(points[right], pivot_point) >= 0)
+                right--;
+
+            points[left] = points[right];
+
+            while (left < right && compare(points[left], pivot_point) <= 0)
+                left++;
+
+            points[right] = points[left];
+        }
+
+        points[left] = pivot_point;
+
+        return left;
+    }
+
+    int compare(std::vector<int>& first, std::vector<int>& second)
+    {
+        return  first[0] *  first[0] +  first[1] *  first[1] -
+               second[0] * second[0] - second[1] * second[1];
+    }
 };
