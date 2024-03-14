@@ -214,3 +214,54 @@ public:
         return decoded_str;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of implementing it
+
+*/
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Codec {
+public:
+    string encode(vector<string>& strs)
+    {
+        std::ostringstream out;
+
+        for (int i = 0; i < strs.size(); i++)
+            out << strs[i].size() << '#' << strs[i];
+
+        return out.str();
+    }
+
+    // 4#lint4#code4#love3#you
+
+    std::vector<std::string> decode(std::string s)
+    {
+        std::vector<std::string> strs;
+
+        int i = 0;
+        while (i < s.length())
+        {
+            std::ostringstream out;
+
+            while (s[i] != '#')
+                out << s[i++];
+            i++; // skip '#'
+
+            int characters = std::stoi(out.str());
+            strs.push_back(s.substr(i, characters));
+
+            i += characters;
+        }
+
+        return strs;
+    }
+};
