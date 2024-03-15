@@ -109,3 +109,89 @@ public:
         return root;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This Solution is much more lengthy in terms of code, however I strongly
+    believe it is much easier to understand, grasp and it's even easier to code
+    it up.
+
+    Even if the code is genuinely much longer.
+
+    This is something you could, genuinely, come up with in an 30-minutes
+    interview, whereas the above approach is something you almost must know
+    beforehand.
+
+*/
+
+/* Time  Beats: 80.98% */
+/* Space Beats: 51.63% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+    TreeNode* deleteNode(TreeNode* root, int key)
+    {
+        if (!root)
+            return nullptr;
+        else if (root->val == key)
+            return merge(root->left, root->right);
+
+        find(root, key);
+
+        return root;
+    }
+
+private:
+    void find(TreeNode* root, int key)
+    {
+        if (!root)
+            return;
+
+        if (root->left && root->left->val == key)
+        {
+            root->left = merge(root->left->left, root->left->right);
+        }
+        else if (root->right && root->right->val == key)
+        {
+            root->right = merge(root->right->left, root->right->right);
+        }
+        else
+        {
+            if (key < root->val)
+                find(root->left, key);
+            else
+                find(root->right, key);
+        }
+    }
+
+    TreeNode* merge(TreeNode* left, TreeNode* right)
+    {
+        if (!left && !right)
+            return nullptr;
+        else if (!left && right)
+            return right;
+        else if (left && !right)
+            return left;
+
+        TreeNode* rights_leftmost = leftmost(right);
+        rights_leftmost->left = left;
+
+        return right;
+    }
+
+    TreeNode* leftmost(TreeNode* root)
+    {
+        if (!root->left)
+            return root;
+
+        return leftmost(root->left);
+    }
+};
