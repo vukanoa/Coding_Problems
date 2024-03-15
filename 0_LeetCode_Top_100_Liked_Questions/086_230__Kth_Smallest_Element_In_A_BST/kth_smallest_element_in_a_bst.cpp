@@ -115,7 +115,7 @@ struct TreeNode {
     Space Complexity: O(h)
     where 'h' is the height of three. At worst 'h' <==> 'n', therefore O(n)
 */
-class Solution{
+class Solution {
 private:
     void count_nodes_of_subtree(TreeNode* root, int& cnt)
     {
@@ -148,6 +148,8 @@ public:
 };
 
 
+
+
 /*
     ------------
     --- IDEA ---
@@ -164,24 +166,25 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution_inorder{
-    void inorder_traversal(TreeNode* root, std::vector<int>& vec)
-    {
-        if (root == nullptr)
-            return;
-
-        inorder_traversal(root->left, vec);
-        vec.push_back(root->val);
-        inorder_traversal(root->right, vec);
-    }
+class Solution_inorder {
 public:
     int kthSmallest(TreeNode* root, int k)
     {
         std::vector<int> vec;
-
-        inorder_traversal(root, vec);
+        inorder(root, vec);
 
         return vec[k - 1];
+    }
+
+private:
+    void inorder(TreeNode* root, std::vector<int>& vec)
+    {
+        if (!root)
+            return;
+
+        inorder(root->left,  vec);
+        vec.push_back(root->val);
+        inorder(root->right, vec);
     }
 };
 

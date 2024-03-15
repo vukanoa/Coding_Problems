@@ -118,7 +118,7 @@
                -------------- One Car Fleet
 
     If cars are next-to-each-other, i.e. a Car Fleet, then they are assumed to
-    have the same exact position. Even thought, technically, one is behind the
+    have the same exact position. Even though, technically, one is behind the
     other, they are considered to have the same position.
 
     That's also mentioned in:
@@ -141,10 +141,10 @@
     Output: 3
 
     Initially there are 5 Car Fleets, but when they actually arrive at the
-    destination(which in this case is as position 12), the number of Car Fleets
+    destination(which in this case is at position 12), the number of Car Fleets
     is 3.
 
-    Let's represent position ans speed as a pair, just for the easy of reading:
+    Let's represent position and speed as a pair, just for the ease of reading:
 
     {position, speed} = [{3, 3}, {5, 2}, {7, 1}];
     target = 10
@@ -155,14 +155,14 @@
     (Position)
     ^         ^                         It's impossible to draw but, here,
     |        /                          {3, 3} is correctly represented.
- 10 -       /
-  9 -      /                            Now you have to imagine or draw in an
-  8 -     /                             notebook or some software how the rest
-  7 -    /                              is going to look like.
+ 10 -       /                           (at time 0 it will be at position 0,
+  9 -      /                             at time 1 it will be at position 6                         
+  8 -     /                              at time 2 it will be at position 12,
+  7 -    /                               etc.)                                 
   6 -   /
-  5 -  /
-    | /
-  3 -/
+  5 -  /                                Now you have to imagine or draw in an
+    | /                                 notebook or some software how the rest
+  3 -/                                  is going to look like.                
     |
     |
     -----,----,----,----,----,--> (Time)
@@ -172,12 +172,15 @@
     cars, which intersected, are going to become a Car Fleet, and they will
     continue to move at the speed of the "right"(slower) one.
 
-    Look at: {3, 3} and {7, 1} first. They will definitely intersect - Where?
+    Look at: {3, 3} and {7, 1} first.
+    (Those are {position, speed} and not coordinates on the coordinate system)
+
+    They will definitely intersect - Where?
     They will intersect at around 2 seconds. However, we must look at {5, 2} as
     well since it's possible that there are some cars between those two and it
     is possible that some previous car is going to "catch up" to the one in
     front of it and therefore will decrease the speed of the one in front of it
-    and then that car won't be able to intersect even though that is shown on a
+    and then that car won't be able to intersect even though it is shown on a
     coordinate system.
 
     Once the first car catches up some car in front, then that faster car now
@@ -185,7 +188,7 @@
     slower pace.
 
     It's VERY important that you draw this in order, i.e. in order in which
-    cars make the fleet because it may see that the "left" car won't ever
+    cars make the fleet because it may be that the "left" car won't ever
     reach the "right" car(the one in front of it), however it can happen that
     the "right" car reaches its "right" car(the one in front of it) and then
     because of that it decreases the speed to move at a pace of the "caught up"
