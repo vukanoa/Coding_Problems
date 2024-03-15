@@ -114,6 +114,8 @@ private:
 };
 
 
+
+
 /*
     ------------
     --- IDEA ---
@@ -159,11 +161,15 @@ public:
     std::vector<std::vector<int>> kClosest(std::vector<std::vector<int>>& points, int k)
     {
         std::priority_queue<std::pair<int, std::vector<int>>> max_heap;
+
         for (auto& point : points)
         {
             int x = point[0];
             int y = point[1];
 
+            // Here instead of (x*x + y*y) we could've had this:
+            // euclidean_distance(point[0], point[1])
+            // However, it's unnecessary computation, hence (x*x + y*y)
             max_heap.push({x*x + y*y, point});
 
             // O(log k)
@@ -171,16 +177,18 @@ public:
                 max_heap.pop();
         }
 
-        std::vector<std::vector<int>> results;
-        for (int i = 0; i < k; ++i)
+        std::vector<std::vector<int>> result;
+        for (int i = 0; i < k; i++)
         {
-            results.push_back(max_heap.top().second);
+            result.push_back(max_heap.top().second);
             max_heap.pop();
         }
 
-        return results;
+        return result;
     }
 };
+
+
 
 
 /*
@@ -188,52 +196,53 @@ public:
     --- IDEA ---
     ------------
 
-    
+    Same as above, however we are explicitly using "min_heap", instead of a
+    "max_heap", that's why there is this giant initialization of
+    "priority_queue".
 
+    The entire Solution is written in a slightly different way than above,
+    however the IDEA is absolutely equivalent.
 
-    Time complexity:
-        Calculating the distance for each point: O(n)
-        Heapify operation: O(n log n)
-        Extracting K smallest distances: O(k log n)
-        Overall time complexity: O(n + k log n)
-    Space complexity: O(n) for the min-heap.
+    We, again, do not have to calculate the entire Euclidean distance, we can
+    just use (x*x + y*y) as the integer that represents the distance. It's
+    completely the same whether we actually calculate the distance or we leave
+    it like this.
+
+    Therefore, why would we do some unnecessary computation every single time?
 
 */
 
-/* Time  Complexity: O(n * logn) */
+/* Time  Beats: 63.64% */
+/* Space Beats: 21.87% */
+
+/* Time  Complexity: O(n * logk) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_3 {
 public:
-    vector<vector<int>> kClosest(vector<vector<int>>& points, int k) {
-        // Create a vector to store triples containing distance, x-coordinate, and y-coordinate
-        vector<vector<int>> triples;
-        // Calculate distance and store each point as a triple
-        for (auto& x : points)
-            triples.push_back({x[0] * x[0] + x[1] * x[1], x[0], x[1]});
-        
-        // Create a min-heap using priority_queue with custom comparison function
-        // Initialize the min-heap with the triples
-        priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>> minHeap(triples.begin(), triples.end());
-        
-        // Create a vector to store the result
-        vector<vector<int>> res;
-        // Extract K closest points from the min-heap
-        while (k--){
-            // Get the top element from the min-heap
-            vector<int> top = minHeap.top();
-            // Pop the top element from the min-heap
-            minHeap.pop();
-            // Add the coordinates of the top element to the result vector
-            res.push_back({top[1], top[2]});
+    std::vector<std::vector<int>> kClosest(std::vector<std::vector<int>>& points, int k)
+    {
+        std::priority_queue<std::pair<int, std::vector<int>>,
+                            std::vector<std::pair<int, std::vector<int>>>,
+                            std::greater<std::pair<int, std::vector<int>>>> min_heap;
+
+        for (auto& point : points)
+        {
+            int distance = point[0]*point[0] + point[1]*point[1];
+            min_heap.push({distance, point});
         }
-        // Return the result vector containing the K closest points
-        return res;
+
+        std::vector<std::vector<int>> result;
+        while (k--)
+        {
+            auto top = min_heap.top();
+            min_heap.pop();
+
+            result.push_back(top.second);
+        }
+
+        return result;
     }
 };
-
-
-
-
 
 
 
