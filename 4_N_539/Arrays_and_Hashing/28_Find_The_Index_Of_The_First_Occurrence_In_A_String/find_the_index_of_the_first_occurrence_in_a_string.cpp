@@ -84,3 +84,50 @@ public:
         return -1;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of implementing it.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  24.28% */
+
+/* Time  Complexity: O(m * n) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    int strStr(string haystack, string needle)
+    {
+        if (needle.length() > haystack.length())
+            return -1;
+
+        int x = 0;
+        int i = 0;
+        while (i < haystack.length())
+        {
+            if (haystack[i] != needle[x])
+            {
+                i = i - x + 1;
+                x = 0;
+                continue;
+            }
+            else
+                x++;
+
+            if (x == needle.length())
+                return i - needle.length() + 1;
+
+            i++;
+        }
+
+        return -1;
+    }
+};
