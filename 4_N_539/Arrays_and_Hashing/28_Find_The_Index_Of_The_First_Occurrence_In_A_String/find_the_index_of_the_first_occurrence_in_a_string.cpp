@@ -131,3 +131,39 @@ public:
         return -1;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   6.03% */
+
+/* Time  Complexity: O(m * n) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    int strStr(std::string haystack, std::string needle)
+    {
+        int x = needle.size(); // Get the size of the needle
+
+        // Iterate through the characters of the haystack
+        for (int i = 0; i < haystack.size(); i++)
+        {
+            // Check if the substring of haystack starting at index i and of
+            // length x is equal to the needle
+            if (needle == haystack.substr(i, x))
+                return i; // If true, return the current index i
+        }
+
+        return -1; // If no match is found, return -1
+    }
+};
