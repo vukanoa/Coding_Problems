@@ -72,12 +72,40 @@
     --- IDEA ---
     ------------
 
-    TODO
+    This seems as a DP problem, but it's not.
+
+    ===========================================
+    == In a nutsheel, this is the algorithm: ==
+    ===========================================
+
+    1. Push all nums1 and nums2 elements in pairs in vector<pair<int, int>>.
+
+    2. Sort that vector by values of nums2.
+         - We have two options:
+             a) push elements in vector of pairs in order {nums2, nums1} and
+                then just use a basic sort like this:
+                    sort(pairs.begin(), pairs.end())
+
+             b) push elements in vecor of pairs in a "normal" order, i.e.
+                {nums1, nums}, but then use a "comparator" for a sort to
+                make sure elements are sorted by nums2 and not by nums1.
+
+    3. Push elements(nums1s) in min_heap
+
+    4. Keep the running total of nums1s so far.
+
+    5. Once min_heap.size() becomes > k, pop from the heap.
+
+    6. If the min_heap.size() == k, then:
+         result = std::max(result, n1_sum * curr_nums2);
+
+
+
 
     Example where it seems impossible to work, but actually still works with
     this code:
 
-    nums1 = [2, 3, 2, 1]
+    nums1 = [2, 7, 3, 1]
     nums2 = {7, 6, 5, 4]
     k = 3
 
@@ -94,6 +122,37 @@
     Because it is guaranteed that if it happens that the minimum element in
     heap is the one that has the the least value up until this point form the
     nums2, we are guaranteed not to get the new maximum.
+
+    In other words, it would be THE SAME product as in the previous iteration.
+
+        1. sum = 2 + 7 + 3 = 12
+           min_heap = {2, 7, 3}  // Where 2 is the TOP of the min_heap(size 3)
+
+           result = std::max(0, 12 * 5) = 60
+
+
+        2. sum = 2 + 7 + 3 + 1
+           min_heap = {1, 2, 7, 3} // min_heap.size() > k --> we must pop
+
+           min_heap.pop(); // We will pop '1' and 1's corresponding nums2 elem.
+                              is the lowest multiplication value(4).
+
+           min_heap = {2, 7, 3}; // As in the previous iteration
+
+           However, since 4(multiplications value from nums2) isn't bound to
+           any of the remaining elements in min_heap, then we'd have this:
+
+               result = std::max(60, 12 * 4) = std::max(60, 48) = 60
+
+           As you can see - NOTHING will change since we've done that same
+           calculation in the previous iteratation, however we've used a
+           GREATER "multiplication value". We've used 5, since we've sorted
+           the vector of pairs and 5 was in the order.
+
+           Now if the new lowest "multiplication value" is NOT BOUND to any
+           element since we've popped it, then we are SURE that it won't change
+           our result for the worse.
+
 
     Consider this example again.
 
