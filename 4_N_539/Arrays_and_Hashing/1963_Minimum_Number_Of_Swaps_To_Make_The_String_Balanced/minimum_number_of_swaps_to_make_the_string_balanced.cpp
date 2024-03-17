@@ -80,7 +80,7 @@
     becomes kind of obivous how many time and which brackets you have to swap.
 
     Consider these: (I'm going to use angle brackets. Easier to distinguish)
-    > > > > > < < < < < 
+    > > > > > < < < < <
     0 1 2 3 4 5 6 7 8 9
 
     If you wanted to manually swap these to make them valid, what is the least
@@ -109,7 +109,7 @@
     0 1 2 3 4 5
 
     Are 3 swaps the most optimal number of swaps? No.
-    We can achieve validity of this string with only 2 swaps. 
+    We can achieve validity of this string with only 2 swaps.
 
     Swap 2-nd with 3-rd
     Swap 0-th with 5-th
@@ -123,7 +123,7 @@
 
     Since 0-th and 1-st form a valid string and 4-th and 5-th as well, it's
     as if we had this:
-    > > < < 
+    > > < <
     0 1 2 3
 
     What is the most optimal amount of swaps?
@@ -144,7 +144,7 @@
 
     or
 
-    > > > > < < < < 
+    > > > > < < < <
     0 1 2 3 4 5 6 7    4 invalid opened brackets, hence: 4/2 swaps.
 
 
@@ -166,14 +166,15 @@
 
 */
 
-/* Time  Beats: 85.15% */
-/* Space Beats: 55.81% */
+
+/* Time  Beats: 95.14% */
+/* Space Beats: 41.04% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
 class Solution_Open_Counting {
 public:
-    int minSwaps(string s)
+    int minSwaps(std::string s)
     {
         int open = 0;
         for (int i = 0; i < s.length(); i++)
@@ -187,9 +188,13 @@ public:
                 open++;
         }
 
-        return (int) std::ceil((double)open/2.0);
+        return (int) std::ceil(open / 2.0);
     }
 };
+
+
+
+
 /*
     ------------
     --- IDEA ---
@@ -202,32 +207,32 @@ public:
     It's a different implementation, but some people might find this one easier
     to read and grasp.
 
-    I prefer the above one.
+    I prefer this one.
 
 */
 
-/* Time  Beats: 71.27% */
-/* Space Beats: 55.81% */
+/* Time  Beats: 96.23% */
+/* Space Beats: 45.39% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_Close_Counting {
+class Solution_Extra_Close {
 public:
-    int minSwaps(string s)
+    int minSwaps(std::string s)
     {
-        int close = 0;
-        int excess_close = 0;
+        int extra_close = 0;
+        int max = 0; // Maximum at any given point
 
-        for (int i = 0; i < s.length(); i++)
+        for (char& chr : s)
         {
-            if (s[i] == '[')
-                close--;
+            if (chr == ']')
+                extra_close++;
             else
-                close++
+                extra_close--;
 
-            excess_close = std::max(excess_close, close);
+            max = std::max(max, extra_close);
         }
 
-        return (int) std::ceil((double)excess_close/2.0);
+        return static_cast<int>((max + 1) / 2.0);
     }
 };

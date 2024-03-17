@@ -25,7 +25,7 @@
     ==========================================================================
 
     --- Example 1 ---
-    Input: [3, 5, 2, 1, 6, 4]
+    Input:  [3, 5, 2, 1, 6, 4]
     Output: [1, 6, 2, 5, 3, 4]
     Explanation: This quesiton may have multiple answers, such as:
         [2, 6, 1, 5, 3, 4]
