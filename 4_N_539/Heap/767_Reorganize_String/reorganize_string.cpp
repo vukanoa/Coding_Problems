@@ -206,3 +206,68 @@ public:
         return out.str();
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  17.84% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n) */
+class Solution_Neat {
+public:
+    std::string reorganizeString(std::string s)
+    {
+        std::unordered_map<char, int> umap;
+
+        // Frequency Map
+        for (auto& chr : s)
+            umap[chr]++;
+
+        std::priority_queue<std::pair<int, char>> max_heap;
+
+        // Convert FrequencyMap to MaxHeap
+        for (auto& entry : umap)
+            max_heap.push({entry.second, entry.first});
+
+        std::pair<int, char>prev; // Default prev = {0, '\0'}
+        std::string result_str = "";
+
+        while ( !max_heap.empty() || prev.second != '\0' )
+        {
+            if ( max_heap.empty() && prev.second != '\0' )
+                return "";
+
+            // Most frequent, except prev
+            int freq = max_heap.top().first;
+            char chr = max_heap.top().second;
+            max_heap.pop();
+
+            std::cout << "\n\tFreq: " << freq << ", Chr: " << chr << "\n";
+
+            result_str += chr;
+            freq--;
+
+            if (prev.second != '\0')
+            {
+                max_heap.push(prev);
+                prev = {0, '\0'};
+            }
+
+            if (freq > 0)
+                prev = {freq, chr};
+        }
+
+        return result_str;
+    }
+};
