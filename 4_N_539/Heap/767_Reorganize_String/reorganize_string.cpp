@@ -49,7 +49,7 @@
 /* Time  Beats: 100.00% */
 /* Space Beats: 45.90% */
 
-/* Time  Complexity: O(log n) */
+/* Time  Complexity: O(n * log n) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
@@ -116,5 +116,93 @@ public:
         }
 
         return result_str;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats:  9.04% */
+/* Space Beats: 17.84% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    std::string reorganizeString(std::string s)
+    {
+        std::unordered_map<char, int> umap;
+
+        // Build a Frequency Map: {'a', 3}, ...
+        for (char& chr : s)
+            umap[chr]++;
+
+        // Build a Max Heap: {3, 'a'}, ...
+        std::priority_queue<std::pair<int, char>> max_heap;
+        for (auto& entry : umap)
+            max_heap.push({entry.second, entry.first});
+
+        std::ostringstream out;
+        char last_chr = '0'; // Dummy initial value
+
+        // ----------------------------------------------------
+        // ---------- Before entering "while loop" ------------
+        // ----------------------------------------------------
+        std::pair<int, char> top = max_heap.top();
+        max_heap.pop();
+
+        out << top.second;
+        last_chr = top.second;
+
+        top.first--;
+
+        if (top.first > 0)
+            max_heap.push({top.first, top.second});
+
+        // ------------------------------------
+        // ------------  while loop -----------
+        // ------------------------------------
+        while (!max_heap.empty())
+        {
+            std::pair<int, char> top = max_heap.top();
+            max_heap.pop();
+
+            std::pair<int, char> sec_top; // {0, '\0'}
+            if (last_chr == top.second)
+            {
+                if (max_heap.empty())
+                    return "";
+
+                sec_top = max_heap.top();
+                max_heap.pop();
+
+                out << sec_top.second;
+                // last_chr = sec_top.second;
+
+                sec_top.first--;
+            }
+
+            out << top.second;
+            last_chr = top.second;
+
+            top.first--;
+
+            if (top.first > 0)
+                max_heap.push({top.first, top.second});
+
+            if (sec_top.first > 0)
+                max_heap.push({sec_top.first, sec_top.second});
+        }
+
+        return out.str();
     }
 };
