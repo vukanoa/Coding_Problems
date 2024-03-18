@@ -271,3 +271,65 @@ public:
         return result_str;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  55.88% */
+
+/* Time  Complexity: O(n) */ // ?
+/* Space Complexity: O(n) */ // ?
+class Solution_Greedy {
+public:
+    std::string reorganizeString(std::string s)
+    {
+        std::unordered_map<char, int> umap;
+
+        // Frequency Map
+        for (auto &chr : s)
+            umap[chr]++;
+
+        std::priority_queue<std::pair<int, char>> max_heap;
+
+        // Convert from FrequencyMap to MaxHeap
+        for (auto& entry : umap)
+            max_heap.push({entry.second, entry.first});
+
+        int size = s.size();
+        int idx = 0;
+
+        while (!max_heap.empty())
+        {
+            auto top = max_heap.top();
+            max_heap.pop();
+
+            int  freq       = top.first;
+            char character  = top.second;
+
+            // Make sure you understand this if statement
+            if(size < 2 * freq - 1)
+                return "";
+
+            while (freq-- > 0)
+            {
+                if(idx >= size)
+                    idx = 1;
+
+                s[idx] = character;
+                idx += 2;
+            }
+        }
+
+        return s;
+    }
+};
