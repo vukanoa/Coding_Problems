@@ -364,3 +364,50 @@ public:
         return true;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 55.99% */
+/* Space Beats: 20.10% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Multimap {
+public:
+    bool carPooling(std::vector<std::vector<int>>& trips, int capacity)
+    {
+        std::multimap<int, int> multi_map;
+
+        for(int i = 0; i < trips.size(); i++)
+        {
+            int num_passengers = trips[i][0];
+            multi_map.insert( {trips[i][1], -num_passengers} ); // From
+            multi_map.insert( {trips[i][2],  num_passengers} ); // To
+        }
+
+        for (auto iter = multi_map.begin(); iter != multi_map.end(); iter++)
+        {
+            capacity += iter->second;
+
+            auto iter_next = iter;
+            ++iter_next;
+
+            // The main part comes here because for a particular interval we
+            // have to check until the next value is not same
+            if(capacity < 0 && iter->first != iter_next->first)
+                return false;
+        }
+
+        return true;
+    }
+};
