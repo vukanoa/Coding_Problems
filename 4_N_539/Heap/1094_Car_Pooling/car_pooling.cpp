@@ -381,7 +381,7 @@ public:
 /* Space Beats: 20.10% */
 
 /* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Space Complexity: O(m) */
 class Solution_Multimap {
 public:
     bool carPooling(std::vector<std::vector<int>>& trips, int capacity)
@@ -409,5 +409,41 @@ public:
         }
 
         return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 78.33% */
+/* Space Beats: 60.76% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(m) */
+class Solution_Multimap_Thousand_and_One_Stops {
+public:
+    bool carPooling(std::vector<std::vector<int>>& trips, int capacity)
+    {
+        int stops[1001] = {};
+
+        for (auto& trip : trips)
+        {
+            stops[trip[1]] += trip[0]; // Take people in car at "From" station
+            stops[trip[2]] -= trip[0]; // take people in car at "To"   station
+        }
+
+        for (int i = 0; capacity >= 0 && i < 1001; i++)
+            capacity -= stops[i];
+
+        return capacity >= 0;
     }
 };
