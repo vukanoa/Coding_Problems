@@ -373,7 +373,102 @@ public:
     --- IDEA ---
     ------------
 
-    TODO
+    This is a similar approach to a last Solution in this file(I've explained
+    that one before this one, that's why I'm referring it from here).
+
+    The point is that at a given "station" we can have multiple "takings" or
+    "drop offs"(or both, of course, but that is implicit in logical OR).
+
+    Therefore, we need a HashMap where we can have "stations" as keys and all
+    the different values associated with that key, hence a MultiMap.
+
+    (We could use a basic Map(aka "TreeMap" in other languages)), however then
+    we'd have to use a vector as values and then we'd have to iteratore over
+    that as well.
+
+    To prevent multiple indendation, we're going to be using a MultiMap here.
+
+    As I've said, we can "take" and/or "drop off" passengers at any "station"
+    and we can do that multiple times per "action"(i.e. "take" or "drop off").
+
+    However, our capacity CANNOT be below zero AFTER WE'RE DONE WITH PROCESSING
+    SOME STATION.
+
+
+    Example:
+
+        trips = [[0,-4], [2,-2], [4,-5], [5,-1], [7,-2], [7,4], [7,5], [9,1]]
+        capacity = 13
+
+             MultiMap
+        |  Key  :  Value |
+        +----------------+
+        |   0   :   -4   |
+        +----------------+
+        |   2   :   -2   |
+        +----------------+
+        |   4   :   -5   |
+        +----------------+
+        |   5   :   -1   |
+        +----------------+
+        |   7   :   -3   |
+        +----------------+
+        |   7   :   +4   |
+        +----------------+
+        |   7   :   +5   |
+        +----------------+
+        |   9   :   +1   |
+        +----------------+
+        |   9   :   +2   |
+        +----------------+
+        |  11   :   +3   |
+        +----------------+
+
+
+                        Initial capacity: 13
+
+        Station  0  -->   capacity += -4       // capacity = 9
+
+        Station  2  -->   capacity += -2       // capacity = 7
+
+        Station  4  -->   capacity += -5       // capacity = 2
+
+        Station  5  -->   capacity += -1       // capacity = 1
+
+        Station  7  -->   capacity += -3       // capacity = -2
+        Station  7  -->   capacity += +4       // capacity = 2
+        Station  7  -->   capacity += +5       // capacity = 7
+
+        Station  9  -->   capacity += +1       // capacity = 8
+        Station  9  -->   capacity += +2       // capacity = 10
+
+        Station 11  -->   capacity += +3       // capacity = 13
+
+
+
+    Notice two importants things:
+        1. Keys are sorted in ASCENDING order BY THE KEY, however, they are NOT
+           by any means sorted by the values as well! Values appear next to
+           keys in order in which they were inserted to the MultiMap!
+           That is VERY imporant to notice.
+
+
+        2. capacity CAN be less than zero ONLY while there are unprocessed
+           passengers FOR THAT STATION.
+
+           Look at "Station 7", it takes on 3 passengers and capacity becomes:
+               -2
+           however, since there are more passengers to take on and/or drop off
+           then we must NOT return false immediately.
+
+           But, if we process the last key-value pair for that key(station) and
+           our capacity is LESS than 0, then and only then do we return false
+           immediately!
+
+           This line in the code, down below, is crucial:
+
+               if(capacity < 0 && iter->first != iter_next->first)
+                   return false;
 
 */
 
