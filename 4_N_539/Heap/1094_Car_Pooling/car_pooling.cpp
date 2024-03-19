@@ -420,7 +420,100 @@ public:
     --- IDEA ---
     ------------
 
-    TODO
+    Since the upper bound of trips.length is 1001, we can initialize an array
+    on the Stack of size 1001 with 0 values as their default.
+
+    Then, the only thing we have to do is use it as a "hash map". We have to
+    add all the passegers for a given "from" station and we have to subtract
+    all of the passengers from a given "to" station.
+
+
+    Example:
+        trips = [[9,0,3],[2,1,4],[3,3,7],[8,5,6]]
+
+    the "stops" or rather "stations" we are going to add and subtract values in
+    are:
+
+         |  |     |  |  |  |  |
+         v  v     v  v  v  v  v
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ..., 0]
+         0  1  2  3  4  5  6  7  8  9      1000
+
+    These pointed slots are the ONLY "stations" at which we have take to drop
+    off passengers.
+
+    Since all of the other slots(i.e. "stations") are 0, they will not
+    interfere with our calculations.
+
+    This is how our array will look after processing every "trip" one by one:
+
+    Before:
+
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ..., 0]
+         0  1  2  3  4  5  6  7  8  9      1000
+
+
+    1. [9, 0, 3]
+           |  |_____
+         __|       |
+         |         |
+         v         v
+        [9, 0, 0, -9, 0, 0, 0, 0, 0, 0, ..., 0]
+         0  1  2   3  4  5  6  7  8  9      1000
+
+
+
+    2. [2, 1, 4]
+           |  |_________
+           |_          |
+            |          |
+            v          v
+        [9, 2, 0, -9, -2, 0, 0, 0, 0, 0, ..., 0]
+         0  1  2   3   4  5  6  7  8  9      1000
+
+
+
+    3. [3, 3, 7]
+           |  |___________________
+           |________             |
+                   |             |
+                   v             v
+        [9, 2, 0, -6, -2, 0, 0, -3, 0, 0, ..., 0]
+         0  1  2   3   4  5  6   7  8  9      1000
+
+
+
+    4. [8, 5, 6]
+           |  |________________
+           |_______________   |
+                          |   |
+                          v   v
+        [9, 2, 0, -6, -2, 8, -8, -3, 0, 0, ..., 0]
+         0  1  2   3   4  5   6   7  8  9      1000
+
+
+                        Initial capacity: 11
+
+    capacity -= 9                         // capacity = 2
+    capacity -= 2                         // capacity = 0
+    capacity -= 0                         // capacity = 0
+    capacity -= -6 ==> capacity += 6      // capacity = 6
+    capacity -= -2 ==> capacity += 2      // capacity = 8
+    capacity -= 8                         // capacity = 0
+    capacity -= -8 ==> capacity += 8      // capacity = 8
+    capacity -= -3 ==> capacity += 3      // capacity = 11
+
+
+
+    Out capacity must NOT get below the zero at any point. If it happens to get
+    below zero, we immediately return false.
+
+    Otherwise we've been able to take and dropp off every passenger using our
+    car with given capacity.
+
+
+    As you can see, our capacity wasn't below zero at any point, therefore we
+    can return true.
 
 */
 
