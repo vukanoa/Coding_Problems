@@ -44,13 +44,10 @@
 
 */
 
-
 /*
     ------------
     --- IDEA ---
     ------------
-
-    (Beats 100%)
 
     Let's start from empty subset in output list. At each step one takes new
     integer into consideration and generates new subsets from the existing
@@ -72,9 +69,6 @@
         {}, {1}, {2}, {1, 2}, {3}, {1, 3}, {2, 3}, {1, 2, 3}
 
 */
-
-
-
 
 /* Time  Beats: 100% */
 /* Space Beats: 73.12% */
@@ -102,40 +96,27 @@
     subsets generated and O(n) due to the temporary vector used in the inner
     loop, for a total of O(2^n * n + n).
 */
-class Solution{
+class Solution_Pattern {
 public:
     std::vector<std::vector<int>> subsets(std::vector<int>& nums)
     {
-        int n = nums.size();
+        std::vector<std::vector<int>> results = {{}};
 
-        std::vector<std::vector<int>> results;
-        results.push_back({});
-
-        if (n == 0)
-            return results;
-
-        int results_size = 0;
-
-        for (int num : nums)
+        for (int i = 0; i < nums.size(); i++)
         {
-            results_size = results.size();
-
-            for (int i = 0; i < results_size; i++)
+            int results_size = results.size();
+            for (int j = 0; j < results_size; j++)
             {
-                std::vector<int> tmp;
-                for (int j = 0; j < results[i].size(); j++)
-                    tmp.push_back(results[i][j]);
+                std::vector<int> curr = results[j];
+                curr.push_back(nums[i]);
 
-                tmp.push_back(num);
-
-                results.push_back(tmp);
+                results.push_back(curr);
             }
         }
 
         return results;
     }
 };
-
 
 
 
@@ -216,7 +197,7 @@ public:
 int
 main()
 {
-    Solution sol;
+    Solution_Pattern      sol_patt;
     Solution_Backtracking sol_back;
 
     /* Example 1 */
@@ -251,7 +232,7 @@ main()
 
 
     /* Solution */
-    std::vector<std::vector<int>> results = sol.subsets(nums);
+    std::vector<std::vector<int>> results = sol_patt.subsets(nums);
     // std::vector<std::vector<int>> results = sol_back.subsets(nums);
 
 
