@@ -51,12 +51,56 @@
     --- IDEA ---
     ------------
 
-    TODO
+    We're told a very valuable and important piece of information:
+    "Given an array nums of n integers where nums[i] is in the range [1, n]..."
+
+
+    What that means is that, no matter how many duplicate numbers we have,
+    every single(only one of the duplicates)distinct number can be at the right
+    position if we reorder it.
+
+    So, how can we order them?
+    We can order them in various ways.
+
+    The very first thing that comes to mind is: Sorting. However, that would
+    take an O(n * logn) Time Complexity, which isn't very efficient for this
+    problem.
+
+    However, let's for a second forget how to reorder them in such a way. Let's
+    just think about what would we get if we were able to be in that position.
+
+    Example:
+                0  1  2  3  4  5  6  7
+        nums = [4, 3, 2, 7, 8, 2, 3, 1]
+
+
+    If we, somehow, reorder this vector in a way that every distinct element
+    gets to be in its right spot, we'd have this:
+
+                0  1  2  3  4  5  6  7
+        nums = [1, 2, 3, 4, 3, 2, 7, 8]
+
+
+    Would this help us solve our problem?
+    Definitely!
+
+    We'd only have to iterate over this vector and check if element at i-th
+    position is the same as "i+1", i.e. if (nums[i] != i+1)
+
+    If it is not, that means the element "i+1" is NOT present in our vector
+    "nums" and thus we shall include it in our "result" vector.
+
+    nums = [7, 3, 2, 4, 8, 2, 3, 1]
+    nums = [3, 3, 2, 4, 8, 2, 7, 1]
+    nums = [2, 3, 3, 4, 8, 2, 7, 1]
+    nums = [3, 2, 3, 4, 8, 2, 7, 1]
+    nums = [3, 2, 3, 4, 1, 2, 7, 8]
+    nums = [1, 2, 3, 4, 3, 2, 7, 8]
 
 */
 
-/* Time  Beats: 72.20% */
-/* Space Beats: 52.72% */
+/* Time  Beats: 97.65% */
+/* Space Beats: 61.22% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -66,14 +110,14 @@ public:
     {
         for (int i = 0; i < nums.size(); i++)
         {
-            while (nums[nums[i] - 1] != nums[i])
-                std::swap(nums[nums[i] - 1], nums[i]);
+            while (nums[i] != nums[nums[i] - 1])
+                std::swap(nums[i], nums[nums[i] - 1]);
         }
 
         std::vector<int> results;
         for (int i = 0; i < nums.size(); i++)
         {
-            if (i+1 != nums[i])
+            if (nums[i] != i+1)
                 results.push_back(i+1);
         }
 
@@ -121,6 +165,7 @@ public:
         return results;
     }
 };
+
 
 
 
