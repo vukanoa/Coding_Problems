@@ -57,91 +57,38 @@
 
 */
 
-/* Time  Beats: 95.82% */
-/* Space Beats: 61.50% */
-
-/* Time  Complexity: O(n * k) */
-/* Space Complexity: O(k)     */
-class Solution_Verbose {
-public:
-    std::vector<std::vector<int>> combine(int n, int k)
-    {
-        std::vector<int> values(n);
-        std::iota(values.begin(), values.end(), 1);
-
-        std::vector<std::vector<int>> result;
-        std::vector<int> curr_comb = {};
-
-        backtracking(values, k, 0, curr_comb, result);
-
-        return result;
-    }
-
-private:
-    void backtracking(std::vector<int>& values, int k, int start, std::vector<int>& curr_comb, std::vector<std::vector<int>>& result)
-    {
-        if (curr_comb.size() == k)
-        {
-            result.push_back(curr_comb);
-            return;
-        }
-
-        for (int i = start; i < values.size(); i++)
-        {
-            curr_comb.push_back(values[i]);
-
-            backtracking(values, k, i+1, curr_comb, result);
-
-            curr_comb.pop_back();
-        }
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    The most basic Backtracking.
-
-*/
-
 /* Time  Beats: 97.17% */
 /* Space Beats: 65.40% */
 
 /* Time  Complexity: O(n * k) */
 /* Space Complexity: O(k)     */
-class Solution_Concise {
+class Solution {
 public:
     std::vector<std::vector<int>> combine(int n, int k)
     {
-        std::vector<std::vector<int>> result;
-        std::vector<int> curr_comb = {};
+        std::vector<std::vector<int>> results;
+        backtracking(n, k, 1, {}, results);
 
-        backtracking(result, curr_comb, n, k, 1);
-
-        return result;
+        return results;
     }
 
 private:
-    void backtracking(std::vector<std::vector<int>>& result, std::vector<int>& curr_comb,
-                      int n, int k, int start)
+    void backtracking(int& n,
+                      int& k,
+                      int start,
+                      std::vector<int> curr_comb,
+                      std::vector<std::vector<int>>& results)
     {
         if (curr_comb.size() == k)
         {
-            result.push_back(curr_comb);
+            results.push_back(curr_comb);
             return;
         }
 
         for (int i = start; i <= n; i++)
         {
             curr_comb.push_back(i);
-
-            backtracking(result, curr_comb, n, k, i+1);
-
+            backtracking(n, k, i+1, curr_comb, results);
             curr_comb.pop_back();
         }
     }
@@ -150,9 +97,7 @@ private:
 
 int main()
 {
-    Solution_Verbose sol_verbose;
-    Solution_Concise sol_concise;
-
+    Solution sol;
 
     /* Example 1 */
     int n = 4;
@@ -177,8 +122,7 @@ int main()
 
 
     /* Solution */
-    std::vector<std::vector<int>> results = sol_verbose.combine(n, k);
-    // std::vector<std::vector<int>> results = sol_concise.combine(n, k);
+    std::vector<std::vector<int>> results = sol.combine(n, k);
 
 
     /* Write Output */
