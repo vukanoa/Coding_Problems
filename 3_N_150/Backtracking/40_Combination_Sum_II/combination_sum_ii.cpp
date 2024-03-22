@@ -72,12 +72,12 @@
     thing, however once we "backtrack" because sum was >= target, now we do not
     want to begin with the same number, for it is possible to get duplicate
     combination. Therefore, we have to skip all the numbers that are the same
-    as the one we've used to go deeper down the backtracking tree.
+    as the one we've used to, successfully, go deeper down the backtracking tree.
 
     That's the whole idea.
 
-    You should simulate the code on the three Examples I'vw listed below and
-    I'm sure it will be ever clearer.
+    You should simulate the code on the three Examples I've listed below and
+    I'm sure it will be even more clear.
 
 */
 
@@ -93,8 +93,8 @@ public:
         std::vector<std::vector<int>> results;
         std::sort(candidates.begin(), candidates.end());
 
-        std::vector<int> curr_combination;
-        backtracking(candidates, target, 0, curr_combination, 0, results);
+        std::vector<int> curr_comb;
+        backtracking(candidates, target, 0, curr_comb, 0, results);
 
         return results;
     }
@@ -102,27 +102,25 @@ public:
 private:
     void backtracking(std::vector<int>& candidates,
                      int& target,
-                     int sum,
-                     std::vector<int>& curr_combination,
                      int start,
+                     std::vector<int>& curr_comb,
+                     int sum,
                      std::vector<std::vector<int>>& results)
     {
         if (sum > target)
             return;
         else if (sum == target)
         {
-            results.push_back(curr_combination);
+            results.push_back(curr_comb);
             return;
         }
 
         int i = start;
         while (i < candidates.size())
         {
-            curr_combination.push_back(candidates[i]);
-
-            backtracking(candidates, target, sum + candidates[i], curr_combination, i+1, results);
-
-            curr_combination.pop_back();
+            curr_comb.push_back(candidates[i]);
+            backtracking(candidates, target, i+1, curr_comb, sum + candidates[i], results);
+            curr_comb.pop_back();
 
             if (sum + candidates[i] > target)
                 return;
