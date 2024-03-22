@@ -59,26 +59,45 @@
 
 */
 
-/* Time  Beats:  100% */
-/* Space Beats: 59.34% */
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    It is very similar to Subset I(first version of this problem), however
+    since there are duplicate values in "nums", we must skip them.
+
+    How are we going to do that?
+
+    This is the crux of the Solution:
+
+        while (i != start && i > 0 && i < nums.size() && nums[i-1] == nums[i])
+            i++;
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  65.72% */
 
 /* Time  Complexity: O(n * 2^n) */
 /* Space Complexity: O(n * 2^n) */
 class Solution {
 public:
-    vector<vector<int>> subsetsWithDup(vector<int>& nums)
+    std::vector<std::vector<int>> subsetsWithDup(std::vector<int>& nums)
     {
         std::vector<std::vector<int>> results = {{}};
         std::sort(nums.begin(), nums.end());
 
-        std::vector<int> curr_combination;
-        backtracking(nums, 0, curr_combination, results);
+        backtracking(nums, 0, {}, results);
 
         return results;
     }
 
 private:
-    void backtracking(std::vector<int>& nums, int start, std::vector<int>& curr_combination, std::vector<std::vector<int>>& results)
+    void backtracking(std::vector<int>& nums,
+                      int start,
+                      std::vector<int>& subset,
+                      std::vector<std::vector<int>>& results)
     {
         if (start == nums.size())
             return;
@@ -91,12 +110,71 @@ private:
             if (i == nums.size())
                 return;
 
-            curr_combination.push_back(nums[i]);
-            results.push_back(curr_combination);
+            subset.push_back(nums[i]);
+            results.push_back(subset);
 
-            backtracking(nums, i+1, curr_combination, results);
+            backtracking(nums, i+1, subset, results);
 
-            curr_combination.pop_back();
+            subset.pop_back();
         }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    A diferent way of implementing the same idea. I'd say this one makes more
+    sense, but the above one comes to mind first. At least in my case, since
+    that is how I usually write a Batracking Solution.
+
+    Notice that we don't have a "for loop" in this bactracking function.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  65.72% */
+
+/* Time  Complexity: O(n * 2^n) */
+/* Space Complexity: O(n * 2^n) */
+class Solution_2 {
+public:
+    std::vector<std::vector<int>> subsetsWithDup(std::vector<int>& nums)
+    {
+        std::vector<std::vector<int>> results; // Don't add initial '{}'
+        std::sort(nums.begin(), nums.end());
+
+        std::vector<int> subset;
+        backtracking(nums, 0, subset, results);
+
+        return results;
+    }
+
+private:
+    void backtracking(std::vector<int>& nums,
+                      int i,
+                      std::vector<int>& subset,
+                      std::vector<std::vector<int>>& results)
+    {
+        if (i == nums.size())
+        {
+            results.push_back(subset);
+            return;
+        }
+
+        // All subsets that do INDEED include nums[i]
+        subset.push_back(nums[i]);
+        backtracking(nums, i+1, subset, results);
+        subset.pop_back();
+
+        // All subsets that do NOT include nums[i]
+        while (i+1 < nums.size() && nums[i] == nums[i+1])
+            i++;
+
+        backtracking(nums, i+1, subset, results);
     }
 };
