@@ -65,43 +65,126 @@ class Solution {
 public:
     std::vector<std::vector<int>> permuteUnique(std::vector<int>& nums)
     {
-        std::sort(nums.begin(), nums.end());
-
-        std::vector<std::vector<int>> result;
-        std::vector<int> tmp;
+        std::vector<std::vector<int>> results;
         std::vector<bool> visited(nums.size(), false);
 
-        backtracking(nums, result, tmp, visited);
+        // Sort the Input
+        std::sort(nums.begin(), nums.end());
 
-        return result;
+        backtracking(nums, {}, visited, results);
+
+        return results;
     }
 
 private:
     void backtracking(
                       std::vector<int>& nums,
-                      std::vector<std::vector<int>>& result,
-                      std::vector<int> tmp,
-                      std::vector<bool>& visited
+                      std::vector<int> curr_permutation,
+                      std::vector<bool>& visited,
+                      std::vector<std::vector<int>>& result
                      )
     {
-        if(tmp.size() == nums.size())
+        if(curr_permutation.size() == nums.size())
         {
-            result.push_back(tmp);
+            result.push_back(curr_permutation);
             return;
         }
 
         for(int i = 0; i < nums.size(); i++)
         {
-            if(visited[i] || (i>0 && nums[i] == nums[i-1] && !visited[i-1]))
+            if(visited[i] || (i > 0 && nums[i] == nums[i-1] && !visited[i-1]))
                 continue;
 
+            // Push
             visited[i] = true;
-            tmp.push_back(nums[i]);
+            curr_permutation.push_back(nums[i]);
 
-            backtracking(nums, result, tmp, visited);
+            backtracking(nums, curr_permutation, visited, result);
 
-            tmp.pop_back();
+            // Pop
+            curr_permutation.pop_back();
             visited[i] = false;
+        }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is almost equivalent to the above Solution, however it is implemented
+    a bit different. Different enough to deserve its on Implementation.
+
+*/
+
+/* Time  Beats: 77.93% */
+/* Space Beats: 24.71% */
+
+/*
+    Time  Complexity: O(N!)
+
+    Time Complexity : O(N!), In worst case when all element of Array(nums) will
+    different then there will be N!  permutations and N! function calls. Where
+    N is the size of the array(nums) and ! stands for factorial.
+*/
+/*
+    Space Complexity: O(N! * N)
+
+    Space Complexity: O(N!*N), In worst case when all element of Array(nums)
+    will different, since we have to store all the possible solutions which are
+    N! in size where N is the size of the array and ! stands for factorial.
+*/
+class Solution_2 {
+public:
+    std::vector<std::vector<int>> permuteUnique(std::vector<int>& nums)
+    {
+        std::vector<std::vector<int>> results;
+        std::unordered_set<int> uset;
+
+        // Sort the Input
+        std::sort(nums.begin(), nums.end());
+
+        backtracking(nums, {}, uset, results);
+
+        return results;
+    }
+
+private:
+    void backtracking(std::vector<int>& nums,
+                      std::vector<int> curr_permutation,
+                      std::unordered_set<int>& uset,
+                      std::vector<std::vector<int>>& results)
+    {
+        if (uset.size() == nums.size())
+        {
+            results.push_back(curr_permutation);
+            return;
+        }
+
+        for (int i = 0; i < nums.size(); i++)
+        {
+            while (i > 0 && i < nums.size() && nums[i-1] == nums[i] && uset.count(i-1) == 0)
+                i++;
+
+            if (i == nums.size())
+                break;
+
+            if (uset.count(i))
+                continue;
+
+            // Push
+            uset.insert(i);
+            curr_permutation.push_back(nums[i]);
+
+            backtracking(nums, curr_permutation, uset, results);
+
+            // Pop
+            curr_permutation.pop_back();
+            uset.erase(i);
         }
     }
 };
