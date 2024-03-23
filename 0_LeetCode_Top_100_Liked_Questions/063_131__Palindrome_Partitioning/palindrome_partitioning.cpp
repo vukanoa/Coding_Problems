@@ -40,7 +40,6 @@
 
 */
 
-
 /*
     ------------
     --- IDEA ---
@@ -138,9 +137,23 @@
 /* Time  Complexity: O(2^n) */
 /* Space Complexity: O(n^2) */
 class Solution {
+public:
+    std::vector<std::vector<std::string>> partition(std::string s)
+    {
+        std::vector<std::vector<std::string>> results;
+        std::vector<std::string> current_vec;
+
+        backtracking_dfs(s, 0, current_vec, results);
+
+        return results;
+    }
+
 private:
     // O(2^n)
-    void backtracking_dfs(std::string& s, int start, std::vector<std::string>& current_vec, std::vector<std::vector<std::string>>& results)
+    void backtracking_dfs(std::string& s,
+                          int start,
+                          std::vector<std::string>& current_vec,
+                          std::vector<std::vector<std::string>>& results)
     {
         if (start == s.length())
             results.push_back(current_vec);
@@ -168,17 +181,6 @@ private:
         }
 
         return true;
-    }
-
-public:
-    std::vector<std::vector<std::string>> partition(std::string s)
-    {
-        std::vector<std::vector<std::string>> results;
-        std::vector<std::string> current_vec;
-
-        backtracking_dfs(s, 0, current_vec, results);
-
-        return results;
     }
 };
 
