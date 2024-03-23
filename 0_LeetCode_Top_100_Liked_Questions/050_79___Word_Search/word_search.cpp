@@ -73,10 +73,8 @@
 
 */
 
-
 /* Time  Beats: 91.61% */
 /* Space Beats: 86.30% */
-
 
 /*
     Time  Complexity: O(M * N * 4^L)
@@ -95,18 +93,15 @@ class Solution {
 public:
     bool exist(std::vector<std::vector<char>>& board, std::string word)
     {
-        int m = board.size();
-        int n = board[0].size();
+        const int ROWS = board.size();
+        const int COLS = board[0].size();
 
-        for (int i = 0; i < m; i++)
+        for (int i = 0; i < ROWS; i++)
         {
-            for (int j = 0; j < n; j++)
+            for (int j = 0; j < COLS; j++)
             {
-                if (board[i][j] == word[0])
-                {
-                    if (dfs(board, word, i, j, 0))
-                        return true;
-                }
+                if (dfs(board, word, i, j, 0))
+                    return true;
             }
         }
 
@@ -114,23 +109,26 @@ public:
     }
 
 private:
-    bool dfs(std::vector<std::vector<char>>& board, std::string& word, int row, int col, int index)
+    bool dfs(std::vector<std::vector<char>>& board, std::string& word, int i, int j, int w)
     {
-        if (index == word.size())
+        const int ROWS = board.size();
+        const int COLS = board[0].size();
+
+        if (w == word.size())
             return true;
 
-        if (row < 0 || row == board.size() || col < 0 || col == board[0].size() || board[row][col] != word[index])
+        if (i < 0 || j < 0 || i == ROWS || j == COLS || board[i][j] != word[w])
             return false;
 
-        char c = board[row][col];
-        board[row][col] = '#'; // So that we don't use the same element twice
+        char original = board[i][j];
+        board[i][j] = '#'; // So that we don't use the same element twice
 
-        if (dfs(board, word, row-1, col  , index+1)) return true;
-        if (dfs(board, word, row+1, col  , index+1)) return true;
-        if (dfs(board, word, row  , col-1, index+1)) return true;
-        if (dfs(board, word, row  , col+1, index+1)) return true;
+        if (dfs(board, word, i-1, j  , w+1)) return true;
+        if (dfs(board, word, i+1, j  , w+1)) return true;
+        if (dfs(board, word, i  , j-1, w+1)) return true;
+        if (dfs(board, word, i  , j+1, w+1)) return true;
 
-        board[row][col] = c; // Return used element so that we can use it again since we haven't found it yet
+        board[i][j] = original; // Return original character
 
         return false;
     }
