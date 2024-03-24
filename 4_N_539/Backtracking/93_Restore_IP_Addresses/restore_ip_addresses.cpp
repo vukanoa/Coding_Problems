@@ -58,15 +58,57 @@
     --- IDEA ---
     ------------
 
-    TODO
+    Input: s = "25401213"
+
+                              ___[]___
+                             /    |   \
+                            /     |    \
+                           /      |     \
+                          /       |      \
+                       2 /      25|       \254
+                        /         |        \
+                       /          |         \
+                      /           |          \
+                     /            |           \
+                   [2]           [25]         [254]
+                  /  \           /  \           |
+                5/    \54      4/    \40        |
+                /      \       /      \         |
+              [5]     [54]   [4]    [40]       [0]
+              /  \                            /   \
+            4/    \54         ...           1/     \12
+            /      \                        /       \
+          [4]     [40]                  __[1]__     [12]__
+          /                            /   |   \          \
+        0/                           2/  21|    \213       \
+        /                            /     |     \         ...
+      [0]                          [2]    [21]   VALID
+     / | \                          |      |      (push)
+    /  |  \                         |      |
+   X   X   X                        X      X
+   (INVALID)
+
 
 */
 
 /* Time  Beats: 100.00% */
 /* Space Beats:  93.56% */
 
-/* Time  Complexity: O(2^n) */
-/* Space Complexity: O(n)   */
+/*
+    Time  Complexity: O(3^4) --> O(1)
+
+    The maximum height of this decision tree can be 4. After that, we'd return
+    immediately.
+
+*/
+/*
+    Space Complexity: O(n) --> O(1)
+
+    if s.length() gets to be greater than 12, we would've returned, therefore
+    we are certain n will, at worst, be equal to 12, which is a constant, hence
+    O(1).
+
+*/
 class Solution {
 public:
     std::vector<std::string> restoreIpAddresses(std::string s)
@@ -101,6 +143,72 @@ public:
                 break;
             else if (std::stol(num) <= 255)
                 backtrack(s, result, path + s.substr(index, i) + ".", index + i,count + 1);
+        }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, implemented a bit differently.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  93.56% */
+
+/*
+    Time  Complexity: O(3^4) --> O(1)
+
+    The maximum height of this decision tree can be 4. After that, we'd return
+    immediately.
+
+*/
+/*
+    Space Complexity: O(n) --> O(1)
+
+    if s.length() gets to be greater than 12, we would've returned, therefore
+    we are certain n will, at worst, be equal to 12, which is a constant, hence
+    O(1).
+
+*/
+class Solution_2{
+public:
+    std::vector<std::string> restoreIpAddresses(std::string s)
+    {
+        std::vector<std::string> results;
+        backtrack(s, 0, 0, "", results);
+
+        return results;
+    }
+
+    void backtrack(string& s,
+                   int start,
+                   int dots,
+                   std::string curr_str,
+                   std::vector<string>& results)
+    {
+        if (dots > 4)
+            return;
+
+        if (dots == 4 && start >= s.length())
+        {
+            curr_str.pop_back();
+            results.push_back(curr_str);
+            return;
+        }
+
+        for (int j = 1; j <= 3 && start + j <= s.length(); j++)
+        {
+            std::string num_str = s.substr(start, j);
+
+            if (std::stoi(num_str) <= 255 && (j == 1 || num_str[0] != '0') )
+                backtrack(s, start + j, dots + 1, curr_str + s.substr(start, j) + ".", results);
         }
     }
 };
