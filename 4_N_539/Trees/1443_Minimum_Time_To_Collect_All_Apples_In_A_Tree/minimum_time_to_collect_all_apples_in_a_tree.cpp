@@ -128,7 +128,7 @@ private:
 
         for (int& neighbor : adj_list[curr_node])
         {
-            if (neighbor == prev)
+            if (neighbor == prev_node)
                 continue;
 
             if (dfs(adj_list, hasApple, curr_node, neighbor, seconds))
