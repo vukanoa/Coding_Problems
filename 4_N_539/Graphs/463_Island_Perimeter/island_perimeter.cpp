@@ -88,22 +88,18 @@ public:
         const int ROWS = grid.size();
         const int COLS = grid[0].size();
 
-        if (ROWS == 1 && COLS == 0)
-            return 4;
-
         int perimeter = 0;
 
-        for (int i = 0; i < ROWS; i++)
+        for (int row = 0; row < ROWS; row++)
         {
-            for (int j = 0; j < COLS; j++)
+            for (int col = 0; col < COLS; col++)
             {
-                if (grid[i][j] == 1)
+                if (grid[row][col] == 1)
                 {
-                    dfs(grid, i, j, perimeter);
+                    dfs(grid, row, col, perimeter);
 
-                    // GOTO out of both loops
-                    i = ROWS;
-                    break;
+                    row = ROWS; // break the outer loop
+                    break;      // break the inner loop
                 }
             }
         }
@@ -112,32 +108,26 @@ public:
     }
 
 private:
-    void dfs(std::vector<std::vector<int>>& grid, int i, int j, int& perimeter)
+    void dfs(std::vector<std::vector<int>>& grid, int row, int col, int& perimeter)
     {
         const int ROWS = grid.size();
         const int COLS = grid[0].size();
 
-        if (i < 0 || j < 0 || i == ROWS || j == COLS || grid[i][j] != 1)
+        if (row < 0 || col < 0 || row == ROWS || col == COLS || grid[row][col] == 0)
+        {
+            perimeter++;
+            return;
+        }
+        else if (grid[row][col] == 2)
             return;
 
-        grid[i][j] = 2;
+        grid[row][col] = 2;
 
-        if (i == 0      || grid[i-1][j  ] == 0)   // Up
-            perimeter++;
-
-        if (i == ROWS-1 || grid[i+1][j  ] == 0)   // Down
-            perimeter++;
-
-        if (j == 0      || grid[i  ][j-1] == 0)   // Left
-            perimeter++;
-
-        if (j == COLS-1 || grid[i  ][j+1] == 0)   // Right
-            perimeter++;
-
-        dfs(grid, i-1, j  , perimeter);
-        dfs(grid, i+1, j  , perimeter);
-        dfs(grid, i  , j-1, perimeter);
-        dfs(grid, i  , j+1, perimeter);
+        /* Signing Cross */
+        dfs(grid, row-1, col  , perimeter);
+        dfs(grid, row+1, col  , perimeter);
+        dfs(grid, row  , col-1, perimeter);
+        dfs(grid, row  , col+1, perimeter);
     }
 };
 
@@ -149,7 +139,7 @@ private:
     --- IDEA ---
     ------------
 
-    Same as above, just writen more concisely.
+    Similar as above, the implementation is a bit different.
 
 */
 
@@ -192,8 +182,9 @@ private:
             return 0;
 
         grid[i][j] = 2;
-
         int perimeter = 0;
+
+        /* Signing Cross */
         perimeter += dfs(grid, i-1, j  );
         perimeter += dfs(grid, i+1, j  );
         perimeter += dfs(grid, i  , j-1);
