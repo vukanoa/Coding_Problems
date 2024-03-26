@@ -94,7 +94,7 @@
 
 /* Time  Complexity: O(M * N * 4^(M * N)) */
 /* Space Complexity: O(M * N) */
-class Solution_Verbose {
+class Solution {
 public:
     int countSubIslands(std::vector<std::vector<int>>& grid1, std::vector<std::vector<int>>& grid2)
     {
@@ -107,7 +107,7 @@ public:
         {
             for (int j = 0; j < COLS; j++)
             {
-                if (grid2[i][j] == 1 && grid2[i][j] == grid1[i][j])
+                if (grid2[i][j] == 1 && grid2[i][j] == 1)
                     sub_islands += dfs(grid1, grid2, i, j) ? 1 : 0;
             }
         }
@@ -124,16 +124,16 @@ private:
         if (i < 0 || j < 0 || i == ROWS || j == COLS || grid2[i][j] != 1)
             return true;
 
-        if (grid2[i][j] == 1 && grid1[i][j] == 0)
+        if (grid1[i][j] == 0)
             return false;
 
         grid2[i][j] = 2;
 
         /* Signing Cross */
-        if (!dfs(grid1, grid2, i-1, j  )) { grid2[i][j] = 1; soak(grid1, grid2, i, j); return false; } // Up
-        if (!dfs(grid1, grid2, i+1, j  )) { grid2[i][j] = 1; soak(grid1, grid2, i, j); return false; } // Down
-        if (!dfs(grid1, grid2, i  , j-1)) { grid2[i][j] = 1; soak(grid1, grid2, i, j); return false; } // Left
-        if (!dfs(grid1, grid2, i  , j+1)) { grid2[i][j] = 1; soak(grid1, grid2, i, j); return false; } // Right
+        if (!dfs(grid1, grid2, i-1, j  )) { soak(grid1, grid2, i, j); return false; } // Up
+        if (!dfs(grid1, grid2, i+1, j  )) { soak(grid1, grid2, i, j); return false; } // Down
+        if (!dfs(grid1, grid2, i  , j-1)) { soak(grid1, grid2, i, j); return false; } // Left
+        if (!dfs(grid1, grid2, i  , j+1)) { soak(grid1, grid2, i, j); return false; } // Right
 
         return true;
     }
@@ -143,10 +143,10 @@ private:
         const int ROWS = grid1.size();
         const int COLS = grid1[0].size();
 
-        if (i < 0 || j < 0 || i == ROWS || j == COLS || grid2[i][j] != 1)
+        if (i < 0 || j < 0 || i == ROWS || j == COLS || grid2[i][j] == 0)
             return;
 
-        grid2[i][j] = 2;
+        grid2[i][j] = 0;
 
         /* Signing Cross */
         soak(grid1, grid2, i-1, j  );
