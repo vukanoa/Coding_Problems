@@ -68,8 +68,8 @@
 
 */
 
-/* Time  Beats: 87.35% */
-/* Space Beats: 61.13% */
+/* Time  Beats: 99.71% */
+/* Space Beats: 70.23% */
 
 /* Time  Complexity: O(m * n) */
 /* Space Complexity: O(m * n) */
@@ -77,44 +77,43 @@ class Solution {
 public:
     int maxAreaOfIsland(vector<vector<int>>& grid)
     {
-        int m = grid.size();
-        int n = grid[0].size();
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
 
-        int max = INT_MIN;
+        int max_area = 0;
 
-        for (int i = 0; i < m; i++)
+        for (int i = 0; i < ROWS; i++)
         {
-            for (int j = 0; j < n; j++)
+            for (int j = 0; j < COLS; j++)
             {
                 if (grid[i][j] == 1)
                 {
                     int area = 0;
-                    dfs(grid, i, j, max, area);
+                    dfs(grid, i, j, area);
+
+                    max_area = std::max(max_area, area);
                 }
             }
         }
 
-        return max == INT_MIN ? 0 : max;
+        return max_area;
     }
 
 private:
-    void dfs(vector<vector<int>>& grid, int i, int j, int& max, int& area)
+    void dfs(std::vector<std::vector<int>>& grid, int i, int j, int& area)
     {
-        int m = grid.size();
-        int n = grid[0].size();
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
 
-        if (i < 0 || j < 0 || i == m || j == n || grid[i][j] != 1)
+        if (i < 0 || j < 0 || i == ROWS || j == COLS || grid[i][j] != 1)
             return;
 
         area++;
-        max = std::max(max, area);
+        grid[i][j] = 2; // Don't traverse it twice. Mark as traversed.
 
-        // Don't traverse it twice
-        grid[i][j] = 2;
-
-        dfs(grid, i-1, j  , max, area);
-        dfs(grid, i+1, j  , max, area);
-        dfs(grid, i  , j-1, max, area);
-        dfs(grid, i  , j+1, max, area);
+        dfs(grid, i-1, j  , area);
+        dfs(grid, i+1, j  , area);
+        dfs(grid, i  , j-1, area);
+        dfs(grid, i  , j+1, area);
     }
 };
