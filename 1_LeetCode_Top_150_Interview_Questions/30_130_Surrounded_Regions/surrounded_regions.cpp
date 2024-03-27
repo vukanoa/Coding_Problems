@@ -1,70 +1,70 @@
 #include <iostream>
 
 /*
-	==============
-	=== MEDIUM ===
-	==============
+    ==============
+    === MEDIUM ===
+    ==============
 
-	===========================
-	130) Surrounded Regions
-	===========================
+    ===========================
+    130) Surrounded Regions
+    ===========================
 
-	============
-	Description:
-	============
+    ============
+    Description:
+    ============
 
-	Given an m x n matrix board containing 'X' and 'O', capture all regions
-	that are 4-directionally surrounded by 'X'.
+    Given an m x n matrix board containing 'X' and 'O', capture all regions
+    that are 4-directionally surrounded by 'X'.
 
-	A region is captured by flipping all 'O's into 'X's in that surrounded
-	region.
+    A region is captured by flipping all 'O's into 'X's in that surrounded
+    region.
 
-	==================================================
-	FUNCTION: void solve(vector<vector<char>>& board);
-	==================================================
+    ==================================================
+    FUNCTION: void solve(vector<vector<char>>& board);
+    ==================================================
 
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
 
-	--- Example 1 ---
-	+---+---+---+---+             +---+---+---+---+
-	| X | X | X | X |             | X | X | X | X |
-	+---+---+---+---+             +---+---+---+---+
-	| X | O | O | X |             | X | X | X | X |
-	+---+---+---+---+    ====>    +---+---+---+---+
-	| X | X | O | X |             | X | X | X | X |
-	+---+---+---+---+             +---+---+---+---+
-	| X | O | X | X |             | X | O | X | X |
-	+---+---+---+---+             +---+---+---+---+
+    --- Example 1 ---
+    +---+---+---+---+             +---+---+---+---+
+    | X | X | X | X |             | X | X | X | X |
+    +---+---+---+---+             +---+---+---+---+
+    | X | O | O | X |             | X | X | X | X |
+    +---+---+---+---+    ====>    +---+---+---+---+
+    | X | X | O | X |             | X | X | X | X |
+    +---+---+---+---+             +---+---+---+---+
+    | X | O | X | X |             | X | O | X | X |
+    +---+---+---+---+             +---+---+---+---+
 
-	Input: board = [["X","X","X","X"],
-	                ["X","O","O","X"],
-	                ["X","X","O","X"],
-	                ["X","O","X","X"]]
-	
-	Output: [["X","X","X","X"],
-	         ["X","X","X","X"],
-	         ["X","X","X","X"],
-	         ["X","O","X","X"]]
+    Input: board = [["X","X","X","X"],
+                    ["X","O","O","X"],
+                    ["X","X","O","X"],
+                    ["X","O","X","X"]]
 
-	Explanation: Notice that an 'O' should not be flipped if:
-	- It is on the border, or
-	- It is adjacent to an 'O' that should not be flipped.
-	The bottom 'O' is on the border, so it is not flipped.
-	The other three 'O' form a surrounded region, so they are flipped.
-	
+    Output: [["X","X","X","X"],
+             ["X","X","X","X"],
+             ["X","X","X","X"],
+             ["X","O","X","X"]]
 
-	--- Example 2 ---
-	Input: board = [["X"]]
-	Output: [["X"]]
+    Explanation: Notice that an 'O' should not be flipped if:
+    - It is on the border, or
+    - It is adjacent to an 'O' that should not be flipped.
+    The bottom 'O' is on the border, so it is not flipped.
+    The other three 'O' form a surrounded region, so they are flipped.
 
 
-	*** Constraints ***
-	m == board.length
-	n == board[i].length
-	1 <= m, n <= 200
-	board[i][j] is 'X' or 'O'.
+    --- Example 2 ---
+    Input: board = [["X"]]
+    Output: [["X"]]
+
+
+    *** Constraints ***
+    m == board.length
+    n == board[i].length
+    1 <= m, n <= 200
+    board[i][j] is 'X' or 'O'.
 
 */
 
@@ -72,45 +72,81 @@
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	We will use boundary DFS to solve this problem
-	
-	Let's analyze when an 'O' cannot be flipped,
-	if it has atleast one 'O' in it's adjacent, AND ultimately this chain
-	of adjacent 'O's is connected to some 'O' which lies on boundary of
-	board
-	
-	Consider these two cases for clarity :
 
-	O's won't be flipped          O's will be flipped
-	   X O X X X                     X X X X X     
-	   X O O O X                     X O O O X
-	   X O X X X                     X O X X X 
-	   X X X X X                     X X X X X
-	
-	we can conclude if a chain of adjacent O's is connected some O on
-	undary then they cannot be flipped
-	
-	Steps to Solve :
-	1. Move over the boundary of board, and find O's 
+    This is one of those problems where you have to think in reverse.
 
-	2. Every time we find an O, perform DFS from it's position
+    Instead of asking yourself:"How do I capture all regions where O's are
+    surrounded by X?"
 
-	3. In DFS convert all 'O' to '#'
-	   (why?? so that we can differentiate which 'O' can be flipped and which
-	    cannot be)   
+    Ask this instead:"How do I mark all the O's that are 4-directionally
+    connected to one of four edges of this entire matrix?"
 
-	4. After all DFSs have been performed, board contains three elements:
-	   '#', 'O' and 'X'
+    Edges are:
 
-	5. 'O' are left over elements which are not connected to any boundary O,
-	   so flip them to 'X'
+        1. Top(1's)        // First Row
+        2. Right side(2's) // First Column
+        3. Bottom(3's)     // Last  Row
+        4. Left side(4's)  // Last  Column
 
-	6. '#' are elements which cannot be flipped to 'X', so flip them
-	   back to 'O'
+
+                        +---+---+---+---+---+---+---+
+                        | 41| 1 | 1 | 1 | 1 | 1 |12 |
+                        +---+---+---+---+---+---+---+
+                        | 4 | O | O | X | X | X | 2 |
+                        +---+---+---+---+---+---+---+
+                        | 4 | X | O | X | X | X | 2 |
+                        +---+---+---+---+---+---+---+
+                        | 4 | O | X | X | X | X | 2 |
+                        +---+---+---+---+---+---+---+
+                        | 43| 3 | 3 | 3 | 3 | 3 |32 |
+                        +---+---+---+---+---+---+---+
+
+
+    We will use boundary DFS to solve this problem.
+
+    Consider these two cases for clarity :
+
+    O's won't be flipped          O's will be flipped
+       X O X X X                     X X X X X
+       X O O O X                     X O O O X
+       X O X X X                     X O X X X
+       X X X X X                     X X X X X
+
+    As we've said - We want to ask ourselves:"How do I mark all the O's that
+    are 4-directionally connected to one of four edges of this entire matrix?"
+
+    Why do we want to mark them in the first place?
+
+    Because once we mark those O's that are connected to any edge by a
+    4-directional O's, then we can flip all of the remaining O's(the ones that
+    are NOT connected to any edge, i.e. the ones that are indeed surrounded
+    entirely by X).
+
+    Once we capture those surrounded O's, then all we have to do is flip our
+    marked O's(let's say we've marked them with a '#') back to O and voila.
+
+
+    Steps to Solve :
+    1. Move over the boundary of board, and find O's
+
+    2. Every time we find an O, perform DFS from it's position
+
+    3. In DFS convert all 'O' to '#'
+       (why? so that we can differentiate which 'O' can be flipped and which
+        cannot be)
+
+    4. After all DFSs have been performed, board contains three elements:
+       '#', 'O' and 'X'
+
+    5. 'O' are left over elements which are not connected to any boundary O,
+       therefore - Flip them to 'X'(i.e. capture all of those O's).
+
+    6. '#' are elements(O's) which cannot be flipped to 'X', so flip them
+       back to 'O'
 */
 
 /* Time  Beats: 89.51% */
@@ -122,56 +158,71 @@ class Solution {
 public:
     void solve(vector<vector<char>>& board)
     {
-		int m = board.size();
-		int n = board[0].size();
+        const int ROWS = board.size();
+        const int COLS = board[0].size();
 
-		/* Moving over first and last column */
-        for (int i = 0; i < m; i++)
+        /* Rows */
+        for (int j = 0; j < COLS; j++)
         {
-			// Check First(0-th) column
-            if (board[i][0] == 'O')
-				dfs(board, i, 0, m, n);
-            
-			// Check Last(n-1th) column
-            if (board[i][n-1]== 'O')
-				dfs(board, i, n-1, m, n);
-        }
-
-		/* Moving over first and last row */
-        for (int j = 1; j < board[0].size() - 1; j++)
-        {
-			// Check First(0-th) row
+            /* First Row */
             if (board[0][j] == 'O')
-				dfs(board, 0, j, m, n);
+                dfs(board, 0, j);
 
-			// Check Last(m-1th) row
-            if (board[m-1][j] == 'O')
-				dfs(board, m-1, j, m, n);
+            /* Last Row */
+            if (board[ROWS-1][j] == 'O')
+                dfs(board, ROWS-1, j);
         }
 
-        for (int i = 0; i < board.size(); i++)
+        /* Columns */
+        for (int i = 0; i < ROWS; i++)
         {
-            for (int j = 0; j < board[0].size(); j++)
+            /* First Column */
+            if (board[i][0] == 'O')
+                dfs(board, i, 0);
+
+            /* Last Column */
+            if (board[i][COLS-1] == 'O')
+                dfs(board, i, COLS-1);
+        }
+
+        /* Capture all regions that are 4-directionally surrounded by 'X' */
+        for (int i = 0; i < ROWS; i++)
+        {
+            for (int j = 0; j < COLS; j++)
             {
                 if (board[i][j] == 'O')
                     board[i][j] = 'X';
-                else if (board[i][j] == '#')
+            }
+        }
+
+        /* Flip #'s back to O's */
+        for (int i = 0; i < ROWS; i++)
+        {
+            for (int j = 0; j < COLS; j++)
+            {
+                if (board[i][j] == '#')
                     board[i][j] = 'O';
             }
         }
     }
 
-private:
-    void dfs(vector<vector<char>>& board, int i, int j, int m, int n)
-    {
-        if (i < 0 || j < 0 || i >= m || j >= n || board[i][j] != 'O')
-            return;
-        
-		board[i][j] = '#';
 
-        dfs(board, i - 1, j    , m, n); // Down
-        dfs(board, i + 1, j    , m, n); // Up
-        dfs(board, i    , j - 1, m, n); // Left
-        dfs(board, i    , j + 1, m, n); // Right
+private:
+
+    /* Flip O's, that are connected to edges, to #'s */
+    void dfs(std::vector<std::vector<char>>& board, int i, int j)
+    {
+        const int ROWS = board.size();
+        const int COLS = board[0].size();
+
+        if (i < 0 || j < 0 || i == ROWS || j == COLS || board[i][j] != 'O')
+            return;
+
+        board[i][j] = '#'; // Flip to '#' or any char other than 'X' or 'O'
+
+        dfs(board, i-1, j  );
+        dfs(board, i+1, j  );
+        dfs(board, i  , j-1);
+        dfs(board, i  , j+1);
     }
 };
