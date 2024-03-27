@@ -234,3 +234,52 @@ private:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is a bit different than the two above. We are pushing nodes as
+    we're visited them.
+
+    Take one example and go through the code and it'll be clear. Especially if
+    you get the idea behind the above two Solutions.
+
+*/
+
+/* Time  Beats: 75.96% */
+/* Space Beats: 21.88% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_3 {
+public:
+    Node* cloneGraph(Node* node)
+    {
+        if (!node)
+            return nullptr;
+
+        std::unordered_map<Node*, Node*> old_to_new;
+
+        return dfs(node, old_to_new);
+    }
+
+private:
+    Node* dfs(Node* node, std::unordered_map<Node*, Node*>& old_to_new)
+    {
+        if (old_to_new.count(node)) // If "node" exists in the HashMap
+            return old_to_new[node];
+
+        Node* copy_node = new Node(node->val);
+        old_to_new.insert({node, copy_node});
+
+        for (Node*& nei : node->neighbors)
+            copy_node->neighbors.push_back(dfs(nei, old_to_new));
+
+        return copy_node;
+    }
+};
