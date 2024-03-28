@@ -118,7 +118,7 @@ private:
 /* Space Complexity: O(n) */
 class Solution{
 public:
-	bool canPartitionKSubsets(vector<int>& nums, int k)
+	bool canPartitionKSubsets(std::vector<int>& nums, int k)
 	{
 		int sum = std::accumulate(nums.begin(), nums.end(), 0);
 
@@ -134,7 +134,12 @@ public:
 	}
 
 private:
-	bool backtracking(vector<int> nums, int start, int k, int subset_sum, std::vector<bool>& used, int target)
+	bool backtracking(std::vector<int> nums,
+                      int start,
+                      int k,
+                      int subset_sum,
+                      std::vector<bool>& used,
+                      int target)
 	{
 		if(k == 0)
 			return true;
@@ -145,7 +150,7 @@ private:
 		if(subset_sum == target)
 			return backtracking(nums, 0, k-1, 0, used, target);
 
-		for(int i=start;i<nums.size();i++)
+		for(int i = start; i < nums.size(); i++)
 		{
 			if(used[i])
 				continue;
