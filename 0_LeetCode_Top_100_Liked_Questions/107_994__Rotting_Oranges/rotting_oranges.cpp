@@ -85,17 +85,14 @@
     --- IDEA ---
     ------------
 
-    It's a basic BFS. The only "tricky" part are the first three things that
+    It's a basic BFS. The only "tricky" part are the first two things that
     are written in this Solution:
         1. Check if there aren't any fresh oranges left. If that is the case
            then return 0.
 
-        2. Check if there aren't any rotten oranges at the beginning, if that
-           is the case, then return -1.
+        2. Fill the queue with **ALL** the rotten oranges at Minute 0.
 
-        3. Fill the queue with **all** the rotten oranges at Minute 0.
-
-    3rd one is very important since that is the initial state of the queue upon
+    2rd one is very important since that is the initial state of the queue upon
     entering the while loop of the BFS functionality.
 
     Each level in BFS is one "Minute".
@@ -104,33 +101,36 @@
     able to be reached). If there are, return -1, else return number of elapsed
     minutes.
 
+    Also, important to note, intially rotten oranges do not count as an
+    additional elapsed minute, that's why we're initializing minutes at -1 and
+    not 0.
+
+    That way if we count, after processing each level, we'll end up with a
+    desired output.
+
 */
 
 /* Time  Beats:   100% */
 /* Space Beats: 76.48% */
 
 /* Time  Complexity: O(n * m) */
-/* Space Complexity: O(num of (fresh + rotten) oranges) */
-class Solution{
+/* Space Complexity: O( (fresh + rotten) oranges) */
+class Solution {
 public:
     int orangesRotting(std::vector<std::vector<int>>& grid)
     {
-        int m = grid.size();
-        int n = grid[0].size();
-
-        /* If there aren't any fresh oranges left, return 0 */
-        if (leftover_fresh(grid) == false)
+        /* If there AREN'T any fresh oranges to begin with, return 0 */
+        if ( ! at_least_one_fresh_orange(grid))
             return 0;
 
-        /* If there aren't any rotten oranges at the beginning, return -1 */
-        if (no_rotten_ones(grid))
-            return -1;
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
 
         /* Fill the queue with all rotten oranges found on minute 0 */
         std::queue<std::pair<int, int>> queue;
-        for (int i = 0; i < m; i++)
+        for (int i = 0; i < ROWS; i++)
         {
-            for (int j = 0; j < n; j++)
+            for (int j = 0; j < COLS; j++)
             {
                 if (grid[i][j] == 2)
                     queue.push({i, j});
@@ -145,23 +145,23 @@ public:
         /* BFS */
         while (!queue.empty())
         {
-            int tmp = queue.size() - 1;
+            int size = queue.size();
 
-            while (tmp-- >= 0)
+            for (int i = 0; i < size; i++)
             {
-                auto curr = queue.front();
+                std::pair<int, int> orange = queue.front();
                 queue.pop();
 
-                for (auto& dir : directions)
+                for (const auto& dir : directions)
                 {
-                    int row = curr.first  + dir.first;
-                    int col = curr.second + dir.second;
+                    int row = orange.first  + dir.first;
+                    int col = orange.second + dir.second;
 
-                    if (row >= 0 && row < m && col >= 0 && col < n && grid[row][col] == 1)
-                    {
-                        queue.push({row, col});
-                        grid[row][col] = 2;
-                    }
+                    if (row < 0 || col < 0 || row == ROWS || col == COLS || grid[row][col] != 1)
+                        continue;
+
+                    grid[row][col] = 2;
+                    queue.push({row, col});
                 }
             }
 
@@ -169,19 +169,19 @@ public:
         }
 
         /* If there aren't any fresh oranges left, return -1, else minutes */
-        return leftover_fresh(grid) ? -1 : minutes;
+        return at_least_one_fresh_orange(grid) ? -1 : minutes;
     }
 
 private:
-    /* Checks if there are any fresh oranges left in entire grid */
-    bool leftover_fresh(std::vector<std::vector<int>>& grid)
+    /* Checks if there are any fresh oranges in the entire grid */
+    bool at_least_one_fresh_orange(std::vector<std::vector<int>>& grid)
     {
-        int m = grid.size();
-        int n = grid[0].size();
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
 
-        for (int i = 0; i < m; i++)
+        for (int i = 0; i < ROWS; i++)
         {
-            for (int j = 0; j < n; j++)
+            for (int j = 0; j < COLS; j++)
             {
                 if (grid[i][j] == 1)
                     return true;
@@ -189,24 +189,6 @@ private:
         }
 
         return false;
-    }
-
-    /* Check if there aren't any rotten oranges. If there aren't return true */
-    bool no_rotten_ones(std::vector<std::vector<int>>& grid)
-    {
-        int m = grid.size();
-        int n = grid[0].size();
-
-        for (int i = 0; i < m; i++)
-        {
-            for (int j = 0; j < n; j++)
-            {
-                if (grid[i][j] == 2)
-                    return false;
-            }
-        }
-
-        return true;
     }
 };
 
