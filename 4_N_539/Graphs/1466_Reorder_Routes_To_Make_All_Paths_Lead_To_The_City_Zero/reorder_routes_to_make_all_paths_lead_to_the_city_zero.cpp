@@ -199,11 +199,73 @@ public:
 
 
 
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats:  5.35% */
+/* Space Beats: 16.29% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_DFS {
+public:
+    int minReorder(int n, std::vector<std::vector<int>>& connections)
+    {
+        int result = 0;
+
+        std::unordered_map<int, std::vector<int>> umap;
+        std::unordered_map<int, bool> visited;
+
+        for(auto conn : connections)
+        {
+            umap[conn[1]].push_back(+conn[0]);
+            umap[conn[0]].push_back(-conn[1]);
+        }
+
+        dfs(umap, visited, result, 0);
+
+        return result;
+    }
+
+private:
+    void dfs(std::unordered_map<int, std::vector<int>>& umap,
+             std::unordered_map<int, bool>& visited,
+             int& result,
+             int city)
+    {
+        visited[city] = true;
+
+        for(auto neighbor : umap[city])
+        {
+            if (!visited[std::abs(neighbor)])
+            {
+                if (neighbor < 0)
+                {
+                    result++;
+                    dfs(umap, visited, result, std::abs(neighbor));
+                }
+                else
+                    dfs(umap, visited, result, neighbor);
+            }
+        }
+    }
+};
+
+
 int
 main()
 {
     Solution_UNINTUITIVE sol_unintuitive;
     Solution_BFS         sol_bfs;
+    Solution_DFS         sol_dfs;
 
     /* Example 1 */
     // std::vector<std::vector<int>> connections = {{1,0}, {1,2}, {3,2}, {3,4}};
@@ -260,7 +322,8 @@ main()
 
     /* Solution */
     // int  result = sol_unintuitive.minReorder(n, connections);
-    int  result = sol_bfs.minReorder(n, connections);
+    // int  result = sol_bfs.minReorder(n, connections);
+    int  result = sol_dfs.minReorder(n, connections);
 
 
     /* Write Output */
