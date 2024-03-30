@@ -1,8 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <unordered_set>
 #include <queue>
-#include <functional>
 #include <climits>
 
 /*
@@ -63,97 +61,6 @@
     --- IDEA ---
     ------------
 
-    TODO
-
-*/
-
-/* Time  Complexity: O(m * n) */
-/* Space Complexity: O(m * n) */
-class Solution{
-private:
-    // Custom comparison function for pairs
-    struct HashFunction {
-        std::size_t operator () (const std::pair<int, int>& p) const
-        {
-            auto h1 = std::hash<int>()(p.first);
-            auto h2 = std::hash<int>()(p.second);
-
-            // Combine the hash values using a bitwise operation
-            return h1 & (h2 << 1);
-        }
-    };
-
-public:
-    void WallsAndGates(std::vector<std::vector<int>>& rooms)
-    {
-        int ROWS = rooms.size();
-        int COLS = rooms[0].size();
-
-        std::unordered_set<std::pair<int, int>, HashFunction> visited;
-        std::queue<std::pair<int, int>> queue;
-
-        std::function<void(int, int)> add_rooms;
-
-        /* Lambda */
-        add_rooms = [&](int r, int c) -> void
-        {
-            if (r < 0 || r == ROWS ||
-                c < 0 || c == COLS ||
-                visited.find({r, c}) != visited.end() ||
-                rooms[r][c] == -1)
-            {
-                return;
-            }
-
-            visited.insert({r, c});
-            queue.push({r, c});
-        };
-
-        for (int r = 0; r < ROWS; r++)
-        {
-            for (int c = 0; c < COLS; c++)
-            {
-                if (rooms[r][c] == 0)
-                {
-                    queue.push({r, c});
-                    visited.insert({r, c});
-                }
-            }
-        }
-
-        int distance = 0;
-        while (!queue.empty())
-        {
-            int size = queue.size();
-            for (int i = 0; i < size; i++)
-            {
-                std::pair<int, int> pair = queue.front();
-                queue.pop();
-
-                int r = pair.first;
-                int c = pair.second;
-
-                rooms[r][c] = distance;
-
-                add_rooms(r-1, c  );
-                add_rooms(r+1, c  );
-                add_rooms(r  , c-1);
-                add_rooms(r  , c+1);
-            }
-
-            distance++;
-        }
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
     Same idea implemented in a much more simple way. Especially because in C++
     you have to write your own Hash Fuctions to be able to use std::pair as a
     key in a HashSet or a HashMap.
@@ -174,7 +81,7 @@ public:
 
 /* Time  Complexity: O(m * n) */
 /* Space Complexity: O(m * n) */
-class Solution_Elegant {
+class Solution {
 public:
     std::vector<std::vector<int>> wallsAndGates(std::vector<std::vector<int>>& rooms)
     {
@@ -230,12 +137,10 @@ public:
 
 };
 
-
 int
 main()
 {
-    Solution         sol;
-    Solution_Elegant sol_Elegant;
+    Solution sol;
 
     const int INF = 2147483647;
 
@@ -281,8 +186,7 @@ main()
 
 
     /* Solution */
-    // sol.WallsAndGates(rooms);
-    sol_simplified.wallsAndGates(rooms);
+    sol.wallsAndGates(rooms);
 
     /* Write Output */
     first = true;
