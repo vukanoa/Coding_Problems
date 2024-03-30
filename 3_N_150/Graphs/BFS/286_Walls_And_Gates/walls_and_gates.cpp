@@ -174,16 +174,16 @@ public:
 
 /* Time  Complexity: O(m * n) */
 /* Space Complexity: O(m * n) */
-class Solution_Simplified {
+class Solution_Elegant {
 public:
     std::vector<std::vector<int>> wallsAndGates(std::vector<std::vector<int>>& rooms)
     {
         const int ROWS = rooms.size();
         const int COLS = rooms[0].size();
 
-        const int INF = INT_MAX;
-
         std::queue<std::pair<int, int>> queue;
+
+        /* Initialize Queue */
         for (int i = 0; i < ROWS; i++)
         {
             for (int j = 0; j < COLS; j++)
@@ -193,27 +193,32 @@ public:
             }
         }
 
+        std::vector<std::pair<int, int>> directions = {{-1,0}, {1,0}, {0,-1}, {0,1}};
         int distance = 1;
+
+        /* BFS */
         while (!queue.empty())
         {
-            int curr_size = queue.size();
+            int size = queue.size();
 
-            while (curr_size--)
+            for (int i = 0; i < size; i++)
             {
-                auto curr_pos = queue.front();
+                std::pair<int, int> room = queue.front();
                 queue.pop();
 
-                std::vector<std::pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
                 for (auto& dir : directions)
                 {
-                    int row = curr_pos.first  + dir.first;
-                    int col = curr_pos.second + dir.second;
+                    int row = room.first  + dir.first;
+                    int col = room.second + dir.second;
 
-                    if (row >= 0 && row < ROWS && col >= 0 && col < COLS && rooms[row][col] == INF)
+                    if (row < 0     || col < 0     ||
+                        row == ROWS || col == COLS || rooms[row][col] != INT_MAX)
                     {
-                        rooms[row][col] = distance;
-                        queue.push({row, col});
+                        continue;
                     }
+
+                    rooms[row][col] = distance;
+                    queue.push({row, col});
                 }
             }
 
@@ -222,14 +227,15 @@ public:
 
         return rooms;
     }
+
 };
 
 
 int
 main()
 {
-    Solution            sol;
-    Solution_Simplified sol_simplified;
+    Solution         sol;
+    Solution_Elegant sol_Elegant;
 
     const int INF = 2147483647;
 
