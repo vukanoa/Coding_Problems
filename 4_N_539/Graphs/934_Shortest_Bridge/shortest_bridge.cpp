@@ -69,8 +69,8 @@
 
 */
 
-/* Time  Beats: 87.49% */
-/* Space Beats: 56.49% */
+/* Time  Beats: 87.00% */
+/* Space Beats: 68.86% */
 
 /* Time  Complexity: O(n^2) */
 /* Space Complexity: O(n^2) */
@@ -83,58 +83,50 @@ public:
         std::queue<std::pair<int, int>> queue;
         std::vector<std::vector<bool>> visited(N, std::vector(N, false));
 
+        /* Push the First Island to the Queue */
         for (int i = 0; i < N; i++)
         {
             for (int j = 0; j < N; j++)
             {
                 if (grid[i][j] == 1)
                 {
-                    dfs(grid, i, j, queue, visited);
+                    dfs(grid, queue, visited, i, j);
 
-                    // Find only the first island
-                    i = N; // This is done to break the outer loop as well
-                    break;
+                    i = N; // Break the Outer loop
+                    break; // Break the Inner loop
                 }
             }
         }
 
         std::vector<std::pair<int, int>> directions = {{-1,0}, {1, 0}, {0, -1}, {0, 1}};
 
-        int bridge = -1;
+        /* BFS */
+        int bridge = 0;
         while (!queue.empty())
         {
-            bridge++;
             int size = queue.size();
 
-            for (int x = 0; x < size; x++)
+            for (int i = 0; i < size; i++)
             {
-                std::pair<int, int> pair = queue.front();
+                std::pair<int, int> field = queue.front();
                 queue.pop();
-
-                int row = pair.first;
-                int col = pair.second;
 
                 for (auto& dir : directions)
                 {
-                    int i = dir.first;
-                    int j = dir.second;
+                    int row = field.first  + dir.first;
+                    int col = field.second + dir.second;
 
-                    if (row+i < 0 || col+j < 0 || row+i == N || col+j == N)
-                        continue;
-
-                    if (visited[row + i][col + j]) //  <---------------------------------------------------------------
-                        continue;                                                                                //   |
-                                                                                                                 //   |
-                                                                                                                 //   |
-                    if (grid[row + i][col + j] == 1) // && NOT visited[i][j], but it's implicit because of the upper if
+                    if (row < 0 || col < 0 || row == N || col == N || visited[row][col]) // <-----------------------
+                        continue;                                                                               // |
+                    else if (grid[row][col] == 1) // && NOT visited[i][j], but it's implicit because of the upper if
                         return bridge;
-                    else
-                    {
-                        visited[row + i][col + j] = true;
-                        queue.push( {row + i, col + j} );
-                    }
+
+                    visited[row][col] = true;
+                    queue.push( {row, col} );
                 }
             }
+
+            bridge++;
         }
 
         return bridge; // The execution will never come to this point
@@ -142,22 +134,23 @@ public:
 
 private:
     void dfs(std::vector<std::vector<int>>& grid,
-             int i,
-             int j,
              std::queue<std::pair<int, int>>& queue,
-             std::vector<std::vector<bool>>& visited)
+             std::vector<std::vector<bool>>& visited,
+             int i,
+             int j)
     {
         const int N = grid.size();
 
         if (i < 0 || j < 0 || i == N || j == N || grid[i][j] == 0 || visited[i][j])
             return;
+
         queue.push( {i, j} ); // Push indices of the current land(one part of the first island)
         visited[i][j] = true; // Mark as visited
 
-        dfs(grid, i-1, j  , queue, visited);
-        dfs(grid, i+1, j  , queue, visited);
-        dfs(grid, i  , j-1, queue, visited);
-        dfs(grid, i  , j+1, queue, visited);
+        dfs(grid, queue, visited, i-1, j  );
+        dfs(grid, queue, visited, i+1, j  );
+        dfs(grid, queue, visited, i  , j-1);
+        dfs(grid, queue, visited, i  , j+1);
     }
 };
 
@@ -253,7 +246,7 @@ private:
 
 /* Time  Complexity: O(N^2) */
 /* Space Complexity: O(N^2) */
-class Solution {
+class Solution_2 {
 public:
     int shortestBridge(std::vector<std::vector<int>>& grid)
     {
@@ -322,7 +315,7 @@ public:
             flips++;
         }
 
-        return -1; // This will never be returned
+        return -1; // The execution will never come to this point
     }
 
 private:
