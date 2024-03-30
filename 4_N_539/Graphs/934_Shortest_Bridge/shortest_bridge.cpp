@@ -160,3 +160,185 @@ private:
         dfs(grid, i  , j+1, queue, visited);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a combination of: DFS & BFS.
+
+    This Solution has 3 steps.
+
+    1. Iterate through the "grid" until you stumble upon a '1'(which represents
+       one field of the first island) and then do a DFS starting from that very
+       field.
+
+       While doing a DFS, all of the 1's, of that first Island, will be changed
+       to 2's.
+
+       That way we're making a distinction between the First and the Second
+       Island.
+
+       Now the land of the First Island is represented with 2's, while the land
+       of the Second Island is represented with 1's.
+
+       (There are no actual "First" and "Second", you can choose which one of
+       the two are you going to call "First" and which one are you going to
+       call "Second". Maybe It's even better to call the one that is
+       represented with 2's, "Second", and the other one "First". But it
+       doesn't matter.)
+
+
+    2. Push the positions(i.e. a pair of {i, j} ) of all of the 2's to the
+       Queue.
+
+       Now we have all of the "fields" that compose a "First Island"(or a
+       "Second Island", however you choose to call it) in the Queue.
+
+       Since and Island it composed of different "fields", i.e. positions in
+       the grid, that means we had to push each and every position to the
+       Queue.
+
+       And that's exactly what we did.
+
+
+    3. Now we perform a BFS, starting with an initial state of the Queue we've
+       just filled.
+
+       Essentially we start from the "First Island" and we expand it
+       level-by-level until we find a '1' in the grid.
+
+       Why 1?
+
+       Because that's the OTHER Island.
+       (Remember, they've said in the Description that there are exactly 2
+       Islands in the grid, no more and no less. Therefore, if one Island is
+       represented with 2's, the OTHER one, then, MUST be represented with 1's)
+
+       While we're going through the layers one-by-one(meaning while we
+       "construct" the bridge over the water "fields") we're going to mark
+       those spots with 3's.
+
+       Why 3's and not 2's?
+
+       We can mark it with 2's as well, however, I wanted to mark it with 3's
+       because if the interviewer said that we're NOT allowed to modify the
+       "grid", then we'd have to return the "grid" to its initial state.
+
+       If we were to mark the "bridge" with 2's as well, then once we tried to
+       return the "grid" to its initial state, we wouldn't be able to do so.
+
+       How would we differentiate between the "bridge field" and "First
+       Island's field"?
+       We wouldn't be able to.
+
+       That's why I'm marking the "bridge" with 3's.
+
+       For the Testcases of LeetCode, that's not needed, you can indeed mark it
+       with 2, however I wanted to point out this possibillity.
+
+       Every time we finish a new "layer", we increment "flips" by one.
+       If at any point of processing the current "layer" we find out that there
+       is a field with value '1' in any of the 4-directionally connected fields
+       then we should immediatelly return the current value of "flips".
+
+*/
+
+/* Time  Beats: 90.16% */
+/* Space Beats: 94.53% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution {
+public:
+    int shortestBridge(std::vector<std::vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        /* Mark First Island with 2's */
+        for (int i = 0; i < ROWS; i++)
+        {
+            for (int j = 0; j < COLS; j++)
+            {
+                if (grid[i][j] == 1)
+                {
+                    dfs(grid, i, j);
+
+                    i = ROWS; // Break the Outer loop
+                    break;    // Break the Inner loop
+                }
+            }
+        }
+
+        std::queue<std::pair<int, int>> queue;
+
+        /* Initialize a Queue with the first Island's positions(marked with 2's) */
+        for (int i = 0; i < ROWS; i++)
+        {
+            for (int j = 0; j < COLS; j++)
+            {
+                if (grid[i][j] == 2)
+                    queue.push({i, j});
+            }
+        }
+
+        /* Signing Cross */
+        std::vector<std::pair<int, int>> directions = {{-1,0}, {1,0}, {0,-1}, {0,1}};
+        int flips = 0;
+
+        /* BFS */
+        while (!queue.empty())
+        {
+            int size = queue.size();
+
+            for (int i = 0; i < size; i++)
+            {
+                std::pair<int, int> land = queue.front();
+                queue.pop();
+
+                for (const auto& dir : directions)
+                {
+                    int row = land.first  + dir.first;
+                    int col = land.second + dir.second;
+
+                    if (row < 0     || col < 0     ||
+                        row == ROWS || col == COLS || grid[row][col] > 1)
+                    {
+                        continue;
+                    }
+                    else if (grid[row][col] == 1)
+                        return flips;
+
+                    grid[row][col] = 3;
+                    queue.push({row, col});
+                }
+            }
+
+            flips++;
+        }
+
+        return -1; // This will never be returned
+    }
+
+private:
+    void dfs(std::vector<std::vector<int>>& grid, int i, int j)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        if (i < 0 || j < 0 || i == ROWS || j == COLS || grid[i][j] != 1)
+            return;
+
+        grid[i][j] = 2;
+
+        dfs(grid, i-1, j  );
+        dfs(grid, i+1, j  );
+        dfs(grid, i  , j-1);
+        dfs(grid, i  , j+1);
+    }
+};
