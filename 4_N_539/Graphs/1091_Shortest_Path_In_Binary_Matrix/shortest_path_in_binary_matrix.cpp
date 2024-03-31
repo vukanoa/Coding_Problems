@@ -147,64 +147,60 @@ private:
 
 */
 
-/* Time  Beats: 97.32% */
-/* Space Beats: 86.77% */
+/* Time  Beats: 95.40% */
+/* Space Beats: 91.54% */
 
 /* Time  Complexity: O(n^2) */
 /* Space Complexity: O(n^2) */
-class Solution_BFS {
+class Solution {
 public:
     int shortestPathBinaryMatrix(vector<vector<int>>& grid)
     {
-        const int n = grid.size();
-
-        if (grid[0][0] != 0 || grid[n-1][n-1] != 0)
+        if (grid[0][0] != 0)
             return -1;
-        else if (n == 1)
-            return grid[0][0] == 0; // Or grid[n-1][n-1], it's the same thing
+        else if (grid.size() == 1)
+            return 1;
 
-        int result = INT_MAX;
+        const int N = grid.size();
 
-        std::queue<std::pair<int, int>> queue;
-        queue.push( {0, 0} );
+        std::queue<std::pair<int,int>> queue;
         grid[0][0] = 2;
+        queue.push({0,0});
 
-        std::vector<std::pair<int, int>> directions = {{-1,  0},   // Up
-                                                       {-1, +1},   // Up-Right
-                                                       { 0, +1},   // Right
-                                                       {+1, +1},   // Down-Right
-                                                       {+1,  0},   // Down
-                                                       {+1, -1},   // Down-Left
-                                                       { 0, -1},   // Left
-                                                       {-1, -1}};  // Up-Left
-        int path = 0;
+        /* Clockwise */
+        std::vector<std::pair<int, int>> directions = {{-1, 0},  // Up
+                                                       {-1, 1},  // Up-Right
+                                                       { 0, 1},  // Right
+                                                       { 1, 1},  // Down-Right
+                                                       { 1, 0},  // Down
+                                                       { 1,-1},  // Down-Left
+                                                       { 0,-1},  // Left
+                                                       {-1,-1}}; // Up-Left
+
+        /* BFS */
+        int path_len = 1;
         while (!queue.empty())
         {
-            path++;
             int size = queue.size();
+            path_len++;
 
-            while (size--)
+            for (int i = 0; i < size; i++)
             {
-                int i = queue.front().first;
-                int j = queue.front().second;
+                std::pair<int, int> field = queue.front();
                 queue.pop();
 
-                for (auto& dir : directions)
+                for (const auto& dir : directions)
                 {
-                    int row = i + dir.first;
-                    int col = j + dir.second;
+                    int row = field.first  + dir.first;
+                    int col = field.second + dir.second;
 
-                    if (row < 0 || col < 0 || row == n || col == n)
+                    if (row < 0 || col < 0 || row == N || col == N || grid[row][col] != 0)
                         continue;
+                    else if (row == N-1 && col == N-1)
+                        return path_len;
 
-                    if (row == n-1 && col == n-1 && grid[row][col] == 0)
-                        return path+1;
-
-                    if (grid[row][col] == 0)
-                    {
-                        grid[row][col] = 2;
-                        queue.push( {row, col} );
-                    }
+                    grid[row][col] = 2;
+                    queue.push({row, col});
                 }
             }
         }
