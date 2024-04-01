@@ -59,8 +59,38 @@
 
 */
 
-/* Time  Beats: 63.37% */
-/* Space Beats: 60.35% */
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a messier approach than the second Solution down below(Solution_2).
+
+    I wanted to have both slower and faster Implementation to prove a point and
+    to be able to compare and see why Solution_2 is better.
+
+    Here we're correctly "remembering" if we've visited some node with a
+    HashSet "visited" and we're having a persisting vector of booleans
+    "safe_nodes".
+
+    However, each time we finish processing from some starting node, we're
+    going to CLEAR a HashSet. If we were not to do that in this one, we would
+    have incorrect results at the very end.
+
+    Therefore, we MUST clear "visited" HashSet, however that's why this
+    Solution is slower than Solution_2.
+
+    Here we'd have to go, manually, through every "neighbor"(aka "nei") in
+    every node's list. Even though we'll be hitting that "continue" most of the
+    time, we're still going to iterate over all the "neighbor"s in the list.
+
+    That's why this Solution isn't fast. However, it's good to have it here for
+    didactic purposes.
+
+*/
+
+/* Time  Beats: 5.01% */
+/* Space Beats: 5.03% */
 
 /* Time  Complexity: O(E + V) */
 /* Space Complexity: O(E + V) */
@@ -68,11 +98,94 @@ class Solution {
 public:
     std::vector<int> eventualSafeNodes(std::vector<std::vector<int>>& graph)
     {
-        int n = graph.size();
+        const int N = graph.size();
+        std::vector<int> results;
+
+        std::unordered_set<int> visited;
+        std::vector<bool> safe_nodes(N, false);
+
+        for (int i = 0; i < N; i++)
+        {
+            if (dfs(graph, safe_nodes, visited, i))
+                results.push_back(i);
+
+            visited.clear();
+        }
+
+        return results;
+    }
+
+private:
+    bool dfs(std::vector<std::vector<int>>& graph,
+             std::vector<bool>& safe_nodes,
+             std::unordered_set<int>& visited,
+             int node)
+    {
+        visited.insert(node);
+
+        for (const int& nei : graph[node])
+        {
+            if (safe_nodes[nei])
+                continue;
+            else if (visited.count(nei))
+                return false;
+
+            if (! dfs(graph, safe_nodes, visited, nei))
+                return false;
+        }
+
+        visited.erase(node);
+        safe_nodes[node] = true;
+
+        return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is an Elegant IDEA of the above Solution. Instead of having a HashSet
+    "visited" and a vector of booleans "safe_nodes", we can have a HashMap
+    named "safe", which will do the trick much more efficient.
+
+    The optimization in this Solution comes from the fact that we're
+    immediately going to return from some node if that node was already
+    processed and put into HashMap "safe" with corresponding boolean value.
+
+    If from that node we're able to get to the terminal node with each path,
+    then, in the HashMap "safe", we'll push {node, true}.
+
+    However, if, on the other hand, we find out that from this node we're not
+    able to get to terminal nodes with any path, i.e. we have a loop at some
+    point, then, in the HashMap "safe", we'll push {node, false}.
+
+    That way once we processed, say, the 0th node and it happens NOT to be a
+    "safe" node, then anytime we stumble upon that node, we can IMMEDIATELY
+    return "false" since we're sure that this node ISN'T "safe".
+
+    That's where the optimization comes in this Solution.
+
+*/
+
+/* Time  Beats: 63.37% */
+/* Space Beats: 60.35% */
+
+/* Time  Complexity: O(E + V) */
+/* Space Complexity: O(E + V) */
+class Solution_2 {
+public:
+    std::vector<int> eventualSafeNodes(std::vector<std::vector<int>>& graph)
+    {
+        const int N = graph.size();
         std::unordered_map<int, bool> safe;
 
         std::vector<int> results;
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < N; i++)
         {
             if (dfs(graph, i, safe))
                 results.push_back(i);
