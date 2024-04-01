@@ -366,14 +366,17 @@ public:
         // for (int i = 0; i < n; i++)
         //     parent.push_back(i);
 
-        int count = n;
+        int components = n;
         for (std::pair<int, int> edge : edges)
         {
-            if (Union(edge, parents, ranks))
-                count--;
+            int node_1 = edge.first;
+            int node_2 = edge.second;
+
+            if (Union(node_1, node_2, parents, ranks))
+                components--;
         }
 
-        return count;
+        return components;
     }
 
 private:
@@ -392,11 +395,11 @@ private:
         return node;
     }
 
-    int Union(std::pair<int, int>& edge, std::vector<int>& parents, std::vector<int>& ranks)
+    bool Union(int node_1, int node_2, std::vector<int>& parents, std::vector<int>& ranks)
     {
         // Parent 1 & Parent 2
-        int p1 = Find(edge.first,  parents);
-        int p2 = Find(edge.second, parents);
+        int p1 = Find(node_1, parents);
+        int p2 = Find(node_2, parents);
 
         if (p1 == p2)
             return false;
