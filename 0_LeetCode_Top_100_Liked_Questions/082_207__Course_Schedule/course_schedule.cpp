@@ -57,9 +57,6 @@
 
 */
 
-
-
-
 /*
     ------------
     --- IDEA ---
@@ -87,26 +84,27 @@
 
     And how can we know if some course can be completed?
     Well, just looking at this picture, it's obvious. For example: 0 has a
-    prerequisites of 2, but 2 does NOT have any prerequisites, which is great
+    2 as a prerequisite, but 2 does NOT have any prerequisites, which is great
     because it means that it can be completed.
 
     0 also has a prerequisite of 1 and 1 has two prerequisites: 3 and 4.
-    3 has one prerequisite of 4. And 4 luckily for us, does NOT have any
+    3 has one prerequisite of 4. And 4, luckily for us, does NOT have any
     prerequisites.
 
     So simply looking at this ASCII drawing, it's obvious that we can complete
-    all these courses.
+    all of these courses.
 
     So how should the Algorithm work?
     We can notice that nodes 2 and 4 are our base cases because they have no
     prerequisites.
+
     But we don't need a graph to tell us that, we can use a data structure
-    called adjacency list. But for ease of reading, let's call it "pre_map",
+    called adjacency list. But for ease of reading, let's call it "adj_list",
     because we are going to use a Hash map to represent this.
-    (pre_map -> Prerequisites Map)
+    (adj_list -> Prerequisites Map)
 
     +---------+---------------+
-    |      Pre_Map            |
+    |      Adj_List           |
     +---------+---------------+
     | courses | prerequisites |
     +---------+---------------+
@@ -130,7 +128,7 @@
     ===========================================================================
 
         +---------+---------------+
-        |      Pre_Map            |
+        |      Adj_List           |
         +---------+---------------+
         | courses | prerequisites |
         +---------+---------------+
@@ -147,7 +145,7 @@
 
 
         +---------+---------------+
-        |      Pre_Map            |
+        |      Adj_List           |
         +---------+---------------+
         | courses | prerequisites |
         +---------+---------------+
@@ -163,7 +161,7 @@
         +---------+---------------+
 
         +---------+---------------+
-        |      Pre_Map            |
+        |      Adj_List           |
         +---------+---------------+
         | courses | prerequisites |
         +---------+---------------+
@@ -179,7 +177,7 @@
         +---------+---------------+
 
         +---------+---------------+
-        |      Pre_Map            |
+        |      Adj_List           |
         +---------+---------------+
         | courses | prerequisites |
         +---------+---------------+
@@ -195,7 +193,7 @@
         +---------+---------------+
 
         +---------+---------------+
-        |      Pre_Map            |
+        |      Adj_List           |
         +---------+---------------+
         | courses | prerequisites |
         +---------+---------------+
@@ -216,7 +214,7 @@
         prerequisites vector.
 
         +---------+---------------+
-        |      Pre_Map            |
+        |      Adj_List           |
         +---------+---------------+
         | courses | prerequisites |
         +---------+---------------+
@@ -232,7 +230,7 @@
         +---------+---------------+
 
         +---------+---------------+
-        |      Pre_Map            |
+        |      Adj_List           |
         +---------+---------------+
         | courses | prerequisites |
         +---------+---------------+
@@ -248,7 +246,7 @@
         +---------+---------------+
 
         +---------+---------------+
-        |      Pre_Map            |
+        |      Adj_List           |
         +---------+---------------+
         | courses | prerequisites |
         +---------+---------------+
@@ -264,7 +262,7 @@
         +---------+---------------+
 
         +---------+---------------+
-        |      Pre_Map            |
+        |      Adj_List           |
         +---------+---------------+
         | courses | prerequisites |
         +---------+---------------+
@@ -280,7 +278,7 @@
         +---------+---------------+
 
         +---------+---------------+
-        |      Pre_Map            |
+        |      Adj_List           |
         +---------+---------------+
         | courses | prerequisites |
         +---------+---------------+
@@ -296,7 +294,7 @@
         +---------+---------------+
 
         +---------+---------------+
-        |      Pre_Map            |
+        |      Adj_List           |
         +---------+---------------+
         | courses | prerequisites |
         +---------+---------------+
@@ -312,7 +310,7 @@
         +---------+---------------+
 
         +---------+---------------+
-        |      Pre_Map            |
+        |      Adj_List           |
         +---------+---------------+
         | courses | prerequisites |
         +---------+---------------+
@@ -341,7 +339,7 @@
 
 
         +---------+---------------+
-        |      Pre_Map            |
+        |      Adj_List           |
         +---------+---------------+
         | courses | prerequisites |
         +---------+---------------+
@@ -359,8 +357,8 @@
         etc.
 */
 
-/* Time  Beats: 5.61% */
-/* Space Beats: 5.10% */
+/* Time  Beats: 10.12% */
+/* Space Beats:  5.16% */
 
 /*
     Time  Complexity: O(n + p)
@@ -372,22 +370,18 @@ public:
     bool canFinish(int numCourses, std::vector<std::vector<int>>& prerequisites)
     {
         /* Course___Prerequisites */
-        std::map<int, std::vector<int>> pre_map;
+        std::map<int, std::vector<int>> adj_list;
 
-        /* Fill the Hash Map with Courses */
-        for (int i = 0; i < numCourses; i++)
-            pre_map.emplace(i, std::vector<int>());
-
-        /* Fill the Hash Map with Prerequisites */
-        for (int i = 0; i < prerequisites.size(); i++)
-            pre_map[prerequisites[i][0]].push_back(prerequisites[i][1]);
+        /* Create an Adjacency List */
+        for (const auto& pre : prerequisites)
+            adj_list[pre[0]].push_back(pre[1]);
 
         /* All courses along the current DFS path */
         std::vector<bool> visited(numCourses, false);
 
-        for(auto& m : pre_map)
+        for (int i = 0; i < numCourses; i++)
         {
-            if (!dfs(m.first, pre_map, visited))
+            if (!dfs(adj_list, visited, i))
                 return false;
         }
 
@@ -395,33 +389,31 @@ public:
     }
 
 private:
-    bool
-    dfs(
-        int course,
-        std::map<int, std::vector<int>>& pre_map,
-        std::vector<bool> visited
-       )
+    bool dfs(std::map<int, std::vector<int>>& adj_list,
+             std::vector<bool> visited,
+             int course)
     {
         if (visited[course])
             return false; // Loop detected
 
         visited[course] = true;
 
-        for (auto& pre : pre_map[course])
+        for (const auto& prereq : adj_list[course])
         {
-            if (!dfs(pre, pre_map, visited))
+            if (!dfs(adj_list, visited, prereq))
                 return false;
         }
 
-        // Remove this course from unordered set
+        /* Remove this course from unordered set */
         visited[course] = false;
 
         /* So that we don't have to do it more than once */
-        pre_map[course].clear();
+        adj_list[course].clear();
 
         return true;
     }
 };
+
 
 
 
@@ -431,14 +423,16 @@ private:
     --- IDEA ---
     ------------
 
-    Slightly different approach than the one above.
+    Slightly different approach than the one above, however it's MUCH more
+    efficient.
 
     Instead of clearing an adj_list[course] each time we're done processing
     some "course", we can, instead, have an unordered Set named "taken" that
-    will contains all of the courses we've taken so far.
+    will contain all of the courses we've taken so far.
 
     That way we can quickly skip current dependencies by checking if we've
-    already taken that current dependency-course.
+    already taken that current dependency-course. We no longer have to go down
+    the rabbit whole only to realize we didn't even need to go "in".
 
 */
 
