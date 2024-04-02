@@ -187,7 +187,7 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_BFS {
 public:
     int closestMeetingNode(vector<int>& edges, int node1, int node2)
     {
@@ -232,5 +232,131 @@ private:
         }
 
         return distance;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The second Solution above(Solution_BFS) is far more efficient than this
+    one, however I wanted to show that this could be done using a DFS approach
+    as well.
+
+    Also, cycles are properly taken care of.
+
+    Example:
+                    node1 = 0
+                    node2 = 3
+                    Input = [4, 4, 4, 5, 1, 2, 2]
+                             0  1  2  3  4  5  6
+
+
+                             --------- 2 <--- 6
+                             |         ^
+                             v         |
+                      0 ---> 4 ----    |
+                             ^    |    5 <-- 3
+                             |    v
+                             ---- 1
+
+
+    The idea in this Solution is to start first with node1 and then with node2
+    and in their respective, separate, vectors named "distances_from_node_X"
+    it will hold, as a name suggests, a distance from the node_X to any of the
+    nodes in the graph from 0 to n-1.
+
+    If there isn't a path to some node, that index will have a value of -1.  If
+    at any point we find out that there is a cycle, or that there is no an
+    outgoing edge from the current node we're in(the one we're processing),
+    then we're immediately going to return from that DFS.
+    (Also this is known as a tail-recursion)
+
+    In this example above, after finishing a DFS for each of the two given
+    nodes, we'd have:
+
+    distances_from_node_1 [ 0,  2, -1, -1,  1, -1, -1]
+                            0   1   2   3   4   5   6
+
+    distances_from_node_2 [-1,  4,  2,  0,  3,  1, -1]
+                            0   1   2   3   4   5   6
+
+    Now we iterate from 0 to n-1 and if at least one of the two compared ones
+    has a value of -1, we continue, i.e. skip that node from consideration.
+
+    If neither distances_from_node_1[i] nor distances_from_node_2[i] is -1,
+    then take maximum of those two.
+
+    After that compare if that maximum is the MINIMAL distance between node1
+    and node2.
+
+    If it is, update the "min_distance" and set "result" to be i, which
+    represents the node we're required to return.
+
+    That means that node(aka node 'i' ) is the result we're looking for.
+
+*/
+
+/* Time  Beats: 11.03% */
+/* Space Beats:  9.61% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_DFS {
+public:
+    int closestMeetingNode(vector<int>& edges, int node1, int node2)
+    {
+        const int n = edges.size();
+
+        std::vector<int> distances_from_node_1(n, -1);
+        std::vector<int> distances_from_node_2(n, -1);
+        std::unordered_set<int> visited;
+
+        dfs(edges, distances_from_node_1, visited, 0, node1);
+        visited.clear();
+        dfs(edges, distances_from_node_2, visited, 0, node2);
+
+        int min_distance = INT_MAX;
+        int result = -1;
+        for (int i = 0; i < n; i++)
+        {
+            if (distances_from_node_1[i] == -1 || distances_from_node_2[i] == -1)
+                continue;
+
+            int maximum = std::max(distances_from_node_1[i], distances_from_node_2[i]);
+            if (maximum < min_distance)
+            {
+                min_distance = maximum;
+                result = i;
+            }
+        }
+
+        return result;
+    }
+
+private:
+    void dfs(std::vector<int>& edges,
+             std::vector<int>& distances_from_node,
+             std::unordered_set<int>& visited,
+             int distance,
+             int node)
+    {
+        /* Cycle detected */
+        if (visited.count(node))
+            return;
+
+        distances_from_node[node] = distance;
+
+        /* If it points to -1, it means it doesn't have an outgoing edge */
+        /* Therefore return immediately to prevent edges[-1] */
+        if (edges[node] == -1)
+            return;
+
+        visited.insert(node);
+        dfs(edges, distances_from_node, visited, distance+1, edges[node]);
     }
 };
