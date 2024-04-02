@@ -75,71 +75,80 @@
     --- IDEA ---
     ------------
 
-    TODO
+    This is a typical Union_&_Find Problem.
 
-    Union & Find
+    If you haven't done "Number of Connected Components in an Undirected Graph"
+    do that first.
+
+    There is a detailed Explanation(IDEA) about how and why Union_&_Find works.
+
+    One small thing I've changed in this Implementation of Union_&_Find is that
+    in "Find" function, I only have one line in body of a "while loop".
+
+    But, for didactic purposes, it is better to write it as two liners as in
+    the "Number of Connected Components in an Undirected Graph" version of this
+    Solution.
 
 */
 
 /* Time  Beats: 90.67% */
 /* Space Beats: 79.01% */
 
-/* Time  Complexity: O(E + V) */
-/* Space Complexity: O(n) */
-class Solution{
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution {
 public:
     std::vector<int> findRedundantConnection(std::vector<std::vector<int>>& edges)
     {
-        int n = edges.size();
+        const int N = edges.size();
 
-        std::vector<int> parents(n + 1); // We don't need 0
-        std::iota(parents.begin(), parents.end(), 0);
+        std::vector<int> parent(N+1);
+        std::vector<int> rank(N+1, 1);
 
-        std::vector<int> ranks(n + 1, 1);
+        // parent = [0, 1, 2, 3, ..., n]
+        std::iota(parent.begin(), parent.end(), 0);
+
         std::vector<int> result;
-
-        for (auto& edge : edges)
+        for (const auto& edge : edges)
         {
-            result = Union(edge, parents, ranks);
+            int node_1 = edge[0];
+            int node_2 = edge[1];
 
-            if (!result.empty())
-                return result;
+            if (! Union(node_1, node_2, parent, rank))
+                result = edge;
         }
 
         return result;
     }
 
 private:
-    int Find(int node, std::vector<int>& parents)
+    int Find(int node, std::vector<int>& parent)
     {
-        while (node != parents[node])
-        {
-            parents[node] = parents[parents[node]];
-            node = parents[node];
-        }
+        while (node != parent[node])
+            node = parent[parent[node]]; // We can write it in one line instead
 
         return node;
     }
 
-    std::vector<int> Union(std::vector<int>& edge, std::vector<int>& parents, std::vector<int>& ranks)
+    bool Union(int node_1, int node_2, std::vector<int>& parent, std::vector<int>& rank)
     {
-        int p1 = Find(edge[0], parents);
-        int p2 = Find(edge[1], parents);
+        int p1 = Find(node_1, parent);
+        int p2 = Find(node_2, parent);
 
         if (p1 == p2)
-            return {edge[0], edge[1]};
+            return false;
 
-        if (ranks[p1] >= ranks[p2])
+        if (rank[p2] > rank[p1])
         {
-            parents[p2] = p1;
-            ranks[p1]++;
+            parent[p1] = parent[p2];
+            rank[p2] += rank[p1];
         }
-        else
+        else // rank[p1] > rank[p2]
         {
-            parents[p1] = p2;
-            ranks[p2]++;
+            parent[p2] = parent[p1];
+            rank[p1] += rank[p2];
         }
 
-        return {};
+        return true;
     }
 };
