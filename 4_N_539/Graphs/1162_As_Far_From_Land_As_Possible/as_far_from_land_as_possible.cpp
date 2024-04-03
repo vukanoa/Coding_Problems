@@ -53,6 +53,22 @@
 */
 
 /*
+    -------------
+    --- NOTES ---
+    -------------
+
+    There are 2 Solutions in this file out of which the 2nd one(bottom one) is
+    much more elegant and even more efficient.
+
+    However, I'd read both of the Solutions and their IDEAs because once you
+    read the first one(assuming you DIDN'T know how to solve it prior to
+    reading it) you would think that it's maybe a "clever approach", however
+    it's only when you see the 2nd Sotluion(pure MultiSource BFS) that you'll
+    quickly realize how unelegant the first Solution was.
+
+*/
+
+/*
     ------------
     --- IDEA ---
     ------------
@@ -210,7 +226,7 @@
 
 /* Time  Complexity: O(n^2) */
 /* Space Complexity: O(n^2) */
-class Solution {
+class Solution_DFS_Plus_MultiSource_BFS {
 public:
     int maxDistance(std::vector<std::vector<int>>& grid)
     {
@@ -292,5 +308,123 @@ private:
         dfs(grid, queue, i+1, j  );
         dfs(grid, queue, i  , j-1);
         dfs(grid, queue, i  , j+1);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    As I've said in the "NOTES" section all the way up there - Once you see the
+    first Solution, you may think that it's a "clever idea", however only when
+    you get this one will you realize how unelegant it was and how much better
+    this approach is.
+
+    The approach is very similar, however there is an important difference.
+
+    In the first Solution we iterated through the grid and did a DFS on every
+    ISLAND, however that is completely unnecessary.
+
+    Why would we care if some field is a part of certain ISLAND or not?
+    We ONLY care about that specific field because we're going to be doing a
+    BFS from each and every field in the queue, therefore we don't and should
+    not care whether we've pushed them into a Queue in an order next to other
+    fields of the same Island.
+
+    We ONLY care abou individual fields.
+
+    What does that mean then?
+    It means that, at the beginning, we only have to push each field with value
+    1(Land) to the Queue.
+
+    And all we do after that is perform a MultiSource BFS from that Queue.
+
+    In the first Solution we've marked visited water cells as 3. Why? Because
+    we have erroneously and completely unnecessary been marking all Land fields
+    with 2, therefore we needed some other value to mark all visited water
+    cells so that, at the end, we're able to restore original state of the
+    grid.
+
+    However, know we realize that:
+        1. We don't have to mark Land as visited, since we're going to visit
+           all of the Land intially. That's our starting point. Each next layer
+           of MultiSource BFS is going to, EXCLUSIVELY, contain water cells.
+
+        2. We don't care about restoring the original grid state.
+
+
+    Since each layer, after the first one, in this MultiSource BFS is going to
+    be, EXCLUSIVELY, consisted of water cells, then we realize we only need to
+    mark visited water cells, therefore we mark is with 2 so that we prevent
+    loops and unnecessary computation.
+
+    At the end, just return the number of "layers" we had to do in this BFS.
+
+*/
+
+/* Time  Beats: 98.42% */
+/* Space Beats: 94.04% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(n^2) */
+class Solution_Pure_MultiSource_BFS {
+public:
+    int maxDistance(std::vector<std::vector<int>>& grid)
+    {
+        const int N = grid.size();
+
+        std::queue<std::pair<int, int>> queue;
+
+        /* Push all of the Land fields in a Queue */
+        for (int i = 0; i < N; i++)
+        {
+            for (int j = 0; j < N; j++)
+            {
+                if (grid[i][j] == 1)
+                    queue.push( {i, j} );
+            }
+        }
+
+        /* If all water   OR if all land */
+        if (queue.empty() || queue.size() == N*N)
+            return -1;
+
+        /* Signing Cross */
+        std::vector<std::pair<int, int>> directions = {{-1,0}, {1,0}, {0,-1}, {0,1}};
+
+        /* Multi-Source BFS */
+        int max_distance = -1;
+        while (!queue.empty())
+        {
+            max_distance++;
+            int size = queue.size();
+
+            for (int x = 0; x < size; x++)
+            {
+                std::pair<int, int> field = queue.front();
+                queue.pop();
+
+                for (const auto& dir : directions)
+                {
+                    int row = field.first  + dir.first;
+                    int col = field.second + dir.second;
+
+                    if (row < 0 || col < 0 || row == N || col == N || grid[row][col] != 0)
+                        continue;
+
+                    /* Mark Water as visited. (It's certainly a water field) */
+                    grid[row][col] = 2;
+                    queue.push( {row, col} );
+                }
+            }
+        }
+
+        /* We don't have to restore the grid to the original state */
+
+        return max_distance;
     }
 };
