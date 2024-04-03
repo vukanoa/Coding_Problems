@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 /*
     ==============
@@ -58,11 +59,10 @@
 
     DFS + Multi-source BFS.
 
-    Multi-source BFS is a very important technique to master. I could be
+    Multi-source BFS is a very important technique to master. It could be
     considered fundamental.
 
     Check out LeetCode: Walls & Gates.
-
 
 
     This is a good example to show how this algorithm works:
@@ -111,7 +111,7 @@
                 |  2  |  0  |  0  |  0  |  0  |  0  |  0  |
                 +-----+-----+-----+-----+-----+-----+-----+
 
-        
+
     Now that we have a filled queue, we start doing BFS. For all the elements
     in the queue we "mark" every adjacent 0 as visited(turn it to 3) and we
     push it in the queue.
@@ -143,7 +143,7 @@
              {4,4}, {5,5}, {3,6}, {5,6},                             // This is around the third  land
              {4,0}, {6,1}, {4,1}, {4,2}, {6,2}, {6,3}}               // This is around the fourth land
 
-    
+
 
 
 
@@ -168,8 +168,8 @@
                 +-----+-----+-----+-----+-----+-----+-----+
 
     Now our queue looks like this:
-    
-    queue = {{0,3}, {4,3}, 
+
+    queue = {{0,3}, {4,3},
              {0,0}, {3,0}, {3,3}, {3,0},
              {4,5}, {6,5}, {6,6},
              {6,3}, {4,3}}
@@ -214,61 +214,54 @@ class Solution {
 public:
     int maxDistance(std::vector<std::vector<int>>& grid)
     {
-        const int n = grid.size();
+        const int N = grid.size();
         std::queue<std::pair<int, int>> queue;
 
-        for (int i = 0; i < n; i++)
+        /* Push each Island in a Queue */
+        for (int i = 0; i < N; i++)
         {
-            for (int j = 0; j < n; j++)
+            for (int j = 0; j < N; j++)
             {
                 if (grid[i][j] == 1)
-                {
-                    dfs(grid, i, j, queue);
-
-                    /* If not everything is a land, we're sure that lands are separated */
-                    if (queue.size() == n * n) // If everything is land
-                        return -1;
-                    else if (queue.empty())    // If everything is water
-                        return -1;
-                }
+                    dfs(grid, queue, i, j);
             }
         }
 
+        /* If all water   OR if all land */
+        if (queue.empty() || queue.size() == N*N)
+            return -1;
+
         std::vector<std::pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-        int as_far_from_land = -1;
+        int max_distance = -1;
 
         while (!queue.empty())
         {
-            as_far_from_land++;
+            max_distance++;
 
             int size = queue.size();
             for (int i = 0; i < size; i++)
             {
-                int x = queue.front().first;
-                int y = queue.front().second;
+                std::pair<int, int> field = queue.front();
                 queue.pop();
 
-                for (auto& dir : directions)
+                for (const auto& dir : directions)
                 {
-                    if (x + dir.first   < 0 ||
-                        y + dir.second  < 0 ||
-                        x + dir.first  == n ||
-                        y + dir.second == n ||
-                        grid[x + dir.first][y + dir.second] != 0)
-                    {
-                        continue;
-                    }
+                    int row = field.first  + dir.first;
+                    int col = field.second + dir.second;
 
-                    grid[x + dir.first][y + dir.second] = 3;
-                    queue.push( {x + dir.first, y + dir.second} );
+                    if (row < 0 || col < 0 || row == N || col == N || grid[row][col] != 0)
+                        continue;
+
+                    grid[row][col] = 3;
+                    queue.push( {row, col} );
                 }
             }
         }
 
-        // Restore Grid to original state
-        for (int i = 0; i < n; i++)
+        /* Restore Grid to original state (We are NOT in obligation to do it)*/
+        for (int i = 0; i < N; i++)
         {
-            for (int j = 0; j < n; j++)
+            for (int j = 0; j < N; j++)
             {
                 if (grid[i][j] == 2)
                     grid[i][j] = 1;
@@ -277,24 +270,27 @@ public:
             }
         }
 
-        return as_far_from_land;
+        return max_distance;
     }
 
 private:
-    void dfs(std::vector<std::vector<int>>& grid, int i, int j, std::queue<std::pair<int, int>>& queue)
+    void dfs(std::vector<std::vector<int>>& grid,
+             std::queue<std::pair<int, int>>& queue,
+             int i,
+             int j)
     {
-        const int n = grid.size();
+        const int N = grid.size();
 
-        if (i < 0 || j < 0 || i == n || j == n || grid[i][j] != 1)
+        if (i < 0 || j < 0 || i == N || j == N || grid[i][j] != 1)
             return;
 
         queue.push( {i, j} );
 
         grid[i][j] = 2;
 
-        dfs(grid, i-1, j  , queue);
-        dfs(grid, i+1, j  , queue);
-        dfs(grid, i  , j-1, queue);
-        dfs(grid, i  , j+1, queue);
+        dfs(grid, queue, i-1, j  );
+        dfs(grid, queue, i+1, j  );
+        dfs(grid, queue, i  , j-1);
+        dfs(grid, queue, i  , j+1);
     }
 };
