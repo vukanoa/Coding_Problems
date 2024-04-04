@@ -76,24 +76,69 @@
     aiming at finding all the "Closed Islands", aim to find all the "Open
     Islands".
 
-    Anytime you find an "Open Island", mark it(by changing it from 0 to 2 or
-    something similar).
+    Anytime you find an "Open Island", mark it(by changing it from 0 to 2)
 
-    So what is, in this problem, a "Open Island"?
-    An "Open Island" is a land that is connected to the edge.
+    So what is, in this problem, an "Open Island"?
+    An "Open Island" is a land that is connected to the edge(directly or
+    indirectly) in at least one of the 4 directions.
 
-    Therefore, traverse: (Clockwise)
-        1. First row      // Upper  edge
-        2. Last  column   // Right  edge
-        3. Last  row      // Bottom edge
-        4. First column   // Left   edge
 
-    Mark every land that is connected to one or more edges.
+    Example:
 
-    After that, start at position (1, 1) and traverse until (ROWS-1, COLS-1).
-    Count how any unconnected Islands are there. That is what we are asked for.
+        (This is a MODIFIED Example 1)
+        Input: grid = [[1,1,1,1,1,1,1,0],
+                       [1,0,0,0,1,0,0,0],
+                       [1,0,1,0,1,1,1,0],
+                       [1,0,0,0,0,1,0,1],
+                       [1,1,1,1,1,1,1,0]]
 
-    That is how you get the number of "Closed Islands".
+
+        +-----+-----+-----+-----+-----+-----+-----+-----+
+        |  1  |  1  |  1  |  1  |  1  |  1  |  1  |  0  | <-------
+        +-----+-----+-----+-----+-----+-----+-----+-----+        |
+        |  1  |  0  |  0  |  0  |  1  |  0  |  0  |  0  | <-------
+        +-----+-----+-----+-----+-----+-----+-----+-----+        |
+        |  1  |  0  |  1  |  0  |  1  |  1  |  1  |  0  | <-------
+        +-----+-----+-----+-----+-----+-----+-----+-----+        |
+        |  1  |  0  |  0  |  0  |  0  |  1  |  0  |  1  |        |
+        +-----+-----+-----+-----+-----+-----+-----+-----+        |
+        |  1  |  1  |  1  |  1  |  1  |  1  |  1  |  0  | <-------
+        +-----+-----+-----+-----+-----+-----+-----+-----+        |
+                                                                 |
+                                                                 |
+                                                                 |
+                                      ___________________________|
+                                      |
+                                      |
+                                      |
+        In the above ASCII drawing, these cells are DIRECTLY connected to the
+        edge in at least one of the 4 directions.
+
+        On the other hand, cells at indices: [1,5], [1,6] are INDIRECTLY
+        connected to the edge in at least one of the 4 directions.
+
+        For example Land at cells [1,5] is connected to [1,6] which is
+        connected to cell at index [1,7] which is DIRECTLY connected to the
+        edge on its right. Therefore, we say that both [1,5] and [1,6] are
+        also connected to the edge.
+
+
+    Therefore, traverse:
+        All the Rows    in First and Last Columns
+        All the Columns in First and Last Rows
+
+    and mark every Land that is connected to one or more edges(directly or
+    undirectly) in at least one of the 4 directions.
+
+    After that, iterate through entire grid, cell by cell, and each time you
+    stumble on some Land(designeated by 0), perform a DFS in which you will,
+    again, mark all the Land with value 2.
+
+    The number of performed DFSs is the number of "Closed Islands".
+
+    At the end, if you want you can restore the original grid by changing all
+    the 2's back to 0's.
+    (You DON'T have to. It's optional)
 
 */
 
@@ -109,82 +154,72 @@ public:
         const int ROWS = grid.size();
         const int COLS = grid[0].size();
 
-        int result = 0;
+        /* ************************************************************* */
+        /* *** Mark all land fields connected to the edge in any way *** */
+        /* ************************************************************* */
 
-        // First Row
-        for (int j = 0; j < COLS; j++)
-            dfs_from_edges(grid, 0, j);
-
-        // Last Col
+        /* Iterate through all the Rows in First and Last Column */
         for (int i = 0; i < ROWS; i++)
-            dfs_from_edges(grid, i, COLS-1);
-
-        // Last Row
-        for (int j = COLS-1; j >= 0; j--)
-            dfs_from_edges(grid, ROWS-1, j);
-
-        // First Col
-        for (int i = ROWS-1; i >= 0; i--)
-            dfs_from_edges(grid, i, 0);
-
-        /* Count Closed Islands */
-        for (int i = 1; i < ROWS-1; i++)
         {
-            for (int j = 1; j < COLS-1; j++)
-            {
-                if (grid[i][j] == 0)
-                {
-                    dfs_inside(grid, i, j);
-                    result++;
-                }
-            }
+            if (grid[i][0] == 0)
+                dfs(grid, i, 0);
+
+            if (grid[i][COLS-1] == 0)
+                dfs(grid, i, COLS-1);
         }
 
-        /* Restore grid matrix back to Original */
+        /* Iterate through all the Columns in First and Last Row */
+        for (int j = 0; j < COLS; j++)
+        {
+            if (grid[0][j] == 0)
+                dfs(grid, 0, j);
+
+            if (grid[ROWS-1][j] == 0)
+                dfs(grid, ROWS-1, j);
+        }
+
+        int islands = 0;
+
+        /* Count Islands by counting the amount of performed DFSs */
         for (int i = 0; i < ROWS; i++)
         {
             for (int j = 0; j < COLS; j++)
             {
-                if (grid[i][j] == 2 || grid[i][j] == 3)
-                    grid[i][j] = 0;
+                if (grid[i][j] == 0)
+                {
+                    islands++;
+                    dfs(grid, i, j);
+                }
             }
         }
 
-        return result;
+        /* Restore grid matrix back to Original(Not obligatory!) */
+        // for (int i = 0; i < ROWS; i++)
+        // {
+        //     for (int j = 0; j < COLS; j++)
+        //     {
+        //         if (grid[i][j] == 2)
+        //             grid[i][j] = 0;
+        //     }
+        // }
+
+        return islands;
     }
 
 private:
-    void dfs_from_edges(std::vector<std::vector<int>>& grid, int i, int j)
+    void dfs(std::vector<std::vector<int>>& grid, int i, int j)
     {
         const int ROWS = grid.size();
         const int COLS = grid[0].size();
 
-        if (i < 0 || j < 0 || i == ROWS || j == COLS)
-            return;
-
-        if (grid[i][j] != 0)
+        if (i < 0 || j < 0 || i == ROWS || j == COLS || grid[i][j] != 0)
             return;
 
         grid[i][j] = 2;
 
-        /* Signing Cross */
-        dfs_from_edges(grid, i-1, j  ); // Up
-        dfs_from_edges(grid, i+1, j  ); // Down
-        dfs_from_edges(grid, i  , j-1); // Left
-        dfs_from_edges(grid, i  , j+1); // Right
-    }
-
-    void dfs_inside(std::vector<std::vector<int>>& grid, int i, int j)
-    {
-        if (grid[i][j] != 0)
-            return;
-
-        grid[i][j] = 3;
-
-        /* Signing Cross */
-        dfs_inside(grid, i-1, j  ); // Up
-        dfs_inside(grid, i+1, j  ); // Down
-        dfs_inside(grid, i  , j-1); // Left
-        dfs_inside(grid, i  , j+1); // Right
+        dfs(grid, i-1, j  );
+        dfs(grid, i+1, j  );
+        dfs(grid, i  , j-1);
+        dfs(grid, i  , j+1);
     }
 };
