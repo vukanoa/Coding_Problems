@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <unordered_map>
 
 /*
     ==============
@@ -109,12 +111,67 @@
     --- IDEA ---
     ------------
 
-    TODO
+    Input: roads = [[1,0],[0,2],[3,1],[1,4],[5,0]]
+           seats = 1
+
+    Instead of visualizing it like this:
+
+            3
+            |
+            1 -- 0 -- 2
+            |    |
+            4    5
+
+    Instead, you should visualize it as a Tree:
+
+
+               __1__
+              /  |  \
+             /   |   \
+            /    |    \
+           /     |     \
+          /      |      \
+         2       1       5
+                / \
+               /   \
+              /     \
+             4       3
+
+
+
+    Now we have to use the "acyclicness" property of the graph, that's why we
+    are only going have to check if the "next_city" is not a "prev_city".
+
+    Everything else is taken care of by itself simply by being an acyclic
+    graph.
+
+    Since the end goal is to get at city '0', we are going to look at it as in
+    the picture above(ASCII Drawing).
+
+    Now try to go through the code and everything will be clear. There is no
+    need for a detailed explanation.
+
+    The Solution should be obvious once you consider the fact that they said in
+    the Description:
+        "There is a tree (i.e., a connected, undirected graph with no cycles)"
+
+    Once you see that, if you've solved enough of Graph problems, it would and
+    should be obvious.
+
+    If it is NOT obvious, you should definitely try to solve easier ones first
+    and only once you master the basics and other more "typical" Graph problems
+    only then proceed to try and to this problem. Otherwise, it doesn't make
+    any sense.
+
+    It's "kind of" a specific one, in a way.(Not too specific, but enough)
+
+    Make sure you have solved easier and "more typical" ones, after that this
+    one will be fairly obvious.
 
 */
 
-/* Time  Beats: 46.46% */
-/* Space Beats: 16.74% */
+/* Time  Beats: 52.76% */
+/* Space Beats: 30.05% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
@@ -122,35 +179,39 @@ class Solution {
 public:
     long long minimumFuelCost(vector<vector<int>>& roads, int seats)
     {
-        std::unordered_map<int, std::vector<int>> adj;
+        std::unordered_map<int, std::vector<int>> adj_list;
 
-        for (int i = 0; i < roads.size(); i++)
+        for (const auto& road : roads)
         {
-            adj[roads[i][0]].push_back(roads[i][1]);
-            adj[roads[i][1]].push_back(roads[i][0]);
+            adj_list[road[0]].push_back(road[1]);
+            adj_list[road[1]].push_back(road[0]);
         }
 
         long long fuel = 0;
-        for (int& next_city : adj[0])
-            dfs(adj, next_city, 0, seats, fuel);
+        for (int& next_city : adj_list[0])
+            dfs(adj_list, seats, fuel, next_city, 0);
 
         return fuel;
     }
 
 private:
-    int dfs(std::unordered_map<int, std::vector<int>>& adj, int& curr_city, int prev_city, int& seats, long long& fuel)
+    int dfs(std::unordered_map<int, std::vector<int>>& adj_list,
+            int& seats,
+            long long& fuel,
+            int& curr_city,
+            int  prev_city)
     {
         int representatives = 1;
 
-        for (int& next_city : adj[curr_city])
+        for (int& next_city : adj_list[curr_city])
         {
             if (next_city == prev_city)
                 continue;
 
-            representatives += dfs(adj, next_city, curr_city, seats, fuel);
+            representatives += dfs(adj_list, seats, fuel, next_city, curr_city);
         }
 
-        int cars = std::ceil(representatives * 1.0 / seats);
+        int cars = (int) std::ceil(1.0 * representatives / seats);
         fuel += cars * 1; // Or just " += cars", but it's more verbose
 
         return representatives;
