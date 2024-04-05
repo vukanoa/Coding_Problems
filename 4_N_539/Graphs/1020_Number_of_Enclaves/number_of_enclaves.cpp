@@ -71,7 +71,6 @@
 
 */
 
-
 /*
     ------------
     --- IDEA ---
@@ -79,11 +78,15 @@
 
     Think of in reverse.
 
+    (It is almost an equivalent problem to LC: 1254_Number_Of_Closed_Islands,
+     although this is a slightly easier one because if doesn't perform a DFS in
+     the last part of the implementation, i.e. in Nested Loops)
+
     Only check if there is land on the edges, i.e. in:
-        1. 0th-row
+        1. 0-th column
         2. last column
-        3. last row
-        4. 0-th column
+        3. 0th-row
+        4. last row
 
     If you find any land in these 4 "arrays", try to follow those lands, i.e.
     try to mark all the land, 4-directionally connected to it, as "visited".
@@ -96,10 +99,10 @@
     boundary of the grid in any number of moves."
 
     After we've done this to all 4 "arrays", meaning:
-        1. 0th-row
+        1. 0-th column
         2. last column
-        3. last row
-        4. 0-th column
+        3. 0th-row
+        4. last row
 
     We can then traverse the "middle" portion of the grid, i.e.
         i in [1, ROWS-2] and
@@ -123,51 +126,43 @@
 /* Space Complexity: O(m * n) */
 class Solution {
 public:
-    int numEnclaves(vector<vector<int>>& grid)
+    int numEnclaves(std::vector<std::vector<int>>& grid)
     {
         const int ROWS = grid.size();
         const int COLS = grid[0].size();
+        int enclaves = 0;
 
-        // Whole 0-th row
-        for (int j = 0; j < COLS; j++)
+        /* Traverse all the Rows in 0-th and Last Column */
+        for (int i = 0; i < ROWS; i++)
         {
-            if (grid[0][j] == 1)
-                dfs(grid, 0, j);
-        }
+            if (grid[i][0] == 1)
+                dfs(grid, i, 0);
 
-        // Entire last column
-        for (int i = 1; i < ROWS; i++)
-        {
             if (grid[i][COLS-1] == 1)
                 dfs(grid, i, COLS-1);
         }
 
-        // Whole last row
-        for (int j = COLS-2; j >= 0; j--)
+        /* Traverse all the Columns in 0-th and Last Row */
+        for (int j = 0; j < COLS; j++)
         {
+            if (grid[0][j] == 1)
+                dfs(grid, 0, j);
+
             if (grid[ROWS-1][j] == 1)
                 dfs(grid, ROWS-1, j);
         }
 
-        // Entire 0-th column
-        for (int i = ROWS-2; i >= 1; i--)
-        {
-            if (grid[i][0] == 1)
-                dfs(grid, i, 0);
-        }
-
-
-        int inner_land = 0;
+        /* Count Enclaves */
         for (int i = 1; i < ROWS-1; i++)
         {
             for (int j = 1; j < COLS-1; j++)
             {
                 if (grid[i][j] == 1)
-                    inner_land++;
+                    enclaves++;
             }
         }
 
-        return inner_land;
+        return enclaves;
     }
 
 private:
@@ -181,6 +176,7 @@ private:
 
         grid[i][j] = 2;
 
+        /* Singing Cross */
         dfs(grid, i-1, j  );
         dfs(grid, i+1, j  );
         dfs(grid, i  , j-1);
