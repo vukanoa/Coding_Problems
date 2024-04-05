@@ -89,7 +89,45 @@
     --- IDEA ---
     ------------
 
-    TODO
+    It's important to *carefully* read the problem.
+
+
+    "A graph is bipartite if the nodes can be partitioned into two independent
+    sets A and B such that EVERY edge in the graph connects a node in set A and
+    a node in set B."
+
+    Since EVERY edge in the graph must connect a node in set A and a node in
+    set B, then what we should do is start at each node and color that node
+    with one color and all of its neighbors with the other color.
+
+    For the convenience of implementing, we're going to use:
+         0 - Hasn't been assigned a color yet
+         1 - Blue
+        -1 - Red
+
+    Why are we using 1 and -1 instead of 1 and 2?
+
+    Because this way we get to assign the opposite color of the current node's
+    color to its neighbors.
+
+    We could, of course, do it with a ternary operator as well, however this
+    way is much more elegant.
+
+
+    We are doing a BFS starting from every node in the graph. Obviously, since
+    we're going to reach many nodes from one of the BFSs, it can happen that
+    once we get to start doing a BFS from some other node, we realize that the
+    color has already been assigned to this node. If that happens, we return
+    immediately and we proceed to start a BFS with a next node.
+
+    If at any point of BFS we realize that a neighbor of the current node is
+    THE SAME color as the current node - We IMMEDIATELY return false and we're
+    done with doing this problem.
+
+    However, if we get to do a BFS starting from each node and we never return
+    "false", then we are going to return "true" at the end since it means that
+    the given property is fulfilled, i.e. EVERY edge in the graph is connects a
+    node in set A and a node in set B.
 
 */
 
@@ -104,7 +142,7 @@ public:
     {
         const int n = graph.size();
 
-        std::vector<int> color(n, 0); // Green(A) == 1, Red(B) == -1
+        std::vector<int> color(n, 0); // Blue(A) == 1, Red(B) == -1
 
         for (int i = 0; i < n; i++)
         {
