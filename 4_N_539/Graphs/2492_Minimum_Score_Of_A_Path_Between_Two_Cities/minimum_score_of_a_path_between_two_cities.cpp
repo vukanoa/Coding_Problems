@@ -333,3 +333,82 @@ private:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 97.79% */
+/* Space Beats: 97.95% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+    int minScore(int n, vector<vector<int>>& roads)
+    {
+        int min_score = INT_MAX;
+
+        std::vector<int> ranks(n+1, 1);
+        std::vector<int> parents(n+1);
+
+        std::iota(parents.begin(), parents.end(), 0);
+
+        /* Create Union */
+        for (const auto& road : roads)
+            Union(road[0], road[1], parents, ranks);
+
+        int parent_1 = Find(1, parents);
+        for (const auto& road : roads)
+        {
+            int node_x   = road[0];
+            int node_y   = road[1];
+            int distance = road[2];
+
+            int parent_x = Find(node_x, parents);
+            int parent_y = Find(node_y, parents);
+
+            if (parent_1 == parent_x && parent_1 == parent_y)
+                min_score = std::min(min_score, distance);
+        }
+
+        return min_score;
+    }
+
+private:
+    int Find(int node, std::vector<int>& parents)
+    {
+        while (node != parents[node])
+        {
+            parents[node] = parents[parents[node]];
+            node = parents[node];
+        }
+
+        return node;
+    }
+
+    void Union(int node_1, int node_2, std::vector<int>& parents, std::vector<int>& ranks)
+    {
+        int p1 = Find(node_1, parents);
+        int p2 = Find(node_2, parents);
+
+        if(p1 == p2)
+            return;
+
+        if (ranks[p2] > ranks[p1])
+            parents[p1] = parents[p2];
+        else // if (ranks[p1] >= ranks[p2])
+        {
+            parents[p2] = p1;
+            ranks[p1]++;
+        }
+    }
+};
