@@ -225,7 +225,7 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_BFS {
 public:
     int minScore(int n, vector<vector<int>>& roads)
     {
@@ -270,5 +270,66 @@ public:
         }
 
         return min_score;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    It's the same IDEA as above, however instead of using a BFS to find a
+    minimum score(i.e. minimum edge) in a graph connected to node_1 and node_n
+    in any direct or indirect way, we use a DFS here to accomplish the same
+    thing.
+
+*/
+
+/* Time  Beats: 37.54% */
+/* Space Beats: 51.26% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_DFS {
+public:
+    int minScore(int n, vector<vector<int>>& roads)
+    {
+        int min_score = INT_MAX;
+        std::vector<bool> visited(n+1, false);
+        std::unordered_map<int, std::vector<std::pair<int, int>>> adj_list;
+
+        for (const auto& road : roads)
+        {
+            adj_list[road[0]].push_back({road[1], road[2]});
+            adj_list[road[1]].push_back({road[0], road[2]});
+        }
+
+        dfs(adj_list, visited, min_score, 1);
+
+        return min_score;
+    }
+
+private:
+    void dfs(std::unordered_map<int, std::vector<std::pair<int,int>>>& adj_list,
+             std::vector<bool>& visited,
+             int& min_score,
+             int city)
+    {
+        if (visited[city])
+            return;
+
+        visited[city] = true;
+
+        for (const auto& neighbor : adj_list[city])
+        {
+            int neighbor_city     = neighbor.first;
+            int neighbor_distance = neighbor.second;
+
+            min_score = std::min(min_score, neighbor_distance);
+            dfs(adj_list, visited, min_score, neighbor_city);
+        }
     }
 };
