@@ -151,7 +151,7 @@
 
 /* Time  Complexity: O(n^3) */
 /* Space Complexity: O(n^2) */
-class Solution {
+class Solution_BFS {
 public:
     int maximumDetonation(std::vector<std::vector<int>>& bombs)
     {
@@ -219,5 +219,84 @@ private:
         }
 
         return detonated;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 18.09% */
+/* Space Beats: 24.72% */
+
+/* Time  Complexity: O(n^3) */
+/* Space Complexity: O(n^2) */
+class Solution_DFS {
+public:
+    int maximumDetonation(std::vector<std::vector<int>>& bombs)
+    {
+        std::unordered_map<int, std::vector<int>> adj_list;
+
+        for (int i = 0; i < bombs.size(); i++)
+        {
+            int x1 = bombs[i][0];
+            int y1 = bombs[i][1];
+            int r1 = bombs[i][2];
+
+            for (int j = i+1; j < bombs.size(); j++)
+            {
+                int x2 = bombs[j][0];
+                int y2 = bombs[j][1];
+                int r2 = bombs[j][2];
+
+                double dist= distance(x1, y1, x2, y2);
+
+                if (dist <= 1.0*r1)
+                    adj_list[i].push_back(j);
+
+                if (dist <= 1.0*r2)
+                    adj_list[j].push_back(i);
+            }
+        }
+
+        int result = 0;
+        for (int i = 0; i < bombs.size(); i++)
+        {
+            std::unordered_set<int> new_visited;
+            int detonated = dfs(bombs, adj_list, new_visited, i);
+
+            result = std::max(result, detonated);
+        }
+
+        return result;
+    }
+
+private:
+    double distance(int& x1, int& y1, int& x2, int& y2)
+    {
+        return 1.0 * std::sqrt(1.0*(x2 - x1)*(x2 - x1) + 1.0*(y2 - y1)*(y2 - y1));
+    }
+
+    int dfs(std::vector<std::vector<int>>& bombs,
+            std::unordered_map<int, std::vector<int>>& adj_list,
+            std::unordered_set<int>& visited,
+            int i)
+    {
+        if (visited.count(i))
+            return 0;
+
+        visited.insert(i);
+        for (const auto& nei : adj_list[i])
+            dfs(bombs, adj_list, visited, nei);
+
+        return visited.size();
     }
 };
