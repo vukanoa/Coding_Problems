@@ -46,7 +46,6 @@
 
 */
 
-
 /*
     ============
     === NOTE ===
@@ -69,7 +68,6 @@
             comprehend.
 
 */
-
 
 /*
     ------------
@@ -243,6 +241,10 @@
         dp[nums.size() -1]
     Meaning in the last position of vector "dp".
 
+
+
+    Solution_Concise_3 is the Space efficient equivalent of this Solution.
+
 */
 
 /* Time  Beats:   100% */
@@ -259,9 +261,6 @@ class Solution_1 {
 public:
     int rob(std::vector<int>& nums)
     {
-        if (nums.size() < 1)
-            return 0;
-
         if (nums.size() == 1)
             return nums[0];
 
@@ -273,48 +272,6 @@ public:
             dp[i] = std::max(dp[i - 2] + nums[i], dp[i - 1]);
 
         return dp[nums.size() - 1];
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Space efficient of the above Solution.
-
-*/
-
-/* Time  Beats:  100% */
-/* Space Beats: 97.9% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution_1_Space_Efficient{
-public:
-    int rob(std::vector<int>& nums)
-    {
-        if (nums.size() < 1)
-            return 0;
-
-        if (nums.size() == 1)
-            return nums[0];
-
-        int dp_i_min_2 = nums[0];
-        int dp_i_min_1 = std::max(nums[0], nums[1]);
-
-        for (int i = 2; i < nums.size(); i++)
-        {
-            int dp_i = std::max(dp_i_min_2 + nums[i], dp_i_min_1);
-
-            std::swap(dp_i_min_2, dp_i_min_1);
-            std::swap(dp_i_min_1, dp_i);
-        }
-
-        return dp_i_min_1;
     }
 };
 
@@ -526,8 +483,8 @@ public:
 
 
 
-/* Time  Beats:   100% */
-/* Space Beats: 50.80% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  80.57% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -596,7 +553,6 @@ int
 main()
 {
     Solution_1                        sol_1;
-    Solution_1_Space_Efficient        sol_1_space;
     Solution_Reusable                 sol_reusable;
     Solution_Reusable_Space_Efficient sol_reusable_space;
     Solution_Concise                  sol_concise;
@@ -644,7 +600,6 @@ main()
 
     /* Solution */
     // int money = sol_1.rob(nums);
-    // int money = sol_1_space.rob(nums);
     // int money = sol_reusable.rob(nums);
     // int money = sol_reusable_space.rob(nums);
     // int money = sol_concise.rob(nums);
