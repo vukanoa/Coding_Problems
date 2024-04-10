@@ -451,6 +451,62 @@ public:
 
 
 
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We could implement this to have a Space Complexity O(1) as well, however
+    this is not the point of this Solution. The point is the to show another
+    way of implementing it.
+
+    It's here for didactic purposes.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   5.72% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Intuitive_3 {
+public:
+    int maxProduct(std::vector<int>& nums)
+    {
+        const int n = nums.size();
+
+        std::vector<int> bigger (n, 0);
+        std::vector<int> smaller(n, 0);
+
+        bigger[0]  = nums[0];
+        smaller[0] = nums[0];
+
+        int result = nums[0];
+        for (int i = 1; i < n; i++)
+        {
+            int big   = std::max({nums[i], nums[i] * bigger[i-1], nums[i] * smaller[i-1]});
+            int small = std::min({nums[i], nums[i] * bigger[i-1], nums[i] * smaller[i-1]});
+
+            result = std::max( {result, small, big} );
+
+            if (nums[i] == 0)
+            {
+                bigger[i]  = 0;
+                smaller[i] = 0;
+            }
+            else
+            {
+                bigger[i]  = big;
+                smaller[i] = small;
+            }
+        }
+
+        return result;
+    }
+};
+
+
 int
 main()
 {
