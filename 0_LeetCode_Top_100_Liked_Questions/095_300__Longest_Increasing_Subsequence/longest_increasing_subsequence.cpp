@@ -196,6 +196,50 @@ public:
     --- IDEA ---
     ------------
 
+    Same as above, however it's a bit faster if we find "result" while we are
+    doing the problem. That way we don't have to go through the array once more
+    to find the maximum element.
+
+*/
+
+/* Time  Beats: 61.69% */
+/* Space Beats: 63.09% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(n) */
+class Solution_DP_2 {
+public:
+    int lengthOfLIS(vector<int>& nums)
+    {
+        const int n = nums.size();
+        std::vector<int> LIS(n, 1);
+
+        int result = 1;
+
+        for (int i = n; i >= 0; i--)
+        {
+            for (int j = i+1; j < n; j++)
+            {
+                if (nums[i] < nums[j])
+                {
+                    LIS[i] = std::max(LIS[i], 1 + LIS[j]);
+                    result = std::max(result, LIS[i]);
+                }
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     This is a classic Dynamic Programming problem.
 
     Let dp[i] be the longest increase subsequence of nums[0..i] where nums[i]
