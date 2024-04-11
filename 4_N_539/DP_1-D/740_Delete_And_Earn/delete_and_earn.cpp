@@ -77,33 +77,35 @@ class Solution {
 public:
     int deleteAndEarn(std::vector<int>& nums)
     {
-        // Hash Map
+        /* Hash Map */
         std::unordered_map<int, int> occurrences;
 
-        // Fill the Hash Map
+        /* Fill Hash Map */
         for (int& num : nums)
             occurrences[num]++;
 
-        // New vector with distinct elements
+        /* Create new vector with unique elements */
         std::vector<int> uniq_nums(occurrences.size());
 
-        // Fill new vector with unique values from "nums"
+        /* Fill new vector with unique values from "nums" */
         int i = 0;
         for (auto& entry : occurrences)
             uniq_nums[i++] = entry.first;
 
-        // Sort
+        /* Sort */
         std::sort(uniq_nums.begin(), uniq_nums.end());
 
-        // The most important part of the Solution
-        // It uses only two variables instead of the whole vector "DP"
+        /*
+           The most important part of the Solution
+           It uses only two variables instead of the whole vector "dp"
+        */
         int prev = 0;
         int curr = uniq_nums[0] * occurrences[uniq_nums[0]];
         for (int i = 1; i < uniq_nums.size(); i++)
         {
             int tmp;
 
-            if (uniq_nums[i] - 1 == uniq_nums[i - 1])
+            if (uniq_nums[i - 1] + 1 == uniq_nums[i])
                 tmp = std::max(curr, uniq_nums[i] * occurrences[uniq_nums[i]] + prev);
             else
                 tmp = uniq_nums[i] * occurrences[uniq_nums[i]] + std::max(curr, prev);
@@ -113,6 +115,66 @@ public:
         }
 
         return curr;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same idea sa abov, implemented a bit differently. This one isn't Space
+    optimized, however it is much easier for reading and understanding how this
+    approach works.
+
+    Therefore, I'll leave it here for didactic purposes.
+
+*/
+
+/* Time  Beats: 64.74% */
+/* Space Beats: 45.29% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    int deleteAndEarn(std::vector<int>& nums)
+    {
+        /* Hash Map */
+        std::unordered_map<int, int> umap;
+
+        /* Fill Hash Map */
+        for (const int& num : nums)
+            umap[num]++;
+
+        /* Create new vector with unique elements */
+        std::vector<int> uniq;
+        for (const auto& entry : umap)
+            uniq.push_back(entry.first);
+
+        /* Sort */
+        std::sort(uniq.begin(), uniq.end());
+
+        /* DP vector */
+        std::vector<int> dp(uniq.size(), 0);
+        dp[0] = umap[uniq[0]] * uniq[0]; // Solve for 0-th index
+
+        for (int i = 1; i < uniq.size(); i++) // Start from 1
+        {
+            dp[i] = umap[uniq[i]] * uniq[i];
+
+            if (i-1 >= 0 && uniq[i-1]+1 != uniq[i])
+                dp[i] += dp[i-1];
+            else if (i-2 >= 0)
+                dp[i] += dp[i-2];
+
+            dp[i] = std::max(dp[i], dp[i-1]);
+        }
+
+        return dp[uniq.size() - 1];
     }
 };
 
