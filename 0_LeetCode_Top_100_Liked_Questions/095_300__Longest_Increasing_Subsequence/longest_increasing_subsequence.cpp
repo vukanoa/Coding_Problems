@@ -165,7 +165,6 @@ public:
     it's a O(n^2) Time Complexity.
 */
 
-
 /* Time  Beats: 62.94% */
 /* Space Beats: 71.42% */
 class Solution_DFS_with_Cache_DP {
@@ -462,21 +461,24 @@ public:
     "nums" array. But in order to do that we'd have to be sure that is
     permitted.
 */
-class Solution_Greedy_Binary{
+class Solution_Greedy_Binary {
 public:
     int lengthOfLIS(std::vector<int> &nums)
     {
         std::vector<int> sub;
+        sub.push_back(nums[0]);
 
-        for (int& x : nums)
+        for (int i = 1; i < nums.size(); i++)
         {
-            if (sub.empty() || sub[sub.size() - 1] < x)
-                sub.push_back(x);
+            if (sub[sub.size() - 1] < nums[i])
+            {
+                sub.push_back(nums[i]);
+            }
             else
             {
-                // Search for first element e such that x <= e
-                auto it = std::lower_bound(sub.begin(), sub.end(), x);
-                *it = x;
+                // Search for first element e such that: nums[i] <= e
+                auto it = std::lower_bound(sub.begin(), sub.end(), nums[i]);
+                *it = nums[i];
             }
         }
 
