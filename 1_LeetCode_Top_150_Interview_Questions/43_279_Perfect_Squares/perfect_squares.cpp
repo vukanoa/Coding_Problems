@@ -73,7 +73,7 @@
 
 /* Time  Complexity: O(n * unique_perfect_squares) */
 /* Space Complexity: O(n * unique_perfect_squares) */
-class Solution{
+class Solution {
 public:
     int numSquares(int n)
     {
@@ -108,7 +108,16 @@ public:
             }
         }
 
-        return dp[n] == INT_MAX ? -1 : dp[n];
+        /*
+            It will NEVER happen that we cannot sum up to n. The lower bound of
+            'n' that is given in description is 1. Since that is the case, we
+            will ALWAYS have value 1 in our "perfect_squares" vector and will,
+            therefore, be able to sum up to n at least with all the 1's.
+
+            That's why we don't have to do this:
+            return dp[n] == INT_MAX ? -1 : dp[n];
+        */
+        return dp[n];
     }
 };
 
@@ -131,7 +140,7 @@ public:
 
 /* Time  Complexity: O(n * unique_perfect_squares) */
 /* Space Complexity: O(n * unique_perfect_squares) */
-class Solution {
+class Solution_2 {
 public:
     int numSquares(int n)
     {
@@ -157,7 +166,8 @@ public:
 
         for (int i = 1; i <= n; i++)
         {
-            dp[i] = INT_MAX;
+            dp[i] = INT_MAX; // We MUST initialize it with INT_MAX!
+
             for (const int& p : perfect_squares)
             {
                 if (i - p < 0)
@@ -167,6 +177,15 @@ public:
             }
         }
 
-        return dp[n] == INT_MAX ? -1 : dp[n];
+        /*
+            It will NEVER happen that we cannot sum up to n. The lower bound of
+            'n' that is given in description is 1. Since that is the case, we
+            will ALWAYS have value 1 in our "perfect_squares" vector and will,
+            therefore, be able to sum up to n at least with all the 1's.
+
+            That's why we don't have to do this:
+            return dp[n] == INT_MAX ? -1 : dp[n];
+        */
+        return dp[n];
     }
 };
