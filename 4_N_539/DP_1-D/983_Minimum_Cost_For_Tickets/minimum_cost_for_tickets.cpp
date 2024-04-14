@@ -173,3 +173,97 @@ public:
         return dp[0];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Essentially the same as the above one, however it's a reversed process.
+    We're starting from index 0 and then we always "go back" to determine the
+    absolute minimum up to that day.
+
+    In the above Solution we've done the other way. We started from the back
+    and then we always "go forward" to determine the absolute minimum.
+
+    I believe this one makes more sense, but it's the best to read them both.
+
+    The crux of this Solutions is:
+        1. What is the minimum $$ we have to spend if we only have the very
+           first element in our vector 'days'?
+
+        2. What is the minimum $$ we have to spend if we only have the first
+           two elements in our vector 'days'?
+
+        3. What is the minimum $$ we have to spend if we only have the first
+           three elements in our vector 'days'?
+
+        4. What is the minimum $$ we have to spend if we only have the first
+           four elements in our vector 'days'?
+        ...
+
+        n. What is the minimum $$ we have to spend if we have all the elements
+           in our vector 'days'?
+
+
+    In each step(except step 1) we are are resting on the previous best
+    calculations.
+
+    I'd say that, in terms of thinking, it's a "combination" of Problems:
+        1. Coin Change and
+        2. LIS (Longest Increasing Subsequence)
+
+    If you've solved these two and you genuinely understand the logic behind
+    them, them you're almost certainly going to come up with a Solution for
+    this one.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  92.79% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Bottom_Up_Reverse {
+public:
+    int mincostTickets(std::vector<int>& days, std::vector<int>& costs)
+    {
+        const int n = days.size();
+        std::vector<int> dp(n, INT_MAX);
+        dp[0] = std::min( {costs[0], costs[1], costs[2]} );
+
+        for (int i = 1; i < n; i++)
+        {
+            /* 1-day pass */
+            dp[i] = std::min(dp[i], costs[0] + dp[i-1]);
+
+            int start = days[i];
+            int x;
+
+            /* 7-day pass */
+            x = i-1;
+            while (x >= 0 && days[x] > start-7)
+                x--;
+
+            if (x >= 0)
+                dp[i] = std::min(dp[i], costs[1] + dp[x]);
+            else
+                dp[i] = std::min(dp[i], costs[1]);
+
+            /* 30-day pass */
+            x = i-1;
+            while (x >= 0 && days[x] > start-30)
+                x--;
+
+            if (x >= 0)
+                dp[i] = std::min(dp[i], costs[2] + dp[x]);
+            else
+                dp[i] = std::min(dp[i], costs[2]);
+        }
+
+        return dp[n-1];
+    }
+};
