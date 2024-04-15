@@ -2,132 +2,131 @@
 #include <vector>
 
 /*
-	============
-	=== EASY ===
-	============
+    ============
+    === EASY ===
+    ============
 
-	===========================
-	136) Single Number
-	===========================
+    ===========================
+    136) Single Number
+    ===========================
 
-	============
-	Description:
-	============
+    ============
+    Description:
+    ============
 
-	Given a non-empty array of integers "nums", every element appears twice
-	except for one. Find that single one.
+    Given a non-empty array of integers "nums", every element appears twice
+    except for one. Find that single one.
 
 
-	You must implement a solution with a linear runtime and use only constant
-	extra space.
+    You must implement a solution with a linear runtime and use only constant
+    extra space.
 
-	==============================================
-	FUNCTION: int singleNumber(vector<int>& nums);
-	==============================================
+    ==============================================
+    FUNCTION: int singleNumber(vector<int>& nums);
+    ==============================================
 
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
 
-	--- Example 1 ---
-	Input:  nums = [2, 2, 1]
-	Output: 1
+    --- Example 1 ---
+    Input:  nums = [2, 2, 1]
+    Output: 1
 
-	--- Example 2 ---
-	Input:  nums = [4, 1, 2, 1, 2]
-	Output: 4
+    --- Example 2 ---
+    Input:  nums = [4, 1, 2, 1, 2]
+    Output: 4
 
-	--- Example 3 ---
-	Input:  nums = [1]
-	Output: 1
+    --- Example 3 ---
+    Input:  nums = [1]
+    Output: 1
 
-	*** Constraints ***
-	1 <= nums.length <= 3 * 10^4
-	-3 * 10 ^ 4 <= nums[i] <= 3 * 10^4
-	Each element in the array apperas twice except for one element which
-	  appears only once.
+    *** Constraints ***
+    1 <= nums.length <= 3 * 10^4
+    -3 * 10 ^ 4 <= nums[i] <= 3 * 10^4
+    Each element in the array apperas twice except for one element which
+      appears only once.
 
 */
-
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	Just XOR all the elements.
+    Just XOR all the elements.
 
-	If you XOR something twice with the same value it's as if you haven't done
-	anything, thus if we XOR all the elements in the array, we will end up with
-	one that doesn't repeat.
+    If you XOR something twice with the same value it's as if you haven't done
+    anything, thus if we XOR all the elements in the array, we will end up with
+    one that doesn't repeat.
 
 */
 
-/* Time  Beats: 82.89% */
-/* Space Beats: 99.12% */
+/* Time  Beats: 96.54% */
+/* Space Beats: 98.76% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
 class Solution{
 public:
-	int singleNumber(std::vector<int>& nums)
-	{
-		int result = 0;
-		for (int i = 0; i < nums.size(); i++)
-			result ^= nums[i];
+    int singleNumber(std::vector<int>& nums)
+    {
+        int result = 0;
+        for (int i = 0; i < nums.size(); i++)
+            result ^= nums[i];
 
-		return result;
-	}
+        return result;
+    }
 };
 
 
 int
 main()
 {
-	Solution sol;
+    Solution sol;
 
-	/* Example 1 */
-	// std::vector<int> nums = {2, 2, 1};
+    /* Example 1 */
+    // std::vector<int> nums = {2, 2, 1};
 
-	/* Example 2 */
-	std::vector<int> nums = {4, 1, 2, 1, 2};
+    /* Example 2 */
+    std::vector<int> nums = {4, 1, 2, 1, 2};
 
-	/* Example 3 */
-	// std::vector<int> nums = {1};
+    /* Example 3 */
+    // std::vector<int> nums = {1};
 
-	/* Example 4 */
-	// std::vector<int> nums = {3, 1, 4, -1, 3, 4, 1};
+    /* Example 4 */
+    // std::vector<int> nums = {3, 1, 4, -1, 3, 4, 1};
 
-	/* Example 5 */
-	// std::vector<int> nums = {-1, -1, -2};
-
-
-	std::cout << "\n\t=====================";
-	std::cout << "\n\t=== SINGLE NUMBER ===";
-	std::cout << "\n\t=====================\n";
+    /* Example 5 */
+    // std::vector<int> nums = {-1, -1, -2};
 
 
-	/* Write Input */
-	bool first = true;
-	std::cout << "\n\tArray: [";
-	for (auto x: nums)
-	{
-		if (!first)
-			std::cout << ", ";
-
-		std::cout << x;
-		first = false;
-	}
-	std::cout << "]\n";
+    std::cout << "\n\t=====================";
+    std::cout << "\n\t=== SINGLE NUMBER ===";
+    std::cout << "\n\t=====================\n";
 
 
-	/* Solution */
-	int result = sol.singleNumber(nums);
+    /* Write Input */
+    bool first = true;
+    std::cout << "\n\tArray: [";
+    for (auto x: nums)
+    {
+        if (!first)
+            std::cout << ", ";
+
+        std::cout << x;
+        first = false;
+    }
+    std::cout << "]\n";
 
 
-	/* Write Output */
-	std::cout << "\n\tOutput: " << result << "\n\n";
+    /* Solution */
+    int result = sol.singleNumber(nums);
 
 
-	return 0;
+    /* Write Output */
+    std::cout << "\n\tOutput: " << result << "\n\n";
+
+
+    return 0;
 }
