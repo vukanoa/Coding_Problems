@@ -87,7 +87,7 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_DFS {
 public:
     int minDepth(TreeNode* root)
     {
@@ -111,5 +111,62 @@ private:
 
         dfs(root->left,  curr_depth+1, min_depth);
         dfs(root->right, curr_depth+1, min_depth);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Again, this is a fundamental technique, however this time it's a BFS.
+
+    These two techniques are ABSOLUTELY FUNDAMENTAL to any Graph/Tree problem.
+
+*/
+
+/* Time  Beats: 79.72% */
+/* Space Beats: 34.63% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_BFS {
+public:
+    int minDepth(TreeNode* root)
+    {
+        if (!root)
+            return 0;
+
+        int min_depth = INT_MAX;
+        std::queue<TreeNode*> queue;
+        queue.push(root);
+
+        int depth = 1;
+        while ( ! queue.empty())
+        {
+            int size = queue.size();
+
+            for (int x = 0; x < size; x++)
+            {
+                TreeNode* curr = queue.front();
+                queue.pop();
+
+                if (!curr->left && !curr->right)
+                    return depth;
+
+                if (curr->left)
+                    queue.push(curr->left);
+
+                if (curr->right)
+                    queue.push(curr->right);
+            }
+
+            depth++;
+        }
+
+        return -1; // This will never be returned
     }
 };
