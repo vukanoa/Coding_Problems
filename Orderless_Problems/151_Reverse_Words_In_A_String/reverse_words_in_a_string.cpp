@@ -145,3 +145,61 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  90.56% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Efficient {
+public:
+    std::string reverseWords(std::string s)
+    {
+        std::reverse(s.begin(), s.end());
+
+        int left    = 0;
+        int current = 0;
+
+        int i = 0;
+        while (i < s.length())
+        {
+            while (i < s.length() && s[i] == ' ')
+                i++;
+
+            current = i;
+            while (i < s.length() && s[i] != ' ')
+                i++;
+
+            std::reverse(s.begin()+current, s.begin()+i);
+
+            while (current < i)
+                s[left++] = s[current++];
+
+            if (i < s.length())
+                s[left++] = ' ';
+
+            i++;
+        }
+
+        i = s.length();
+        while (left < i--)
+            s.pop_back();
+
+        while (s.back() == ' ')
+            s.pop_back();
+
+        return s;
+    }
+};
