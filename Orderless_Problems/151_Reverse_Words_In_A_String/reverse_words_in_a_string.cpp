@@ -203,3 +203,145 @@ public:
         return s;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    + Reverse the entire string
+    + Reverse individual words while handling the extra spaces
+    + Remove extra spaces and return
+
+
+    Input: s = "__Bob__Alice__"
+
+    Initialize left, right and current to 0.
+
+    Step 1: [Reverse the entire string]
+
+        std::reverse(s.begin(), s.end());
+
+
+
+    Step 2: [Skip Leading Spaces]
+
+        while (i < s.length() && s[i] == ' ')
+            i++;
+
+                current
+                   |
+                   |
+                   v
+            s = "__eciliA__boB__"
+
+
+
+    Step 3: [Copy characters of a word to the correct position]
+
+        while (i < s.length() && s[i] != ' ')
+            s[right++] = s[i++];
+
+
+                current
+                   |
+                   |
+                   v
+            s = "__eciliA__boB__"
+
+            s = "ecilAA__boB__"
+                     ^
+                     |
+                     |
+                   right
+
+    Step 4: [Reverse Individual words]
+
+        std::reverse(s.begin()+left, s.begin()+right);
+
+        from:
+            s = "ecilAA__boB__"
+                 ^   ^
+              ___|   |___
+              |         |
+             left      right
+
+
+        to:
+            s = "AliceA__boB__"
+
+
+    Step 5: [Add Space between words]
+
+        s[right++] = ' ';
+        left = right;
+
+        from:
+            s = "AliceA__boB__"
+
+
+                     right
+                       |
+        to:            v
+            s = "Alice___boB__"
+                       ^
+                       |
+                     left
+
+
+    Repeat the steps for all the words.
+
+    Finally, it resizes the string to remove any extra space.
+        s.resize(right-1);
+
+            s = "Alice_Bob_ob___"
+                          ^    ^
+                       ___|    |___
+                       |          |
+                     left        current
+
+
+    Output: s = "Alice_Bob"
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  95.82% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Efficient_2 {
+public:
+    std::string reverseWords(std::string s)
+    {
+        std::reverse(s.begin(), s.end());
+
+        int left  = 0;
+        int right = 0;
+
+        int i = 0;
+        while(i < s.length())
+        {
+            while(i < s.length() && s[i] == ' ')
+                i++;
+
+            if(i == s.length())
+                break; // To stop index going out of bounds
+
+            while(i < s.length() && s[i] != ' ')
+                s[right++] = s[i++];
+
+            std::reverse(s.begin()+left, s.begin()+right);
+            s[right++] = ' ';
+
+            left = right;
+            i++;
+        }
+
+        s.resize(right-1);
+        return s;
+    }
+};
