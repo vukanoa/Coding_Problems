@@ -205,3 +205,46 @@ private:
         return root == nullptr ? -1 : 1+height(root->left);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    A combination of Iterative and Recursive Solutoins above. It seems as if
+    this runs fastest on LeetCode for some reason.
+
+*/
+
+/* Time  Beats: 94.34% */
+/* Space Beats: 12.85% */
+
+/* Time  Complexity: O(log(n)^2) */
+/* Space Complexity: O(log(n))   */
+class Solution_Efficient {
+public:
+    int countNodes(TreeNode* root)
+    {
+        if ( ! root)
+            return 0;
+
+        TreeNode* left  = root;
+        TreeNode* right = root;
+        int height = 0;
+
+        while (right)
+        {
+            left  = left->left;
+            right = right->right;
+            height++;
+        }
+
+        if ( ! left)
+            return (1 << height) - 1;
+
+        return 1 + countNodes(root->left) + countNodes(root->right);
+    }
+};
