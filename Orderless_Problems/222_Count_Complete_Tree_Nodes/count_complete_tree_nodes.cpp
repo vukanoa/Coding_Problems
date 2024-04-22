@@ -154,3 +154,54 @@ private:
         return root == nullptr ? -1 : 1+height(root->left);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+   Here's an iterative version as well, with the benefit that we don't
+   recompute h in every step.
+
+*/
+
+/* Time  Beats: 63.32% */
+/* Space Beats: 78.63% */
+
+/* Time  Complexity: O(log(n)^2) */
+/* Space Complexity: O(log(n))   */
+class Solution_Iterative {
+public:
+    int countNodes(TreeNode* root)
+    {
+        int nodes = 0;
+        int h = height(root);
+
+        while (root)
+        {
+            if (height(root->right) == h - 1)
+            {
+                nodes += 1 << h;
+                root = root->right;
+            }
+            else
+            {
+                nodes += 1 << (h-1);
+                root = root->left;
+            }
+
+            h--;
+        }
+
+        return nodes;
+    }
+
+private:
+    int height(TreeNode* root)
+    {
+        return root == nullptr ? -1 : 1+height(root->left);
+    }
+};
