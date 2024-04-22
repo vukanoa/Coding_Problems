@@ -248,3 +248,32 @@ public:
         return 1 + countNodes(root->left) + countNodes(root->right);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Concise way of solving. It is not the most Time efficient, but it does the
+    job.
+
+*/
+
+/* Time  Beats: 54.04% */
+/* Space Beats: 78.63% */
+
+/* Time  Complexity: O(log(n)^2) */
+/* Space Complexity: O(log(n))   */
+class Solution_Concise {
+public:
+    int countNodes(TreeNode* root)
+    {
+        if ( ! root)
+            return 0;
+
+        return 1 + countNodes(root->left) + countNodes(root->right);
+    }
+};
