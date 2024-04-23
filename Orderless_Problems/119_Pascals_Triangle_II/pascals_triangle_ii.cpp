@@ -86,3 +86,38 @@ public:
         return vec_rowIndex;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is Space efficient because it doesn't use any extra space other
+    than the vector we're returning at the very end.
+
+*/
+
+/* Time  Beats: 38.42% */
+/* Space Beats: 98.33% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Follow_Up {
+public:
+    std::vector<int> getRow(int rowIndex)
+    {
+        std::vector<int> result(rowIndex+1, 1);
+
+        for(int i = 1; i < rowIndex; i++)
+        {
+            for(int j = i; j > 0; j--)
+                result[j] += result[j-1];
+
+        }
+
+        return result;
+    }
+};
