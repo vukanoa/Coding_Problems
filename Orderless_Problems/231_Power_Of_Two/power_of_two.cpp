@@ -301,3 +301,42 @@ public:
         return n > 0 && (n & (n-1)) == 0;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    ceil()  = rounds up   to the nearest integer.
+    floor() = rounds down to the nearest integer.
+
+    Example 1:
+        ceil (log2(5)) = 2
+        floor(log2(5)) = 3
+
+    Example 2:
+    ceil (log2(8)) = 3
+    floor(log2(8)) = 3
+
+    In case of number multiple of 2 ceil and floor will always be equal.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   7.20% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Follow_Up_2 {
+public:
+    bool isPowerOfTwo(int n)
+    {
+        if (n == 0)
+            return false;
+
+        return std::floor(std::log2(n)) == std::ceil(std::log2(n));
+    }
+};
