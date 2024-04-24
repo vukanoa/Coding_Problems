@@ -132,3 +132,71 @@ public:
         return num == n;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is 2's Complement:
+
+        -2147483648 = 1000 0000 0000 0000 0000 0000 0000 0000
+
+                 -1 = 1111 1111 1111 1111 1111 1111 1111 1111
+
+                 -2 = 1111 1111 1111 1111 1111 1111 1111 1110
+
+                 -3 = 1111 1111 1111 1111 1111 1111 1111 1101
+
+                 -4 = 1111 1111 1111 1111 1111 1111 1111 1100
+
+    However, we don't really have to worry about negative integers at all.
+    Let's read the important part of Description CAREFULLY:
+
+    An integer n is a power of two, if there exists an integer x such that:
+        n == 2^x.
+
+    Since integers can be both positive and negative, that means x can be both
+    positive or negative.
+
+    If an exponent is NEGATIVE, then it NEVER will be equal to an integer.
+    Think about it:
+        2^(-4) ==> 1/2^4 ==> 1/16 ==> 0.0625
+
+    Any NEGATIVE EXPONENT leads to NON-integer, therefore we will only consider
+    exponents that are POSITIVE.
+
+    Also, one important thing: NEGATIVE NUMBERS ARE NOT(!!!) CONSIDERED A POWER
+    OF TWO.
+
+    Now, we just try every power of two from [0 to 31] (inclusive), and if any
+    2 to the power of i(i is starting at 0 and then goes all the way to 31),
+    then we've found our answer to be true.
+
+    False otherwise.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  77.16% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Loop_2 {
+public:
+    bool isPowerOfTwo(int n)
+    {
+        for(int i = 0; i < 31 ; i++)
+        {
+            int ith_pow_of_two = (1 << i); // (1 << i) <==> pow(2,i)
+
+            if (ith_pow_of_two == n)
+                return true;
+        }
+
+        return false;
+    }
+};
