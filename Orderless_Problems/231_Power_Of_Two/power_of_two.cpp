@@ -334,9 +334,37 @@ class Solution_Follow_Up_2 {
 public:
     bool isPowerOfTwo(int n)
     {
-        if (n == 0)
-            return false;
+        return n > 0 && std::floor(std::log2(n)) == std::ceil(std::log2(n));
+    }
+};
 
-        return std::floor(std::log2(n)) == std::ceil(std::log2(n));
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Multiple of 2 will always divide 2^30.
+
+    Keep in mind that we're mod-ing 2^30 and NOT 2^31.
+    Why?
+
+    Because in a signed integer 2^31 is Overflow.
+    32-bit integers are in the range [-2^31, 2^31-1]
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  77.16% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Follow_Up_3 {
+public:
+    bool isPowerOfTwo(int n)
+    {
+        return n > 0 && (1 << 30) % n == 0;
     }
 };
