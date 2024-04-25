@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <unordered_set>
+#include <bitset>
 
 /*
     ============
@@ -84,5 +85,62 @@ public:
         }
 
         return results;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Since in the "Constraints" it is said that the upper bounds of both nums1
+    and nums2 is 1000, we can make use of a bitset.
+
+    That way, our Time Complexity can be considered O(1), which is an
+    improvement.
+
+    Container bitset<1001> is very suitable.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  87.49% */
+
+/*
+    Time  Complexity: O(n + m)
+*/
+/*
+    Space Complexity: O(1)
+
+    i.e. O(1001) which is just O(1).
+*/
+class Solution_Efficient {
+public:
+    std::vector<int> intersection(std::vector<int>& nums1, std::vector<int>& nums2)
+    {
+        if (nums1.size() > nums2.size())
+            return intersection(nums2, nums1);
+
+        std::bitset<1001> bitset = 0;
+
+        for (const int& num : nums1)
+            bitset[num] = 1;
+
+        std::vector<int> result;
+        result.reserve(1001); // This is only to enhance "pushing of elements"
+
+        for (const int& num : nums2)
+        {
+            if (bitset[num])
+            {
+                result.push_back(num); // Since we've reserved, it's faster
+                bitset[num] = 0;
+            }
+        }
+
+        return result;
     }
 };
