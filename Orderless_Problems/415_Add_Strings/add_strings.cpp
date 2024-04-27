@@ -150,3 +150,53 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a similar approach that we use in adding two numbers in Linked
+    Lists in LeetCode number 2 "Add Two Numbers".
+
+*/
+
+/* Time  Beats: 66.65% */
+/* Space Beats: 45.68% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Elegant {
+public:
+    std::string addStrings(std::string num1, std::string num2)
+    {
+        int carry = 0;
+        int i = num1.length() - 1;
+        int j = num2.length() - 1;
+
+        std::ostringstream out;
+
+        while (i >= 0 || j >= 0 || carry != 0)
+        {
+            int x1 = i >= 0 ? num1[i] - '0' : 0;
+            int x2 = j >= 0 ? num2[j] - '0' : 0;
+
+            int digit;
+            digit = (x1 + x2 + carry) % 10;
+            carry = (x1 + x2 + carry) / 10;
+
+            out << digit;
+
+            i--;
+            j--;
+        }
+
+        std::string result = out.str();
+        std::reverse(result.begin(), result.end());
+
+        return result;
+    }
+};
