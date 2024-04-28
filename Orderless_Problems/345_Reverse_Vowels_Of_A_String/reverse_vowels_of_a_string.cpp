@@ -91,3 +91,70 @@ public:
         return s;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    A bit of a different approach than above. Instead of first finding indices
+    of all the vowels in string s, we know swap vowels as we stumble upon them
+    from both left and right side.
+
+    In each iteration we first iterate through s from left to right until we
+    hit a vowel.
+
+    Then we iterate through s from right to left until we hit a vowel.
+
+    Those indices are represented in "start" and "end", respectively.
+    (That means - In subsequent iterations we will begin from "start" and from
+     "end", respectively)
+
+    Then we swap those two characters within the string s.
+
+    Once start == end or start < end, we break the "while loop" and return s.
+
+*/
+
+/* Time  Beats: 43.67% */
+/* Space Beats: 33.13% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Efficient {
+public:
+    std::string reverseVowels(std::string s)
+    {
+        // Convert the input string to a character array.
+        std::string word = s;
+
+        std::string vowels = "aeiouAEIOU";
+
+        int start = 0;
+        int end = s.length() - 1;
+
+        while (start < end)
+        {
+            // Move "start" pointer towards the end until it points to a vowel
+            while (start < end && vowels.find(word[start]) == string::npos)
+                start++;
+
+            // Move "end" pointer towards the start until it points to a vowel
+            while (start < end && vowels.find(word[end]) == string::npos)
+                end--;
+
+            // Swap the vowels found at the start and end positions.
+            std::swap(word[start], word[end]);
+
+            // Move the pointers towards each other for the next iteration.
+            start++;
+            end--;
+        }
+
+        // Return the modified string.
+        return word;
+    }
+};
