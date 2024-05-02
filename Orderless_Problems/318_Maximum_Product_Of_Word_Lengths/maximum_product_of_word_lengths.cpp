@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <bitset>
 
 /*
     ==============
@@ -100,5 +101,66 @@ private:
         }
 
         return false;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 29.37% */
+/* Space Beats:  8.90% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(n) */
+class Solution_Bitsets {
+public:
+    int maxProduct(std::vector<std::string>& words)
+    {
+        std::bitset<32> all_zeroes(0x0);
+        std::vector<std::bitset<32>> vec_bitsets;
+        std::vector<std::string> bit_words;
+
+        for (const std::string& word : words)
+        {
+            std::vector<bool> letters(26, false);
+
+            for (int i = 0; i < word.length(); i++)
+                letters[word[i] - 'a'] = true;
+
+            std::ostringstream out;
+            for (int i = 0; i < 26; i++)
+            {
+                if (letters[i])
+                    out << 1;
+                else
+                    out << 0;
+            }
+
+            std::bitset<32> bitset(out.str());
+            vec_bitsets.push_back(bitset);
+        }
+
+        unsigned long max_product = 0;
+        for (int i = 0; i < vec_bitsets.size()-1; i++)
+        {
+            for (int j = i+1; j < vec_bitsets.size(); j++)
+            {
+                if ((vec_bitsets[i] & vec_bitsets[j]) == all_zeroes)
+                    max_product = std::max(max_product, words[i].length() * words[j].length());
+            }
+        }
+
+        int result = max_product;
+
+        return result;
     }
 };
