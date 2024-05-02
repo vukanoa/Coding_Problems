@@ -100,3 +100,28 @@ public:
         return count;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a Square function, if you look closely.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  23.40% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Efficient {
+public:
+    int bulbSwitch(int n)
+    {
+        return std::sqrt(n);
+    }
+};
