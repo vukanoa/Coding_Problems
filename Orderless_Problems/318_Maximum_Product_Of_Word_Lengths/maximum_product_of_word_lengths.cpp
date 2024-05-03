@@ -112,7 +112,64 @@ private:
     --- IDEA ---
     ------------
 
-    TODO
+    This one is peculiar, but it makes sense once you get the hang of it.
+
+    We have n different words in vectors called "words". We are going to make
+    another vector, of size n as well, but this one is going to have n bitsets.
+
+    Why bitsets?
+
+    Since we're told we are allowed to multiply only those words that do NOT
+    have a single letter in common, the easiest way is to have a binary
+    representation and that do a bitwise AND operation to determine that.
+
+    For example, if we have words = ["abc", "abd", "def"]
+
+    Then bitsets that will correspond to each letter will be as following:
+
+    position 0 (character 'a')                     position 25(character 'z')
+             |                                               |
+             |______                              ___________|
+                   |                              |
+                   |                              |
+                   v                              v
+        1. "abc" - 1110 0000 0000 0000 0000 0000 00
+
+        2. "abd" - 1101 0000 0000 0000 0000 0000 00
+
+        3. "def" - 0001 1100 0000 0000 0000 0000 00
+
+
+    Once you see this, it becomes painfully obvious if any two words have any
+    character in common.
+
+    To be explicit - To check whether two words have any characters in common,
+    all we have to do is do a bitwise AND operation. If the result is:
+
+        0000 0000 0000 0000 0000 0000 00       // 0x0 in Hexa
+
+    Then that means that those two words do NOT have any character in common.
+    Any other result, meaning anything other than 0x0, indicates that the two
+    words do have at least one character in common.
+
+
+    Therefore, the crux of this solution is to transform:
+
+        words = ["abc", "abd", "def"]
+
+    into:
+        vec_bitsets = [
+                       1110 0000 0000 0000 0000 0000 00,   // This is "abc"
+                       1101 0000 0000 0000 0000 0000 00,   // This is "abd"
+                       0001 1100 0000 0000 0000 0000 00    // This is "def"
+                      ]
+
+    After that, just do a "bitwise AND" operation on any two words and if the
+    result bitset is 0x0, then take the max out of:
+
+        max_product = std::max(max_product, word1.length() * word2.length());
+
+    That's the entire IDEA.
 
 */
 
