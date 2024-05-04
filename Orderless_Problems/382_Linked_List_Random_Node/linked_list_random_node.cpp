@@ -25,6 +25,14 @@
         equally likely to be chosen.
 
 
+    ---------------
+    -- Follow Up --
+    ---------------
+
+    What if the linked list is extremely large and its length is unknown to
+    you? Could you solve this efficiently without using extra space?
+
+
     ===============================
     CLASS:
     class Solution {
@@ -128,3 +136,71 @@ private:
  * Solution* obj = new Solution(head);
  * int param_1 = obj->getRandom();
  */
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Instead of making a vector out of every node, we can just iterate through
+    entire Linked List to find out the number of nodes.
+
+    Once we have that, we can again use a rand() function now we mod it with
+    variable "size" instead of node_values.size().
+
+    But what is the difference?
+
+    The difference is that now once we know the size and once we've correctly
+    picked the i-th node, then we can just iterate "random" number of times
+    through the original Linked List and return its value.
+
+    That way we don't use extra space as before.
+
+*/
+
+/* Time  Beats: 93.26% */
+/* Space Beats: 57.53% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Follow_Up {
+public:
+    Solution(ListNode* head) : beginning(head)
+    {
+        size = get_size(head);
+    }
+
+    int getRandom()
+    {
+        int random = std::rand() % size;
+
+        ListNode* curr = beginning;
+        while(random > 0)
+        {
+            random--;
+            curr = curr->next;
+        }
+
+        return curr->val;
+    }
+
+private:
+    int get_size(ListNode* head)
+    {
+        int n = 0;
+
+        while (head)
+        {
+            n++;
+            head = head->next;
+        }
+
+        return n;
+    }
+
+    ListNode* beginning;
+    int size;
+};
