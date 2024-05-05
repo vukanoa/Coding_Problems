@@ -221,7 +221,7 @@
 
 /* Time  Complexity: O(n) */ // One-pass
 /* Space Complexity: O(1) */
-class Solution_Follow_Up {
+class Solution_Follow_Up_Implementation_1 {
 public:
     int countBattleships(std::vector<std::vector<char>>& board)
     {
@@ -243,6 +243,51 @@ public:
                 // pass the previous "if statement" up above
                 if (board[row][col] == 'X')
                     battleships++;
+            }
+        }
+
+        return battleships;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Absolutely equivalent as above, however this one is implemented a bit
+    differently. Some people may find this implementation easier to read and
+    grasp.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  90.52% */
+
+/* Time  Complexity: O(n) */ // One-pass
+/* Space Complexity: O(1) */
+class Solution_Follow_Up_Implementation_2 {
+public:
+    int countBattleships(std::vector<std::vector<char>>& board)
+    {
+        const int ROWS = board.size();
+        const int COLS = board[0].size();
+
+        int battleships = 0;
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                if (board[row][col] == '.'                  ||
+                    (row > 0 && board[row-1][col  ] == 'X') ||
+                    (col > 0 && board[row  ][col-1] == 'X'))
+                    continue;
+
+                battleships++;
             }
         }
 
