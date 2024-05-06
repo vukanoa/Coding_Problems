@@ -84,3 +84,51 @@ public:
         return num;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Iterate backwards through the number's digits, marking a swap candidate
+    when encountering a larger digit. Commit to the swap in subsequent
+    iterations only if it results in an improvement
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  72.27% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    int maximumSwap(int num)
+    {
+        std::string str_num = std::to_string(num);
+        const int n = str_num.length();
+
+        int max_position = str_num.length() - 1;
+        int best_src  = -1;
+        int best_dest = -1;
+
+        for (int i = n-1; i >= 0; i--)
+        {
+            if (str_num[i] > str_num[max_position])
+                max_position = i;
+            else if (str_num[i] < str_num[max_position])
+            {
+                best_src = max_position;
+                best_dest = i;
+            }
+        }
+
+        if (best_src != -1)
+            std::swap(str_num[best_src], str_num[best_dest]);
+
+        return std::stoi(str_num);
+    }
+};
