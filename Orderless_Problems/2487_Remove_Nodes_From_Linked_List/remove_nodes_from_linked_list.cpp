@@ -193,6 +193,9 @@ private:
 
 */
 
+/* Time  Beats: 76.34% */
+/* Space Beats: 44.51% */
+
 /*
     Time  Complexity: O(n)
 
@@ -235,5 +238,54 @@ public:
         }
 
         return curr;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We can use recursion to traverse the linked list and at each step, we
+    compare the current node's value with the value of the next greater node.
+    If the next greater node has a value less than the current node, we keep
+    the current node; otherwise, we skip the current node.
+
+
+    1. Recursively traverse the linked list.
+
+    2. At each step, compare the current node's value with the value of the
+       next greater node.
+
+    3. If the next greater node has a value less than the current node, keep
+       the current node; otherwise, skip the current node.
+
+    4. Return the head of the modified linked list.
+
+*/
+
+/* Time  Beats: 82.82% */
+/* Space Beats: 72.49% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_3 {
+public:
+    ListNode* removeNodes(ListNode* head)
+    {
+        if ( ! head)
+            return nullptr;
+
+        ListNode* node = head;
+        ListNode* next_greater = removeNodes(node->next);
+
+        node->next = next_greater;
+        if ( ! next_greater || node->val >= next_greater->val)
+            return node;
+
+        return next_greater;
     }
 };
