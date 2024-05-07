@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <stack>
 
 /*
     ==============
@@ -99,7 +100,7 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_1 {
 public:
     ListNode* removeNodes(ListNode* head)
     {
@@ -158,5 +159,81 @@ private:
         }
 
         return prev;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    One approach is to traverse the linked list and maintain a stack to store
+    nodes in non-decreasing order of their values. While traversing, if we
+    encounter a node with a value greater than the top element of the stack, we
+    pop elements from the stack until the condition is met. This ensures that
+    the stack contains only nodes with the highest values seen so far. Finally,
+    we reverse the stack to get the modified linked list.
+
+
+    1. Initialize a stack to store nodes in non-increasing order of their
+       values.
+
+    2. Traverse the linked list:
+        + If the current node's value is greater than the top element of the
+          stack, pop elements from the stack until the condition is met.
+
+        + Push the current node onto the stack.
+
+    3. Reverse the stack to obtain the modified linked list.
+
+    4. Return the head of the modified linked list.
+
+*/
+
+/*
+    Time  Complexity: O(n)
+
+    Outer while: O(n)
+    Inner while: O(n - k), where k is length of resultand linked list
+    Stack while: O(k)
+
+    Total Time complexity: O(n) + O(n-k) + O(k) = O(2n) -> O(n). This is a
+                           linear 2 pass solution.
+
+    Note: Even though there is nested while loop TC is O(n) because a node is
+          pushed and popped from the stack at most once.
+
+*/
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    ListNode* removeNodes(ListNode* head)
+    {
+        std::stack<ListNode*> stack;
+
+        ListNode* curr = head;
+        while (curr)
+        {
+            while (!stack.empty() && stack.top()->val < curr->val)
+                stack.pop();
+
+            stack.push(curr);
+            curr = curr->next;
+        }
+
+        ListNode* next = nullptr;
+        while ( ! stack.empty())
+        {
+            curr = stack.top();
+            stack.pop();
+
+            curr->next = next;
+            next = curr;
+        }
+
+        return curr;
     }
 };
