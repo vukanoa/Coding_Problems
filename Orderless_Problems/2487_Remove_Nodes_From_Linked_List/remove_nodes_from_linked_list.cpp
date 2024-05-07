@@ -289,3 +289,83 @@ public:
         return next_greater;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is similar to Solution 1, however this one doesn't use any extra
+    Space.
+
+    We can reverse the given linked list first. Then we traverse the reversed
+    list, keeping nodes whose values are greater than or equal to the previous
+    node's value. After traversing, we reverse the resulting list to obtain the
+    modified linked list.
+
+    1. Reverse the given linked list.
+
+    2. Initialize a dummy node to hold the result.
+
+    3. Traverse the reversed list, keeping nodes whose values are greater
+       than or equal to the previous node's value.
+
+    4. Reverse the resulting list to obtain the modified linked list.
+
+    5. Return the head of the modified linked list.
+
+*/
+
+/* Time  Beats: 97.11% */
+/* Space Beats: 90.63% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_4 {
+public:
+    ListNode* removeNodes(ListNode* head)
+    {
+        ListNode* prev = nullptr;
+        head = reverse_linked_list(head);
+
+        ListNode  dummy(-1);
+        ListNode* tmp_prev = &dummy;
+
+        while (head)
+        {
+            if (head->val >= tmp_prev->val)
+            {
+                tmp_prev->next = head;
+                tmp_prev = head;
+                head = head->next;
+            }
+            else
+                head = head->next;
+        }
+        tmp_prev->next = nullptr;
+
+        // Reverse Newly Linked List
+        return reverse_linked_list(dummy.next);
+    }
+
+private:
+    ListNode* reverse_linked_list(ListNode* head)
+    {
+        ListNode* prev = nullptr;
+        ListNode* curr = head;
+
+        while (curr)
+        {
+            ListNode* next = curr->next;
+
+            curr->next = prev;
+            prev = curr;
+            curr = next;
+        }
+
+        return prev;
+    }
+};
