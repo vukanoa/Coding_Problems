@@ -152,7 +152,7 @@
 
 /* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_1 {
 public:
     std::vector<std::string> findRelativeRanks(std::vector<int>& score)
     {
@@ -237,5 +237,66 @@ public:
             result.push_back(umap_rank[s]);
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Instead of using a Sorting Algorithm, we can use a different data structure
+    i.e. a Heap. A max Heap to be exact since we want the highest score to be
+    popped first.
+
+    Everything else is pretty much the same as in the Solution_1 in this file.
+
+    Also, here we are using if-else_if-else statements instead of a switch-case
+    form, but that is irrelevant.
+
+*/
+
+/* Time  Beats: 81.94% */
+/* Space Beats: 70.05% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n) */
+class Solution_Heap {
+public:
+    std::vector<std::string> findRelativeRanks(std::vector<int>& score)
+    {
+        const int n = score.size();
+
+        // Create a max heap of pairs {score, index}
+        priority_queue<pair<int, int>> max_heap;
+        for (int i = 0; i < n; i++)
+            max_heap.push( {score[i], i} );
+
+        // Assign ranks to athletes
+        std::vector<std::string> ranks(n);
+
+        int place = 0;
+        while ( ! max_heap.empty())
+        {
+            place++; // Since ranks start from 1 and not from 0
+
+            int original_index = max_heap.top().second;
+            max_heap.pop();
+
+            if (place == 1)
+                ranks[original_index] = "Gold Medal";
+            else if (place == 2)
+                ranks[original_index] = "Silver Medal";
+            else if (place == 3)
+                ranks[original_index] = "Bronze Medal";
+            else
+                ranks[original_index] = std::to_string(place);
+
+        }
+
+        return ranks;
     }
 };
