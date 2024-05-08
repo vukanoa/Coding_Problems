@@ -194,3 +194,48 @@ public:
         return results;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Equivalent to the Solution above, implemented in a different way.
+
+*/
+
+/* Time  Beats: 78.51% */
+/* Space Beats: 24.86% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    std::vector<std::string> findRelativeRanks(std::vector<int>& score)
+    {
+        const int n = score.size();
+        std::vector<int> sorted_score = score;
+
+        std::sort(sorted_score.begin(), sorted_score.end(), greater<int>());
+
+        std::vector<std::string> medals = {"Gold Medal", "Silver Medal", "Bronze Medal"};
+        std::unordered_map<int, string> umap_rank;
+
+        for (int i = 0; i < n; i++)
+        {
+            if (i < 3)
+                umap_rank[sorted_score[i]] = medals[i];
+            else
+                umap_rank[sorted_score[i]] = std::to_string(i + 1);
+        }
+
+        std::vector<std::string> result;
+        for (const int& s : score)
+            result.push_back(umap_rank[s]);
+
+        return result;
+    }
+};
