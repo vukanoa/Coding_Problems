@@ -148,10 +148,10 @@ public:
 
 */
 
-/* Time  Beats: 99.63% */
-/* Space Beats: 32.91% */
+/* Time  Beats: 99.85% */
+/* Space Beats: 60.15% */
 
-/* Time  Complexity: O(n * logn)  */
+/* Time  Complexity: O(k + n * logn)  */
 /* Space Complexity: O(n) or O(1) */ // Depending on the sorting algorihtm
 class Solution_Sorting {
 public:
@@ -162,6 +162,55 @@ public:
 
         // O(n * logn)
         std::sort(happiness.begin(), happiness.end(), std::greater<int>());
+
+        for (int i = 0; i < k; i++)
+            result += happiness[i] - i > 0 ? happiness[i] - i : 0;
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Instead of Heap or some standard sorting algorithm, we are using:
+    Partial Sort.
+
+    What is "Partial Sort"?
+
+    As the name suggests, it only partially sorts array/vector.
+
+    In our Solution:
+    std::partial_sort(happiness.begin(), happiness.begin() + k, happiness.end(), greater<int>());
+
+    It sorts only first K elements in descending order, meaning the 0-th
+    element is the greatest.
+
+    After first k elements, from 0 to k-1, the rest is unsorted.
+
+    The rest of the Solution is exactly the same as two Solutions above.
+
+*/
+
+/* Time  Beats: 67.75% */
+/* Space Beats: 60.15% */
+
+/* Time  Complexity: O(k + k * logn) */
+/* Space Complexity: O(1) */
+class Solution_Partial_Sort {
+public:
+    long long maximumHappinessSum(std::vector<int>& happiness, int k)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        long long result = 0;
+
+        // O(n * logk)
+        std::partial_sort(happiness.begin(), happiness.begin() + k, happiness.end(), greater<int>());
 
         for (int i = 0; i < k; i++)
             result += happiness[i] - i > 0 ? happiness[i] - i : 0;
