@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 /*
     ==============
@@ -110,7 +111,7 @@
 
 /* Time  Complexity: O(n + k*logn) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_Heap {
 public:
     long long maximumHappinessSum(std::vector<int>& happiness, int k)
     {
@@ -128,6 +129,42 @@ public:
 
             result += happy - i > 0 ? happy - i : 0;
         }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Insted of using a Heap, we are sorting the vector "happiness".
+
+    The rest of the Solution is exactly the same as above.
+
+*/
+
+/* Time  Beats: 99.63% */
+/* Space Beats: 32.91% */
+
+/* Time  Complexity: O(n * logn)  */
+/* Space Complexity: O(n) or O(1) */ // Depending on the sorting algorihtm
+class Solution_Sorting {
+public:
+    long long maximumHappinessSum(vector<int>& happiness, int k)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        long long result = 0;
+
+        // O(n * logn)
+        std::sort(happiness.begin(), happiness.end(), std::greater<int>());
+
+        for (int i = 0; i < k; i++)
+            result += happiness[i] - i > 0 ? happiness[i] - i : 0;
 
         return result;
     }
