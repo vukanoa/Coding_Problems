@@ -104,3 +104,44 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Similar idea as above, but Time Complexity is reduced to O(n^2), however
+    this is still considered a Brute Force Solution.
+
+*/
+
+/* Time  Beats: 10.26% */
+/* Space Beats:  6.77% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(k) */
+class Solution_Better_But_Still_Inefficient {
+public:
+    std::vector<int> kthSmallestPrimeFraction(std::vector<int>& arr, int k)
+    {
+        const int N = arr.size();
+        std::priority_queue<std::pair<double, std::vector<int>>> max_heap;
+
+        for (int i = 0; i < N-1; i++)
+        {
+            for (int j = i+1; j < N; j++)
+            {
+                max_heap.push( {1.0 * arr[i] / arr[j], {arr[i], arr[j]} } );
+
+                if(max_heap.size() > k)
+                    max_heap.pop();
+            }
+        }
+
+        std::vector<int> result = max_heap.top().second;
+        return result;
+    }
+};
