@@ -145,3 +145,75 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 96.91% */
+/* Space Beats: 92.65% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    std::vector<int> kthSmallestPrimeFraction(std::vector<int>& arr, int k)
+    {
+        const int N = arr.size();
+        std::vector<int> result;
+
+        double left  = 0;
+        double right = 1;
+        double mid;
+
+        while (left <= right)
+        {
+            mid = left + (right - left) / 2;
+
+            int j = 1; // Current denominator index
+
+            int total = 0;
+            double max_fraction = 0;
+
+            int numerator_idx   = 0;
+            int denominator_idx = 0;
+
+            for (int i = 0; i < N; i++)
+            {
+                while (j < N && 1.0*arr[i] / arr[j] >= mid)
+                    j++;
+
+                total += N - j;
+
+                if (j < N && max_fraction < 1.0*arr[i] / arr[j])
+                {
+                    max_fraction = 1.0*arr[i] / arr[j];
+
+                    numerator_idx   = i;
+                    denominator_idx = j;
+                }
+            }
+
+            if (total == k)
+            {
+                result = {arr[numerator_idx], arr[denominator_idx]};
+                break;
+            }
+
+            if (total > k)
+                right = mid;
+            else
+                left = mid;
+        }
+
+        return result;
+    }
+};
