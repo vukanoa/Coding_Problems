@@ -223,7 +223,7 @@ public:
 /* Space Complexity: O(n) */
 class Solution_3 {
 public:
-    bool isPalindrome(string s)
+    bool isPalindrome(std::string s)
     {
         int left  = 0;
         int right = s.length() - 1;
@@ -314,13 +314,61 @@ private:
 };
 
 
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is the most Efficient as the one above, but instead of using a
+    custom function "alpha_num", we are using std::isalnum().
+
+    It's important to know about this function, but it's also important to know
+    how to write it yourself. That's why I keep both of these Solution here.
+
+*/
+
+/* Time  Beats: 80.25% */
+/* Space Beats: 83.56% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Efficient_STD {
+public:
+    bool isPalindrome(std::string s)
+    {
+        int i = 0;
+        int j = s.length() - 1;
+
+        while (i < j)
+        {
+            while (i < j && !(std::isalnum(s[i])))
+                i++;
+
+            while (i < j && !(std::isalnum(s[j])))
+                j--;
+
+            if (std::tolower(s[i]) != std::tolower(s[j]))
+                return false;
+
+            i++;
+            j--;
+        }
+
+        return true;
+    }
+};
+
+
 int
 main()
 {
-    Solution_1         sol_1;
-    Solution_2         sol_2;
-    Solution_3         sol_3;
-    Solution_Efficient sol_eff;
+    Solution_1             sol_1;
+    Solution_2             sol_2;
+    Solution_3             sol_3;
+    Solution_Efficient     sol_eff;
+    Solution_Efficient_STD sol_std;
 
 
     /* Example 1 */
@@ -343,7 +391,8 @@ main()
 
 
     /* Solution */
-    bool result = sol_eff.isPalindrome(s);
+    // bool result = sol_eff.isPalindrome(s);
+    bool result = sol_std.isPalindrome(s);
 
 
     /* Write Output */
