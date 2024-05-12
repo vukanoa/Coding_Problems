@@ -119,3 +119,52 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Use a sized 3 extra array maxC to compute the max for 3x1 submatrices. In
+    each row, moving j & compute the next maxC[(j+1)%3], i.e. sliding window,
+    computational amount is reduced.
+
+*/
+
+/* Time  Beats: 99.54% */
+/* Space Beats: 53.31% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(1) */
+class Solution_Sliding_Window {
+public:
+    std::vector<std::vector<int>> largestLocal(std::vector<std::vector<int>>& grid)
+    {
+        const int N = grid.size();
+        int max_columns[3] = {0};
+
+        for(int i = 1; i < N-1; i++)
+        {
+            for(int j = 1; j < N-1; j++)
+            {
+                if (j == 1)
+                {
+                    max_columns[0] = std::max( {grid[i-1][0], grid[i][0], grid[i+1][0]} );
+                    max_columns[1] = std::max( {grid[i-1][1], grid[i][1], grid[i+1][1]} );
+                }
+
+                max_columns[(j+1) % 3] = std::max( {grid[i-1][j+1], grid[i][j+1], grid[i+1][j+1]} );
+
+                grid[i-1][j-1] = std::max( {max_columns[0], max_columns[1], max_columns[2]} );
+            }
+            grid[i-1].resize(N-2);
+
+        }
+        grid.resize(N-2);
+
+        return grid;
+    }
+};
