@@ -150,7 +150,7 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution_Simple_Recursion{
+class Solution_Recursion_1 {
 public:
     ListNode* reverseList(ListNode* head)
     {
@@ -170,6 +170,42 @@ public:
         return new_head;
     }
 };
+
+
+
+
+/* Time  Beats: 79.43% */
+/* Space Beats: 31.84% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Recursion_2 {
+public:
+    ListNode* reverseList(ListNode* head)
+    {
+        if ( ! head)
+            return nullptr;
+
+        ListNode* prev = nullptr;
+        head = helper(prev, head);
+
+        return head;
+    }
+
+private:
+    ListNode* helper(ListNode* prev, ListNode* curr)
+    {
+        ListNode* next = curr->next;
+        curr->next = prev;
+
+        if (next == nullptr)
+            return curr;
+
+        return helper(curr, next); // tail-recursion
+    }
+};
+
+
 
 
 void
@@ -196,8 +232,9 @@ print_list(struct ListNode* head)
 int
 main()
 {
-    Solution sol;
-    Solution_Recursion sol_rec;
+    Solution             sol;
+    Solution_Recursion_1 sol_rec_1;
+    Solution_Recursion_2 sol_rec_2;
 
 
     /* Example 1 */
@@ -241,8 +278,9 @@ main()
 
 
     /* Solution */
-    head = sol.reverseList(head);
-    // head = sol_rec.reverseList(head);
+    // head = sol.reverseList(head);
+    // head = sol_rec_1.reverseList(head);
+    head = sol_rec_2.reverseList(head);
 
 
     /* Write Output */
