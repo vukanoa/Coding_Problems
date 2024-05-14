@@ -222,12 +222,63 @@ public:
 };
 
 
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Equivalent to the one above, however it is implemented a bit differently.
+    Some people may find this approach easier to read than the above one.
+
+    Even though, for some reason, above Solution runs faster on LeetCode.
+    Probably because "Wall Time Clock" is lower than here.
+
+*/
+
+/* Time  Beats: 78.56% */
+/* Space Beats: 59.88% */
+
+/* Time  Complexity: O(k * n * logn) */
+/* Space Complexity: O(k * n)     */
+class Solution_Efficient_2 {
+public:
+    std::vector<std::vector<std::string>>
+    groupAnagrams(std::vector<std::string>& strs)
+    {
+        std::vector<std::vector<std::string>> results;
+
+        std::unordered_map<std::string, std::vector<std::string>> umap;
+        for (const std::string& str : strs)
+        {
+            std::string sorted_str = str;
+            std::sort(sorted_str.begin(), sorted_str.end());
+
+            umap[sorted_str].push_back(str);
+        }
+
+        for (const auto& entry : umap)
+        {
+            std::vector<std::string> group;
+            for (const std::string& str : entry.second)
+                group.push_back(str);
+
+            results.push_back(group);
+        }
+
+        return results;
+    }
+};
+
+
 int
 main()
 {
     // Solution_Verbose  sol_verbose;
     // Solution_improved sol_improved;
-    Solution_Efficient sol_eff;
+    Solution_Efficient   sol_eff;
+    Solution_Efficient_2 sol_eff_2;
 
     /* Example 1 */
     std::vector<std::string> strs = {"eat", "tea", "tan", "ate", "nat", "bat"};
@@ -273,6 +324,7 @@ main()
     // std::vector<std::vector<std::string>> results = sol_verbose.groupAnagrams(strs);
     // std::vector<std::vector<std::string>> results = sol_improved.groupAnagrams(strs);
     std::vector<std::vector<std::string>> results = sol_eff.groupAnagrams(strs);
+    // std::vector<std::vector<std::string>> results = sol_eff_2.groupAnagrams(strs);
 
 
     /* Write Output */
