@@ -78,7 +78,7 @@ struct TreeNode {
     where 'h' is the height of the tree. At worst 'h' can be 'n' and that makes
     it O(n)
 */
-class Solution{
+class Solution {
 public:
     TreeNode* invertTree(TreeNode* root)
     {
@@ -90,6 +90,45 @@ public:
 
         root->left  = right;
         root->right = left;
+
+        return root;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The same as above, just wanted to show that you can implemented it this way
+    also.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  51.27% */
+
+/*    Time  Complexity: O(n) */
+/*
+    Space Complexity: O(h)
+    where 'h' is the height of the tree. At worst 'h' can be 'n' and that makes
+    it O(n)
+*/
+class Solution_2 {
+public:
+    TreeNode* invertTree(TreeNode* root)
+    {
+        if ( ! root)
+            return nullptr;
+
+        TreeNode* left  = root->left;
+        TreeNode* right = root->right;
+
+        root->left  = invertTree(right);
+        root->right = invertTree(left);
 
         return root;
     }
@@ -281,6 +320,7 @@ int
 main()
 {
     Solution           sol;
+    Solution_2         sol_2;
     Solution_Another   sol_another;
     Solution_iterative sol_iter;
 
@@ -333,7 +373,8 @@ main()
 
     /* Solution */
     // sol.invertTree(root);
-    sol_another.invertTree(root);
+    sol_2.invertTree(root);
+    // sol_another.invertTree(root);
     // sol_iter.invertTree(root);
 
 
