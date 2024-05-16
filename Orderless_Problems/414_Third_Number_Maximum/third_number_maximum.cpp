@@ -100,3 +100,59 @@ public:
         return heap.top();
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Since we only care about the top 3, we don't really need a Heap. We can do
+    it manually. It's a bit more code, but it's much more Space efficient.
+    Especially if vector "nums" is really large.
+
+*/
+
+/* Time  Beats: 87.66% */
+/* Space Beats: 10.88% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Efficient {
+public:
+    int thirdMax(std::vector<int>& nums)
+    {
+        /* Push all elements to a Hash Set */
+        std::unordered_set<int> uset(nums.begin(), nums.end());
+
+        int first   = INT_MIN; // Largest
+        int second  = INT_MIN; // 2nd Largest
+        int third   = INT_MIN; // 3rd Largest
+
+        for (const int& num : uset)
+        {
+            if (num > first)
+            {
+                third  = second;
+                second = first;
+                first  = num;
+            }
+            else if (num > second)
+            {
+                third  = second;
+                second = num;
+            }
+            else if (num > third)
+            {
+                third = num;
+            }
+        }
+
+        if (uset.size() < 3)
+            return first;
+
+        return third;
+    }
+};
