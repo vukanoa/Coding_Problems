@@ -141,3 +141,49 @@ public:
         return root;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, however this Implementation prevents Memory Leak.
+
+*/
+
+// LeetCode times are weird sometimes.
+/* Time  Beats: 76.17% */
+/* Space Beats:  9.62% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Without_Memory_Leak {
+public:
+    TreeNode* removeLeafNodes(TreeNode* root, int target)
+    {
+        return dfs(root, target, nullptr);
+    }
+
+private:
+    TreeNode* dfs(TreeNode* root, int target, TreeNode* parent)
+    {
+        if (!root)
+            return nullptr;
+
+        root->left  = dfs(root->left,  target, root);
+        root->right = dfs(root->right, target, root);
+
+        if (!root->left && !root->right && root->val == target)
+        {
+            if (parent)
+                delete root;
+
+            return nullptr;
+        }
+
+        return root;
+    }
+};
