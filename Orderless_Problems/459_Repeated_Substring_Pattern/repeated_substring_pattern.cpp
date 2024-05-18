@@ -90,3 +90,31 @@ public:
         return false;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 88.69% */
+/* Space Beats: 61.10% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+    bool repeatedSubstringPattern(string s)
+    {
+        std::string ss = s + s;
+
+        return ss.substr(1, ss.length() - 2).find(s) != string::npos;
+    }
+};
+
