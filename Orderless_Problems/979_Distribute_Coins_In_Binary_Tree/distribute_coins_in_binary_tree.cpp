@@ -105,3 +105,153 @@ private:
         return moves;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Why Post-Order Traversal
+
+    Post-order traversal is a tree traversal method where you process the left
+    subtree, then the right subtree, and finally the current node. This
+    traversal is particularly useful for problems where decisions at a node
+    depend on the results from its children. Here's why post-order traversal is
+    suited for this problem:
+
+
+    1. Dependency on Subtrees:
+
+        + Each node's coin balance is dependent on its subtrees. To determine
+          whether a node has excess or deficit coins, you need to know the coin
+          balance of its left and right children first.
+
+        + Post-order traversal ensures that by the time you process a node, you
+          have already processed its children, and you know the coin balance
+          for both subtrees.
+
+
+    2. Aggregating Results
+
+        + By processing the left and right subtrees first, you can aggregate
+          the results (i.e., the excess or deficit coins) and determine the
+          number of moves required to balance the subtrees before dealing with
+          the current node.
+
+        + This aggregation is crucial because the number of moves needed at a
+          node includes not only the moves to balance itself but also the moves
+          required to balance its subtrees.
+
+
+
+    3. Simplifies Calculation
+
+        + With post-order traversal, the calculation at each node becomes
+          straightforward. You can simply take the excess coins from the left
+          and right subtrees and adjust the current node's coin count
+          accordingly.
+
+        + This avoids the complexity of needing to backtrack or perform
+          additional traversals, making the algorithm efficient.
+
+
+
+    Understanding the Formula for Moves:
+
+    The goal is to redistribute the coins such that every node has exactly one
+    coin. Let's understand the excess coins at each node and how the moves are
+    calculated.
+
+    1. Excess Coins
+
+        + For any given node, the excess coins can be calculated as:
+              excess = total coins at node and its subtrees − 1
+
+        + The -1 accounts for the fact that each node needs exactly one coin.
+
+
+
+    2. Steps to Calculate Moves
+
+        + Post-Order Traversal: Traverse the tree in a post-order manner. This
+          ensures that we first process the left and right subtrees before the
+          current node.
+
+        + Calculate Excess Coins for Subtrees:
+            + left_excess = postOrder(root->left): Calculate the excess coins
+              in the left subtree.
+
+            + right_excess = postOrder(root->right): Calculate the excess coins
+              in the right subtree.
+
+
+
+    3. Calculate Moves:
+
+        + The number of moves required to balance the left and right subtrees
+          is the sum of the absolute values of left_excess and right_excess:
+
+              moves += ∣left_excess∣ + ∣right_excess∣
+
+
+        + This is because the excess (or deficit) in each subtree needs to be
+          moved to or from the current node to balance it.
+
+        + The total excess coins at the current node after balancing its
+          subtrees is:
+
+              excess at node = root->val + left_excess + right_excess − 1.
+
+
+    Example:
+
+                        0
+                      /   \
+                     /     \
+                    /       \
+                   /         \
+                  /           \
+                 6             0
+                /             / \
+               /             /   \
+              /             /     \
+             0             0       0
+
+
+    Knowing all of the above explanation, try to "simulate" on this example and
+    you'll surely understand it.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  89.89% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+    int distributeCoins(TreeNode* root)
+    {
+        int moves = 0;
+        dfs(root, moves);
+
+        return moves;
+    }
+
+private:
+    int dfs(TreeNode* root, int& moves)
+    {
+        if ( ! root)
+            return 0;
+
+        int left_excess  = dfs(root->left,  moves);
+        int right_excess = dfs(root->right, moves);
+
+        moves += std::abs(left_excess) + std::abs(right_excess);
+
+        return root->val + left_excess + right_excess - 1;
+    }
+};
