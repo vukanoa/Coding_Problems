@@ -128,3 +128,75 @@ private:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    However, we DON'T have to generate all the subsets first. There is a trick.
+
+    The code calculates the sum of XOR totals for all subsets by accumulating
+    the bitwise OR of all elements and then scaling it by 2 ^ (n−1) to account
+    for each bit's contribution to the subsets. This leverages the property
+    that each bit appears in half of all possible subsets.
+
+    Approach
+
+    Initialization:
+
+        Initialize sumTotal to 0. This variable will be used to accumulate the
+        bitwise OR of all elements in the list.
+
+
+    Accumulation of Bitwise OR:
+
+        + Iterate over each number in the list nums.
+
+        + Use the bitwise OR operator (|=) to combine each number with
+          sumTotal. This step ensures that sumTotal will contain all the bits
+          set that are set in any of the numbers in the list.
+
+        + Once the iteration is complete, left shift sumTotal by
+              (len(nums) - 1) positions.
+          This operation multiplies sumTotal by:
+              2^(len(nums)−1).
+
+        + The final value of sumTotal after the left shift is returned as the
+          result.
+
+    Example: nums = [1, 2, 3]
+
+    sumTotal = 0
+
+    For num = 1: sumTotal |= 1 results in sumTotal = 1 (binary 0001)
+    For num = 2: sumTotal |= 2 results in sumTotal = 3 (binary 0011)
+    For num = 3: sumTotal |= 3 results in sumTotal = 3 (binary 0011, unchanged)
+
+    Left Shift: sumTotal << 2 (since len(nums) - 1 = 2) results in 3 << 2 which
+                is 12 (binary 1100).
+
+    Return: The result is 12.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  88.36% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    int subsetXORSum(vector<int>& nums)
+    {
+        int total = 0;
+
+        for (const int& num : nums)
+            total |= num;
+
+        return total << (nums.size() - 1);
+    }
+};
