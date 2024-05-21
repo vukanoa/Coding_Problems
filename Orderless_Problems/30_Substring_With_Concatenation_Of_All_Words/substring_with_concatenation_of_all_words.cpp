@@ -297,3 +297,92 @@ private:
         return true;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 86.54% */
+/* Space Beats: 69.24% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+    std::vector<int> findSubstring(std::string s, std::vector<std::string>& words)
+    {
+        const int STR_LENGTH  = s.length();
+        const int WORD_LENGTH = words[0].length();
+        const int WORDS_SIZE  = words.size();
+        const int WINDOW_SIZE = WORD_LENGTH * WORDS_SIZE;
+
+        std::unordered_map<std::string, int> wordCount;
+        for (const std::string& word : words)
+            word_count[word]++;
+
+        std::vector<int> result;
+        for(int i = 0; i < WORD_LENGTH; i++)
+            slidingWindow(i, s, word_count, result, STR_LENGTH, WORDS_SIZE , WORD_LENGTH, WINDOW_SIZE);
+
+        return result;
+    }
+
+    void slidingWindow (int start_idx,
+                        std::string& s,
+                        std::unordered_map<std::string, int>& word_count,
+                        std::vector<int>& result,
+                        const int& STR_LENGTH,
+                        const int& WORDS_SIZE,
+                        const int& WORD_LENGTH,
+                        const int& WINDOW_SIZE)
+    {
+        std::unordered_map<std::string, int> words_found;
+        int  words_used = 0;
+        bool excess_word = false;
+
+        for(int r = start_idx; r <= STR_LENGTH - WORD_LENGTH; r += WORD_LENGTH)
+        {
+            std::string sub = s.substr(r, WORD_LENGTH);
+
+            if(word_count.find(sub) == word_count.end()) // Not found
+            {
+                words_found.clear();
+                words_used = 0;
+                excess_word = false;
+                start_idx = r + WORD_LENGTH;
+            }
+            else
+            {
+                while (r - start_idx == WINDOW_SIZE || excess_word)
+                {
+                    std::string left_most_word = s.substr(start_idx, WORD_LENGTH);
+                    start_idx += WORD_LENGTH;
+                    words_found[left_most_word]--;
+
+                    if(words_found[left_most_word] >= word_count[left_most_word])
+                        excess_word = false;
+                    else
+                        words_used--;
+                }
+
+                words_found[sub]++;
+
+                if(words_found[sub] <= word_count[sub])
+                    words_used++;
+                else
+                    excess_word = true;
+
+                if(words_used == WORDS_SIZE && !excess_word)
+                    result.push_back(start_idx);
+            }
+        }
+    }
+};
