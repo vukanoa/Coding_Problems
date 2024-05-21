@@ -386,3 +386,88 @@ public:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 84.14% */
+/* Space Beats: 75.73% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+    std::vector<int> findSubstring(std::string s, std::vector<string>& words)
+    {
+        std::vector<int> result;
+
+        if (words.empty())
+            return result;
+
+        int STR_LENGTH  = s.size();
+        int WORDS_SIZE  = words.size();
+        int WORD_LENGTH = words[0].size();
+
+        std::unordered_map<string, int> word_count;
+        for (std::string& word : words)
+            word_count[word]++;
+
+        for (int i = 0; i < WORD_LENGTH; i++)
+        {
+            int left = i;
+            int count = 0;
+            std::unordered_map<string, int> found_words;
+
+            for (int j = i; j <= STR_LENGTH - WORD_LENGTH; j += WORD_LENGTH)
+            {
+                std::string str = s.substr(j, WORD_LENGTH);
+
+                if (word_count.find(str) != word_count.end())
+                {
+                    found_words[str]++;
+                    if (found_words[str] <= word_count[str])
+                        count++;
+                    else
+                    {
+                        while (found_words[str] > word_count[str])
+                        {
+                            std::string str1 = s.substr(left, WORD_LENGTH);
+                            found_words[str1]--;
+
+                            if (found_words[str1] < word_count[str1])
+                                count--;
+
+                            left += WORD_LENGTH;
+                        }
+                    }
+
+                    if (count == WORDS_SIZE)
+                    {
+                        result.push_back(left);
+                        found_words[s.substr(left, WORD_LENGTH)]--;
+                        count--;
+                        left += WORD_LENGTH;
+                    }
+
+                }
+                else
+                {
+                    found_words.clear();
+                    count = 0;
+                    left = j + WORD_LENGTH;
+                }
+            }
+        }
+
+        return result;
+    }
+};
