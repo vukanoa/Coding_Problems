@@ -2,64 +2,64 @@
 #include <vector>
 
 /*
-	============
-	=== HARD ===
-	============
+    ============
+    === HARD ===
+    ============
 
-	===========================
-	140) Word Break II
-	===========================
+    ===========================
+    140) Word Break II
+    ===========================
 
-	============
-	Description:
-	============
+    ============
+    Description:
+    ============
 
-	Given a string s and a dictionary of strings wordDict, add spaces in s to
-	construct a sentence where each word is a valid dictionary word. Return all
-	such possible sentences in any order.
+    Given a string s and a dictionary of strings wordDict, add spaces in s to
+    construct a sentence where each word is a valid dictionary word. Return all
+    such possible sentences in any order.
 
-	=====
-	Node: that the same word in the dictionary may be reused multiple times in 
-	      the segmentation.
-	=====
+    =====
+    Node: that the same word in the dictionary may be reused multiple times in
+          the segmentation.
+    =====
 
-	=======================================================================
-	FUNCTION: vector<string> wordBreak(string s, vector<string>& wordDict);
-	=======================================================================
+    =======================================================================
+    FUNCTION: vector<string> wordBreak(string s, vector<string>& wordDict);
+    =======================================================================
 
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
 
-	--- Example 1 ---
-	Input: s = "catsanddog",
-	       wordDict = ["cat","cats","and","sand","dog"]
+    --- Example 1 ---
+    Input: s = "catsanddog",
+           wordDict = ["cat","cats","and","sand","dog"]
 
-	Output: ["cats and dog","cat sand dog"]
-
-
-
-
-	--- Example 2 ---
-	Input: s = "pineapplepenapple",
-	       wordDict = ["apple","pen","applepen","pine","pineapple"]
-
-	Output:["pine apple pen apple","pineapple pen apple","pine applepen apple"]
-
-	Explanation: Note that you are allowed to reuse a dictionary word.
+    Output: ["cats and dog","cat sand dog"]
 
 
 
 
-	--- Example 3 ---
-	Input: s = "catsandog",
-	       wordDict = ["cats","dog","sand","and","cat"]
+    --- Example 2 ---
+    Input: s = "pineapplepenapple",
+           wordDict = ["apple","pen","applepen","pine","pineapple"]
 
-	Output: []
+    Output:["pine apple pen apple","pineapple pen apple","pine applepen apple"]
+
+    Explanation: Note that you are allowed to reuse a dictionary word.
 
 
 
-	*** Constraints ***
+
+    --- Example 3 ---
+    Input: s = "catsandog",
+           wordDict = ["cats","dog","sand","and","cat"]
+
+    Output: []
+
+
+
+    *** Constraints ***
     1 <= s.length <= 20
     1 <= wordDict.length <= 1000
     1 <= wordDict[i].length <= 10
@@ -70,586 +70,586 @@
 */
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	It's pretty much a standard Bactracking approach. I'm not sure why is this
-	a HARD problem.
+    It's pretty much a standard Bactracking approach. I'm not sure why is this
+    a HARD problem.
 
-	You should try to simulate the very first Example and it'll be obvious:
+    You should try to simulate the very first Example and it'll be obvious:
 
-	Example 1:
-	Input: s = "catsanddog",
-	       wordDict = ["cat","cats","and","sand","dog"]
-
-	Output: ["cats and dog","cat sand dog"]
-
-	
-	Simulation:
+    Example 1:
+    Input: s = "catsanddog",
+           wordDict = ["cat","cats","and","sand","dog"]
 
-	    start = 0;
-	     |
-	     |____
-	         |
-	         v
-	    s = "c a t s a n d d o g"
-	         0 1 2 3 4 5 6 7 8 9
-	         i
+    Output: ["cats and dog","cat sand dog"]
 
-		
-		std::string str = s.substr(start, i - start + 1);
-
-		Which means that str in this case is only letter 'c'.
-		It starts at index "start", then
-		takes (i - start + 1) characters including the starting index
-		Therefore it's only letter 'c'.
 
-		Does "c" exist as a word in wordDict?
-			No! Then i++.
+    Simulation:
 
-	
-	    result  = [""]
-	    current = [""]
-	    start = 0;
-	     |
-	     |____
-	         |
-	         v
-	    s = "c a t s a n d d o g"
-	         0 1 2 3 4 5 6 7 8 9
-	           i
-
-		std::string str = s.substr(start, i - start + 1);
+        start = 0;
+         |
+         |____
+             |
+             v
+        s = "c a t s a n d d o g"
+             0 1 2 3 4 5 6 7 8 9
+             i
 
-		str is now "ca"
 
-		Does "ca" exist as a word in wordDict?
-			No! Then i++.
+        std::string str = s.substr(start, i - start + 1);
 
+        Which means that str in this case is only letter 'c'.
+        It starts at index "start", then
+        takes (i - start + 1) characters including the starting index
+        Therefore it's only letter 'c'.
 
-	
-	    result  = [""]
-	    current = [""]
-	    start = 0;
-	     |
-	     |____
-	         |
-	         v
-	    s = "c a t s a n d d o g"
-	         0 1 2 3 4 5 6 7 8 9
-	             i
+        Does "c" exist as a word in wordDict?
+            No! Then i++.
 
-		std::string str = s.substr(start, i - start + 1);
 
-		str is now "cat"
-
-		Does "cat" exist as a word in wordDict?
-			Yes!
-			Put it in vector "current" where we'll keep track of all the
-			separate words in a sentence.
+        result  = [""]
+        current = [""]
+        start = 0;
+         |
+         |____
+             |
+             v
+        s = "c a t s a n d d o g"
+             0 1 2 3 4 5 6 7 8 9
+               i
 
-			call backtracking with same argument, but "start" will be "i + 1".
+        std::string str = s.substr(start, i - start + 1);
 
+        str is now "ca"
 
-				result  = [""]
-				current = ["cat"]
-				start = 3;
-				 |
-				 |__________
-				           |
-				           v
-				s = "c a t s a n d d o g"
-				     0 1 2 3 4 5 6 7 8 9
-				           i
+        Does "ca" exist as a word in wordDict?
+            No! Then i++.
 
-				std::string str = s.substr(start, i - start + 1);
 
-				str is now "s"
 
-				Does "s" exist as a word in wordDict?
-					No! Then i++.
+        result  = [""]
+        current = [""]
+        start = 0;
+         |
+         |____
+             |
+             v
+        s = "c a t s a n d d o g"
+             0 1 2 3 4 5 6 7 8 9
+                 i
 
+        std::string str = s.substr(start, i - start + 1);
 
+        str is now "cat"
 
-				result  = [""]
-				current = ["cat"]
-				start = 3;
-				 |
-				 |__________
-				           |
-				           v
-				s = "c a t s a n d d o g"
-				     0 1 2 3 4 5 6 7 8 9
-				             i
+        Does "cat" exist as a word in wordDict?
+            Yes!
+            Put it in vector "current" where we'll keep track of all the
+            separate words in a sentence.
 
-				std::string str = s.substr(start, i - start + 1);
+            call backtracking with same argument, but "start" will be "i + 1".
 
-				str is now "sa"
 
-				Does "sa" exist as a word in wordDict?
-					No! Then i++.
+                result  = [""]
+                current = ["cat"]
+                start = 3;
+                 |
+                 |__________
+                           |
+                           v
+                s = "c a t s a n d d o g"
+                     0 1 2 3 4 5 6 7 8 9
+                           i
 
+                std::string str = s.substr(start, i - start + 1);
 
-				result  = [""]
-				current = ["cat"]
-				start = 3;
-				 |
-				 |__________
-				           |
-				           v
-				s = "c a t s a n d d o g"
-				     0 1 2 3 4 5 6 7 8 9
-				               i
+                str is now "s"
 
-				std::string str = s.substr(start, i - start + 1);
+                Does "s" exist as a word in wordDict?
+                    No! Then i++.
 
-				str is now "san"
 
-				Does "san" exist as a word in wordDict?
-					No! Then i++.
 
+                result  = [""]
+                current = ["cat"]
+                start = 3;
+                 |
+                 |__________
+                           |
+                           v
+                s = "c a t s a n d d o g"
+                     0 1 2 3 4 5 6 7 8 9
+                             i
 
-				result  = [""]
-				current = ["cat"]
-				start = 3;
-				 |
-				 |__________
-				           |
-				           v
-				s = "c a t s a n d d o g"
-				     0 1 2 3 4 5 6 7 8 9
-				                 i
+                std::string str = s.substr(start, i - start + 1);
 
-				std::string str = s.substr(start, i - start + 1);
+                str is now "sa"
 
-				str is now "sand"
+                Does "sa" exist as a word in wordDict?
+                    No! Then i++.
 
-				Does "sand" exist as a word in wordDict?
-					Yes!
 
-					Put it in vector "current" where we'll keep track of all the
-					separate words in a sentence.
+                result  = [""]
+                current = ["cat"]
+                start = 3;
+                 |
+                 |__________
+                           |
+                           v
+                s = "c a t s a n d d o g"
+                     0 1 2 3 4 5 6 7 8 9
+                               i
 
-					call backtracking with same argument, but "start" will be "i + 1".
+                std::string str = s.substr(start, i - start + 1);
 
-						result  = [""]
-						current = ["cat", "sand"]
-						start = 7;
-						 |
-						 |__________________
-						                   |
-						                   v
-						s = "c a t s a n d d o g"
-						     0 1 2 3 4 5 6 7 8 9
-						                     i
+                str is now "san"
 
-						std::string str = s.substr(start, i - start + 1);
+                Does "san" exist as a word in wordDict?
+                    No! Then i++.
 
-						str is now "d"
 
-						Does "d" exist as a word in wordDict?
-							No! Then i++.
+                result  = [""]
+                current = ["cat"]
+                start = 3;
+                 |
+                 |__________
+                           |
+                           v
+                s = "c a t s a n d d o g"
+                     0 1 2 3 4 5 6 7 8 9
+                                 i
 
+                std::string str = s.substr(start, i - start + 1);
 
-						result  = [""]
-						current = ["cat", "sand"]
-						start = 7;
-						 |
-						 |__________________
-						                   |
-						                   v
-						s = "c a t s a n d d o g"
-						     0 1 2 3 4 5 6 7 8 9
-						                     i
+                str is now "sand"
 
-						std::string str = s.substr(start, i - start + 1);
+                Does "sand" exist as a word in wordDict?
+                    Yes!
 
-						str is now "do"
+                    Put it in vector "current" where we'll keep track of all the
+                    separate words in a sentence.
 
-						Does "do" exist as a word in wordDict?
-							No! Then i++.
+                    call backtracking with same argument, but "start" will be "i + 1".
 
+                        result  = [""]
+                        current = ["cat", "sand"]
+                        start = 7;
+                         |
+                         |__________________
+                                           |
+                                           v
+                        s = "c a t s a n d d o g"
+                             0 1 2 3 4 5 6 7 8 9
+                                             i
 
+                        std::string str = s.substr(start, i - start + 1);
 
-						result  = [""]
-						current = ["cat", "sand"]
-						start = 7;
-						 |
-						 |__________________
-						                   |
-						                   v
-						s = "c a t s a n d d o g"
-						     0 1 2 3 4 5 6 7 8 9
-						                       i
+                        str is now "d"
 
-						std::string str = s.substr(start, i - start + 1);
+                        Does "d" exist as a word in wordDict?
+                            No! Then i++.
 
-						str is now "dog"
 
-						Does "dog" exist as a word in wordDict?
-							Yes!
+                        result  = [""]
+                        current = ["cat", "sand"]
+                        start = 7;
+                         |
+                         |__________________
+                                           |
+                                           v
+                        s = "c a t s a n d d o g"
+                             0 1 2 3 4 5 6 7 8 9
+                                             i
 
-							Put it in vector "current" where we'll keep track of all the
-							separate words in a sentence.
+                        std::string str = s.substr(start, i - start + 1);
 
-							current = ["cat", "sand", "dog"]
+                        str is now "do"
 
-							call backtracking with same argument, but "start" will be "i + 1".
+                        Does "do" exist as a word in wordDict?
+                            No! Then i++.
 
-								start = 10;
-								 |
-								 |_________________________
-								                          |
-								                          v (index: s.length())
-								s = "c a t s a n d d o g"
-								     0 1 2 3 4 5 6 7 8 9
-								                          i (10)
 
-								Is "start" greater or equal than string s?
-								Yes! That means we've found one sentence.
 
-								All the words in a sentence are in vector "current"
-								Iterate through that vector and concatenate the
-								words in one string with a " "(Space) in between.
-								(Since we'll concatenate a " "(Space) at the
-								end as well, remove it after the for loop)
+                        result  = [""]
+                        current = ["cat", "sand"]
+                        start = 7;
+                         |
+                         |__________________
+                                           |
+                                           v
+                        s = "c a t s a n d d o g"
+                             0 1 2 3 4 5 6 7 8 9
+                                               i
 
-								Put that string(sentence) in vector "results".
-								That is one sentence.
+                        std::string str = s.substr(start, i - start + 1);
 
-								result = ["cat sand dog"]
+                        str is now "dog"
 
-								Now return from this function.
-						
-						Since we are now back from the "backtracking" we called
-						from this functions, now we have to pop the last word
-						in "current" since maybe there is some longer word that
-						starts with 7th index 'd'.
+                        Does "dog" exist as a word in wordDict?
+                            Yes!
 
-						pop "dog" from current:
-						Before: current = ["cat", "sand", "dog"]
-						After : current = ["cat", "sand"]
+                            Put it in vector "current" where we'll keep track of all the
+                            separate words in a sentence.
 
-						Since there is not, return from this function as well.
+                            current = ["cat", "sand", "dog"]
 
+                            call backtracking with same argument, but "start" will be "i + 1".
 
-				Since we are now back from the "backtracking" we called
-				from this functions, now we have to pop the last word
-				in "current" since maybe there is some longer word that
-				starts with 4th index 's'.
+                                start = 10;
+                                 |
+                                 |_________________________
+                                                          |
+                                                          v (index: s.length())
+                                s = "c a t s a n d d o g"
+                                     0 1 2 3 4 5 6 7 8 9
+                                                          i (10)
 
-				pop "sand" from current:
-				Before: current = ["cat", "sand"]
-				After : current = ["cat"]
+                                Is "start" greater or equal than string s?
+                                Yes! That means we've found one sentence.
 
-				Since there is not, return from this function as well.
+                                All the words in a sentence are in vector "current"
+                                Iterate through that vector and concatenate the
+                                words in one string with a " "(Space) in between.
+                                (Since we'll concatenate a " "(Space) at the
+                                end as well, remove it after the for loop)
 
+                                Put that string(sentence) in vector "results".
+                                That is one sentence.
 
-		Since we are now back from the "backtracking" we called
-		from this functions, now we have to pop the last word
-		in "current" since maybe there is some longer word that
-		starts with 0th index 'c'.
+                                result = ["cat sand dog"]
 
-		pop "sand" from current:
-		Before: current = ["cat"]
-		After : current = []
+                                Now return from this function.
 
-		(We just popped "cat") There is a longer one named "cats". Push that
-		to "current" and call backtracking from 5th index "a".
+                        Since we are now back from the "backtracking" we called
+                        from this functions, now we have to pop the last word
+                        in "current" since maybe there is some longer word that
+                        starts with 7th index 'd'.
 
-		result = ["cat sand dog"]
-		current = [""]
-	    start = 0;
-	     |
-	     |____
-	         |
-	         v
-	    s = "c a t s a n d d o g"
-	         0 1 2 3 4 5 6 7 8 9
-	               i
+                        pop "dog" from current:
+                        Before: current = ["cat", "sand", "dog"]
+                        After : current = ["cat", "sand"]
 
+                        Since there is not, return from this function as well.
 
-		std::string str = s.substr(start, i - start + 1);
 
-		str is now "a"
+                Since we are now back from the "backtracking" we called
+                from this functions, now we have to pop the last word
+                in "current" since maybe there is some longer word that
+                starts with 4th index 's'.
 
-		Does "a" exist as a word in wordDict?
-			Yes!
+                pop "sand" from current:
+                Before: current = ["cat", "sand"]
+                After : current = ["cat"]
 
-			Put it in vector "current" where we'll keep track of all the
-			separate words in a sentence.
+                Since there is not, return from this function as well.
 
-			call backtracking with same argument, but "start" will be "i + 1".
 
-				result = ["cat sand dog"]
-				current = ["cats"]
-				start = 4;
-				 |
-				 |____________
-				             |
-				             v
-				s = "c a t s a n d d o g"
-				     0 1 2 3 4 5 6 7 8 9
-				             i
+        Since we are now back from the "backtracking" we called
+        from this functions, now we have to pop the last word
+        in "current" since maybe there is some longer word that
+        starts with 0th index 'c'.
 
-				std::string str = s.substr(start, i - start + 1);
+        pop "sand" from current:
+        Before: current = ["cat"]
+        After : current = []
 
-				str is now "a"
+        (We just popped "cat") There is a longer one named "cats". Push that
+        to "current" and call backtracking from 5th index "a".
 
-				Does "a" exist as a word in wordDict?
-					No! Then i++.
+        result = ["cat sand dog"]
+        current = [""]
+        start = 0;
+         |
+         |____
+             |
+             v
+        s = "c a t s a n d d o g"
+             0 1 2 3 4 5 6 7 8 9
+                   i
 
 
-				result = ["cat sand dog"]
-				current = ["cats"]
-				start = 4;
-				 |
-				 |____________
-				             |
-				             v
-				s = "c a t s a n d d o g"
-				     0 1 2 3 4 5 6 7 8 9
-				               i
+        std::string str = s.substr(start, i - start + 1);
 
-				std::string str = s.substr(start, i - start + 1);
+        str is now "a"
 
-				str is now "an"
+        Does "a" exist as a word in wordDict?
+            Yes!
 
-				does "an" exist as a word in worddict?
-					No! then i++.
+            Put it in vector "current" where we'll keep track of all the
+            separate words in a sentence.
 
+            call backtracking with same argument, but "start" will be "i + 1".
 
+                result = ["cat sand dog"]
+                current = ["cats"]
+                start = 4;
+                 |
+                 |____________
+                             |
+                             v
+                s = "c a t s a n d d o g"
+                     0 1 2 3 4 5 6 7 8 9
+                             i
 
-				result = ["cat sand dog"]
-				current = ["cats"]
-				start = 4;
-				 |
-				 |____________
-				             |
-				             v
-				s = "c a t s a n d d o g"
-				     0 1 2 3 4 5 6 7 8 9
-				                 i
+                std::string str = s.substr(start, i - start + 1);
 
-				std::string str = s.substr(start, i - start + 1);
+                str is now "a"
 
-				str is now "and"
+                Does "a" exist as a word in wordDict?
+                    No! Then i++.
 
-				Does "and" exist as a word in wordDict?
-					Yes!
-					Put it in vector "current" where we'll keep track of all the
-					separate words in a sentence.
 
-					call backtracking with same argument, but "start" will be "i + 1".
+                result = ["cat sand dog"]
+                current = ["cats"]
+                start = 4;
+                 |
+                 |____________
+                             |
+                             v
+                s = "c a t s a n d d o g"
+                     0 1 2 3 4 5 6 7 8 9
+                               i
 
-						result = ["cat sand dog"]
-						current = ["cats", "and"]
-						start = 7;
-						 |
-						 |__________________
-						                   |
-						                   v
-						s = "c a t s a n d d o g"
-						     0 1 2 3 4 5 6 7 8 9
-						                   i
+                std::string str = s.substr(start, i - start + 1);
 
-						std::string str = s.substr(start, i - start + 1);
+                str is now "an"
 
-						str is now "d"
+                does "an" exist as a word in worddict?
+                    No! then i++.
 
-						does "d" exist as a word in worddict?
-							No! then i++.
 
 
-						result = ["cat sand dog"]
-						current = ["cats", "and"]
-						start = 7;
-						 |
-						 |__________________
-						                   |
-						                   v
-						s = "c a t s a n d d o g"
-						     0 1 2 3 4 5 6 7 8 9
-						                     i
+                result = ["cat sand dog"]
+                current = ["cats"]
+                start = 4;
+                 |
+                 |____________
+                             |
+                             v
+                s = "c a t s a n d d o g"
+                     0 1 2 3 4 5 6 7 8 9
+                                 i
 
-						std::string str = s.substr(start, i - start + 1);
+                std::string str = s.substr(start, i - start + 1);
 
-						str is now "do"
+                str is now "and"
 
-						does "do" exist as a word in worddict?
-							No! then i++.
+                Does "and" exist as a word in wordDict?
+                    Yes!
+                    Put it in vector "current" where we'll keep track of all the
+                    separate words in a sentence.
 
+                    call backtracking with same argument, but "start" will be "i + 1".
 
-						result = ["cat sand dog"]
-						current = ["cats", "and"]
-						start = 7;
-						 |
-						 |__________________
-						                   |
-						                   v
-						s = "c a t s a n d d o g"
-						     0 1 2 3 4 5 6 7 8 9
-						                       i
+                        result = ["cat sand dog"]
+                        current = ["cats", "and"]
+                        start = 7;
+                         |
+                         |__________________
+                                           |
+                                           v
+                        s = "c a t s a n d d o g"
+                             0 1 2 3 4 5 6 7 8 9
+                                           i
 
-						std::string str = s.substr(start, i - start + 1);
+                        std::string str = s.substr(start, i - start + 1);
 
-						str is now "dog"
+                        str is now "d"
 
-						does "dog" exist as a word in worddict?
-							Yes!
-							Put it in vector "current" where we'll keep track of all the
-							separate words in a sentence.
+                        does "d" exist as a word in worddict?
+                            No! then i++.
 
-							current = ["cats", "and", "dog"]
 
-							call backtracking with same argument, but "start" will be "i + 1".
+                        result = ["cat sand dog"]
+                        current = ["cats", "and"]
+                        start = 7;
+                         |
+                         |__________________
+                                           |
+                                           v
+                        s = "c a t s a n d d o g"
+                             0 1 2 3 4 5 6 7 8 9
+                                             i
 
-								start = 10;
-								 |
-								 |_________________________
-								                          |
-								                          v (index: s.length())
-								s = "c a t s a n d d o g"
-								     0 1 2 3 4 5 6 7 8 9
-								                          i (10)
+                        std::string str = s.substr(start, i - start + 1);
 
+                        str is now "do"
 
-								Is "start" greater or equal than string s?
-								Yes! That means we've found one sentence.
+                        does "do" exist as a word in worddict?
+                            No! then i++.
 
-								All the words in a sentence are in vector "current"
-								Iterate through that vector and concatenate the
-								words in one string with a " "(Space) in between.
-								(Since we'll concatenate a " "(Space) at the
-								end as well, remove it after the for loop)
 
-								Put that string(sentence) in vector "results".
-								That is one sentence.
+                        result = ["cat sand dog"]
+                        current = ["cats", "and"]
+                        start = 7;
+                         |
+                         |__________________
+                                           |
+                                           v
+                        s = "c a t s a n d d o g"
+                             0 1 2 3 4 5 6 7 8 9
+                                               i
 
-								result = ["cat sand dog", "cats and dog"]
+                        std::string str = s.substr(start, i - start + 1);
 
-								Now return from this function.
+                        str is now "dog"
 
+                        does "dog" exist as a word in worddict?
+                            Yes!
+                            Put it in vector "current" where we'll keep track of all the
+                            separate words in a sentence.
 
-	   result  = ["cat sand dog", "cats and dog"]
-	   current = [""]
-	    start = 0;
-	     |
-	     |____
-	         |
-	         v
-	    s = "c a t s a n d d o g"
-	         0 1 2 3 4 5 6 7 8 9
-	                 i
+                            current = ["cats", "and", "dog"]
 
-		std::string str = s.substr(start, i - start + 1);
+                            call backtracking with same argument, but "start" will be "i + 1".
 
-		str is now "catsa"
+                                start = 10;
+                                 |
+                                 |_________________________
+                                                          |
+                                                          v (index: s.length())
+                                s = "c a t s a n d d o g"
+                                     0 1 2 3 4 5 6 7 8 9
+                                                          i (10)
 
-		does "catsa" exist as a word in worddict?
-			No! then i++.
 
+                                Is "start" greater or equal than string s?
+                                Yes! That means we've found one sentence.
 
+                                All the words in a sentence are in vector "current"
+                                Iterate through that vector and concatenate the
+                                words in one string with a " "(Space) in between.
+                                (Since we'll concatenate a " "(Space) at the
+                                end as well, remove it after the for loop)
 
-	   result  = ["cat sand dog", "cats and dog"]
-	   current = [""]
-	    start = 0;
-	     |
-	     |____
-	         |
-	         v
-	    s = "c a t s a n d d o g"
-	         0 1 2 3 4 5 6 7 8 9
-	                   i
+                                Put that string(sentence) in vector "results".
+                                That is one sentence.
 
-		std::string str = s.substr(start, i - start + 1);
+                                result = ["cat sand dog", "cats and dog"]
 
-		str is now "catsan"
+                                Now return from this function.
 
-		does "catsan" exist as a word in worddict?
-			No! then i++.
 
+       result  = ["cat sand dog", "cats and dog"]
+       current = [""]
+        start = 0;
+         |
+         |____
+             |
+             v
+        s = "c a t s a n d d o g"
+             0 1 2 3 4 5 6 7 8 9
+                     i
 
-	   result  = ["cat sand dog", "cats and dog"]
-	   current = [""]
-	    start = 0;
-	     |
-	     |____
-	         |
-	         v
-	    s = "c a t s a n d d o g"
-	         0 1 2 3 4 5 6 7 8 9
-	                     i
+        std::string str = s.substr(start, i - start + 1);
 
-		std::string str = s.substr(start, i - start + 1);
+        str is now "catsa"
 
-		str is now "catsand"
+        does "catsa" exist as a word in worddict?
+            No! then i++.
 
-		does "catsand" exist as a word in worddict?
-			No! then i++.
 
 
-	   result  = ["cat sand dog", "cats and dog"]
-	   current = [""]
-	    start = 0;
-	     |
-	     |____
-	         |
-	         v
-	    s = "c a t s a n d d o g"
-	         0 1 2 3 4 5 6 7 8 9
-	                       i
+       result  = ["cat sand dog", "cats and dog"]
+       current = [""]
+        start = 0;
+         |
+         |____
+             |
+             v
+        s = "c a t s a n d d o g"
+             0 1 2 3 4 5 6 7 8 9
+                       i
 
-		std::string str = s.substr(start, i - start + 1);
+        std::string str = s.substr(start, i - start + 1);
 
-		str is now "catsandd"
+        str is now "catsan"
 
-		does "catsandd" exist as a word in worddict?
-			No! then i++.
+        does "catsan" exist as a word in worddict?
+            No! then i++.
 
 
-	   result  = ["cat sand dog", "cats and dog"]
-	   current = [""]
-	    start = 0;
-	     |
-	     |____
-	         |
-	         v
-	    s = "c a t s a n d d o g"
-	         0 1 2 3 4 5 6 7 8 9
-	                         i
+       result  = ["cat sand dog", "cats and dog"]
+       current = [""]
+        start = 0;
+         |
+         |____
+             |
+             v
+        s = "c a t s a n d d o g"
+             0 1 2 3 4 5 6 7 8 9
+                         i
 
-		std::string str = s.substr(start, i - start + 1);
+        std::string str = s.substr(start, i - start + 1);
 
-		str is now "catsanddo"
+        str is now "catsand"
 
-		does "catsanddo" exist as a word in worddict?
-			No! then i++.
+        does "catsand" exist as a word in worddict?
+            No! then i++.
 
 
-	   result  = ["cat sand dog", "cats and dog"]
-	   current = [""]
-	    start = 0;
-	     |
-	     |____
-	         |
-	         v
-	    s = "c a t s a n d d o g"
-	         0 1 2 3 4 5 6 7 8 9
-	                           i
+       result  = ["cat sand dog", "cats and dog"]
+       current = [""]
+        start = 0;
+         |
+         |____
+             |
+             v
+        s = "c a t s a n d d o g"
+             0 1 2 3 4 5 6 7 8 9
+                           i
 
-		std::string str = s.substr(start, i - start + 1);
+        std::string str = s.substr(start, i - start + 1);
 
-		str is now "catsanddog"
+        str is now "catsandd"
 
-		does "catsanddog" exist as a word in worddict?
-			No! then i++.
+        does "catsandd" exist as a word in worddict?
+            No! then i++.
 
 
-		We've come to the end, return to main function.
-		Return vector "results" which is now:
-			result = ["cat sand dog", "cats and dog"]
+       result  = ["cat sand dog", "cats and dog"]
+       current = [""]
+        start = 0;
+         |
+         |____
+             |
+             v
+        s = "c a t s a n d d o g"
+             0 1 2 3 4 5 6 7 8 9
+                             i
+
+        std::string str = s.substr(start, i - start + 1);
+
+        str is now "catsanddo"
+
+        does "catsanddo" exist as a word in worddict?
+            No! then i++.
+
+
+       result  = ["cat sand dog", "cats and dog"]
+       current = [""]
+        start = 0;
+         |
+         |____
+             |
+             v
+        s = "c a t s a n d d o g"
+             0 1 2 3 4 5 6 7 8 9
+                               i
+
+        std::string str = s.substr(start, i - start + 1);
+
+        str is now "catsanddog"
+
+        does "catsanddog" exist as a word in worddict?
+            No! then i++.
+
+
+        We've come to the end, return to main function.
+        Return vector "results" which is now:
+            result = ["cat sand dog", "cats and dog"]
 
 */
 
@@ -660,57 +660,57 @@
 /* Space Complexity: O(s.length()) */
 class Solution{
 public:
-	std::vector<std::string> wordBreak(std::string s, std::vector<std::string>& wordDict)
-	{
-		std::vector<std::string> results;
-		std::vector<std::string> current;
+    std::vector<std::string> wordBreak(std::string s, std::vector<std::string>& wordDict)
+    {
+        std::vector<std::string> results;
+        std::vector<std::string> current;
 
-		backtracking(s, wordDict, 0, current, results);
+        backtracking(s, wordDict, 0, current, results);
 
-		return results;
-	}
+        return results;
+    }
 
-	void backtracking(std::string& s,
-	                  std::vector<std::string>& wordDict,
-					  int start,
-					  std::vector<std::string>& current,
-					  std::vector<std::string>& results)
-	{
-		// If such sentence exist
-		if (start >= s.length())
-		{
-			std::string tmp;
+    void backtracking(std::string& s,
+                      std::vector<std::string>& wordDict,
+                      int start,
+                      std::vector<std::string>& current,
+                      std::vector<std::string>& results)
+    {
+        // If such sentence exist
+        if (start >= s.length())
+        {
+            std::string tmp;
 
-			for (std::string& x : current)
-			{
-				tmp += x;
-				tmp += " ";
-			}
-			
-			// Removing trailing whitespace character
-			tmp.pop_back();
+            for (std::string& x : current)
+            {
+                tmp += x;
+                tmp += " ";
+            }
 
-			// Store in results
-			results.push_back(tmp);
+            // Removing trailing whitespace character
+            tmp.pop_back();
 
-			return;
-		}
+            // Store in results
+            results.push_back(tmp);
 
-		for (int i = start; i < s.length(); i++)
-		{
-			std::string str = s.substr(start, i - start + 1);
+            return;
+        }
 
-			for(std::string& word : wordDict)
-			{
-				if(word == str)
-				{
-					current.push_back(str);
-					backtracking(s, wordDict, i + 1, current, results);
-					current.pop_back();
-					break;
-				}
-			}
-		}
+        for (int i = start; i < s.length(); i++)
+        {
+            std::string str = s.substr(start, i - start + 1);
 
-	}
+            for(std::string& word : wordDict)
+            {
+                if(word == str)
+                {
+                    current.push_back(str);
+                    backtracking(s, wordDict, i + 1, current, results);
+                    current.pop_back();
+                    break;
+                }
+            }
+        }
+
+    }
 };
