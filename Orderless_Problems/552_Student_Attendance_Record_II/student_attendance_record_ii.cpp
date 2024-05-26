@@ -143,3 +143,91 @@ private:
         return total;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    After my recursive solution was accepted I thinked about whether there's
+    more optimized approach and here is is - Dynamic Programming (DP)
+
+        + As was said every state is defined only by count_a, count_l and
+          cur_ind.
+
+        + But what we can see that for cur_ind we always check in memo for
+          cur_ind - 1 so on step when we calculated all states for cur_ind=3 we
+          don't care about others cur_ind which are lower.
+
+        + So let's say we have step with cur_ind=n how we will calculate states
+          for it knowing all states for cur_ind=n-1?
+
+            + We want to iterate trough every legal combination from
+              cur_ind=n-1 of count_a and count_l so (0, 0), (0, 1), (0, 2) and
+              (1, 0), (1, 1), (1, 2) and for every this state we want to try to
+              add "A", "P" and "L" if this possible and add this result to the
+              state with cur_ind=n
+
+            + On every adding we want to add modulo by MOD to avoid MLE
+              (described above)
+
+            + On every iteration we copy current state to previous and reset it
+
+        + After we calculated dp n times our result is stored in dp_last so we
+          just need to sum up every possible state and return the result
+
+*/
+
+/* Time  Beats: 10.86% */
+/* Space Beats: 22.05% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Dynamic_Programming {
+public:
+    int checkRecord(int n)
+    {
+        const int MOD = 1000000007;
+
+        std::vector<std::vector<int>> dp_last   (2, std::vector<int>(3, 0)); // previous state
+        std::vector<std::vector<int>> dp_current(2, std::vector<int>(3, 0)); // current  state
+
+        dp_last[0][0] = 1; // empty string
+
+        for (int i = 0; i < n; i++)
+        {
+            for (int count_a = 0; count_a < 2; count_a++)
+            {
+                for (int count_l = 0; count_l < 3; count_l++)
+                {
+                    // choose "P"
+                    dp_current[count_a][0] = (dp_current[count_a][0] + dp_last[count_a][count_l]) % MOD;
+
+                    // choose "A"
+                    if (count_a == 0)
+                        dp_current[count_a + 1][0] = (dp_current[count_a + 1][0] + dp_last[count_a][count_l]) % MOD;
+
+                    // Choose "L"
+                    if (count_l < 2)
+                        dp_current[count_a][count_l + 1] = (dp_current[count_a][count_l + 1] + dp_last[count_a][count_l]) % MOD;
+                }
+            }
+
+            dp_last = dp_current; // Reference current to previous
+            dp_current = vector<vector<int>>(2, vector<int>(3, 0)); // make new current
+        }
+
+        // Sum up the counts for all combinations of length 'n' with different count_a and count_l
+        int result = 0;
+        for (int count_a = 0; count_a < 2; count_a++)
+        {
+            for (int count_l = 0; count_l < 3; count_l++)
+                result = (result + dp_last[count_a][count_l]) % MOD;
+        }
+
+        return result;
+    }
+};
