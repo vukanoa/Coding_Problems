@@ -75,7 +75,7 @@
 
 /* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Binary_Search {
 public:
     int specialArray(std::vector<int>& nums)
     {
@@ -117,5 +117,47 @@ private:
         }
 
         return N - first_index;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  9.22% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Suffix_Sum {
+public:
+    int specialArray(std::vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        std::vector<int> frequency(N+1, 0);
+
+        for (const int& num : nums)
+            frequency[std::min(N, num)]++;
+
+        int num_greater_equal = 0;
+
+        for (int candidate_num = N; candidate_num > 0; candidate_num--)
+        {
+            num_greater_equal += frequency[candidate_num];
+
+            if (candidate_num == num_greater_equal)
+                return candidate_num;
+        }
+
+        return -1;
     }
 };
