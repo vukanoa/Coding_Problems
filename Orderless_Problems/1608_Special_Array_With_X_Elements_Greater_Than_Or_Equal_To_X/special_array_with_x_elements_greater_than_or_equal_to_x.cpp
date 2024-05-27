@@ -132,6 +132,54 @@ private:
 
 */
 
+/* Time  Beats: 51.71% */
+/* Space Beats: 52.24% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(1) */
+class Solution_Elegant_Binary_Search {
+public:
+    int specialArray(std::vector<int>& nums)
+    {
+        std::sort(nums.begin(), nums.end());
+
+        int left  = 1;
+        int right = 100; // Out of Bounds length, according to Constraints
+
+        while(left <= right)
+        {
+            int mid = left + (right - left) / 2;
+
+            int num_of_elements_greater_than_or_equal_to_mid = 0;
+            for(int i = 0; i < nums.size(); i++)
+                num_of_elements_greater_than_or_equal_to_mid += (mid <= nums[i]);
+
+            // cout << mid << " " << x << endl;
+            if(num_of_elements_greater_than_or_equal_to_mid == mid)
+                return num_of_elements_greater_than_or_equal_to_mid;
+
+            if(mid < num_of_elements_greater_than_or_equal_to_mid)
+                left  = mid + 1;
+            else
+                right = mid - 1;
+        }
+
+        return -1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
 /* Time  Beats: 100.00% */
 /* Space Beats:  9.22% */
 
