@@ -114,3 +114,42 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   8.41% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    std::vector<int> numberOfLines(std::vector<int>& widths, std::string s)
+    {
+        int lines = 1;
+        int width = 0;
+
+        for(int i = 0; i < s.length(); i++)
+        {
+            if(widths[s[i] - 97] + width > 100) // lowercase 'a' is ASCII 97
+            {
+                lines++;
+                width = widths[s[i] - 97];
+            }
+            else
+                width += widths[s[i] - 97];
+        }
+
+        return {lines, width};
+    }
+};
