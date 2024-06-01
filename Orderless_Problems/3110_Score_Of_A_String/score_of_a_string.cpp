@@ -74,3 +74,28 @@ public:
         return score;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Self-explanatory.
+
+*/
+
+/* Time  Beats: 41.75% */
+/* Space Beats: 97.38% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Recursion {
+public:
+    int scoreOfString(std::string& s, int i=1)
+    {
+        return (i == s.size()) ? 0 : std::abs(s[i] - s[i-1]) + scoreOfString(s, i+1);
+    }
+};
