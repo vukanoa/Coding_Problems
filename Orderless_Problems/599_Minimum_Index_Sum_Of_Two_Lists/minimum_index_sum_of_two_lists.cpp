@@ -120,3 +120,47 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of implemenitng it.
+
+*/
+
+/* Time  Beats: 66.44% */
+/* Space Beats: 55.87% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    std::vector<std::string> findRestaurant(std::vector<std::string>& list1, std::vector<std::string>& list2)
+    {
+        std::vector<std::string> result;
+
+        std::unordered_map<std::string,int> umap;
+        int min = INT_MAX;
+
+        for (int i = 0; i < list1.size(); i++)
+            umap[list1[i]] = i;
+
+        for (int i = 0; i < list2.size(); i++)
+        {
+            if (umap.count(list2[i]) != 0)
+            {
+                if (umap[list2[i]] + i < min)
+                    min = umap[list2[i]] + i, result.clear(), result.push_back(list2[i]);
+                else if (umap[list2[i]] + i == min)
+                    result.push_back(list2[i]);
+            }
+        }
+
+        return result;
+    }
+};
