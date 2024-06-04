@@ -58,6 +58,42 @@
     --- IDEA ---
     ------------
 
+    If we aren't allowed to use built-in functions, then we have to use a loop.
+
+*/
+
+/* Time  Beats: 37.74% */
+/* Space Beats: 73.86% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Without_Builtin_functions {
+public:
+    bool isPowerOfFour(int n)
+    {
+        if (n <= 0) return false;
+        if (n == 1) return true;
+
+        while (n > 1)
+        {
+            if (n % 4 != 0)
+                return false;
+
+            n /= 4;
+        }
+
+        return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     Simple math.
 
 */
