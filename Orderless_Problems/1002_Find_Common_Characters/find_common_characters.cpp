@@ -134,3 +134,66 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, though we use a different way of converting char's to string
+
+*/
+
+/* Time  Beats: 96.29% */
+/* Space Beats: 51.34% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    std::vector<std::string> commonChars(std::vector<std::string>& words)
+    {
+        const int N = words.size();
+
+        std::vector<std::vector<int>> vec_letters_freq(N, std::vector<int>(26, 0));
+
+        for (int i = 0; i < N; i++)
+        {
+            for (int j = 0; j < words[i].size(); j++)
+            {
+                vec_letters_freq[i][words[i][j] - 'a']++;
+            }
+        }
+
+
+        std::vector<std::string> result;
+        for (int letter_idx = 0; letter_idx < 26; letter_idx++)
+        {
+            int repeats = INT_MAX;
+
+            for (int i = 0; i < N; i++)
+            {
+                repeats = std::min(repeats, vec_letters_freq[i][letter_idx]);
+            }
+
+            /*
+                Another way of constructing a character out from an integer and
+                a string out of a character
+            */
+            while (repeats-- > 0)
+            {
+                char chr = static_cast<char>(letter_idx + 'a');
+
+                std::ostringstream out;
+                out << chr;
+
+                result.push_back(out.str());
+            }
+        }
+
+        return result;
+    }
+};
