@@ -93,8 +93,8 @@
 /* Time  Beats: 70.90% */
 /* Space Beats: 51.34% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(n * max(word.length())) */
+/* Space Complexity: O(n)                      */
 class Solution {
 public:
     std::vector<std::string> commonChars(std::vector<std::string>& words)
@@ -150,8 +150,8 @@ public:
 /* Time  Beats: 96.29% */
 /* Space Beats: 51.34% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(n * max(word.length())) */
+/* Space Complexity: O(n)                      */
 class Solution_2 {
 public:
     std::vector<std::string> commonChars(std::vector<std::string>& words)
@@ -192,6 +192,58 @@ public:
 
                 result.push_back(out.str());
             }
+        }
+
+        return result;
+    }
+};
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Memory optimal Solution.
+
+    We don't use N vectors of 26, instead we only use two:
+        1. frequencies, that will count frequencies in a for loop.
+        2. min_frequency, that will count min frequency for each letter.
+
+*/
+
+/* Time  Beats: 70.90% */
+/* Space Beats: 60.89% */
+
+/* Time  Complexity: O(n * max(word.length())) */
+/* Space Complexity: O(1)                      */
+class Solution_Space_Efficient {
+public:
+    std::vector<std::string> commonChars(std::vector<std::string>& words)
+    {
+        std::vector<int>   frequencies(26, 0);
+        std::vector<int> min_frequency(26, INT_MAX);
+
+        for (const std::string& word : words)
+        {
+            for (const char& chr : word)
+                frequencies[chr - 'a']++;
+
+            for (int letter_idx = 0; letter_idx < 26; letter_idx++)
+            {
+                min_frequency[letter_idx] = std::min(min_frequency[letter_idx],
+                                                     frequencies[letter_idx]);
+            }
+
+            /* Reset to zero */
+            frequencies = std::vector<int>(26, 0);
+        }
+
+        std::vector<std::string> result;
+        for (int letter_idx = 0; letter_idx < 26; letter_idx++)
+        {
+            for (int i = 0; i < min_frequency[letter_idx]; i++)
+                result.push_back(std::string(1, letter_idx + 'a'));
         }
 
         return result;
