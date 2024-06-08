@@ -3,103 +3,103 @@
 #include <algorithm>
 
 /*
-	==============
-	=== MEDIUM ===
-	==============
+    ==============
+    === MEDIUM ===
+    ==============
 
-	===========================
-	48) Rotate Image
-	===========================
+    ===========================
+    48) Rotate Image
+    ===========================
 
-	============
-	Description:
-	============
+    ============
+    Description:
+    ============
 
-	You are given an "n x n" 2D matrix representing an image, rotate the image
-	by 90 degrees(clockwise).
+    You are given an "n x n" 2D matrix representing an image, rotate the image
+    by 90 degrees(clockwise).
 
-	You have to rotate the image in-place, which means you have to modify the
-	input 2D matrix directly. DO NOT allocate another 2D matrix and so the
-	rotation.
+    You have to rotate the image in-place, which means you have to modify the
+    input 2D matrix directly. DO NOT allocate another 2D matrix and so the
+    rotation.
 
-	=============================================================
-	FUNCTION: void rotate(std::vector<std::vector<int>>& matrix);
-	=============================================================
+    =============================================================
+    FUNCTION: void rotate(std::vector<std::vector<int>>& matrix);
+    =============================================================
 
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
 
-	--- Example 1 ---
-	Input:  matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-	Output: [[7, 4, 1], [8, 5, 2], [9, 6, 3]]
+    --- Example 1 ---
+    Input:  matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    Output: [[7, 4, 1], [8, 5, 2], [9, 6, 3]]
 
-	--- Example 2 ---
-	Input:  matrix = [[5, 1, 9, 11], [2, 4, 8, 10], [13, 3, 6, 7], [15, 14, 12, 16]]
-	Output: [[15, 13, 2, 5], [14, 3, 4, 1], [12, 6, 8, 9], [16, 7, 10, 11]]
+    --- Example 2 ---
+    Input:  matrix = [[5, 1, 9, 11], [2, 4, 8, 10], [13, 3, 6, 7], [15, 14, 12, 16]]
+    Output: [[15, 13, 2, 5], [14, 3, 4, 1], [12, 6, 8, 9], [16, 7, 10, 11]]
 
-	*** Constraints ***
-	n == matrix.length == matrix[i].length
-	1 <= n <= 20
-	-1000 <= matrix[i][j] <= 1000
+    *** Constraints ***
+    n == matrix.length == matrix[i].length
+    1 <= n <= 20
+    -1000 <= matrix[i][j] <= 1000
 */
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	The main thing is that we rotate in "cycles".
-	In 1st Example:
-	1 2 3
-	4 5 6
-	7 8 9
+    The main thing is that we rotate in "cycles".
+    In 1st Example:
+    1 2 3
+    4 5 6
+    7 8 9
 
-	First we process(swap) (0, 0) element and its all 3 remaining ones:
-		1 -> 3 -> 9 -> 7 -> 1
-	(We use matrix[x][y], matrix[0][0] in this case, as a "tmp" variable)
+    First we process(swap) (0, 0) element and its all 3 remaining ones:
+        1 -> 3 -> 9 -> 7 -> 1
+    (We use matrix[x][y], matrix[0][0] in this case, as a "tmp" variable)
 
-	Then we process (0, 1), then (0, 2)(In a bigger matrix) and so on.
+    Then we process (0, 1), then (0, 2)(In a bigger matrix) and so on.
 
-	Important thing is that whenever we are done with a current row(i), we MUST
-	start with incremented "i", that is [i, i]. So:
-		(0, 0) for row 0, then
-		(1, 1) for row 1, then
-		(2, 2) for row 2, then
-		...
-		(n/2 - 1, n/2 - 1)
+    Important thing is that whenever we are done with a current row(i), we MUST
+    start with incremented "i", that is [i, i]. So:
+        (0, 0) for row 0, then
+        (1, 1) for row 1, then
+        (2, 2) for row 2, then
+        ...
+        (n/2 - 1, n/2 - 1)
 
-	But since we're rotating, our "i" won't go all the way up until "n - 1".
-	We will only begin the "cycle"(of swapping 4 elements) up until "i < n/2"
+    But since we're rotating, our "i" won't go all the way up until "n - 1".
+    We will only begin the "cycle"(of swapping 4 elements) up until "i < n/2"
 
-	Consider this:
-	1  2  3  4  5
-	6  7  8  9  10
-	11 12 13 14 15
-	16 17 18 19 20
-	21 22 23 24 25
+    Consider this:
+    1  2  3  4  5
+    6  7  8  9  10
+    11 12 13 14 15
+    16 17 18 19 20
+    21 22 23 24 25
 
-	We're ONLY doing the "cycles" on elements:
-		Row 0:
-			1 (0, 0)
-			2 (0, 1)
-			3 (0, 2)
-			4 (0, 3)
-			5 (0, 4)
+    We're ONLY doing the "cycles" on elements:
+        Row 0:
+            1 (0, 0)
+            2 (0, 1)
+            3 (0, 2)
+            4 (0, 3)
+            5 (0, 4)
 
-		Row 1:
-			7 (1, 1)
-			8 (1, 2)
+        Row 1:
+            7 (1, 1)
+            8 (1, 2)
 
-		Row 2:
-			13 (2, 2) // This will "cycle" with itself
+        Row 2:
+            13 (2, 2) // This will "cycle" with itself
 
-	All of the other elements will be processed as a part of the "cycle" of one
-	of these elements.
+    All of the other elements will be processed as a part of the "cycle" of one
+    of these elements.
 
-	*** GENERAL RULE FOR SWAPPING ***
-	[x][y] -> [y][n - 1 - x] -> [n - 1 - x][n - 1 - y] -> [n - 1 - y][x] -> [x][y]
+    *** GENERAL RULE FOR SWAPPING ***
+    [x][y] -> [y][n - 1 - x] -> [n - 1 - x][n - 1 - y] -> [n - 1 - y][x] -> [x][y]
 
 */
 
@@ -111,55 +111,55 @@
 /* Space Complexity: O(1) */
 class Solution{
 public:
-	void rotate(std::vector<std::vector<int>>& matrix)
-	{
-		int n = matrix.size();
-		int i = 0;
+    void rotate(std::vector<std::vector<int>>& matrix)
+    {
+        int n = matrix.size();
+        int i = 0;
 
-		while (i < n/2)
-		{
-			int x = i;
-			int y = i;
+        while (i < n/2)
+        {
+            int x = i;
+            int y = i;
 
-			while (y < (n - 1 - i))
-			{
-				int counter = 3; // Because it's always a square
+            while (y < (n - 1 - i))
+            {
+                int counter = 3; // Because it's always a square
 
-				while (counter--)
-				{
-					switch(counter)
-					{
-						case 2:
-							std::swap(matrix[x][y], matrix[y][n - 1 - x]);
-							break;
+                while (counter--)
+                {
+                    switch(counter)
+                    {
+                        case 2:
+                            std::swap(matrix[x][y], matrix[y][n - 1 - x]);
+                            break;
 
-						case 1:
-							std::swap(matrix[x][y], matrix[n - 1 - x][n - 1 - y]);
-							break;
+                        case 1:
+                            std::swap(matrix[x][y], matrix[n - 1 - x][n - 1 - y]);
+                            break;
 
-						case 0:
-							std::swap(matrix[x][y], matrix[n - 1 - y][x]);
-							break;
-					}
-				}
-				y++;
-			}
-			i++;
-		}
-	}
+                        case 0:
+                            std::swap(matrix[x][y], matrix[n - 1 - y][x]);
+                            break;
+                    }
+                }
+                y++;
+            }
+            i++;
+        }
+    }
 };
 
 
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	Keep pointers: Left, Right, Top, Bottom
+    Keep pointers: Left, Right, Top, Bottom
 
-	After that it becomes easy, just do simulate example and you'll get it.
+    After that it becomes easy, just do simulate example and you'll get it.
 */
 
 /* Time  Beats: 100% */
@@ -169,46 +169,46 @@ public:
 /* Space Complexity: O(1) */
 class Solution_L_R_T_B {
 public:
-	void rotate(std::vector<std::vector<int>>& matrix)
-	{
-		int n = matrix.size();
+    void rotate(std::vector<std::vector<int>>& matrix)
+    {
+        int n = matrix.size();
 
-		int left  = 0;
-		int right = n-1;
+        int left  = 0;
+        int right = n-1;
 
-		while (left < right)
-		{
-			int top    = left;
-			int bottom = right;
+        while (left < right)
+        {
+            int top    = left;
+            int bottom = right;
 
-			int tmp;
-			for (int i = 0; i < right-left; i++)
-			{
-				tmp = matrix[top][left + i];
+            int tmp;
+            for (int i = 0; i < right-left; i++)
+            {
+                tmp = matrix[top][left + i];
 
-				std::swap(tmp, matrix[top + i   ][right    ]);
-				std::swap(tmp, matrix[bottom    ][right - i]);
-				std::swap(tmp, matrix[bottom - i][left     ]);
-				std::swap(tmp, matrix[top       ][left + i ]);
-			}
+                std::swap(tmp, matrix[top + i   ][right    ]);
+                std::swap(tmp, matrix[bottom    ][right - i]);
+                std::swap(tmp, matrix[bottom - i][left     ]);
+                std::swap(tmp, matrix[top       ][left + i ]);
+            }
 
-			left++;
-			right--;
-		}
-	}
+            left++;
+            right--;
+        }
+    }
 };
 
 
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	Transpose Matrix and then Reverse Columns.
+    Transpose Matrix and then Reverse Columns.
 
-	Check Linear Algebra.
+    Check Linear Algebra.
 
 */
 
@@ -220,13 +220,13 @@ public:
 class Solution_Transpose_Reverse {
 public:
     void rotate(std::vector<std::vector<int>>& matrix)
-	{
+    {
         int rows = matrix.size();
 
         for(int i = 0; i < rows; i++)
-		{
+        {
             for(int j = 0; j < i; j++)
-				std::swap(matrix[i][j], matrix[j][i]);
+                std::swap(matrix[i][j], matrix[j][i]);
         }
 
         for(int i = 0; i < rows; i++)
@@ -238,52 +238,52 @@ public:
 void
 print_matrix(std::vector<std::vector<int>>& matrix)
 {
-	for (int i = 0; i < matrix.size(); i++)
-	{
-		std::cout << "\n\t\t";
+    for (int i = 0; i < matrix.size(); i++)
+    {
+        std::cout << "\n\t\t";
 
-		for (int j = 0; j < matrix.size(); j++)
-			printf("%2d ", matrix[i][j]);
-	}
-	std::cout << "\n\n";
+        for (int j = 0; j < matrix.size(); j++)
+            printf("%2d ", matrix[i][j]);
+    }
+    std::cout << "\n\n";
 }
 
 
 int
 main()
 {
-	Solution                   sol;
-	Solution_L_R_T_B           sol_l_r_t_b;
-	Solution_Transpose_Reverse sol_transpose_reverse;
+    Solution                   sol;
+    Solution_L_R_T_B           sol_l_r_t_b;
+    Solution_Transpose_Reverse sol_transpose_reverse;
 
-	/* Example 1 */
-	std::vector<std::vector<int>> matrix = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    /* Example 1 */
+    std::vector<std::vector<int>> matrix = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
 
-	/* Example 2 */
-	// std::vector<std::vector<int>> matrix = {{5, 1, 9, 11}, {2, 4, 8, 10}, {13, 3, 6, 7}, {15, 14, 12, 16}};
+    /* Example 2 */
+    // std::vector<std::vector<int>> matrix = {{5, 1, 9, 11}, {2, 4, 8, 10}, {13, 3, 6, 7}, {15, 14, 12, 16}};
 
-	/* Example 3 */
-	// std::vector<std::vector<int>> matrix = {{1, 2, 3, 4}, {4, 6, 7, 8}, {9, 10, 11, 12}, {13, 14, 15, 16}};
+    /* Example 3 */
+    // std::vector<std::vector<int>> matrix = {{1, 2, 3, 4}, {4, 6, 7, 8}, {9, 10, 11, 12}, {13, 14, 15, 16}};
 
-	std::cout << "\n\t====================";
-	std::cout << "\n\t=== ROTATE IMAGE ===";
-	std::cout << "\n\t====================\n";
-
-
-	/* Write Input */
-	std::cout << "\n\tOriginal Matrix:";
-	print_matrix(matrix);
+    std::cout << "\n\t====================";
+    std::cout << "\n\t=== ROTATE IMAGE ===";
+    std::cout << "\n\t====================\n";
 
 
-	/* Solution */
-	// sol.rotate(matrix);
-	// sol_l_r_t_b.rotate(matrix);
-	sol_transpose_reverse.rotate(matrix);
+    /* Write Input */
+    std::cout << "\n\tOriginal Matrix:";
+    print_matrix(matrix);
 
 
-	/* Write Output */
-	std::cout << "\n\tRotated Matrix:";
-	print_matrix(matrix);
+    /* Solution */
+    // sol.rotate(matrix);
+    // sol_l_r_t_b.rotate(matrix);
+    sol_transpose_reverse.rotate(matrix);
 
-	return 0;
+
+    /* Write Output */
+    std::cout << "\n\tRotated Matrix:";
+    print_matrix(matrix);
+
+    return 0;
 }
