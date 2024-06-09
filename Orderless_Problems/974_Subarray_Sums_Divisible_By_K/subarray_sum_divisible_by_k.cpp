@@ -127,7 +127,7 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_2 {
 public:
     int subarraysDivByK(vector<int>& nums, int k)
     {
@@ -147,5 +147,55 @@ public:
         {
             return sum + num * (num - 1) / 2;
         });
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 82.59% */
+/* Space Beats: 83.86% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Recursive {
+public:
+    std::vector<int> mod_k;
+    int subarraysDivByK(std::vector<int>& nums, int k)
+    {
+        const int n = nums.size();
+        mod_k.assign(k, 0);
+        mod_k[0] = 1; // Consider prefix sums that are directly divisible by k
+
+        int prefix = 0;
+
+        return dfs(nums, n-1, 0, k);
+    }
+
+private:
+    int dfs(vector<int>& nums, int i, int prefix, int k)
+    {
+        if (i < 0)
+            return 0;
+
+        prefix =  (prefix + nums[i]) % k;
+        prefix += (prefix < 0) ? k : 0;
+
+        int result = mod_k[prefix];
+        mod_k[prefix]++;
+
+        result += dfs(nums, i-1, prefix, k); // Recursive call
+        mod_k[prefix]--; // Backtracking
+
+        return result;
     }
 };
