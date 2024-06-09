@@ -109,3 +109,43 @@ public:
         return count; // Total number of subarrays divisible by k
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 89.59% */
+/* Space Beats: 92.10% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+    int subarraysDivByK(vector<int>& nums, int k)
+    {
+        std::vector<int> mod_k(k, 0);
+        mod_k[0] = 1;
+
+        int prefix = 0;
+
+        for(const int& num : nums)
+        {
+            prefix = (prefix + num) % k;
+            prefix += (prefix < 0) ? k : 0;
+            mod_k[prefix]++;
+        }
+
+        return accumulate(mod_k.begin(), mod_k.end(), 0, [](int sum, int num)
+        {
+            return sum + num * (num - 1) / 2;
+        });
+    }
+};
