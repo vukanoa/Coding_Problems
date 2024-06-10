@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 /*
     ============
@@ -138,6 +139,46 @@ public:
         int result = 0;
         for(int i = 0; i < N; i++)
             result += (heights[i] != sorted[i]);
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats: 96.50% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n)        */
+class Solution_Bit_Manipulation {
+public:
+    int heightChecker(std::vector<int>& heights)
+    {
+        // Reuse heights, no other container
+        const int N = heights.size();
+
+        for(int i = 0; i < N; i++) // Pack value for heights[i] & i in an int
+            heights[i] = (heights[i] << 8) + i;
+
+        std::sort(heights.begin(), heights.end());
+
+        int result = 0;
+        for(int i = 0; i < N; i++)
+        {
+            // Unpack heights[i] & index j. check if heights[j]==heights[i]
+            result += (heights[(heights[i] & 255)] >> 8 != heights[i] >> 8);
+        }
 
         return result;
     }
