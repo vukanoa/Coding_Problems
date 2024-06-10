@@ -109,3 +109,36 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats: 96.50% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n)        */
+class Solution_Builtin_Sort {
+public:
+    int heightChecker(std::vector<int>& heights)
+    {
+        const int N = heights.size();
+        std::vector<char> sorted(heights.begin(), heights.end());
+        std::sort(heights.begin(), heights.end());
+
+        int result = 0;
+        for(int i = 0; i < N; i++)
+            result += (heights[i] != sorted[i]);
+
+        return result;
+    }
+};
