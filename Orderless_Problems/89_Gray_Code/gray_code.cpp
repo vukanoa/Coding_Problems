@@ -102,3 +102,47 @@ public:
             dfs(result, curr_num, i);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Using bitsets and this feels much more like a standard Backtracking
+    Solution.
+
+*/
+
+/* Time  Beats: 84.60% */
+/* Space Beats: 14.70% */
+
+/* Time  Complexity: O(2^n) */
+/* Space Complexity: O(n) */
+class Solution_Bitset_Backtracking {
+public:
+    std::vector<int> grayCode(int n)
+    {
+        std::bitset<32> bits;
+        std::vector<int> result;
+
+        backtracking(bits, result, n);
+
+        return result;
+    }
+
+private:
+    void backtracking(std::bitset<32>& bits, std::vector<int>& result, int k)
+    {
+        if (k == 0)
+            result.push_back(bits.to_ulong());
+        else
+        {
+            backtracking(bits, result, k-1);
+            bits.flip(k-1);
+            backtracking(bits, result, k-1);
+        }
+    }
+};
