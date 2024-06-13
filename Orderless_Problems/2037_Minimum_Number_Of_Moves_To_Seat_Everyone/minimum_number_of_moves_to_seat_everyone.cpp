@@ -107,3 +107,46 @@ public:
         return moves;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 91.43% */
+/* Space Beats: 97.78% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Linear {
+public:
+    int minMovesToSeat(std::vector<int>& seats, std::vector<int>& students)
+    {
+        const int n = seats.size();
+        std::vector<int> positions(101, 0);
+
+        for(int i = 0; i < n; i++)
+        {
+            positions[seats[i]]++;
+            positions[students[i]]--;
+        }
+
+        int result  = 0;
+        int current = 0;
+
+        for(const int& i : positions)
+        {
+            result  += abs(current);
+            current += i;
+        }
+
+        return result;
+    }
+};
