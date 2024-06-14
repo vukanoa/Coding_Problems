@@ -127,3 +127,55 @@ public:
         return min_increment;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 96.65% */
+/* Space Beats: 93.90% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Efficient {
+public:
+    int minIncrementForUnique(std::vector<int>& nums)
+    {
+        const int n = nums.size();
+
+        int frequencies[200001] = {0};
+        int smallest_taken = 1e5;
+
+        for(const int& num : nums)
+        {
+            frequencies[num]++;
+            smallest_taken = std::min(smallest_taken, num);
+        }
+
+        int count  = 0;
+        int result = 0;
+
+        for(int i = smallest_taken; count < n; i++)
+        {
+            int curr_freq = frequencies[i];
+
+            count += (curr_freq != 0);
+
+            if (curr_freq <= 1)
+                continue;
+
+            frequencies[i + 1] += curr_freq - 1;
+            result += curr_freq - 1;
+        }
+
+        return result;
+    }
+};
