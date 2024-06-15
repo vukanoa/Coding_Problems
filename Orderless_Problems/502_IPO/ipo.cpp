@@ -144,3 +144,55 @@ public:
         return w;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 50.11% */
+/* Space Beats: 89.28% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n) */
+class Solution_Binary_Search {
+public:
+    int findMaximizedCapital(int k, int w, std::vector<int>& profits, std::vector<int>& capital)
+    {
+        const int n = profits.size();
+        std::vector<std::pair<int, int>> pairs(n);
+
+        for (int i = 0; i < n; i++)
+            pairs[i] = {capital[i], profits[i]};
+
+        sort(pairs.begin(), pairs.end());
+
+        priority_queue<int> queue;
+
+        int curr=0, idx=0;
+        for (int i = 0; i<k; i++)
+        {
+            // binary search find idx such that capital[i]<=w for i<idx
+            idx = std::upper_bound(pairs.begin() + idx, pairs.end(), std::make_pair(w, INT_MAX), std::less<>()) - pairs.begin();
+
+            while (curr< idx)
+                queue.push(pairs[curr++].second);
+
+            if (!queue.empty())
+            {
+                w += queue.top();
+                queue.pop();
+            }
+            else
+                break;
+        }
+        return w;
+    }
+};
