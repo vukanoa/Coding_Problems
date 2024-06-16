@@ -175,3 +175,67 @@ public:
         return max_area;
     }
 };
+
+
+
+
+/* Time  Beats: 93.51% */
+/* Space Beats: 66.81% */
+
+/* Time  Complexity: O(n^2 * m) */
+/* Space Complexity: O(m)       */
+class Solution {
+public:
+    int maximalRectangle(std::vector<std::vector<char>>& matrix)
+    {
+        const int ROWS = matrix.size();
+        const int COLS = matrix[0].size();
+
+        std::vector<int>heights(COLS, 0);
+
+        int result=0;
+        for(int i = 0; i < ROWS; i++)
+        {
+            for(int j = 0; j < COLS; j++)
+            {
+                if (matrix[i][j] == '1')
+                    heights[j]++;
+                else
+                    heights[j] = 0;
+            }
+
+            result = std::max(result, area(heights));
+        }
+
+        return result;
+    }
+
+private:
+    int area(std::vector<int>&heights)
+    {
+        int n = heights.size();
+        int result = 0;
+
+        std::stack<int> stack;
+        for(int i = 0; i <= n; i++)
+        {
+            while(!stack.empty() && (i==n || heights[stack.top()] >= heights[i]))
+            {
+                int height = heights[stack.top()];
+                stack.pop();
+                int width;
+
+                if (stack.empty())
+                    width = i;
+                else
+                    width = i - stack.top() - 1;
+
+                result = std::max(result, width * height);
+            }
+
+            stack.push(i);
+        }
+
+        return result;
+    }
+};
