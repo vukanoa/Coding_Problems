@@ -183,3 +183,54 @@ private:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 90.08% */
+/* Space Beats: 96.39% */
+
+/*
+    Time  Complexity: O(n + m + d)
+
+    where ( n ) is the number of jobs, ( m ) is the number of workers, and ( d
+    ) is the maximum difficulty.
+*/
+/*
+    Space Complexity: O(d)
+    for the maxProfitUpToDifficulty array.
+*/
+class Solution_Linear {
+public:
+    int maxProfitAssignment(std::vector<int>& difficulty,
+                            std::vector<int>& profit,
+                            std::vector<int>& worker)
+    {
+        int max_elem = *std::max_element(difficulty.begin(), difficulty.end());
+        int array[max_elem + 1];
+
+        for(int i = 0; i < max_elem+1; i++)
+            array[i] = 0;
+
+        for(int i = 0; i < difficulty.size(); i++)
+            array[difficulty[i]] = std::max(array[difficulty[i]], profit[i]);
+
+        for(int i = 1; i < max_elem+1; i++)
+            array[i] = std::max(array[i-1], array[i]);
+
+        int result = 0;
+        for(int i = 0; i < worker.size(); i++)
+            result += array[std::min(worker[i], max_elem)];
+
+        return result;
+    }
+};
