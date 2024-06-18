@@ -104,3 +104,82 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 61.34% */
+/* Space Beats: 89.18% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n) */
+class Solution_Greedy_Plus_Binary_Search {
+public:
+    int maxProfitAssignment(std::vector<int>& difficulty,
+                            std::vector<int>& profit,
+                            std::vector<int>& worker)
+    {
+        std::vector<std::pair<int,int>> vec (difficulty.size());
+        for(int i = 0; i < difficulty.size(); i++)
+            vec[i] = { difficulty[i], profit[i] };
+
+        /* Lambda */
+        auto comp = [&](std::pair<int,int> a, std::pair<int,int> b){
+            if (a.first < b.first)
+                return true;
+
+            return false;
+        };
+
+        std::sort(vec.begin(), vec.end(), comp);
+        std::sort(worker.begin(), worker.end());
+
+        int result = 0;
+        int x = 0;
+        int max_profit = 0;
+
+        for(int i = 0; i < worker.size(); i++)
+        {
+            int mid  = binarySearch(vec, worker[i]);
+            for(int i = x; i <= mid; i++)
+                max_profit = std::max(max_profit, vec[i].second);
+
+            x = std::max(0, mid);
+            result += max_profit;
+        }
+
+        return result;
+    }
+
+private:
+    int binarySearch(std::vector<std::pair<int,int>>& vec, int target)
+    {
+        int left  = 0;
+        int right = vec.size()-1;
+
+        int result = -1;
+        while (left <= right)
+        {
+            int mid = left + (right - left) / 2;
+
+            if(vec[mid].first <= target)
+            {
+                result = mid;
+                left   = mid + 1;
+            }
+            else
+                right  = mid - 1;
+        }
+
+        return result;
+    }
+};
