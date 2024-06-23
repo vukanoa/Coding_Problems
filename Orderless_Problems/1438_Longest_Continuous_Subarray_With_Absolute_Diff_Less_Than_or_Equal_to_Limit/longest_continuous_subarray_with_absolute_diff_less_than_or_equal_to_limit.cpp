@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <queue>
 
 /*
     ==============
@@ -109,5 +110,71 @@ public:
         }
 
         return longest;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 99.83% */
+/* Space Beats: 59.41% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Efficient {
+public:
+    int longestSubarray(std::vector<int>& nums, int limit)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        const int N = nums.size();
+
+        int left  = 0;
+        int right = 0;
+
+        std::deque<int> deq_mini;
+        std::deque<int> deq_maxi;
+        int result = 0;
+
+        while (right < N)
+        {
+            while ( ! deq_mini.empty() && deq_mini.back() > nums[right])
+            {
+                deq_mini.pop_back();
+            }
+            deq_mini.push_back(nums[right]);
+
+            while ( ! deq_maxi.empty() && deq_maxi.back() < nums[right])
+            {
+                deq_maxi.pop_back();
+            }
+            deq_maxi.push_back(nums[right]);
+
+            while (deq_maxi.front() - deq_mini.front() > limit)
+            {
+                if (nums[left] == deq_maxi.front())
+                    deq_maxi.pop_front();
+
+                if (nums[left] == deq_mini.front())
+                    deq_mini.pop_front();
+
+                left++;
+            }
+
+            result = std::max(result, right-left+1);
+
+            right++; // Extend the Window
+        }
+
+        return result;
     }
 };
