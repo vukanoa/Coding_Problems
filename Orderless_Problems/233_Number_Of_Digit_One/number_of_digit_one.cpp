@@ -93,3 +93,34 @@ private:
         return dp[idx][cnt][flag] = count;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Go through the digit positions one at a time, find out how often a "1"
+    appears at each position, and sum those up. 
+
+*/
+
+/* Time  Beats: 100%   */
+/* Space Beats: 99.90% */
+
+/* Time  Complexity: O(log10(n)) */
+/* Space Complexity: O(1)        */
+class Solution_Efficient {
+public:
+    int countDigitOne(int n)
+    {
+        int ones = 0;
+
+        for (long long m = 1; m <= n; m *= 10)
+            ones += (n/m + 8) / 10 * m + (n/m % 10 == 1) * (n % m + 1);
+
+        return ones;
+    }
+};
