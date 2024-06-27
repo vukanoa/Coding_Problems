@@ -99,3 +99,43 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 99.21% */
+/* Space Beats: 40.94% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+    int findCenter(std::vector<std::vector<int>>& edges)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        
+        std::bitset<100000> visited = 0;
+
+        for(auto& edge: edges)
+        {
+            if (visited[edge[0]])
+                return edge[0];
+
+            if (visited[edge[1]])
+                return edge[1];
+
+            visited[edge[0]] = visited[edge[1]] = 1;
+        }
+
+        return -1;
+    }
+};
