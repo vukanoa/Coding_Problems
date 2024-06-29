@@ -127,3 +127,106 @@ public:
         return countWithMergeSort(prefixSum, 0, n, lower, upper);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 88.43% */
+/* Space Beats: 83.89% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n)        */
+class SegmentTree {
+private:
+    int n;
+    std::vector<int> arr;
+public:
+    SegmentTree(int size)
+        : n(size), arr(2*size)
+    {
+        arr[0] = 0;
+        for(int i = 0; i < n; ++i)
+            arr[i+n] = 1;
+
+        for(int i = n-1; i > 0; --i)
+            arr[i] = arr[2*i]+arr[2*i+1];
+    }
+
+    void add_value(int idx, int val)
+    {
+        idx += n;
+        arr[idx] += val;
+
+        while (idx > 1)
+        {
+            if (idx % 2)
+                arr[idx/2] = arr[idx-1] + arr[idx];
+            else
+                arr[idx/2] = arr[idx] + arr[idx+1];
+
+            idx >>= 1;
+        }
+    }
+
+    int getSum(int left, int right)
+    {
+        int count = 0;
+        left  += n;
+        right += n;
+
+        while (left <= right)
+        {
+            if (left % 2)
+                count += arr[left++];
+
+            if (right % 2 == 0)
+                count += arr[right--];
+
+            left  >>= 1;
+            right >>= 1;
+        }
+
+        return count;
+    }
+};
+
+//Time O(NlogN), Space O(N)
+class Solution {
+public:
+    int countRangeSum(std::vector<int>& nums, int lower, int upper)
+    {
+        std::vector<long long> sum(nums.size()+1, 0);
+
+        for (int i = 0; i < nums.size(); ++i)
+            sum[i+1] = sum[i] + nums[i];
+
+        std::vector<long long> A(sum.begin(), sum.end());
+
+        std::sort(A.begin(), A.end());
+
+        SegmentTree tree(A.size());
+        int count = 0;
+        for (const auto &x : sum)
+        {
+            int idx = lower_bound(A.begin(), A.end(), x)-A.begin();
+            int lower_idx = std::lower_bound(A.begin(), A.end(), x+lower)-A.begin();
+            int upper_idx = std::upper_bound(A.begin(), A.end(), x+upper)-A.begin()-1;
+
+            tree.add_value(idx, -1);
+            count += tree.getSum(lower_idx, upper_idx);
+        }
+
+        return count;
+    };
+};
+
+
