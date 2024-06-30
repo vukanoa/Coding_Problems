@@ -81,3 +81,57 @@ public:
         return dp[0][n-1];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 85.41% */
+/* Space Beats: 88.38% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(n^2) */
+class Solution_Memoization {
+public:
+    int dp[101][101];
+
+
+    int strangePrinter(string s)
+    {
+        memset(dp,-1,sizeof(dp));
+
+        return backtracking(s, 0, s.size() - 1);
+    }
+
+private:
+    int backtracking(string &s, int i, int j)
+    {
+        if (i > j)
+            return 0;
+
+        if (dp[i][j] != -1)
+            return dp[i][j];
+
+        int x = i;
+        while (x + 1 <= j && s[x] == s[x + 1])
+            x++;
+
+        int result = 1 + backtracking(s, x+1, j);
+
+        for (int k = x+1; k <= j; k++)
+        {
+            if (s[k] == s[i])
+                result = std::min(result, backtracking(s, k, j) + backtracking(s, x+1, k-1));
+        }
+
+        return dp[i][j] = result;
+    }
+};
