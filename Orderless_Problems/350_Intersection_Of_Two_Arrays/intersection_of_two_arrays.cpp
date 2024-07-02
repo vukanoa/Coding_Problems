@@ -82,3 +82,43 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is an improved version of the above approach.
+
+*/
+
+/* Time  Beats: 81.88% */
+/* Space Beats: 34.02% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    std::vector<int> intersect(std::vector<int>& nums1, std::vector<int>& nums2)
+    {
+        std::vector<int> result;
+        std::unordered_map<int,int> umap;
+
+        for(const int& num : nums1)
+            umap[num]++;
+
+        for(const int& num : nums2)
+        {
+            if(umap.find(num) != umap.end() && umap[num] > 0)
+            {
+                result.push_back(num);
+                umap[num]--;
+            }
+        }
+
+        return result;
+    }
+};
