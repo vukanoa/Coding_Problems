@@ -72,3 +72,49 @@ public:
         return {result_str.rbegin(), result_str.rend()};
     }
 };
+
+
+
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  60.67% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    std::string toHex(int n) 
+    {
+        if (n == 0)
+            return "0";
+
+        std::string result_str = "";
+        unsigned int num = n;
+         
+        while (num != 0)
+        {
+            int  remainder = 0;
+            char chr;
+
+            remainder = num % 16;
+            if (remainder < 10)
+                chr = remainder + '0';     // '0' == ASCII(0) == 48
+            else
+                chr = remainder + 'a' -10; // 'a' == ASCII(a) == 97
+
+            result_str += chr;
+            num /= 16;
+        }
+        int i = 0;
+        int j = result_str.size()-1;
+
+        while(i<j)
+        {
+            std::swap(result_str[i], result_str[j]);
+            i++;
+            j--;
+        }
+
+        return result_str;
+    }
+};
