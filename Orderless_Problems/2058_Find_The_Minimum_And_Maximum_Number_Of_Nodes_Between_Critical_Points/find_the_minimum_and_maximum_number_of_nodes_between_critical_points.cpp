@@ -33,7 +33,7 @@
     two critical points, return [-1, -1].
 
     =================================================================
-    FUNCTION: vector<int> nodesBetweenCriticalPoints(ListNode* head);  
+    FUNCTION: vector<int> nodesBetweenCriticalPoints(ListNode* head);
     =================================================================
 
     ==========================================================================
@@ -83,6 +83,15 @@
  * };
  */
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Intuitive.
+
+*/
+
 /* Time  Beats: 82.68% */
 /* Space Beats: 35.95% */
 
@@ -129,7 +138,78 @@ public:
 
         if (minima == INT_MAX || maxima == INT_MAX)
             return {-1, -1};
-        
+
+        return {minima, maxima};
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Improve Space Complexity from O(n) to O(1).
+
+    Actually, it was maximally O(n/2), but that is consideredd O(n).
+
+*/
+
+/* Time  Beats: 99.85% */
+/* Space Beats: 99.71% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    std::vector<int> nodesBetweenCriticalPoints(ListNode* head)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        int minima = INT_MAX;
+        int maxima = INT_MIN;
+
+        int first_critical_idx = -1;
+        int last_critical_idx  = -1;
+
+        int index = 1; // Starts at 1
+
+        ListNode* prev = nullptr;
+        ListNode* next;
+
+        ListNode* curr = head;
+        while (curr)
+        {
+            next = curr->next;
+
+            if (prev && next)
+            {
+                if ((prev->val < curr->val && curr->val > next->val) ||
+                    (prev->val > curr->val && curr->val < next->val))
+                {
+                    if (first_critical_idx > -1)
+                    {
+                        minima = std::min(minima, index - last_critical_idx);
+                        maxima = index - first_critical_idx;
+                    }
+                    else
+                        first_critical_idx = index;
+
+                    last_critical_idx = index;
+                }
+            }
+
+            prev = curr;
+            curr = curr->next;
+
+            index++;
+        }
+
+        if (minima == INT_MAX || maxima == INT_MAX)
+            return {-1, -1};
+
         return {minima, maxima};
     }
 };
