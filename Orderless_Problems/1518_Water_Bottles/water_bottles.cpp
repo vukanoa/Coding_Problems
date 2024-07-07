@@ -121,3 +121,52 @@ private:
 
 };
 
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    As it turns out, we can calculate the number of bottles we can drink with
+    just one formula in O(1) time.
+
+        First of all as earlier you can immediately drink numBottles and get
+        numBottles empty bottles.
+
+        Every time you trade in numExchange bottles, you get one bottle back.
+        Therefore you decrease your number of bottles by numExchange - 1 and
+        increase result by 1.
+
+        This suggests a simple division, where you can just divide numBottles
+        by numExchange - 1. This doesn't work you can't end up with zero
+        bottles. For example if you have 4 bottles and numExchange is 5, you
+        can't trade and wind up with 0 bottles; you can't trade at all.
+
+    The "price" of buying a refill is handing over numExchange - 1 empties.
+    However, you must have your own empty bottle to receive the refill.
+
+    Therefore after drinking the initial numBottles, you "keep aside" one empty
+    for receiving the refills.
+    (therefore in fact you use for exchange numBottles - 1) and trade in the
+    remaining numBottles - 1 empties to get refills.
+
+    So, you subtract one from each of the numbers you're given, and then
+    divide. That says how many full bottles you can get by trading. Add to that
+    the number of bottles you started with, and you have the answer
+
+*/
+
+/* Time  Beats: 53.84% */
+/* Space Beats: 95.58% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Math {
+public:
+    int numWaterBottles(int numBottles, int numExchange)
+    {
+        return numBottles + (numBottles - 1) / (numExchange - 1);
+    }
+};
