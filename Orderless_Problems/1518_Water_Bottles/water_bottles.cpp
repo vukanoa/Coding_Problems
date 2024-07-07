@@ -83,3 +83,41 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats: 30.43%  */
+
+/* Time  Complexity: O(log(numExhange)) */
+/* Space Complexity: O(log(numExchange)) */
+class Solution_Recursion {
+public:
+    int numWaterBottles(int numBottles, int numExchange)
+    {
+        return numBottles + exchange(numBottles, numExchange);
+    }
+
+private:
+    int exchange(int numBottles, int numExchange)
+    {
+        if (numBottles < numExchange)
+            return 0;
+
+        auto [full, empty] = std::div(numBottles, numExchange);
+
+        return full + exchange(full + empty, numExchange);
+    }
+
+};
+
