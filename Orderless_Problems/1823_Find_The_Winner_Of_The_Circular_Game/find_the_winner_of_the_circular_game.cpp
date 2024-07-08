@@ -117,3 +117,37 @@ public:
         return -1;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 75.45% */
+/* Space Beats: 92.77% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Recursive {
+public:
+    int findTheWinner(int n, int k)
+    {
+        return recursion(n, k) + 1;
+    }
+
+private:
+    int recursion(int n, int k)
+    {
+        if (n == 1)
+            return 0;
+
+        return (recursion(n-1, k) + k) % n;
+    }
+};
