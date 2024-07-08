@@ -151,3 +151,32 @@ private:
         return (recursion(n-1, k) + k) % n;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 65.36% */
+/* Space Beats: 76.96% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Bottom_Up_DP {
+public:
+    int findTheWinner(int n, int k)
+    {
+        int result = 0;
+        for (int friend_idx = 2; friend_idx <= n; friend_idx++)
+            result = (result + k) % friend_idx;
+
+        return result + 1;
+    }
+};
