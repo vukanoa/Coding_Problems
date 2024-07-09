@@ -137,3 +137,48 @@ public:
         return result / customers.size();
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Basically the same approach, but using Recursion.
+
+*/
+
+/* Time  Beats: 84.12% */
+/* Space Beats: 17.94% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Recursive {
+public:
+    double averageWaitingTime(vector<vector<int>>& customers)
+    {
+        const int n = customers.size();
+
+        return sum(0, 0, customers) / n;
+    }
+
+private:
+    double sum(int i, double prepare, vector<vector<int>>& customers)
+    {
+        const int n = customers.size();
+
+        if (i >= n)
+            return 0;
+
+        auto& one_customer = customers[i];
+
+        int arrival = one_customer[0];
+        int time    = one_customer[1];
+
+        prepare = std::max(prepare, (double)arrival) + time;
+
+        return prepare - arrival + sum(i+1, prepare, customers);
+    }
+};
