@@ -140,12 +140,58 @@ public:
         int level = 0;
         for (std::string& log: logs)
         {
-            if (log == "../") 
+            if (log == "../")
                 level -= (level > 0);
             else if (log!="./")
                 level++;
         }
 
         return level;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Similar to first Solution in this file(All the way above), but implemented
+    in a Recursive way.
+
+*/
+
+/* Time  Beats: 67.13% */
+/* Space Beats: 37.81% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Recursive {
+public:
+    int minOperations(vector<string>& logs)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        const int n = logs.size();
+
+        return dfs(n-1, logs);
+    }
+
+private:
+    int dfs(int i, vector<string>& logs)
+    {
+        if (i < 0)
+            return 0;
+
+        int prev = dfs(i-1, logs);
+
+        if (logs[i] == "../")
+            return prev - (prev > 0);
+
+        if (logs[i] != "./")
+            return 1 + prev;
+
+        return prev;
     }
 };
