@@ -195,3 +195,36 @@ private:
         return prev;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 67.13% */
+/* Space Beats: 61.11% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Branchloss {
+public:
+    static int minOperations(vector<string>& logs)
+    {
+        int level = 0;
+        for (auto& log: logs)
+        {
+            const int x = (log[0] << 8) + log[1];
+
+            level += - (x == 11822 && level > 0) + (x >= 12544);
+        }
+
+        return level;
+    }
+};
