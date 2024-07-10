@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stack>
 
 /*
     ============
@@ -110,5 +111,41 @@ public:
         }
 
         return stack.size();
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 86.73% */
+/* Space Beats: 41.82% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Space_Efficient {
+public:
+    int minOperations(vector<string>& logs)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        int level = 0;
+        for (std::string& log: logs)
+        {
+            if (log == "../") 
+                level -= (level > 0);
+            else if (log!="./")
+                level++;
+        }
+
+        return level;
     }
 };
