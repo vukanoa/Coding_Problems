@@ -115,3 +115,83 @@ private:
         return new Node_Value(INT_MIN, INT_MAX, std::max(left->max_sum, right->max_sum));
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 43.20% */
+/* Space Beats: 39.77% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    int maxSumBST(TreeNode* root)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        int result = 0;
+
+        int curr_max = INT_MIN;
+        int curr_min = INT_MAX;
+
+        dfs(root, curr_max, curr_min, result);
+
+        return result;
+    }
+
+private:
+    int dfs(TreeNode* root, int& curr_max, int& curr_min, int& result)
+    {
+        if ( ! root)
+            return 0;
+
+        /*
+          left_min, left_max will find the minimum and maximum node in the
+          left subtree.
+
+          Similarly, right_min, right_max will find minimum and maximum node in
+          the right subtree.
+        */
+        int left_min;
+        int right_min;
+
+        int left_max;
+        int right_max;
+
+        left_min  = right_min = INT_MAX;
+        left_max = right_max = INT_MIN;
+
+        int left  = dfs(root->left,  left_max,  left_min,  result);
+        int right = dfs(root->right, right_max, right_min, result);
+
+        int val = left + right + root->val;
+
+        // If the left maximum is less than and right minimum is greater than
+        // current node then the subtree rooted at current node is indeed BST.
+
+        if (left_max < root->val && right_min > root->val)
+        {
+            result = std::max(result, val);
+
+            curr_max = std::max(root->val, right_max);
+            curr_min = std::min(root->val, left_min);
+        }
+        else
+        {
+            curr_max = INT_MAX;
+            curr_min = INT_MIN;
+        }
+
+        return val;
+    }
+};
