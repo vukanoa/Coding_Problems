@@ -119,3 +119,68 @@ private:
         return result;
     };
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats:  100% */
+/* Space Beats: 75.61% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Space_Efficient {
+public:
+    int maximumGain(string s, int x, int y)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        int result = 0;
+
+        int a_count = 0;
+        int b_count = 0;
+
+        int lesser = std::min(x, y);
+
+        for (char c : s)
+        {
+            if (c > 'b')
+            {
+                result += std::min(a_count, b_count) * lesser;
+                a_count = 0;
+                b_count = 0;
+            }
+            else if (c == 'a')
+            {
+                if (x < y && b_count > 0)
+                {
+                    b_count--;
+                    result += y;
+                }
+                else
+                    a_count++;
+            }
+            else
+            {
+                if (x > y && a_count > 0)
+                {
+                    a_count--;
+                    result += x;
+                }
+                else
+                    b_count++;
+            }
+        }
+
+        result += std::min(a_count, b_count) * lesser;
+        return result;
+    }
+};
