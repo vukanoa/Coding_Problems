@@ -45,7 +45,7 @@
     =====
 
     =============================================================================================================
-    FUNCTION: vector<int> survivedRobotsHealths(vector<int>& positions, vector<int>& healths, string directions); 
+    FUNCTION: vector<int> survivedRobotsHealths(vector<int>& positions, vector<int>& healths, string directions);
     =============================================================================================================
 
     ==========================================================================
@@ -105,7 +105,7 @@ public:
     vector<int> survivedRobotsHealths(vector<int>& positions, vector<int>& healths, string directions)
     {
         ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-        
+
         const int N = positions.size();
 
         unordered_map<int, int> position_index_map;
@@ -137,7 +137,7 @@ public:
                     {
                         healths[stack_top_idx]--;
                         healths[curr_idx] = 0;
-                        
+
                         stack.push(stack_top_idx);
                     }
                     else // if (healths[stack_top_idx] == healths[curr_idx])
@@ -148,6 +148,84 @@ public:
 
                 if (healths[curr_idx] > 0)
                     stack.push(curr_idx);
+            }
+            else // if (directions[curr_idx] == 'R')
+                stack.push(curr_idx);
+        }
+
+        vector<int> results;
+        for (int& health : healths)
+        {
+            if (health > 0)
+                results.push_back(health);
+        }
+
+        return results;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 88.93% */
+/* Space Beats: 34.35% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n)        */
+class Solution_Slightly_Optimized {
+public:
+    vector<int> survivedRobotsHealths(vector<int>& positions, vector<int>& healths, string directions)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        const int N = positions.size();
+
+        unordered_map<int, int> position_index_map;
+        for (int i = 0; i < N; i++)
+            position_index_map.insert( {positions[i], i}  );
+
+        stack<int> stack;
+
+        /* Sort positions */
+        sort(positions.begin(), positions.end());
+
+        for (int& pos : positions)
+        {
+            int curr_idx = position_index_map[pos];
+
+            if (directions[curr_idx] == 'L')
+            {
+                while (!stack.empty() && healths[curr_idx] > 0)
+                {
+                    int stack_top_idx = stack.top();
+                    stack.pop();
+
+                    if (healths[stack_top_idx] < healths[curr_idx])
+                    {
+                        healths[stack_top_idx] = 0;
+                        healths[curr_idx]--;
+                    }
+                    else if (healths[stack_top_idx] > healths[curr_idx])
+                    {
+                        healths[stack_top_idx]--;
+                        healths[curr_idx] = 0;
+
+                        stack.push(stack_top_idx);
+                    }
+                    else // if (healths[stack_top_idx] == healths[curr_idx])
+                    {
+                        healths[stack_top_idx] = healths[curr_idx] = 0;
+                    }
+                }
             }
             else // if (directions[curr_idx] == 'R')
                 stack.push(curr_idx);
