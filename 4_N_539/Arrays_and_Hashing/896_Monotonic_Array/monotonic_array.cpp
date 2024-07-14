@@ -23,7 +23,7 @@
     or false otherwise.
 
     ==============================================
-    FUNCTION: bool isMonotonic(vector<int>& nums); 
+    FUNCTION: bool isMonotonic(vector<int>& nums);
     ==============================================
 
     ==========================================================================
@@ -89,12 +89,49 @@ public:
             {
                 if (nums[i-1] == nums[i])
                     continue;
-                
+
                 if (nums[i-1] < nums[i])
                     type = 1;
                 else
                     type = 2;
             }
+        }
+
+        return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a much more elegant approach. It's self-explanatory.
+
+*/
+
+/* Time  Beats: 97.90% */
+/* Space Beats: 97.70% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Elegant {
+class Solution {
+public:
+    bool isMonotonic(vector<int>& nums)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        
+        if (nums[0] > nums.back())
+            reverse(nums.begin(), nums.end());
+
+        for (int i = 1; i < nums.size(); i++)
+        {
+            if (nums[i-1] > nums[i]) // If it's NOT monotonicly INCREASING
+                return false;
         }
 
         return true;
