@@ -59,8 +59,8 @@
 
 */
 
-/* Time  Beats: 42.51% */
-/* Space Beats:  7.28% */
+/* Time  Beats: 99.64% */
+/* Space Beats: 89.93% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -68,6 +68,8 @@ class Solution_Naive_Messy {
 public:
     bool isMonotonic(vector<int>& nums)
     {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        
         int type = 0; // 1 => increasing, 2 => decreasing
 
         for (int i = 1; i < nums.size(); i++)
@@ -109,6 +111,46 @@ public:
     --- IDEA ---
     ------------
 
+    Only if both "premises"(i.e. that nums array is strictly increasing or
+    strictly decreasing) are disputed, only then can we return "false".
+
+*/
+
+/* Time  Beats: 98.46% */
+/* Space Beats: 30.83% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Improved_Naive {
+public:
+    bool isMonotonic(vector<int>& nums)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        
+        bool increasing = true;
+        bool decreasing = true;
+
+        for (int i = 1; i < nums.size(); i++)
+        {
+            if (nums[i-1] > nums[i])
+                increasing = false;
+
+            if (nums[i-1] < nums[i])
+                decreasing = false;
+        }
+
+        return increasing || decreasing;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     This is a much more elegant approach. It's self-explanatory.
 
 */
@@ -119,7 +161,6 @@ public:
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
 class Solution_Elegant {
-class Solution {
 public:
     bool isMonotonic(vector<int>& nums)
     {
