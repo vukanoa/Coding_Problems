@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 
 /*
     ==============
@@ -125,6 +126,69 @@ public:
         }
 
         while (parent[root] != 0) // Find real root
+            root = parent[root];
+
+        return node[root];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 95.20% */
+/* Space Beats: 88.86% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Hash_Map {
+public:
+    TreeNode* createBinaryTree(vector<vector<int>>& descriptions)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        int root = -1;
+        const int n = descriptions.size();
+
+        unordered_map<int, int> parent;
+        unordered_map<int, TreeNode*> node;
+
+        parent.reserve(n);
+        node.reserve(n);
+
+        for (auto& d : descriptions)
+        {
+            int x = d[0];
+            int y = d[1];
+            int l = d[2];
+
+            if (node.count(x) == 0)
+            {
+                node[x] = new TreeNode(x);
+
+                if (parent.count(x) == 0)
+                    root = x;
+            }
+
+            if (node.count(y)==0)
+                node[y] = new TreeNode(y);
+
+            parent[y] = x;
+            if (l)
+                node[x]->left = node[y];
+            else
+                node[x]->right = node[y];
+        }
+
+        while (parent.count(root))// find real root
             root = parent[root];
 
         return node[root];
