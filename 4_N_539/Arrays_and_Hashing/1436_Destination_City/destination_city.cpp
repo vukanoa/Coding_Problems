@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 /*
     ============
@@ -92,6 +93,44 @@ public:
         {
             if (entry.second == 0)
                 return entry.first;
+        }
+
+        return ""; // Won't get to here ever
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of implementing it.
+
+*/
+
+/* Time  Beats: 75.56% */
+/* Space Beats: 44.89% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+    string destCity(vector<vector<string>>& paths)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        unordered_set<string> uset;
+
+        for (auto& p : paths)
+            uset.insert(p[0]);
+
+        for (auto& p : paths)
+        {
+            if (uset.find(p[1]) == uset.end()) // Doesn't exist in the Set
+                return p[1];
         }
 
         return ""; // Won't get to here ever
