@@ -200,3 +200,90 @@ private:
         return all_distances;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 8.89% */
+/* Space Beats: 5.24% */
+
+/* Time  Complexity: O(n^3) */
+/* Space Complexity: O(n)   */
+class Solution_Graph_Conversion_Plus_BFS {
+public:
+    int countPairs(TreeNode* root, int distance)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        
+        unordered_map<TreeNode*, vector<TreeNode*>> graph;
+        unordered_set<TreeNode*> leaf_nodes;
+
+        traverse_tree(root, nullptr, graph, leaf_nodes);
+
+        int pairs = 0;
+        for (TreeNode* leaf : leaf_nodes)
+        {
+            queue<TreeNode*> bfs_queue;
+            unordered_set<TreeNode*> seen;
+
+            bfs_queue.push(leaf);
+            seen.insert(leaf);
+
+            for (int i = 0; i <= distance; i++)
+            {
+                int size = bfs_queue.size();
+                for (int j = 0; j < size; j++)
+                {
+                    TreeNode* currNode = bfs_queue.front();
+                    bfs_queue.pop();
+                    if (leaf_nodes.count(currNode) && currNode != leaf)
+                        pairs++;
+
+                    if (graph.count(currNode))
+                    {
+                        for (TreeNode* neighbor : graph[currNode])
+                        {
+                            if (!seen.count(neighbor))
+                            {
+                                bfs_queue.push(neighbor);
+                                seen.insert(neighbor);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return pairs / 2;
+    }
+
+private:
+    void traverse_tree(TreeNode* currNode, TreeNode* prevNode, 
+                      unordered_map<TreeNode*, vector<TreeNode*>>& graph, 
+                      unordered_set<TreeNode*>& leaf_nodes)
+        {
+            if (!currNode)
+                return;
+
+            if (!currNode->left && !currNode->right)
+                leaf_nodes.insert(currNode);
+
+        if (prevNode)
+        {
+            graph[prevNode].push_back(currNode);
+            graph[currNode].push_back(prevNode);
+        }
+
+        traverse_tree(currNode->left,  currNode, graph, leaf_nodes);
+        traverse_tree(currNode->right, currNode, graph, leaf_nodes);
+    }
+};
