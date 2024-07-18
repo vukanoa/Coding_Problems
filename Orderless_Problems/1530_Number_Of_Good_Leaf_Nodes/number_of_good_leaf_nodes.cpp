@@ -124,3 +124,79 @@ private:
         return all_distances;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Since there can be more than one leaf on the left(or right) side with the
+    same distance to its mutual parent, then we can use a Hash Map instead
+    where the distance is the key and number of such nodes is the value.
+
+*/
+
+/* Time  Beats: 46.68% */
+/* Space Beats: 17.94% */
+
+/* Time  Complexity: O(n * d^2) */
+/* Space Complexity: O(n)       */
+class Solution_Hash_Map {
+class Solution {
+public:
+    int countPairs(TreeNode* root, int distance)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        int pairs = 0;
+
+        dfs(root, distance, pairs);
+
+        return pairs;
+    }
+
+private:
+    unordered_map<int, int> dfs(TreeNode* root, const int& distance, int& pairs)
+    {
+        if (!root)
+            return {};
+
+        if (!root->left && !root->right)
+        {
+            unordered_map<int, int> count_umap;
+            count_umap.insert({1, 1});
+
+            return count_umap;
+        }
+
+        unordered_map<int, int> left_distances = dfs(root->left, distance, pairs);
+        unordered_map<int, int> right_distances = dfs(root->right, distance, pairs);
+
+        for (const auto& d1 : left_distances)
+        {
+            for (const auto& d2 : right_distances)
+            {
+                if (d1.first + d2.first <= distance)
+                    pairs += d1.second * d2.second;
+            }
+        }
+
+        unordered_map<int, int> all_distances;
+
+        for (const auto& d : left_distances)
+        {
+            if (d.first + 1 <= distance)
+                all_distances[d.first + 1] = d.second;
+        }
+
+        for (const auto& d : right_distances)
+        {
+            if (d.first + 1 <= distance)
+                all_distances[d.first + 1] += d.second;
+        }
+
+        return all_distances;
+    }
+};
