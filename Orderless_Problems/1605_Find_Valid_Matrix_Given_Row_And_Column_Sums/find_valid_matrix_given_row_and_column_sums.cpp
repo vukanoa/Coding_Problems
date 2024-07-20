@@ -115,3 +115,49 @@ public:
         return matrix;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    (This one is more difficult to come up with)
+
+*/
+
+/* Time  Beats: 97.74% */
+/* Space Beats: 11.51% */
+
+/* Time  Complexity: O(M * N) */
+/* Space Complexity: O(1)     */
+class Solution_2 {
+public:
+    vector<vector<int>> restoreMatrix(vector<int>& rowSum, vector<int>& colSum)
+    {
+        const int ROWS = rowSum.size();
+        const int COLS = colSum.size();
+
+        vector<vector<int>> matrix(ROWS, vector<int>(COLS, 0));
+
+        int r = 0;
+        int c = 0;
+        while (r < ROWS && c < COLS)
+        {
+            matrix[r][c] = min(rowSum[r], colSum[c]);
+
+            rowSum[r] -= matrix[r][c];
+            colSum[c] -= matrix[r][c];
+
+            if (rowSum[r] == 0)
+                r++;
+            else
+                c++;
+        }
+
+        return matrix;
+    }
+};
