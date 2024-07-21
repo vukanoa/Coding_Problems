@@ -115,7 +115,7 @@
 /* Space Beats:   7.03% */
 
 /* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(n)        */
+/* Space Complexity: O(n + m)    */ // n - number of tweets, m - number of users
 class Twitter {
 public:
     Twitter()
@@ -187,6 +187,89 @@ private:
     std::priority_queue<vector<int>, vector<vector<int>>> max_heap_tweets;
 
     int time;
+};
+
+/**
+ * Your Twitter object will be instantiated and called as such:
+ * Twitter* obj = new Twitter();
+ * obj->postTweet(userId,tweetId);
+ * vector<int> param_2 = obj->getNewsFeed(userId);
+ * obj->follow(followerId,followeeId);
+ * obj->unfollow(followerId,followeeId);
+ */
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Implementation without using Heap.
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  13.99% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n + m)    */ // n - number of tweets, m - number of users
+class Twitter {
+public:
+    Twitter() {
+
+    }
+
+    void postTweet(int userId, int tweetId)
+    {
+        posts.push_back({userId, tweetId});
+    }
+
+    vector<int> getNewsFeed(int userId)
+    {
+        int count = 0;
+        vector<int> most_recent_ten_or_less_tweets;
+
+        // Since postTweet pushes to the back, looping from back gets most recent
+        for (int i = posts.size() - 1; i >= 0; i--)
+        {
+            if (count == 10)
+                break;
+
+            int followingId = posts[i].first;
+            int tweetId = posts[i].second;
+
+            unordered_set<int> following = follow_umap[userId];
+
+            // Add to result if they're following them or it's a tweet from themself
+            if (followingId == userId || following.find(followingId) != following.end())
+            {
+                most_recent_ten_or_less_tweets.push_back(tweetId);
+                count++;
+            }
+        }
+
+        return most_recent_ten_or_less_tweets;
+    }
+
+    void follow(int followerId, int followeeId)
+    {
+        follow_umap[followerId].insert(followeeId);
+    }
+
+    void unfollow(int followerId, int followeeId)
+    {
+        follow_umap[followerId].erase(followeeId);
+    }
+
+private:
+    // Pairs: [user, tweet]
+    vector<pair<int, int>> posts;
+
+    // Hash Map: {user -> people they follow}
+    unordered_map<int, unordered_set<int>> follow_umap;
 };
 
 /**
