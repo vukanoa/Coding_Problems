@@ -105,3 +105,41 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Using custom sort.
+
+*/
+
+/* Time  Beats: 34.26% */
+/* Space Beats:  8.78% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n)        */
+class Solution_Custom_Sort {
+public:
+    vector<int> frequencySort(vector<int>& nums)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        
+        int n = nums.size();
+        unordered_map<int, int> freq;
+
+        for(int num : nums)
+            freq[num]++;
+        
+        sort(nums.begin(), nums.end(), [&](int a, int b){
+            return (freq[a] == freq[b]) ? a > b : freq[a] < freq[b];
+        });
+
+        return nums;
+    }
+};
+
