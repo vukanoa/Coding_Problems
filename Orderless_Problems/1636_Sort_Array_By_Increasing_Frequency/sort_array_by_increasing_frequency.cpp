@@ -128,13 +128,13 @@ public:
     vector<int> frequencySort(vector<int>& nums)
     {
         ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-        
+
         int n = nums.size();
         unordered_map<int, int> freq;
 
         for(int num : nums)
             freq[num]++;
-        
+
         sort(nums.begin(), nums.end(), [&](int a, int b){
             return (freq[a] == freq[b]) ? a > b : freq[a] < freq[b];
         });
@@ -143,3 +143,94 @@ public:
     }
 };
 
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Counting sort is by far the most efficient.
+
+    TODO
+
+*/
+
+/* Time  Beats: 73.10% */
+/* Space Beats: 78.88% */
+
+/* Time  Complexity: O(n + m) */
+/* Space Complexity: O(m)     */
+class Solution_Counting_Sort {
+public:
+    vector<int> frequencySort(vector<int>& nums)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        const int n = nums.size();
+        vector<int> freq(201, 0);
+
+        int maxF = 0;
+        int maxX = -1;
+
+        for (int x : nums)
+        {
+            x += 100; // x-min_x where min_x=-100
+            int f = ++freq[x];
+
+            maxX = max(x, maxX);
+            maxF = max(f, maxF);
+        }
+
+        vector<vector<int>> freq_x(maxF + 1);
+        for (int x = 0; x <= maxX; x++)
+        {
+            if (freq[x] > 0)
+                freq_x[freq[x]].push_back(x - 100); // Adjust value back
+        }
+
+        int i = 0;
+        for (int curr_freq = 1; curr_freq <= maxF; curr_freq++)
+        {
+            auto& arr = freq_x[curr_freq];
+            counting_sort(arr);
+
+            // Each x occurs f times
+            for (int x : arr)
+            {
+                fill(nums.begin() + i, nums.begin() + i + curr_freq, x);
+                i += curr_freq;
+            }
+        }
+
+        return nums;
+    }
+
+public:
+
+    // Counting sort in the decreasing order
+    void counting_sort(auto& arr)
+    {
+        if (arr.empty())
+            return;
+
+        auto [x_min, x_max] = minmax_element(arr.begin(), arr.end());
+        int min_val  = *x_min;
+        int diff_val = *x_max - min_val + 1;
+
+        vector<int> count(diff_val, 0);
+
+        for (int x : arr)
+            count[x - min_val]++;
+
+        int i = 0;
+        // Sort in decreasing order
+        for (int y = diff_val - 1; y >= 0; y--)
+        {
+            int f = count[y];
+            fill(arr.begin() + i, arr.begin() + i + f, y + min_val);
+            i += f;
+        }
+    }
+};
