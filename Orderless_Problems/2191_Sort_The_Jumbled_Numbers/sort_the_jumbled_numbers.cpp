@@ -118,3 +118,57 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 97.40% */
+/* Space Beats: 67.53% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n)        */
+class Solution_2 {
+public:
+    vector<int> sortJumbled(vector<int>& mapping, vector<int>& nums)
+    {
+        vector<pair<int, int>> pairs;
+
+        for (int i = 0; i < nums.size(); i++)
+        {
+            int number = nums[i]; // So that we don't "touch" the original
+            int mapped_num = 0;
+            int base = 1;
+
+            if (number == 0)
+                mapped_num = mapping[number];
+
+            while (number > 0)
+            {
+                int digit = number % 10;
+                number /= 10;
+
+                mapped_num += base * mapping[digit];
+                base *= 10;
+            }
+
+            pairs.push_back( {mapped_num, i} );
+        }
+
+        sort(pairs.begin(), pairs.end());
+
+        vector<int> result;
+        for (int i = 0; i < pairs.size(); i++)
+            result.push_back(nums[pairs[i].second]);
+
+        return result;
+    }
+};
