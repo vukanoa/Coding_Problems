@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <numeric>
 
 /*
     ============
@@ -115,5 +116,33 @@ public:
             return false;
 
         return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Efficient C++ way.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  27.10% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_CPP {
+public:
+    bool arrayStringsAreEqual(vector<string>& word1, vector<string>& word2)
+    {
+        std::string concatenated_word1 = std::accumulate(word1.begin(), word1.end(), std::string{});
+        std::string concatenated_word2 = std::accumulate(word2.begin(), word2.end(), std::string{});
+
+        return concatenated_word1 == concatenated_word2;
     }
 };
