@@ -163,3 +163,96 @@ private:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+    We don't have to do it for N characters, we can do it for all 26 lowercase
+    character and then each time we have the same character, we can use the
+    precalculated one.
+
+    That's where the above TLE comes down to this.
+
+*/
+
+/* Time  Beats: 13.53% */
+/* Space Beats: 19.14% */
+
+/* Time  Complexity: O(26 * M + N) ==> O(M + N) */
+/* Space Complexity: O(M)                       */
+class Solution {
+public:
+    long long minimumCost(string source, string target, vector<char>& original, vector<char>& changed, vector<int>& cost)
+    {
+        const int N = source.length();
+
+        // Create Adjacency List
+        unordered_map<char, vector<pair<char, int>>> adj_list;
+        for (int i = 0; i < original.size(); i++)
+            adj_list[original[i]].push_back({changed[i], cost[i]});
+
+        unordered_map<char, unordered_map<char, int>> umap_min_cost_maps;
+
+        // Iterate over the set of unique characters in the source string
+        unordered_set<char> unique_chars(source.begin(), source.end());
+        for (const char& chr : unique_chars)
+            umap_min_cost_maps[chr] = dijkstra(adj_list, chr);
+
+        long long result = 0;
+        for (int i = 0; i < N; i++)
+        {
+            char src = source[i];
+            char dst = target[i];
+
+            // If we cannot convert src into dst in any way, then return -1
+            if (umap_min_cost_maps[src].find(dst) == umap_min_cost_maps[src].end())
+                return -1;
+
+            result += umap_min_cost_maps[src][dst];
+        }
+
+        return result;
+    }
+
+private:
+    unordered_map<char, int> dijkstra(unordered_map<char, vector<pair<char, int>>>& adj_list, char src)
+    {
+        priority_queue<pair<int, char>, vector<pair<int, char>>, greater<pair<int, char>>> min_heap;
+        unordered_map<char, int> min_cost_map;
+        unordered_set<char> visited;
+
+        // Initialize the priority queue with the source node
+        min_heap.push({0, src});
+
+        while ( ! min_heap.empty())
+        {
+            int cost  = min_heap.top().first;
+            char node = min_heap.top().second;
+            min_heap.pop();
+
+            if (visited.find(node) != visited.end())
+                continue;
+
+            visited.insert(node);
+            min_cost_map[node] = cost;
+
+            for (auto& entry : adj_list[node])
+            {
+                char nei      = entry.first;
+                int  nei_cost = entry.second;
+
+                if (visited.find(nei) == visited.end())
+                    min_heap.push({cost + nei_cost, nei});
+            }
+        }
+
+        return min_cost_map;
+    }
+};
