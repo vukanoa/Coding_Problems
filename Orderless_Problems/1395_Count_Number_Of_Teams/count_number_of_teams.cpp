@@ -133,6 +133,76 @@ public:
 
     TODO
 
+    (DP Solution)
+
+*/
+
+/* Time  Beats: 35.62% */
+/* Space Beats: 19.18% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(n)   */
+class Solution_DP {
+public:
+    int numTeams(vector<int>& rating)
+    {
+        int n = rating.size();
+        vector<vector<vector<int>>> cache(n, vector<vector<int>>(2, vector<int>(4, -1))); // 2 for ascending/descending, 4 for in_line (0, 1, 2, 3)
+
+        int result = 0;
+        for (int i = 0; i < n; i++)
+        {
+            result += backtracking(rating, cache, i, true, 1);  // Ascending
+            result += backtracking(rating, cache, i, false, 1); // Descending
+        }
+
+        return result;
+    }
+
+private:
+    int backtracking(vector<int>& rating,
+                     vector<vector<vector<int>>>& cache,
+                     int i,
+                     bool ascending,
+                     int in_line)
+    {
+        if (in_line == 3)
+            return 1;
+
+        if (i == rating.size())
+            return 0;
+
+        int asc_idx = ascending ? 1 : 0;
+
+        if (cache[i][asc_idx][in_line] != -1)
+            return cache[i][asc_idx][in_line];
+
+        int result = 0;
+        for (int j = i + 1; j < rating.size(); j++)
+        {
+            if (ascending && rating[i] < rating[j])
+                result += backtracking(rating, cache, j, ascending, in_line + 1);
+
+            if (!ascending && rating[i] > rating[j])
+                result += backtracking(rating, cache, j, ascending, in_line + 1);
+        }
+
+        cache[i][asc_idx][in_line] = result;
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
     (Binary Index Tree)
 
 */
