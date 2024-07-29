@@ -1,5 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <unordered_map>
+#include <tuple>
+#include <functional>
 
 /*
     ==============
@@ -117,5 +120,105 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+    (Binary Index Tree)
+
+*/
+
+/* Time  Beats: 98.95% */
+/* Space Beats: 26.87% */
+
+/*
+    Time  Complexity: O(n * logn)
+
+        + Sorting the soldiers takes O(n log n) time.
+
+        + We iterate through all soldiers once, and for each soldier, we
+          perform constant number of BIT operations, each taking O(log n) time.
+
+        + Therefore, the overall time complexity is O(n log n).
+*/
+/*
+    Space Complexity: O(n)
+
+        + We use additional space for the list of soldiers, the index map, and
+          the BIT, each of size O(n).
+
+        + Therefore, the overall space complexity is O(n).
+*/
+class Solution {
+public:
+    int numTeams(vector<int>& rating)
+    {
+        const int N = rating.size();
+
+        if (N < 3)
+            return 0;
+
+        vector<pair<int, int>> soldiers;
+
+        for (int i = 0; i < N; i++)
+            soldiers.push_back({rating[i], i});
+
+        sort(soldiers.begin(), soldiers.end());
+
+        vector<int> index_map(N);
+        for (int i = 0; i < N; i++)
+            index_map[soldiers[i].second] = i;
+
+        return count_teams(index_map, N, true) + count_teams(index_map, N, false);
+    }
+
+private:
+    int count_teams(const vector<int>& index_map, int N, bool ascending)
+    {
+        vector<int> bit(N + 1, 0);
+        int teams = 0;
+
+        for (int i = 0; i < N; i++)
+        {
+            int rank  = index_map[i] + 1;
+
+            int left  = ascending ? get_sum(bit, rank - 1) : get_sum(bit, N) - get_sum(bit, rank);
+            int right = ascending ? N - rank - (get_sum(bit, N) - get_sum(bit, rank)) : rank - 1 - get_sum(bit, rank - 1);
+
+            teams += left * right;
+            update(bit, rank, 1);
+        }
+
+        return teams;
+    }
+
+    void update(vector<int>& bit, int index, int val)
+    {
+        while (index < bit.size())
+        {
+            bit[index] += val;
+            index += index & (-index);
+        }
+    }
+
+    int get_sum(const vector<int>& bit, int index)
+    {
+        int sum = 0;
+        while (index > 0)
+        {
+            sum += bit[index];
+            index -= index & (-index);
+        }
+
+        return sum;
     }
 };
