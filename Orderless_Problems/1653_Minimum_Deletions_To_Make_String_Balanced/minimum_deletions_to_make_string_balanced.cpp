@@ -95,3 +95,54 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 99.04% */
+/* Space Beats: 66.99% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Space_Efficient {
+public:
+    int minimumDeletions(string s)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        const int N = s.length();
+        int count_a_to_the_right = 0;
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            if (s[i] == 'a')
+                count_a_to_the_right++;
+        }
+
+        int result = INT_MAX;
+        int count_b_to_the_left = 0;
+
+        for (int i = 0; i < N; i++)
+        {
+            if (s[i] == 'a')
+                count_a_to_the_right--;
+
+            int deletions = count_b_to_the_left + count_a_to_the_right;
+            result = min(result, deletions);
+
+            if (s[i] == 'b')
+                count_b_to_the_left++;
+        }
+
+        return result;
+    }
+};
