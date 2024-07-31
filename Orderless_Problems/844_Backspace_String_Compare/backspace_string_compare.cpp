@@ -19,6 +19,14 @@
 
     Note that after backspacing an empty text, the text will continue empty.
 
+
+    ---------------
+    -- Follow Up --
+    ---------------
+
+        Can you solve it in O(n) time and O(1) space?
+
+
     ====================================================
     FUNCTION: bool backspaceCompare(string s, string t);
     ====================================================
@@ -63,14 +71,14 @@ using namespace std;
 /* Time  Beats: 43.51% */
 /* Space Beats: 61.03% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(n + m) */
+/* Time  Complexity: O(n + m) */
 class Solution {
 public:
     bool backspaceCompare(string s, string t)
     {
         ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-        
+
         vector<int> vec_s;
         for (int i = 0; i < s.length(); i++)
         {
@@ -100,5 +108,70 @@ public:
         }
 
         return vec_s == vec_t;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO (Follow-up)
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   9.32% */
+
+/* Time  Complexity: O(n + m) */
+/* Space Complexity: O(1)     */
+class Solution_Efficient {
+public:
+    bool backspaceCompare(string s, string t)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        int index_s = s.length()-1;
+        int index_t = t.length()-1;
+
+        while (index_s >= 0 || index_t >= 0)
+        {
+            index_s = next_valid_char(s, index_s);
+            index_t = next_valid_char(t, index_t);
+
+            char chr_s = index_s >= 0 ? s[index_s] : '\0';
+            char chr_t = index_t >= 0 ? t[index_t] : '\0';
+
+            if (chr_s != chr_t)
+                return false;
+
+            index_s--;
+            index_t--;
+        }
+
+        return true;
+    }
+
+private:
+    int next_valid_char(string str, int index)
+    {
+        int backspaces = 0;
+
+        while (index >= 0)
+        {
+            if (backspaces == 0 && str[index] != '#')
+                break;
+            else if (str[index] == '#')
+                backspaces++;
+            else
+                backspaces--;
+
+            index--;
+        }
+
+        return index;
     }
 };
