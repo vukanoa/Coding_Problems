@@ -131,3 +131,61 @@ public:
         return min_swaps;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 99.41% */
+/* Space Beats: 45.38% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Space_Efficient {
+public:
+    int minSwaps(vector<int>& nums)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // accelerates
+
+        const int n = nums.size();
+
+        int total_ones = 0;
+        for (const int& num : nums)
+            total_ones += num == 1 ? 1 : 0;
+
+        if (total_ones == 0 || total_ones == n)
+            return 0;
+
+        int curr_ones_in_window = 0;
+        int max_ones_in_window  = 0;
+
+        int left  = 0;
+        int right = 0;
+
+        while (right < 2*n)
+        {
+            if (nums[right % n] == 1)
+                curr_ones_in_window++;
+
+            if (right - left + 1 > total_ones)
+            {
+                curr_ones_in_window -= nums[left % n];
+                left++;
+            }
+
+            max_ones_in_window = max(max_ones_in_window, curr_ones_in_window);
+
+            right++;
+        }
+
+        return total_ones - max_ones_in_window;
+    }
+};
