@@ -195,3 +195,51 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+    for (const int& num : nums)
+    {
+        if (umap.find(num) != umap.end()) // Exists in HashMap
+            result += umap[num];
+
+        umap[num]++;
+    }
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   7.73% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Without_Formula {
+public:
+    int numIdenticalPairs(vector<int>& nums)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        int result = 0;
+
+        unordered_map<int, int> umap;
+        for (const int& num : nums)
+        {
+            if (umap.find(num) != umap.end()) // Exists in HashMap
+            {
+                result += umap[num];
+                umap[num]++;
+            }
+            else // Doesn't exist
+                umap.insert( {num, 1} );
+        }
+
+        return result;
+    }
+};
