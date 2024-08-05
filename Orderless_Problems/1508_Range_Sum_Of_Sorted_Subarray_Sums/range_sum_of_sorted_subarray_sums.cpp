@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <queue>
 
 /*
     ============
@@ -99,5 +100,60 @@ public:
             result += computed[i];
 
         return result % MODULO;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+    (Way too complicated to come up with, but it's not bad to be aware of this
+     approach)
+
+*/
+
+/* Time  Beats: 75.97% */
+/* Space Beats: 78.57% */
+
+/* Time  Complexity: O(n * logn + k * logn) */
+/* Space Complexity: O(n)                   */
+class Solution_Complicated {
+public:
+    int rangeSum(vector<int>& nums, int n, int left, int right)
+    {
+        const int MODULO = 1e9 + 7;
+
+        std::priority_queue<pair<int, int>,
+                            vector<pair<int, int>>,
+                            greater<pair<int, int>>> min_heap;
+
+        /* O(n * logn) */
+        for (int i = 0; i < nums.size(); i++)
+            min_heap.push( {nums[i], i} );
+
+        int result = 0;
+        for (int i = 0; i < right; i++)
+        {
+            int num   = min_heap.top().first;
+            int index = min_heap.top().second;
+            min_heap.pop();
+
+            if (i >= left-1)
+                result = (result + num) % MODULO;
+
+            if (index+1 < n)
+            {
+                pair<int, int> next_pair = {num + nums[index+1], index+1};
+                min_heap.push(next_pair);
+            }
+        }
+
+        return result;
     }
 };
