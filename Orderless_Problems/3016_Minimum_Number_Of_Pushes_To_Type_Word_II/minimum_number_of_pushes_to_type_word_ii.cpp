@@ -190,3 +190,54 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Pretty much the same as above, but written in another way.
+
+*/
+
+/* Time  Beats: 99.00% */
+/* Space Beats: 98.11% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    int minimumPushes(string& word)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        const int MAPPABLE_BUTTONS    = 8;
+        const int LETTERS_IN_ALPHABET = 26;
+
+        vector<int> freq(LETTERS_IN_ALPHABET, 0);
+
+        /* O(n) */
+        for (const char& chr : word)
+            freq[chr - 'a']++;
+
+        /* O(26) -> O(1) */
+        sort(freq.begin(), freq.end(), greater<int>());
+
+        int position = 1;
+        int result   = 0;
+
+        /* O(26) -> O(1) */
+        for(int i = 0; i < LETTERS_IN_ALPHABET && freq[i] > 0; i++)
+        {
+            if (i >= MAPPABLE_BUTTONS && i % MAPPABLE_BUTTONS == 0)
+                position++;
+
+            result += freq[i] * position;
+        }
+
+        return result;
+    }
+};
