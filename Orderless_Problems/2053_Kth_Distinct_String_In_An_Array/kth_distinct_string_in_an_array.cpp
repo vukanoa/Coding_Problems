@@ -127,3 +127,44 @@ public:
         return min_heap.empty() ? "" : min_heap.top().second;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 84.08% */
+/* Space Beats: 20.16% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Elegant {
+public:
+    string kthDistinct(vector<string>& arr, int k)
+    {
+        unordered_map<string, int> counter;
+
+        for (auto& str : arr)
+            counter[str]++;
+
+        for (auto& str : arr)
+        {
+            if (counter[str] == 1)
+            {
+                k--;
+
+                if (k == 0)
+                    return str;
+            }
+        }
+
+        return "";
+    }
+};
