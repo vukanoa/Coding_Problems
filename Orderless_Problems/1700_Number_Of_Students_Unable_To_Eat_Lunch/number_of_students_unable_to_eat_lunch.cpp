@@ -117,3 +117,49 @@ public:
         return 0;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   5.06% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Elegant {
+public:
+    int countStudents(vector<int>& students, vector<int>& sandwiches)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        
+        const int N = students.size();
+
+        int have_not_eaten = N;
+
+        unordered_map<int, int> count_preferences;
+        for (const int& prefer_type : students)
+            count_preferences[prefer_type]++;
+
+        for (const int& top_type : sandwiches)
+        {
+            if (count_preferences[top_type] > 0)
+            {
+                count_preferences[top_type]--;
+                have_not_eaten--;
+            }
+            else
+                break;
+        }
+
+        return have_not_eaten;
+    }
+};
