@@ -61,8 +61,8 @@ using namespace std;
 
 */
 
-/* Time  Beats: 57.70% */
-/* Space Beats: 47.85% */
+/* Time  Beats: 98.57% */
+/* Space Beats: 32.34% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -70,6 +70,8 @@ class Solution {
 public:
     long long countSubarrays(vector<int>& nums, int k)
     {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
         const int n = nums.size();
         int max_elem = *std::max_element(nums.begin(), nums.end());
         int max_cnt  = 0;
@@ -94,6 +96,60 @@ public:
 
             if (max_cnt == k)
                 result += left + 1;
+
+            right++;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 99.63% */
+/* Space Beats: 32.77% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Concise {
+public:
+    long long countSubarrays(vector<int>& nums, int k)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        const int n = nums.size();
+        int max_elem = *std::max_element(nums.begin(), nums.end());
+        int max_cnt  = 0;
+
+        long long result = 0;
+
+        int left  = 0;
+        int right = 0;
+
+        while (right < n)
+        {
+            if (nums[right] == max_elem)
+                max_cnt++;
+
+            while (max_cnt == k)
+            {
+                if (nums[left] == max_elem)
+                    max_cnt--;
+
+                left++;
+            }
+
+            result += left;
 
             right++;
         }
