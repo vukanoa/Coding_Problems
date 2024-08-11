@@ -84,6 +84,18 @@ public:
 
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Usually, for some reason, LeetCode Solutions that use "uset.count" instead
+    of uset.find() are faster.
+
+    That's something to keep in mind, but it's not too important.
+
+*/
+
 /* Time  Beats: 99.28% */
 /* Space Beats: 71.44% */
 
