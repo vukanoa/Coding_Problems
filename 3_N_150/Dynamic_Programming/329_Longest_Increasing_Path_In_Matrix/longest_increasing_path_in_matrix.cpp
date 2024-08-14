@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 /*
     ============
@@ -58,6 +59,8 @@
     0 <= matrix[i][j] <= 2^31 - 1
 
 */
+
+using namespace std;
 
 /*
     ------------
@@ -159,5 +162,69 @@ private:
         dp[i][j] = local_longest;
 
         return dp[i][j];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, the only difference is that the above Solution is written
+    more explicitly.
+
+    For example it has both visited and dp, whereas here we only has dp, but if
+    dp[i][j] = -1, it measn that it's NOT visited.
+
+    It's easier to read the above Solution.
+
+*/
+
+/* Time  Beats: 26.73% */
+/* Space Beats: 31.87% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
+class Solution_Concise {
+public:
+    int longestIncreasingPath(vector<vector<int>>& matrix)
+    {
+        int ROWS = matrix.size();
+        int COLS = matrix[0].size();
+
+        vector<vector<int>> dp(ROWS, vector<int>(COLS, -1));
+
+        function<int(int, int, int)> dfs = [&](int r, int c, int prev)
+        {
+            if (r < 0 || r == ROWS || c < 0 || c == COLS || matrix[r][c] <= prev)
+                return 0;
+
+            if (dp[r][c] != -1)
+                return dp[r][c];
+
+            int result = 1;
+            result = max(result, 1 + dfs(r+1, c  , matrix[r][c]));
+            result = max(result, 1 + dfs(r-1, c  , matrix[r][c]));
+            result = max(result, 1 + dfs(r  , c+1, matrix[r][c]));
+            result = max(result, 1 + dfs(r  , c-1, matrix[r][c]));
+
+            dp[r][c] = result;
+
+            return result;
+        };
+
+        int longest_path = 0;
+        for (int r = 0; r < ROWS; r++)
+        {
+            for (int c = 0; c < COLS; c++)
+            {
+                longest_path = max(longest_path, dfs(r, c, -1));
+            }
+        }
+
+        return longest_path;
     }
 };
