@@ -85,7 +85,7 @@
 
 /* Time  Complexity: O(E * K) */
 /* Space Complexity: O(n)     */
-class Solution {
+class Solution_Bellman-Ford Algorithm {
 public:
     int findCheapestPrice(int n, vector<vector<int>>& flights, int src, int dst, int k)
     {
@@ -115,5 +115,73 @@ public:
         }
 
         return prices[dst] == INT_MAX ? -1 : prices[dst];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Classic BFS.
+
+*/
+
+/* Time  Beats: 69.98% */
+/* Space Beats: 80.43% */
+
+/* Time  Complexity: O(E * K) */
+/* Space Complexity: O(n + E) */
+class Solution_BFS {
+public:
+    int findCheapestPrice(int n, vector<vector<int>>& flights, int src, int dst, int K)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        vector<pair<int,int>> adj_list[n];
+
+        for (const auto& entry : flights)
+            adj_list[entry[0]].push_back({entry[1], entry[2]});
+
+        queue<pair<int, pair<int,int>>> queue; // {stops, {node, distance}}
+
+        queue.push({0, {src,0}});
+
+        vector<int> distances(n, INT_MAX);
+        distances[src] = 0;
+
+        while ( ! queue.empty())
+        {
+            pair<int, pair<int, int>> one_flight = queue.front();
+            queue.pop();
+
+            int stops  = one_flight.first;
+            int node   = one_flight.second.first;
+            int weight = one_flight.second.second;
+
+            if (stops > K)
+                continue;
+
+            for (auto i : adj_list[node])
+            {
+                int neighbor_node  = i.first;
+                int neighbor_price = i.second;
+
+                if (weight + neighbor_price < distances[neighbor_node])
+                {
+                    queue.push({stops+1, {neighbor_node, weight + neighbor_price}});
+                    distances[neighbor_node] = weight + neighbor_price;
+                }
+            }
+        }
+
+        // destination do not reached under k stops
+        if (distances[dst] == INT_MAX)
+            return -1;
+
+        return distances[dst];
     }
 };
