@@ -170,3 +170,43 @@ public:
         return max_distance;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Absolutely Equivalent idea to the one above, written in a concise way.
+
+*/
+
+/* Time  Beats: 99.06% */
+/* Space Beats: 29.72% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Concise {
+public:
+    int maxDistance(vector<vector<int>>& arrays)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        int curr_min = arrays[0][0];
+        int curr_max = arrays[0].back();
+
+        int result = 0;
+
+        for (int i = 1; i < arrays.size(); i++)
+        {
+            result = max( {result, arrays[i].back() - curr_min, curr_max - arrays[i][0]} );
+
+            curr_min = min(curr_min, arrays[i][0]);
+            curr_max = max(curr_max, arrays[i].back());
+        }
+
+        return result;
+    }
+};
