@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 /*
     ==============
@@ -61,10 +62,55 @@ using namespace std;
 
 */
 
+/* Time  Beats: 52.56% */
+/* Space Beats: 41.13% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(n)   */
+class Solution_DP {
+public:
+    int minSteps(int n)
+    {
+        if (n == 1)
+            return 0;
+
+        vector<int> min_operations(n + 1, INT_MAX);
+        min_operations[1] = 0;
+
+        for (int curr_count = 2; curr_count <= n; curr_count++)
+        {
+            for (int factor = 1; factor * factor <= curr_count; factor++)
+            {
+                if (curr_count % factor == 0)
+                {
+                    min_operations[curr_count] = min(min_operations[curr_count], min_operations[factor] + curr_count / factor);
+
+                    if (factor != curr_count / factor)
+                        min_operations[curr_count] = min(min_operations[curr_count], min_operations[curr_count / factor] + factor);
+                }
+            }
+        }
+
+        return min_operations[n];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
 /* Time  Beats: 69.44% */
 /* Space Beats: 72.78% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(√n) */ // O(sqrt(n))
 /* Space Complexity: O(1) */
 class Solution {
 public:
