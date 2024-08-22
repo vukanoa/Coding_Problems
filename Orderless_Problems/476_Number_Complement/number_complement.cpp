@@ -110,10 +110,39 @@ public:
             return 1;
 
         unsigned int mask = ~0;
-        
+
         while (num & mask)
             mask <<= 1;
 
         return ~mask & ~num;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 50.07% */
+/* Space Beats: 33.08% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_BuiltinCLZ {
+public:
+    int findComplement(int num)
+    {
+        int len_in_bits = (31 - __builtin_clz(num));
+
+        int mask = (len_in_bits == 31) ? INT_MAX : ((1 << len_in_bits) - 1);
+
+        return (INT_MAX ^ num) & mask;
     }
 };
