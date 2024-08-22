@@ -79,8 +79,41 @@ public:
             num = num / 2;
         }
 
-        int and_val = (1 << count) - 1;
+        int mask = (1 << count) - 1;
 
-        return ~num_copy & and_val;
+        return ~num_copy & mask;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  65.77% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    int findComplement(int num)
+    {
+        if (num == 0)
+            return 1;
+
+        unsigned int mask = ~0;
+        
+        while (num & mask)
+            mask <<= 1;
+
+        return ~mask & ~num;
     }
 };
