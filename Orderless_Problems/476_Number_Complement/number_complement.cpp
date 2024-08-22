@@ -146,3 +146,28 @@ public:
         return (INT_MAX ^ num) & mask;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 50.07% */
+/* Space Beats: 33.08% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_OneLiner {
+public:
+    int findComplement(int num)
+    {
+        return num ^ (( 1u << (32 - countl_zero((unsigned)num))) - 1);
+    }
+};
