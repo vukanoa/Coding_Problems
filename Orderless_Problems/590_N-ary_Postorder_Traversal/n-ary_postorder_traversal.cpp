@@ -111,3 +111,79 @@ private:
         result.push_back(root->val);
     }
 };
+
+
+
+
+class Solution {
+public:
+    vector<int> postorder(Node* root)
+    {
+        vector<Node*> stack;
+        vector<int>   vec_result;
+
+        stack.push_back(root);
+
+        while ( ! stack.empty())
+        {
+            Node* curr = stack.back();
+            stack.pop_back();
+
+            if (curr->left)
+                stack.push_back(curr->left);
+
+            if (curr->right)
+                stack.push_back(curr->right);
+
+            vec_result.push_back(curr->val);
+        }
+
+        return vec_result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Iterative way to impement it. It uses "two stacks"(but actually one).
+
+*/
+
+/* Time  Beats: 99.95% */
+/* Space Beats: 51.23% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+    vector<int> postorder(Node* root)
+    {
+        if ( ! root)
+            return {};
+
+        vector<Node*> stack;
+        vector<int>   vec_result;
+
+        stack.push_back(root);
+
+        while ( ! stack.empty())
+        {
+            Node* curr = stack.back();
+            stack.pop_back();
+
+            for (const auto& child : curr->children)
+                stack.push_back(child);
+
+            vec_result.push_back(curr->val);
+        }
+
+        reverse(vec_result.begin(), vec_result.end());
+
+        return vec_result;
+    }
+};
