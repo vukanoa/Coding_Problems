@@ -1,4 +1,8 @@
 #include <iostream>
+#include <vector>
+#include <queue>
+#include <unordered_map>
+#include <unordered_set>
 
 /*
     ==============
@@ -201,5 +205,63 @@ public:
         }
 
         return 0;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 99.80% */
+/* Space Beats: 98.59% */
+
+/* Time  Complexity: O(n * E) */
+/* Space Complexity: O(n + E) */
+class Solution_Efficient {
+public:
+    double maxProbability(int n, vector<vector<int>>& edges, vector<double>& succProb, int start_node, int end_node)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        vector<double> max_prob(n, 0.0);
+        max_prob[start_node] = 1.0;
+
+        for (int i = 0; i < n-1; i++)
+        {
+            bool updated = false;
+
+            for (int j = 0; j < edges.size(); j++)
+            {
+                int u = edges[j][0];
+                int v = edges[j][1];
+                double prob = succProb[j];
+
+                if (max_prob[u] * prob > max_prob[v])
+                {
+                    max_prob[v] = max_prob[u] * prob;
+                    updated = true;
+                }
+
+                if (max_prob[v] * prob > max_prob[u])
+                {
+                    max_prob[u] = max_prob[v] * prob;
+                    updated = true;
+                }
+
+            }
+
+            if ( ! updated)
+                break;
+        }
+
+        return max_prob[end_node];
     }
 };
