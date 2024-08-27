@@ -79,8 +79,8 @@
 
 /* TLE(Brut Force) */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(E^V) */
+/* Space Complexity: O(V) */
 class Solution {
 public:
     double maxProbability(int n, vector<vector<int>>& edges, vector<double>& succProb, int start_node, int end_node)
@@ -133,5 +133,73 @@ private:
         }
 
         visited.erase(curr_node);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+
+/* Time  Beats: 65.76% */
+/* Space Beats: 10.22% */
+
+/* Time  Complexity: O(E * logV) */
+/* Space Complexity: O(V) */
+class Solution_Dijkstra {
+public:
+    double maxProbability(int n, vector<vector<int>>& edges, vector<double>& succProb, int start_node, int end_node)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        if (edges.empty())
+            return 0;
+
+        unordered_map<int, vector<pair<int,double>>> adj_list;
+
+        // Create Adjacency list.
+        for (int i = 0; i < edges.size(); i++)
+        {
+            adj_list[edges[i][0]].push_back({edges[i][1], succProb[i]});
+            adj_list[edges[i][1]].push_back({edges[i][0], succProb[i]});
+        }
+
+        priority_queue<pair<double,int>, vector<pair<double,int>>> max_heap;
+        unordered_set<int> visited;
+
+        max_heap.push({1.0, start_node});
+
+        while ( ! max_heap.empty())
+        {
+            auto entry = max_heap.top();
+            max_heap.pop();
+
+            double prob = entry.first;
+            int    curr = entry.second;
+
+            visited.insert(curr);
+
+            if (curr == end_node)
+                return prob;
+
+            for (auto& neighbor : adj_list[curr])
+            {
+                int    nei_curr = neighbor.first;
+                double nei_prob = neighbor.second;
+
+                if (visited.find(nei_curr) == visited.end()) // Not Found in Set
+                    max_heap.push({prob * nei_prob, nei_curr});
+            }
+        }
+
+        return 0;
     }
 };
