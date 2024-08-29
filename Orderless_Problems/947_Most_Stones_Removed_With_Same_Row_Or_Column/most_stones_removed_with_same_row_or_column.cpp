@@ -140,3 +140,68 @@ public:
         return n - component;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 65.95% */
+/* Space Beats: 46.90% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Union_and_Find {
+public:
+    unordered_map<short, vector<short>> row_col_adj_list;
+    bitset<20003> visited;
+
+    int removeStones(vector<vector<int>>& stones)
+    {
+        const int n = stones.size();
+        const int M = 10001;
+
+        row_col_adj_list.reserve(200);
+
+        for (int idx = 0; idx < n; idx++)
+        {
+            const int i = stones[idx][0];
+            const int j = stones[idx][1];
+
+            row_col_adj_list[i].push_back(j+M);
+            row_col_adj_list[M+j].push_back(i);
+        }
+
+        int component = 0;
+
+        for (auto& [i, _] : row_col_adj_list)
+        {
+            if (visited[i] == 0)
+            {
+                dfs(i);
+                component++;
+            }
+        }
+
+        return n - component;
+    }
+
+private:
+    void dfs(short idx)
+    {
+        visited[idx] = 1;
+
+        for (short k : row_col_adj_list[idx])
+        {
+            if (visited[k] == 0)
+                dfs(k);
+        }
+    }
+};
