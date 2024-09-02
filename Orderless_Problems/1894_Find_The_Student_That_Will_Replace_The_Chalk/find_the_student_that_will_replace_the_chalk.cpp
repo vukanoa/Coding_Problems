@@ -72,6 +72,8 @@
 
 */
 
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -88,14 +90,14 @@
 /* Space Complexity: O(n) */
 class Solution {
 public:
-    int chalkReplacer(vector<int>& chalk, int initialChalkPieces)
+    int chalkReplacer(vector<int>& chalk, int k)
     {
         long long total_chalk_needed = 0;
 
         for (int student_chalk_use : chalk)
             total_chalk_needed += student_chalk_use;
 
-        int remaining_chalk = initialChalkPieces % total_chalk_needed;
+        int remaining_chalk = k % total_chalk_needed;
 
         for (int student_index = 0; student_index < chalk.size(); student_index++)
         {
@@ -106,5 +108,41 @@ public:
         }
 
         return 0;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 95.68% */
+/* Space Beats:  5.65% */
+
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(n)    */
+class Solution_PrefixSum_plus_BinarySearch {
+public:
+    int chalkReplacer(vector<int>& chalk, int k)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        const int n = chalk.size();
+
+        vector<long long> sum(n, chalk[0]); // Prefix sum 0-indexed
+
+        for (int i = 1; i < n; i++)
+            sum[i] = sum[i-1] + chalk[i];
+
+        k %= sum[n-1];
+
+        return upper_bound(sum.begin(), sum.end(), k)-sum.begin();
     }
 };
