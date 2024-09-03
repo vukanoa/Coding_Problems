@@ -102,7 +102,7 @@ using namespace std;
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_BFS {
 public:
     vector<int> findAllPeople(int n, vector<vector<int>>& meetings, int firstPerson)
     {
@@ -149,5 +149,64 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 82.16% */
+/* Space Beats: 75.22% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_DFS {
+public:
+    vector<int> findAllPeople(int n, vector<vector<int>>& meetings, int firstPerson)
+    {
+        vector<pair<int, int>> adj_list[n];
+        meetings.push_back({0, firstPerson, 0});
+
+        for (int i = 0; i < meetings.size(); i++)
+        {
+            adj_list[meetings[i][0]].push_back({meetings[i][1], meetings[i][2]});
+            adj_list[meetings[i][1]].push_back({meetings[i][0], meetings[i][2]});
+        }
+
+        vector<int> min_shared_time(n, INT_MAX);
+        min_shared_time[0] = 0;
+
+        dfs(0, 0, adj_list, min_shared_time);
+
+        vector<int> ans;
+        for (int i = 0; i < n; i++)
+        {
+            if(min_shared_time[i] != INT_MAX)
+                ans.push_back(i);
+        }
+
+        return ans;
+    }
+
+private:
+    void dfs (int u, int uTime, vector<pair<int, int>> adj_list[], vector<int>& min_shared_time)
+    {
+        for (auto [v, w]: adj_list[u])
+        {
+            if (uTime <= w && min_shared_time[v] > w)
+            {
+                min_shared_time[v] = w;
+                dfs(v, w, adj_list, min_shared_time);
+            }
+        }
     }
 };
