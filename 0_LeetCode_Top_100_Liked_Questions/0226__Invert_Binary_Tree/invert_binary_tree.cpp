@@ -61,13 +61,42 @@ struct TreeNode {
 
     This is a classic tree problem that is best-suited for a recursive approach
 
-    Algorithm
-    The inverse of an empty tree is empty tree. The inverse of a tree with root
-    "t", and subtrees "right" and "left", is a tree with root "r", whose right
-    subtree is the inverse of "left", and whose left subtree is the inverse of
-    "right".
-*/
+    How to come-up with with this Solution:
 
+        Forget hat you know how to code for a second.
+        Answer this question:"What does it mean to 'invert the tree'?"
+
+        It means you should swap the pointers of children at every parent's
+        level.
+        Once you say that aloud, it becomes painfully obvious - Go through the
+        tree(using DFS, inorder traversal) and swap children of every parent.
+
+        Parent is also a Leaf Node since it also has two children, i.e. two
+        null children.
+
+        The only thing you have to be careful about is this - What if the input
+        is a nullptr?
+
+        Nothing special, just return nullptr as well. You cannot invert a
+        non-existing tree, right?
+
+
+    Summarized:
+        Do an inorder DFS. Each time you hit a leaf swap it's two children and
+        return that node itself.
+
+        Do that for every parent(i.e. node with children) and you'll have an
+        inverted tree.
+
+
+    Note:
+        Note that if you swap "children" of the Leaf, i.e. two null nodes,
+        nothing will happen, therefore we do not have to take of this in some
+        special way.
+
+        Take a look at the code and I'm sure it'll be clear if it's no already.
+
+*/
 
 /* Time  Beats:   100% */
 /* Space Beats: 77.34% */
@@ -142,61 +171,23 @@ public:
     --- IDEA ---
     ------------
 
-    The same as above, but implemented on another occasion so I wanted to have
-    another implementation of it.
-
-*/
-
-/* Time  Beats:  100% */
-/* Space Beats: 77.34% */
-
-/*    Time  Complexity: O(n) */
-/*
-    Space Complexity: O(h)
-    In the worst case the queue will contain all nodes in one level of the
-    binary tree. For a full binary tree, the leaf level has ceil(n / 2) = O(n)
-    leaves.
-*/
-class Solution_Another {
-public:
-    TreeNode* invertTree(TreeNode* root)
-    {
-        if (!root)
-            return nullptr;
-
-        /* Invert (Swap) */
-        TreeNode* tmp = root->left;
-        root->left = root->right;
-        root->right = tmp;
-
-        invertTree(root->left);
-        invertTree(root->right);
-
-        return root;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Alternatively, we can solve the problem iteratively, in a manner similar
-    to Breadth-first search(BFS). (Or DFS as well)
-
-    Algorithm
     The idea is that we need to swap the left and right child of all nodes in
-    the tree. So we create a queue to store nodes whose left and right child
-    have not been swapped yet. Initially, only the root is in the queue. As
-    long as the queue is not empty, remove the next node from the queue, swap
-    its children, and add the children to the queue. Null nodes are not added
-    to the queue. Eventually, the queue will be empty and all the children
-    swapped, and we return the original root.
+    the tree(even Leaf nodes).
 
-    Though, this Solution is a lot less Space efficient.
+    We create a queue to store nodes whose left and right child have not been
+    swapped yet.
+    Initially, only the root is in the queue.
+
+    As long as the queue is not empty, remove the next node from the queue,
+    swap its children, and add the children to the queue. Null nodes are not
+    added to the queue.
+
+    Eventually, the queue will be empty and all the children swapped, and we
+    return the original root.
+
+
+    Note:
+    This Solution is a lot less Space efficient.
 
 */
 
@@ -220,7 +211,7 @@ public:
         std::queue<TreeNode*> queue;
         queue.push(root);
 
-        while (!queue.empty())
+        while ( ! queue.empty())
         {
             TreeNode* curr = queue.front();
             queue.pop();
@@ -321,7 +312,6 @@ main()
 {
     Solution           sol;
     Solution_2         sol_2;
-    Solution_Another   sol_another;
     Solution_iterative sol_iter;
 
     /* Example 1 */
@@ -374,7 +364,6 @@ main()
     /* Solution */
     // sol.invertTree(root);
     sol_2.invertTree(root);
-    // sol_another.invertTree(root);
     // sol_iter.invertTree(root);
 
 
