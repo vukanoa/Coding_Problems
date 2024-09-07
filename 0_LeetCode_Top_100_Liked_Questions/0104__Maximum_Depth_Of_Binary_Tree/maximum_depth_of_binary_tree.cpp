@@ -58,19 +58,28 @@ struct TreeNode {
     --- IDEA ---
     ------------
 
-    Let's assume that we're already given the maximum depth of root's left and
-    right subtrees by recursion.
+    The base case - If we have a nullptr as an input, we should return 0.
 
-    So to find the maximum depth of this binary tree, we will have to take out
-    the maximum of the 2 depths given to us by recursion and add 1 to that to
-    consider the current level i.e. root's level into our depth.
+    Let's assume that we know the max depth of the left subtree and the max
+    depth od the right subtree. And currently we're at the parent node of those
+    two subtrees.
 
-    Base Case:
-        We can easily analyze that if we are at a leaf node as root, then its
-        left and right subtrees will have 0 depth, and consecutively, this leaf
-        node will have max depth of 1.
+    Ask yourself - How would you get the maximum depth of the entire tree
+    including this current node?
 
-    From Base Case, just follow recursion and it's self-explanatory.
+    Simply take the deeper subtree of the two and add 1(the current node).
+
+
+    Notice that if the Input was only a single node, our base case + recursion
+    would do the trick.
+
+    Both the left and the right subtrees' depth would be 0 and if we take the
+    max out of those two subtrees and add 1(the current node) we'll get the
+    maximum depth of this entire single-node Binary Tree.
+
+    That's why we're able to perform this elegant recursion.
+
+    We are doing an inorder DFS and we're doing what we described above.
 
 */
 
@@ -86,7 +95,7 @@ class Solution{
 public:
     int maxDepth(TreeNode* root)
     {
-        if (!root)
+        if ( ! root)
             return 0;
 
         return 1 + std::max(maxDepth(root->left), maxDepth(root->right));
@@ -124,7 +133,7 @@ public:
 private:
     int depth(TreeNode* root, int level)
     {
-        if (!root)
+        if ( ! root)
             return level;
 
         return std::max(depth(root->left, level+1), depth(root->right, level+1));
@@ -169,7 +178,7 @@ public:
 private:
     void dfs(TreeNode* root, int current, int& max)
     {
-        if (!root)
+        if ( ! root)
             return;
 
         // If current is not nullptr, add it to the current path and check max
@@ -210,7 +219,7 @@ public:
         stack.push({root, 1});
         int result = 0;
 
-        while (!stack.empty())
+        while ( ! stack.empty())
         {
             std::pair<TreeNode*, int> entry = stack.top();
             stack.pop();
@@ -262,7 +271,7 @@ public:
         // Emplace is a bit faster than "push" for custom Data Types
         queue.emplace(root);
 
-        while (!queue.empty())
+        while ( ! queue.empty())
         {
             int nodes_at_this_level = queue.size();
 
