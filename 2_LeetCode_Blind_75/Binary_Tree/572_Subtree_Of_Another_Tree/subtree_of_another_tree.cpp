@@ -65,13 +65,37 @@
 
     First, you MUST do LeetCode 100 "Same Tree".
 
-    After that, think of what you are being asked and you'll probably come up
-    with this Solution. Of course, only if you genuinely understand reasons
-    behind implementing "SameTree" in that particular way.
-
     If you don't genuinely understand "SameTree", make sure to understand that
-    one first and then come back. That is an absolutley necessary foundation
+    one first and then come back. That is an absolutely necessary foundation
     for solving this problem.
+
+
+    Let's read the problem CAREFULLY:
+        "Given the roots of two binary trees root and subRoot, return true if
+         there is a subtree of root with the same structure and node values of
+         subRoot and false otherwise."
+
+    There lays a Solution. We literally have to do what we are told.
+    At EACH node in the original Tree we have to check if by starting at that
+    node and starting from the root of the subRoot Tree, they are the same.
+
+    If they are the same:
+        we IMMEDIATELY return "true".
+
+    If the are NOT the same:
+        we try by starting with:
+            1. current's left node or
+            2. current's right node.
+
+        If any of those two get to return "true", we'll propagate "true" all
+        the way up independently of other return values we get or already got
+        along the way to the top in this recursion.
+
+
+    Now, after you've read this, try reading the code. It is LITERALLY what
+    it says up here.
+
+    (See how "SameTree" is absolutely necessary to solve this problem?)
 
 */
 
