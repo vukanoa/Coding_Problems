@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include <numeric>
 
 /*
@@ -166,6 +167,17 @@ public:
 
     Same Idea, just implemented using Gaus' method for calculating first n
     numbers.
+
+    Gaus used this method in math class to calculate sum of first 100 numbers
+    by adding 1 and 99, 2 and 98, 3 and 97, ..., 49 and 51
+
+    The sum of each of this bids is 100 and there are 49 of them. However
+    we didn't add 50 which is in the middle and we didn't add 100 that is at
+    the very top.
+
+    Therefore 49 * 100 + 100 + 50 = 4900 + 100 + 50 = 5050
+
+    And the formula is: n * (n + 1) / 2
 
 */
 
