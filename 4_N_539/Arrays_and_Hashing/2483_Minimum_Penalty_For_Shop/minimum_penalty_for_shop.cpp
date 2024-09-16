@@ -171,3 +171,46 @@ public:
         return hour;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 84.74% */
+/* Space Beats: 88.11% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    int bestClosingTime(string customers)
+    {
+        int res  = -1;
+        int maxi = 0;
+        int pen  = 0;
+
+        for (int i = 0 ; i < customers.size(); ++i)
+        {
+            if (customers[i] == 'Y')
+                pen++;
+            else
+                pen--;
+
+            if(pen > maxi)
+            {
+                maxi = pen;
+                res = i;
+            }
+        }
+
+        return ++res;
+    }
+};
