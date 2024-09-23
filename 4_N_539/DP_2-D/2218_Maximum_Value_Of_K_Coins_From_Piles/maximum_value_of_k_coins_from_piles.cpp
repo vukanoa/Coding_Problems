@@ -113,3 +113,66 @@ private:
         return dp[end_pile_idx][k] = max_sum;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 88.33% */
+/* Space Beats: 71.99% */
+
+// n ==> Number of piles
+// k ==> Number of coins to pick
+// m ==> is the maximum size of any pile
+/* Time  Complexity: O(n * k * m) */
+/* Space Complexity: O(n * k)     */
+class Solution_Bottom_Up {
+public:
+    int maxValueOfCoins(vector<vector<int>>& piles, int k)
+    {
+        const int n = piles.size();
+        vector<vector<int>>dp(n, vector<int>(k + 1, 0));
+        // For considering [number of piles = n]
+        // We must already have answers for [number of piles = (n - 1)],
+        // thus we need to go bottom up
+        // We need to go from [no. of piles under consideration = 1 to n]
+
+        // Consider only (end_pile_idx + 1) number of piles at a time
+        for (int end_pile_idx = 0; end_pile_idx < n; end_pile_idx++) // Count of piles = end_pile_idx + 1
+        {
+            int curr_pile_size = piles[end_pile_idx].size();
+            for (int coins_to_pick = 1; coins_to_pick <= k; coins_to_pick++)
+            {
+                // Do NOT pick any coin from curr pile
+                int max_sum = (end_pile_idx - 1 < 0)? 0 : dp[end_pile_idx - 1][coins_to_pick];
+
+                int max_can_pick = min(coins_to_pick, curr_pile_size);
+                int picked_sum = 0;
+                // Now consider picking some coins
+                for (int i = 0; i < max_can_pick; i++)
+                {
+                    int coin_value = piles[end_pile_idx][i];
+                    picked_sum += coin_value;
+
+                    int next_max_sum = 0;
+                    if (end_pile_idx > 0)
+                        next_max_sum = dp[end_pile_idx - 1][coins_to_pick - i - 1];
+
+                    max_sum = max(max_sum, picked_sum + next_max_sum);
+                }
+
+                dp[end_pile_idx][coins_to_pick] = max_sum;
+            }
+        }
+
+        return dp[n - 1][k];
+    }
+};
