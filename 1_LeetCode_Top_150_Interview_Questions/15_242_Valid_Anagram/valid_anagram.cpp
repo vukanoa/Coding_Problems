@@ -3,74 +3,74 @@
 #include <std::unordered_map>
 
 /*
-	============
-	=== EASY ===
-	============
+    ============
+    === EASY ===
+    ============
 
-	===========================
-	242) Valid Anagram
-	===========================
+    ===========================
+    242) Valid Anagram
+    ===========================
 
-	============
-	Description:
-	============
+    ============
+    Description:
+    ============
 
-	Given two strings s and t, return true if t is an anagram of s, and false
-	otherwise.
+    Given two strings s and t, return true if t is an anagram of s, and false
+    otherwise.
 
-	An Anagram is a word or phrase formed by rearranging the letters of a
-	different word or phrase, typically using all the original letters exactly
-	once.
+    An Anagram is a word or phrase formed by rearranging the letters of a
+    different word or phrase, typically using all the original letters exactly
+    once.
 
 
-	Follow up: What if the inputs contain Unicode characters? How would you
-	adapt your solution to such a case?
+    Follow up: What if the inputs contain Unicode characters? How would you
+    adapt your solution to such a case?
 
-	=============================================
-	FUNCTION: bool isAnagram(string s, string t);
-	=============================================
+    =============================================
+    FUNCTION: bool isAnagram(string s, string t);
+    =============================================
 
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
 
-	--- Example 1 ---
-	Input: s = "anagram", t = "nagaram"
-	Output: true
+    --- Example 1 ---
+    Input: s = "anagram", t = "nagaram"
+    Output: true
 
-	--- Example 2 ---
-	Input: s = "rat", t = "car"
-	Output: false
+    --- Example 2 ---
+    Input: s = "rat", t = "car"
+    Output: false
 
-	*** Constraints ***
-	1 <= s.length, t.length <= 5 * 104
-	s and t consist of lowercase English letters.
+    *** Constraints ***
+    1 <= s.length, t.length <= 5 * 104
+    s and t consist of lowercase English letters.
 
 
 */
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	Initialize two vectors with 26 0's.
-	Each index represents one letter in a lowercase English alphabet.
+    Initialize two vectors with 26 0's.
+    Each index represents one letter in a lowercase English alphabet.
 
-	If s and t are not of the same length, they are certainly not anagrams.
+    If s and t are not of the same length, they are certainly not anagrams.
 
-	Otherwise, fill the vects and at the end check if those two vectors are
-	equal.
+    Otherwise, fill the vects and at the end check if those two vectors are
+    equal.
 
-	Alternatively, we could have one less vector by making s characters
-	increment the values in the vector and t characters decrementing them.
+    Alternatively, we could have one less vector by making s characters
+    increment the values in the vector and t characters decrementing them.
 
-	At the end, instead of comparing two vectors, just check if the vector has
-	all the 0's.
+    At the end, instead of comparing two vectors, just check if the vector has
+    all the 0's.
 
-	If it does. then return true.
-	False otherwise.
+    If it does. then return true.
+    False otherwise.
 
 */
 
