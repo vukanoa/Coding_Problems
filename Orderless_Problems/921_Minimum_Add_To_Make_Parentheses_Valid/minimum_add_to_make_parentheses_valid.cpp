@@ -66,7 +66,7 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_1 {
 public:
     int minAddToMakeValid(string s)
     {
@@ -87,5 +87,43 @@ public:
         }
 
         return c + stack.size();
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 44.73% */
+/* Space Beats: 55.34% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    int minAddToMakeValid(string s)
+    {
+        string stack;
+
+        for (auto c : s)
+        {
+            if (stack.empty())
+                stack.push_back(c);
+
+            else if (stack.back() == '(' && c == ')')
+                stack.pop_back();
+            else
+                stack.push_back(c);
+        }
+
+        return stack.size();
     }
 };
