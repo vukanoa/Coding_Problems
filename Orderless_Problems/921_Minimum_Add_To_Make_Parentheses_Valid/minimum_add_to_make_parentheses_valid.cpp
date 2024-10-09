@@ -127,3 +127,44 @@ public:
         return stack.size();
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 42.94% */
+/* Space Beats: 94.13% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    int minAddToMakeValid(string s)
+    {
+        int open  = 0;
+        int close = 0;
+
+        for (const auto& chr: s)
+        {
+            if (chr == '(')
+                open++;
+            else
+            {
+                if (open > 0)
+                    open--;
+                else
+                    close++;
+            }
+        }
+
+        return open + close;
+    }
+};
