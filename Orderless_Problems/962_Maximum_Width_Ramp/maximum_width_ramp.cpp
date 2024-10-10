@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <stack>
 
 /*
     ==============
@@ -95,5 +96,52 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 48.87% */
+/* Space Beats: 37.47% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Monotonic_Decreasing_Stack {
+public:
+    int maxWidthRamp(vector<int>& nums)
+    {
+        const int n = nums.size();
+        stack<int> stack;
+
+        // Build a decreasing stack of indices
+        for (int i = 0; i < n; ++i)
+        {
+            if (stack.empty() || nums[stack.top()] > nums[i])
+                stack.push(i);
+        }
+
+        int max_width = 0;
+
+        // Traverse from the end and find maximum width ramp
+        for (int j = n-1; j >= 0; j--)
+        {
+            while ( ! stack.empty() && nums[stack.top()] <= nums[j])
+            {
+                max_width = max(max_width, j - stack.top());
+                stack.pop();
+            }
+        }
+
+        return max_width;
     }
 };
