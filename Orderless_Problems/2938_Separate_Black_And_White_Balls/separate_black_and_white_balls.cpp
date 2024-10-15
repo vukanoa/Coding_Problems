@@ -154,3 +154,45 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Revising the previous Solution, we can see that we don't really need to
+    keep the whole "ones_to_the_right" vector, since we only need the very next
+    value.
+
+    Thus, we can do this in One-Pass and without additional Space.
+
+*/
+
+/* Time  Beats: 96.42% */
+/* Space Beats: 45.68% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Efficient {
+public:
+    long long minimumSteps(string s)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        long long swaps = 0;
+        int black = 0;
+
+        for (int i = 0; i < s.length(); i++)
+        {
+            if (s[i] == '0')
+                swaps += (long long) black;
+            else
+                black++;
+        }
+
+        return swaps;
+    }
+};
