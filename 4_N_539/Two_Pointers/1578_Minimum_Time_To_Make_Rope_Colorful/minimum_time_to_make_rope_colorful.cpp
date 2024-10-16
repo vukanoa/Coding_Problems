@@ -189,3 +189,59 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Upon further revising of the above Solution we can see that we don't really
+    need "move_left" variable since once the balloons above 'L' and 'R'
+    pointers are NOT the same, we ALWAYS have to move the 'L' pointer to the
+    index of the current 'R' pointer and then increment the 'R' by one as we're
+    used to.
+
+    That way we're "jumping over the gap" with the left pointer without having
+    to worry about the amount of balloons we've evicted.
+
+*/
+
+/* Time  Beats: 97.75% */
+/* Space Beats: 17.26% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    int minCost(string colors, vector<int>& neededTime)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        int result = 0;
+
+        int left  = 0;
+        int right = 1;
+        while (right < colors.length())
+        {
+            if (colors[left] == colors[right])
+            {
+                if (neededTime[left] < neededTime[right])
+                {
+                    result += neededTime[left];
+                    left = right;
+                }
+                else
+                    result += neededTime[right];
+            }
+            else
+                left = right;
+
+            right++;
+        }
+
+        return result;
+    }
+};
