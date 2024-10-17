@@ -81,12 +81,12 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Verbose {
 public:
     int minimumLength(string s)
     {
         ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-        
+
         const int n = s.length();
 
         if (n == 1)
@@ -119,5 +119,46 @@ public:
         }
 
         return 0;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 99.15% */
+/* Space Beats: 86.26% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Elegant {
+public:
+    int minimumLength(string s)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        int left  = 0;
+        int right = s.length() - 1;
+
+        while (left < right && s[left] == s[right])
+        {
+            int tmp = s[left];
+
+            while (left <= right && s[left] == tmp)
+                left++;
+
+            while (left <= right && s[right] == tmp)
+                right--;
+        }
+
+        return right - left + 1;
     }
 };
