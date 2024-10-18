@@ -66,7 +66,7 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_3-Way_Sliding_Window {
 public:
     int subarraysWithKDistinct(vector<int>& nums, int k)
     {
@@ -102,6 +102,69 @@ public:
             if (umap_count.size() == k)
                 result += left_near - left_far + 1;
 
+            right++;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    (This indeed has one additional pass, but it is MUCH simpler to understand)
+
+    This one uses two standard Sliding-Window techniques instead of 3-way
+    Sliding-Window.
+
+*/
+
+/* Time  Beats: 84.21% */
+/* Space Beats: 62.88% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    int subarraysWithKDistinct(vector<int>& nums, int k)
+    {
+        int sub_with_max_element_k = subarray_with_atmost_X(nums, k);
+        int reduced_sub_with_max_k = subarray_with_atmost_X(nums, k-1);
+
+        return (sub_with_max_element_k - reduced_sub_with_max_k);
+    }
+
+private:
+    int subarray_with_atmost_X(vector<int>& nums, int k)
+    {
+        unordered_map<int,int> umap_count;
+
+        int left  = 0;
+        int right = 0;
+
+        int result = 0;
+
+        while (right < nums.size())
+        {
+            umap_count[nums[right]]++;
+
+            while (umap_count.size() > k)
+            {
+                umap_count[nums[left]]--;
+
+                if (umap_count[nums[left]] == 0)
+                    umap_count.erase(nums[left]);
+
+                left++;
+            }
+
+            result += right - left + 1; // Basically the size of subarray;
             right++;
         }
 
