@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include <unordered_set>
 
 /*
@@ -42,7 +43,6 @@
     -109 <= nums[i] <= 109
 
 */
-
 
 /*
     ------------
