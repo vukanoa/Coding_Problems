@@ -86,11 +86,69 @@
     Let's assume we have each level's sum in, say, a vector. How can we find a
     k-th one?
 
-    Well, one way is to sort that and then go either from the front or the back
-    and then return the kth one.
+    Well, one way is to sort that and then go simply return the kth one in O(1)
 
-    That is a valid approach, however, there is a slightly more optimized way
-    of doing that.
+    It's as simple as that. (There is a slightly more optimized way in 2nd
+    Solution down there)
+
+*/
+
+/* Time  Beats: 99.90% */
+/* Space Beats:  5.08% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n)        */
+class Solution_Sorting {
+public:
+    long long kthLargestLevelSum(TreeNode* root, int k)
+    {
+        vector<long long> sums;
+
+        /* BFS */
+        queue<TreeNode*> queue;
+        queue.push(root);
+
+        while ( ! queue.empty())
+        {
+            int size = queue.size();
+
+            long long level_sum = 0;
+            for (int x = 0; x < size; x++)
+            {
+                TreeNode* curr_node = queue.front();
+                queue.pop();
+
+                level_sum += curr_node->val;
+
+                if (curr_node->left)
+                    queue.push(curr_node->left);
+
+                if (curr_node->right)
+                    queue.push(curr_node->right);
+            }
+
+            sums.push_back(level_sum);
+        }
+
+        if (sums.size() < k) // Fewer than k levels
+            return -1;
+
+        sort(sums.begin(), sums.end());
+
+        return sums[sums.size() - k];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a slightly more optimized way of solving this problem than the
+    above one that uses sort.
 
         Using a Max Heap!
 
@@ -127,7 +185,7 @@
 
 /* Time  Complexity: O(n * logk) */
 /* Space Complexity: O(n + k)    */
-class Solution {
+class Solution_Heap {
 public:
     long long kthLargestLevelSum(TreeNode* root, int k)
     {
