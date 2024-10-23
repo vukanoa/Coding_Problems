@@ -1,5 +1,6 @@
 #include <iostream>
 #include <queue>
+#include <vector>
 
 /*
     ==============
@@ -283,5 +284,80 @@ public:
         }
 
         return root;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+    This one is implemented using DFS. I wanted to show that it CAN be
+    implemented using DFS as well, but as I've mentioned above - It is much
+    more natural to solve it using BFS.
+
+*/
+
+/* Time  Beats: 90.87% */
+/* Space Beats: 15.59% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+    TreeNode* replaceValueInTree(TreeNode* root)
+    {
+        root->val = 0;
+
+        dfs(std::vector<TreeNode*>{root});
+        return root;
+    }
+
+private:
+    void dfs(std::vector<TreeNode*>vec)
+    {
+        if (vec.empty())
+            return;
+
+        int sum = 0;
+        for (auto node :vec)
+        {
+            if ( ! node)
+                continue;
+
+            if (node->left)
+                sum += node->left->val;
+
+            if (node->right)
+                sum += node->right->val;
+        }
+
+        std::vector<TreeNode*> child_vec;
+        for (auto node : vec)
+        {
+            int curr_sum = 0;
+
+            curr_sum += node->left  ? node->left->val  : 0;
+            curr_sum += node->right ? node->right->val : 0;
+
+            if (node->left)
+            {
+                node->left->val = sum - curr_sum;
+                child_vec.push_back(node->left);
+            }
+
+            if (node->right)
+            {
+                node->right->val = sum - curr_sum;
+                child_vec.push_back(node->right);
+            }
+        }
+
+        dfs(child_vec);
     }
 };
