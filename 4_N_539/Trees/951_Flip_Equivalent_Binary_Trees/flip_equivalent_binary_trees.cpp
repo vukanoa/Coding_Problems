@@ -247,7 +247,7 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_1 {
 public:
     bool flipEquiv(TreeNode* root1, TreeNode* root2)
     {
@@ -282,6 +282,47 @@ public:
     --- IDEA ---
     ------------
 
+    This one is essentially the same as the Solution BELOW(Solution_3), however
+    I wanted to have both Solution_2 and Solution_3 so that we can appreciate
+    the elegance and ease of reading in Solution_3.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats: 21.11% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    bool flipEquiv(TreeNode* root1, TreeNode* root2)
+    {
+        if (!root1 && !root2)
+            return true;
+
+        if ((root1 && !root2) || (!root1 && root2) || (root1->val != root2->val))
+            return false;
+        
+        
+
+        if (flipEquiv(root1->left, root2->left) && flipEquiv(root1->right, root2->right))
+            return true;
+        
+        if (flipEquiv(root1->left, root2->right) && flipEquiv(root1->right, root2->left))
+            return true;
+        
+        return false;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     Another way of implementing, however this one has a different concept.
 
     Here, we are specifically asking if at any point two trees are the same or
@@ -296,7 +337,7 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_3 {
 public:
     bool flipEquiv(TreeNode* root1, TreeNode* root2)
     {
