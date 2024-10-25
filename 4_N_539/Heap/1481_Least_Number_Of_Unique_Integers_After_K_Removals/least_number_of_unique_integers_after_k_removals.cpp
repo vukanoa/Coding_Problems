@@ -2,6 +2,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <queue>
 
 /*
     ==============
@@ -112,7 +113,7 @@
 
 /* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(n)        */
-class Solution {
+class Solution_Sorting {
 public:
     int findLeastNumOfUniqueInts(vector<int>& arr, int k)
     {
@@ -147,4 +148,55 @@ public:
 
         return result;
     }
-}
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Essentially the same as the above Solution, but instead of sorting
+    explicitly, we're using a Heap data structure.
+
+*/
+
+/* Time  Beats: 65.01% */
+/* Space Beats: 34.52% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n )       */
+class Solution_Heap {
+public:
+    int findLeastNumOfUniqueInts(vector<int>& arr, int k)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> min_heap;
+
+        unordered_map<int, int> umap_counter;
+
+        for (auto elem : arr)
+            umap_counter[elem]++;
+
+        for (auto item : umap_counter)
+            min_heap.push({item.second, item.first});
+
+        while (k > 0)
+        {
+            auto top = min_heap.top();
+            min_heap.pop();
+
+            top.first--;
+
+            if (top.first)
+                min_heap.push(top);
+
+            k--;
+        }
+
+        return min_heap.size();
+    }
+};
