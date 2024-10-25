@@ -3,6 +3,7 @@
 #include <map>
 #include <algorithm>
 #include <queue>
+#include <unordered_map>
 
 /*
     ==============
@@ -198,5 +199,63 @@ public:
         }
 
         return min_heap.size();
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    If you've ever implemented BucketSort, then this one is pretty easy.
+    Otherwise you're compelled to solve it in O(n * logn).
+
+*/
+
+/* Time  Beats: 99.17% */
+/* Space Beats: 91.25% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Bucket_Sort {
+public:
+    int findLeastNumOfUniqueInts(vector<int>& arr, int k)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        // Counter HashMap
+        unordered_map<int, int> umap_counter;
+        for (auto elem : arr)
+            umap_counter[elem]++;
+
+        // freq -> num of elems with that freq
+        vector<int> freq_list(arr.size() + 1, 0);
+
+        for (const auto& [num, freq] : umap_counter)
+            freq_list[freq]++;
+
+        int result = umap_counter.size();
+        for (int freq = 1; freq < freq_list.size(); freq++)
+        {
+            int remove = freq_list[freq];
+
+            if (k >= freq * remove)
+            {
+                k -= freq * remove;
+                result -= remove;// 'remove' is the number of distinct elements
+            }
+            else
+            {
+                remove = k / freq; // Rounded down
+                result -= remove;// 'remove' is the number of distinct elements
+                break;
+            }
+        }
+
+        return result;
     }
 };
