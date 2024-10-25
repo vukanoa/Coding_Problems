@@ -2,6 +2,7 @@
 #include <vector>
 #include <unordered_set>
 #include <algorithm>
+#include <cstring> // memset
 
 /*
     ==============
@@ -111,6 +112,8 @@
 
 */
 
+using namespace std;
+
 /* Time  Beats: 92.31% */
 /* Space Beats: 55.22% */
 
@@ -206,6 +209,107 @@ public:
                 result.push_back(curr_path);
                 prev = curr_path;
             }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 67.03% */
+/* Space Beats: 13.46% */
+
+/* Time  Complexity: O(n * logn * average_length(string_path)) */
+/* Space Complexity: O(n * average_length(string_path))        */
+struct Trie {
+    Trie* links[27];
+    bool  is_end = 0;// 26 letters + 1 for '/'
+
+
+    Trie() {
+        memset(links, 0, sizeof(links));
+    }
+
+    // Insert folder into trie returning position for last '/'
+    int insert(string_view path)
+    {
+        Trie* node = this;
+        int size = path.size();
+        int position = 0;
+
+        for (int i = 0; i < size; i++)
+        {
+            char c = path[i];
+            int idx = (c == '/') ? 26 : c-'a'; // Use 26 for '/'
+
+            if (idx == 26)
+                position = i;
+
+            if ( ! node->links[idx])
+                node->links[idx] = new Trie();
+
+            node = node->links[idx];
+        }
+        node->is_end = 1;
+
+        return position;
+    }
+
+    // Check if this folder is a subfolder of an already inserted folder
+    bool isSubfolder(const string& path, int position)
+    {
+        if (position == 0)
+            return 0; // Each folder name is unique.
+
+        Trie* node = this;
+        for (int i = 0; i < position; i++)
+        {
+            char c = path[i];
+            int idx = (c=='/')?26:c - 'a';
+            node = node->links[idx];
+
+            // It is a subfolder
+            if (path[i+1] == '/' && node->is_end)
+                return 1;
+        }
+
+        return 0;
+    }
+};
+
+class Solution {
+public:
+    Trie trie;
+    vector<string> removeSubfolders(vector<string>& folder)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        // First pass: Insert all folder paths into the trie
+        int n = folder.size();
+        int i = 0;
+        vector<int> positions(n);
+        for (string_view path : folder)
+            positions[i++] = trie.insert(path);
+
+        vector<string> result;
+
+        // Second pass: Check each folder to see if it's a subfolder
+        for (int i = 0; i < n; i++)
+        {
+            string path = folder[i];
+            if ( ! trie.isSubfolder(path, positions[i]))
+                result.push_back(path);
         }
 
         return result;
