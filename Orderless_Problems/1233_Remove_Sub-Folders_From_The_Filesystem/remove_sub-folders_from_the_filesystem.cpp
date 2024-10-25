@@ -114,9 +114,9 @@
 /* Time  Beats: 92.31% */
 /* Space Beats: 55.22% */
 
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(n)        */
-class Solution {
+/* Time  Complexity: O(n * logn * average_length(string_path)) */
+/* Space Complexity: O(n * average_length(string_path))        */
+class Solution_Verbose {
 public:
     vector<string> removeSubfolders(vector<string>& folder)
     {
@@ -160,6 +160,53 @@ public:
         vector<string> result;
         for (const string& valid_path : uset)
             result.push_back(valid_path);
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    It's equivalent to the above Solution, though it is written in a much more
+    elegant and concise way, however if you haven't been able to solve it
+    yourself, I highly suggest to read the Solution_Verbose since it's much
+    more explicit.
+
+*/
+
+/* Time  Beats: 92.86% */
+/* Space Beats: 67.31% */
+
+/* Time  Complexity: O(n * logn * average_length(string_path)) */
+/* Space Complexity: O(n * average_length(string_path))        */
+class Solution_Elegant {
+public:
+    vector<string> removeSubfolders(vector<string>& folder)
+    {
+        const int n = folder.size();
+
+        // Default sort will do the trick
+        sort(folder.begin(), folder.end());
+
+        vector<string> result = { folder[0] };
+
+        string prev = folder[0];
+        for (int i = 1; i < n; i++)
+        {
+            string curr_path = folder[i];
+
+            if (curr_path.find(prev + '/') != 0)
+            {
+                result.push_back(curr_path);
+                prev = curr_path;
+            }
+        }
 
         return result;
     }
