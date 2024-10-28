@@ -186,3 +186,48 @@ public:
         return result == 1 ? -1 : result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Almost equivalent to the above one, written in a much moce concise and
+    elegant way.
+
+*/
+
+/* Time  Beats: 51.11% */
+/* Space Beats: 52.73% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n)        */
+class Solution_Elegant {
+public:
+    int longestSquareStreak(vector<int>& nums)
+    {
+        unordered_map<int, int> umap;
+
+        // Sort
+        sort(nums.begin(), nums.end());
+
+        int result = -1;
+        for (int num : nums)
+        {
+            int squared_num = std::sqrt(num);
+
+            if (squared_num * squared_num == num && umap.find(squared_num) != umap.end())
+            {
+                umap[num] = umap[squared_num] + 1;
+                result = max(result, umap[num]);
+            }
+            else
+                umap[num] = 1;
+        }
+
+        return result;
+    }
+};
