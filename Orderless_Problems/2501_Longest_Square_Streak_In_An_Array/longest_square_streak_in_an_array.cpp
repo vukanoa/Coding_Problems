@@ -2,6 +2,7 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
+#include <bitset>
 
 /*
     ==============
@@ -229,5 +230,59 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 87.14% */
+/* Space Beats: 93.87% */
+
+/* Time  Complexity: O(n + N) */
+/* Space Complexity: O(N)     */
+const long long N = 100001;
+class Solution {
+public:
+    int longestSquareStreak(vector<int>& nums)
+    {
+        bitset<N> number_exists = 0;
+        int max_num = 0;
+        for (int num : nums)
+        {
+            number_exists[num] = 1;
+            max_num = max(max_num, num);
+        }
+
+        int max_streak = 0;
+
+        for (long long num : nums)
+        {
+            int streak = 1;
+
+            for (long long next_square = num*num; next_square <= max_num; next_square *= next_square)
+            {
+                if (number_exists[next_square])
+                    streak++;
+                else
+                    break;
+            }
+
+            max_streak = max(max_streak, streak);
+
+            if (max_streak == 5)
+                break;
+        }
+
+        return max_streak < 2 ? -1 : max_streak;
     }
 };
