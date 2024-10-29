@@ -347,3 +347,71 @@ public:
         return max_streak < 2 ? -1 : max_streak;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  93.87% */
+
+/* Time  Complexity: O(n + log(max_num)) */
+/* Space Complexity: O(N)                */
+const long long N = 100001;
+const int bound[] = {2, 4, 17, 316};// bounds for early stop
+class Solution_Upper_Bound {
+public:
+    int longestSquareStreak(vector<int>& nums)
+    {
+        bitset<N> number_exists = 0;
+
+        int max_num = 0;
+        for (int num : nums)
+        {
+            number_exists[num] = 1;
+            max_num = max(max_num, num);
+        }
+
+        int limit = 5;
+        int i = 0;
+
+        int max_streak = 0;
+        for (long long num = 2; num <= bound[3]; num++)
+        {
+            if (number_exists[num] == 0)
+                continue;
+
+            if (num > bound[i])
+            {
+                i++;
+                limit--;
+            }
+
+            int streak = 1;
+            for (long long next_square = num*num; next_square <= max_num; next_square *= next_square)
+            {
+                if (number_exists[next_square])
+                {
+                    streak++;
+                    number_exists[next_square] = 0;
+                }
+                else
+                    break;
+            }
+
+            max_streak = max(max_streak, streak);
+            if (max_streak == limit)
+                break;
+        }
+
+        return max_streak < 2 ? -1 : max_streak;
+    }
+};
