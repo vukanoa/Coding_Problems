@@ -118,3 +118,71 @@ public:
         return result - 1; // subtracting 1 as per initial setup
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 93.48% */
+/* Space Beats: 25.57% */
+
+/* Time  Complexity: O(n * m) */
+/* Space Complexity: O(n * m) */
+class Solution_Memoization {
+public:
+    int dfs(vector<vector<int>>& grid, vector<vector<int>>& dp, int prev, int i, int j)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        if (i < 0 || j < 0 || i >= ROWS || j >= COLS)
+            return 0;
+
+        int curr = grid[i][j];
+
+        if (curr <= prev)
+            return 0;
+
+        if (dp[i][j] != -1)
+            return dp[i][j];
+
+        int max_move = 1 + dfs(grid, dp, curr, i-1, j+1);
+
+        for (int i0 = i; i0 <= i+1; i0++)
+        {
+            if (max_move == COLS - j)
+                break; // early stop pruning
+
+            max_move = max(max_move, 1 + dfs(grid, dp, curr, i0, j+1));
+        }
+
+        return dp[i][j] = max_move;
+    }
+
+    int maxMoves(vector<vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        vector<vector<int>> dp(ROWS, vector<int>(COLS, -1));
+
+        int result = 0;
+        for (int i = 0; i < ROWS; i++)
+        {
+            if (result == COLS)
+                break; // early stop
+
+            result = max(result, dfs(grid, dp, -1, i, 0));
+        }
+
+        return result-1;
+    }
+};
