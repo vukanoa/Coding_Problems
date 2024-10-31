@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <queue>
+#include <cmath>
 
 /*
     ============
@@ -151,5 +152,78 @@ public:
 
         // Return minimum total distance starting from first robot and first factory
         return dp[0][0];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 82.76% */
+/* Space Beats: 84.38% */
+
+/* Time  Complexity: O(m * n) */
+/* Space Complexity: O(m * n) */
+class Solution_Memoization {
+public:
+    long long minimumTotalDistance(vector<int>& robot, vector<vector<int>>& factory)
+    {
+        int m = robot.size();
+        int n = factory.size();
+
+        sort(robot.begin(), robot.end());
+        sort(factory.begin(), factory.end(), [](const vector<int>& a, const vector<int>& b) {
+            return a[0] < b[0];
+        });
+
+        // Memoization table
+        vector<vector<long long>> memo(m, vector<long long>(n, -1));
+
+        return dfs(robot, factory, memo, 0, 0);
+    }
+
+private:
+    long long dfs(vector<int>& robot,
+                  vector<vector<int>>& factory,
+                  vector<vector<long long>>& memo,
+                  int i,
+                  int j)
+    {
+        int m = robot.size();
+        int n = factory.size();
+
+        long long infinity = 1e13;
+
+        if (i == m)
+            return 0;
+
+        if (j == n)
+            return infinity;
+
+        if (memo[i][j] != -1)
+            return memo[i][j];
+
+        // Skip the current factory
+        long long result = dfs(robot, factory, memo, i, j+1);
+        long long sum = 0;
+
+        // Attempt to assign robots to the current factory
+        for (int k = i; k < m && k-i+1 <= factory[j][1]; k++)
+        {
+            sum += std::abs(robot[k] - factory[j][0]);
+            result = min(result, sum + dfs(robot, factory, memo, k+1, j+1));
+        }
+
+        memo[i][j] = result;
+
+        return result;
     }
 };
