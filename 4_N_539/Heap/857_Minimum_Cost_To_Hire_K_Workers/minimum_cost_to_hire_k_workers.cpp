@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <limits>
 #include <algorithm>
 #include <queue>
 
@@ -67,7 +68,7 @@
     --- IDEA ---
     ------------
 
-    TODO 
+    TODO
 
 */
 
@@ -81,19 +82,19 @@ public:
     double mincostToHireWorkers(vector<int>& quality, vector<int>& wage, int k)
     {
         ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-        
+
         vector<pair<double, int>> ratio;
         int n = quality.size();
-        
+
         for (int i = 0; i < n; i++)
             ratio.emplace_back(static_cast<double>(wage[i]) / quality[i], i);
-            
+
         sort(begin(ratio), end(ratio));
 
         priority_queue<int> max_heap;
         int quality_sum = 0;
         double max_rate = 0.0;
-        
+
         for (int i = 0; i < k; ++i)
         {
             quality_sum += quality[ratio[i].second];
@@ -108,12 +109,67 @@ public:
         {
             max_rate = max(max_rate, ratio[i].first);
 
-            quality_sum -= max_heap.top(); 
+            quality_sum -= max_heap.top();
             max_heap.pop();
 
             quality_sum += quality[ratio[i].second];
             max_heap.push(quality[ratio[i].second]);
             result = min(result, max_rate * quality_sum);
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 96.81% */
+/* Space Beats: 21.26% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n)        */
+class Solution_Neat {
+public:
+    double mincostToHireWorkers(std::vector<int>& quality, std::vector<int>& wage, int k)
+    {
+        double result = std::numeric_limits<double>::infinity();
+
+        // {ratio, quality}
+        std::vector<std::pair<double, int>> pairs;
+
+        for (int i = 0; i < quality.size(); i++)
+            pairs.push_back({1.0 * wage[i] / quality[i], quality[i]});
+
+        // Sort by ratio
+        std::sort(pairs.begin(), pairs.end(), [](const auto& a, const auto& b) {
+            return a.first < b.first;
+        });
+
+        std::priority_queue<int> max_heap; // Qualities
+        int total_quality = 0;
+        for (const auto& [rate, q] : pairs)
+        {
+            max_heap.push(q);
+            total_quality += q;
+
+            if (max_heap.size() > k)
+            {
+                total_quality -= max_heap.top();
+                max_heap.pop();
+            }
+
+            if (max_heap.size() == k)
+                result = std::min(result, total_quality * rate);
         }
 
         return result;
