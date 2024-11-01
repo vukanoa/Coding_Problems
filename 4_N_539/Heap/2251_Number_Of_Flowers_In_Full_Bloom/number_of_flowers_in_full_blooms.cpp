@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <map>
+#include <queue>
 
 /*
     ============
@@ -183,6 +184,70 @@ public:
 
         for (int i = 0; i < n; i++)
             result[i] = map[people[i]];
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 71.55% */
+/* Space Beats: 67.53% */
+
+/* Time  Complexity: O((m + n) * logm) */
+/* Space Complexity: O(m + n)          */
+class Solution_Min_Heap {
+public:
+    vector<int> fullBloomFlowers(vector<vector<int>>& flowers, vector<int>& people)
+    {
+        const int n = people.size();
+
+        vector<pair<int, int>> people_idx(n);
+
+        for (int i = 0; i < n; i++)
+            people_idx[i] = {people[i], i};
+
+        // Sort
+        sort(people_idx.begin(), people_idx.end());
+
+        priority_queue<pair<int, int>,
+                       vector<pair<int, int>>,
+                       greater<pair<int, int>>> min_heap;
+
+        for (const auto& fl: flowers)
+        {
+            int start_time = fl[0];
+            int end_time   = fl[1]+1;
+
+            min_heap.emplace(start_time, 1); // emplace because it's pair<int, int>
+            min_heap.emplace(end_time,  -1); // emplace because it's pair<int, int>
+        }
+
+        vector<int> result(n);
+        int j = 0;
+        int bloom = 0;
+
+        for (int i = 0; i < n; i++)
+        {
+            auto [peo, idx] = people_idx[i];
+
+            while ( ! min_heap.empty() && min_heap.top().first <= peo)
+            {
+                bloom += min_heap.top().second;
+                min_heap.pop();
+            }
+            result[idx] = bloom;
+        }
 
         return result;
     }
