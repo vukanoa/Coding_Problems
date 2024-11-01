@@ -2,6 +2,7 @@
 #include <vector>
 #include <unordered_map>
 #include <algorithm>
+#include <map>
 
 /*
     ============
@@ -71,7 +72,7 @@
 
 /* Time  Complexity: O((m + n) * log(m + n)) */
 /* Space Complexity: O(m + n)                */
-class Solution {
+class Solution_Unordered_Map {
 public:
     vector<int> fullBloomFlowers(vector<vector<int>>& flowers, vector<int>& people)
     {
@@ -123,6 +124,65 @@ public:
 
         for (int i = 0; i < n; i++)
            result[i] = umap[people[i]];
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 13.82% */
+/* Space Beats: 22.47% */
+
+/* Time  Complexity: O((m + n) * log(m + n)) */
+/* Space Complexity: O(m + n)                */
+class Solution_Map {
+public:
+    vector<int> fullBloomFlowers(vector<vector<int>>& flowers, vector<int>& people)
+    {
+        map<int, int> map; // Keep the ordering
+
+        for (int p : people)
+            map[p] = 0;
+
+        for (auto& fl : flowers)
+        {
+            int start_time = fl[0];
+            int end_time   = fl[1] + 1;
+
+            if (map.count(start_time))
+                map[start_time]++;
+            else
+                map[start_time] = 1;
+
+            if (map.count(end_time))
+                map[end_time]--;
+            else
+                map[end_time] = -1;
+        }
+
+        int bloom = 0;
+        for (auto& [time, bloom_count] : map) // map has an ordered traversal
+        {
+            bloom_count += bloom;
+            bloom = bloom_count;
+        }
+
+        int n = people.size();
+        vector<int> result(n);
+
+        for (int i = 0; i < n; i++)
+            result[i] = map[people[i]];
 
         return result;
     }
