@@ -141,3 +141,61 @@ public:
         return last_word.back() == first_word[0];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is even more simple than the above Solution.
+    Since last word's last character needs to be equal to the first word's
+    first character, that literally means that the very last character of the
+    Input needs to be equal to the very first character of the Input sentence.
+
+    If they are equal indeed, then we proceed to check other ones. We're told
+    that each words is separated by EXACTLY one space character. We can use
+    that information to that advantage.
+
+    Anytime we stumble upon a whitespace character, we are CERTAIN that exactly
+    one character BEFORE that whitespace character is a previous word's LAST
+    character. Similarly, we are CERTAIN that exactly one character AFTER that
+    whitespace character is a next word's FIRST character. They MUST much in
+    order to call this Input sentence a "Circular sentence".
+
+    If at any point we find that they do NOT match - Return false.
+
+    Once we're done with the for-loop and since we haven't returned false, we
+    can simply return true since we are sure that this is INDEED a circular
+    sentence.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  59.78% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Efficient {
+public:
+    bool isCircularSentence(string sentence)
+    {
+        const int n = sentence.size();
+
+        if (sentence[0] != sentence[n-1])
+            return false;
+
+        for (int i = 1; i < n-1; i++)
+        {
+            if (sentence[i] == ' ')
+            {
+                if (sentence[i-1] != sentence[i+1])
+                    return false;
+            }
+        }
+
+        return true;
+    }
+};
