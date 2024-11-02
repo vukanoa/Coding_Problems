@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <unordered_map>
+#include <algorithm>
 
 /*
     ==============
@@ -63,7 +65,7 @@
 
 /* Time  Complexity: O(target * n) */
 /* Space Complexity: O(target)     */
-class Solution {
+class Solution_Bottom-Up {
 public:
     int combinationSum4(std::vector<int>& nums, int target)
     {
@@ -82,5 +84,68 @@ public:
         }
 
         return dp[target];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   5.97% */
+
+/* Time  Complexity: O(target * n) */
+/* Space Complexity: O(target)     */
+class Solution_Memoization {
+public:
+    int combinationSum4(std::vector<int>& nums, int target)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        std::sort(nums.begin(), nums.end());
+
+        // Memoization map for caching results
+        std::unordered_map<int, int> memo;
+
+        return helper(nums, target, memo);
+    }
+
+private:
+    int helper(const std::vector<int>& nums, int target, std::unordered_map<int, int>& memo)
+    {
+        // Check if result is already computed
+        if (memo.find(target) != memo.end())
+            return memo[target];
+
+        // Base cases
+        if (target == 0)
+            return 1;
+
+        if (target < nums[0])
+            return 0;
+
+        int count = 0;
+
+        // Recursively compute combination sums
+        for (int num : nums)
+        {
+            if (target - num < 0)
+                break;
+
+            count += helper(nums, target - num, memo);
+        }
+
+        // Cache the result
+        memo[target] = count;
+
+        return count;
     }
 };
