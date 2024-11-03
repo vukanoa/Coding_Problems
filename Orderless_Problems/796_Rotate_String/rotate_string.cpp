@@ -96,3 +96,52 @@ public:
         return false;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We don't actually have to literally rotate as that would take way too much
+    time, as previously shown in the above Solution(even though for EASY
+    problems like these LeetCode rates even those Solutions as Beating 100.00%)
+
+    Instead we can concatenate string s to itself and the simply use the "find"
+    function to see if there is a substring goal anywhere in that new string
+    composed of two s strings concatenated.
+
+    Example:
+        Input: s = "abcde", goal = "cdeab"
+
+        new_str = s + s;
+        // new_str = "abcdeabcde" 
+
+        Can you match string goal="cdeab" as a substring in this new_str?
+        The answer is - Yes!
+
+        // new_str = "abcdeabcde" 
+                        ^^^^^
+                        |||||
+                        |||||
+        //    goal =    cdeab
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  55.81% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Elegant {
+public:
+    bool rotateString(string s, string goal)
+    {
+        if (s.length() != goal.length())
+            return false;
+
+        return (s + s).find(goal) != string::npos;
+    }
+};
