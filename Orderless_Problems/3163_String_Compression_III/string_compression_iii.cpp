@@ -80,7 +80,7 @@
 /* Space Beats: 67.50% */
 
 /* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Space Complexity: O(1) */ // We don't want to count what we return as extra
 class Solution {
 public:
     string compressedString(string word)
@@ -110,5 +110,57 @@ public:
             out << R-L << word[L];
 
         return out.str();
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one doesn't use ostringstream. Instead we're using basic string
+    variable and appending to it.
+
+    ostringstream is a more verbose and elegant solution in my opinion, but
+    this one is, I guess, more common or more natural to most people.
+
+*/
+
+/* Time  Beats: 66.67% */
+/* Space Beats: 77.92% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */ // We don't want to count what we return as extra
+class Solution_2 {
+public:
+    string compressedString(string word)
+    {
+        string result = "";
+
+        int n = word.length();
+
+        int count = 1;
+        char chr = word[0];
+
+        for (int i = 1; i < n; i++)
+        {
+            if (word[i] == chr && count < 9)
+                count++;
+            else
+            {
+                result.push_back(count + '0'); // 4 + 48 == 52 ---> '4'
+                result.push_back(chr);
+
+                chr = word[i];
+                count = 1;
+            }
+        }
+        result.push_back(count+'0');
+        result.push_back(chr);
+
+        return result;
     }
 };
