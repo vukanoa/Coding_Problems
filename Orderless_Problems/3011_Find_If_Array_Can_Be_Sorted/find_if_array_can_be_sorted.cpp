@@ -130,3 +130,66 @@ private:
         return std::bitset<32>(num).count();
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  63.3% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Efficient {
+public:
+    bool canSortArray(std::vector<int>& nums)
+    {
+        int prev_max = INT_MIN;
+        int curr_max = nums[0];
+        int curr_min = nums[0];
+
+        for (int i = 1; i < nums.size(); i++)
+        {
+            if (count_bits(nums[i]) == count_bits(curr_min))
+            {
+                curr_min = std::min(curr_min, nums[i]);
+                curr_max = std::max(curr_max, nums[i]);
+            }
+            else
+            {
+                if (curr_min < prev_max)
+                    return false;
+
+                prev_max = curr_max;
+                curr_min = nums[i];
+                curr_max = nums[i];
+            }
+        }
+
+        /*
+                                curr_min(curr group max) ------
+                                                              |
+            prev_max(prev group max) --------------------     |
+                                                        |     |
+                                                        v     v
+            Last group Edge-case (Consider: nums = [16,32,8,6,3,9])
+                                                    ^^^^^^^ ######
+                                                   prev_grp  curr_grp
+        */
+        return prev_max < curr_min;
+    }
+
+private:
+    int count_bits(int num)
+    {
+        return std::bitset<32>(num).count();
+    }
+};
