@@ -139,7 +139,7 @@ private:
 
 */
 
-/* Time  Beats: 13.47% */
+/* Time  Beats: 46.63% */
 /* Space Beats: 80.19% */
 
 /* Time  Complexity: O(n * nums[i] + nums[i] * sqrt(nums[i])) */
@@ -150,8 +150,11 @@ public:
     {
         int max_elem = *max_element(nums.begin(), nums.end());
 
-        // Pre-compute prime numbers
-        vector<bool> primes; // primes[i] == true, if i == prime
+        /*
+           Pre-compute prime numbers
+           Optimization 1: primes[i] == true, if i == prime
+        */
+        vector<bool> primes;
         primes.push_back(true); // Idx = 0;
         primes.push_back(true); // Idx = 1;
 
@@ -162,8 +165,6 @@ public:
             else
                 primes.push_back(false);
         }
-        // ------
-
 
 
         int prev = 0;
@@ -197,6 +198,153 @@ private:
         {
             if (num % factor == 0)
                 return false;
+        }
+
+        return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+    For some reason I cannot get this to work, even if it's the natural
+    optimization of the above Solution, but I'll leave it here anyways.
+
+    However, I'll try to write this one in another way below this failed
+    attempt.
+
+*/
+
+/* Time  Complexity: O(n + nums[i] * sqrt(nums[i])) */
+/* Space Complexity: O(1)                           */
+class Solution_Optimization_2 {
+public:
+    bool primeSubOperation(vector<int>& nums)
+    {
+        int max_elem = *max_element(nums.begin(), nums.end());
+
+        /*
+           Pre-compute prime numbers
+           Optimization 2: primes[i] --> largest prime <= i
+        */
+        vector<int> primes;
+        primes.push_back(0); // Idx = 0;
+        primes.push_back(0); // Idx = 1;
+        primes.push_back(2); // Idx = 2;
+
+        // It's going to be something like this: (No, it's NOT Fibonacci)
+        // [0, 0, 2, 3, 3, 5, 5, 7, ...]
+
+
+        for (int i = 2; i < max_elem + 1; i++)
+        {
+            if (is_prime(i))
+                primes.push_back(i);
+            else
+                primes.push_back(primes[i - 1]);
+        }
+
+
+        int prev = 0;
+        for (const int& num : nums)
+        {
+            int upper_bound = num - prev; // Non-inclusive
+
+            /*
+                Optimization 2:
+
+                We took out the for-loop and now the total Time Complexity is:
+                    O(n + nums[i] * sqrt(nums[i]))
+
+            */
+            int largest_prime = primes[upper_bound - 1];
+
+            if (num - largest_prime <= prev)
+                return false; // It's impossible to make the array sorted
+
+            prev = num - largest_prime;
+        }
+
+        return true;
+    }
+
+private:
+    bool is_prime(int& num)
+    {
+        for (int factor = 2; factor <= std::sqrt(num); factor++)
+        {
+            if (num % factor == 0)
+                return false;
+        }
+
+        return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    (Sieve of Eratosthenes)
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  81.15% */
+
+/* Time  Complexity: O(n * sqrt(m)) */
+/* Space Complexity: O(m)           */
+class Solution_Sieve_Of_Eratosthenes {
+class Solution {
+public:
+    bool primeSubOperation(vector<int>& nums)
+    {
+        int max_elem = *max_element(nums.begin(), nums.end());
+
+        // Create Sieve of Eratosthenes array to identify prime numbers
+        vector<bool> sieve(max_elem + 1, true);
+        sieve[1] = false;
+
+        for (int i = 2; i <= std::sqrt(max_elem + 1); i++)
+        {
+            if (sieve[i]) // If it's a prime number
+            {
+                for (int j = i * i; j <= max_elem; j += i)
+                    sieve[j] = false;
+            }
+        }
+
+        // Check if array can be made strictly increasing by subtracting prime numbers
+        int curr_val = 1;
+        int i = 0;
+        while (i < nums.size())
+        {
+            int upper_bound = nums[i] - curr_val;
+
+            // Return false if current number is already smaller than required value
+            if (upper_bound < 0)
+                return false;
+
+            // Move to next number if upper_bound is prime or zero
+            if (sieve[upper_bound] == true || upper_bound == 0)
+            {
+                i++;
+                curr_val++;
+            }
+            else
+                curr_val++;
         }
 
         return true;
