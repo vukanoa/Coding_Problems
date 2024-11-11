@@ -120,3 +120,85 @@ private:
         return true;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+    This Solution is MORE efficient in terms of Big O Complexity, however
+    LeetCode, for some reason, rates it as LESS efficient.
+
+    Anyway, the optimization is not trivial as we've prevented the repetitive
+    work.
+
+*/
+
+/* Time  Beats: 13.47% */
+/* Space Beats: 80.19% */
+
+/* Time  Complexity: O(n * nums[i] + nums[i] * sqrt(nums[i])) */
+/* Space Complexity: O(1)                                     */
+class Solution_Optimization_1 {
+public:
+    bool primeSubOperation(vector<int>& nums)
+    {
+        int max_elem = *max_element(nums.begin(), nums.end());
+
+        // Pre-compute prime numbers
+        vector<bool> primes; // primes[i] == true, if i == prime
+        primes.push_back(true); // Idx = 0;
+        primes.push_back(true); // Idx = 1;
+
+        for (int i = 2; i < max_elem; i++)
+        {
+            if (is_prime(i))
+                primes.push_back(true);
+            else
+                primes.push_back(false);
+        }
+        // ------
+
+
+
+        int prev = 0;
+        for (const int& num : nums)
+        {
+            int upper_bound = num - prev; // Non-inclusive
+
+            int largest_prime = 0;
+            for (int i = upper_bound - 1; i >= 2; i--)
+            {
+                if (is_prime(i))
+                {
+                    largest_prime = i;
+                    break;
+                }
+            }
+
+            if (num - largest_prime <= prev)
+                return false; // It's impossible to make the array sorted
+
+            prev = num - largest_prime;
+        }
+
+        return true;
+    }
+
+private:
+    bool is_prime(int& num)
+    {
+        for (int factor = 2; factor <= std::sqrt(num); factor++)
+        {
+            if (num % factor == 0)
+                return false;
+        }
+
+        return true;
+    }
+};
