@@ -406,3 +406,84 @@ public:
         return true;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 55.96% */
+/* Space Beats: 80.07% */
+
+/* Time  Complexity: O(n + m * log(logm)) */
+/* Space Complexity: O(m)                 */
+class Solution_Sieve_Of_Atkin {
+public:
+    bool primeSubOperation(vector<int>& nums)
+    {
+        int max_elem = *max_element(nums.begin(), nums.end());
+        
+        // Sieve of Atkin
+        vector<bool> sieve(max_elem + 1, false);
+
+        if (max_elem > 2)
+            sieve[2] = true;
+
+        if (max_elem > 3)
+            sieve[3] = true;
+        
+        for (int x = 1; x*x <= max_elem; x++)
+        {
+            for (int y = 1; y*y <= max_elem; y++)
+            {
+                int n = (4 * x*x) + (y*y);
+                if (n <= max_elem && (n % 12 == 1 || n % 12 == 5))
+                    sieve[n] = !sieve[n];
+                
+                n = (3 * x*x) + (y*y);
+                if (n <= max_elem && n % 12 == 7)
+                    sieve[n] = !sieve[n];
+                
+                n = (3 * x*x) - (y*y);
+                if (x > y && n <= max_elem && n % 12 == 11)
+                    sieve[n] = !sieve[n];
+            }
+        }
+        
+        for (int i = 5; i*i <= max_elem; i++)
+        {
+            if (sieve[i])
+            {
+                for (int j = i*i; j <= max_elem; j += i*i)
+                    sieve[j] = false;
+            }
+        }
+        
+        int curr_val = 1;
+        int i = 0;
+        while (i < nums.size())
+        {
+            int upper_bound = nums[i] - curr_val;
+            
+            if (upper_bound < 0)
+                return false;
+            
+            if (sieve[upper_bound] == true || upper_bound == 0)
+            {
+                i++;
+                curr_val++;
+            }
+            else
+                curr_val++;
+        }
+
+        return true;
+    }
+};
