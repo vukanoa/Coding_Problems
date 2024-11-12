@@ -76,6 +76,8 @@
 
 */
 
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -151,9 +153,9 @@
 /* Time  Beats: 9.02% */
 /* Space Beats: 9.46% */
 
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(n)        */
-class Solution {
+/* Time  Complexity: O(n * logn + m * logn) */
+/* Space Complexity: O(n + m)   */ // O(n) because we must have "answer" array
+class Solution_Lower_Bound {
 public:
     vector<int> maximumBeauty(vector<vector<int>>& items, vector<int>& queries)
     {
@@ -190,6 +192,68 @@ public:
                 int index = it - negative_items.begin();
                 answer[i] = dp[index];
             }
+        }
+
+        return answer;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    We've used "upper_bound" instead. It's a bit different but essentially
+    similary approach.
+
+*/
+
+/* Time  Beats: 23.77% */
+/* Space Beats: 13.51% */
+
+/* Time  Complexity: O((n + m) * logn) */
+/* Space Complexity: O(n + m)          */
+class Solution_Upper_Bound {
+public:
+    vector<int> maximumBeauty(vector<vector<int>>& items, vector<int>& queries)
+    {
+        vector<vector<int>> max_beauty_for_price = { {0, 0} };
+
+        // Sort items by price in ascending order
+        sort(items.begin(), items.end());
+
+        // Build max_beauty_for_price with maximum beauty for each price point
+        for (const auto& item : items)
+        {
+            int price = item[0];
+            int beauty = item[1];
+
+            // Update max_beauty_for_price only if the current beauty is higher
+            // than the last recorded one
+            if (beauty > max_beauty_for_price.back()[1])
+                max_beauty_for_price.push_back({price, beauty});
+        }
+
+        vector<int> answer;
+
+        // Process each query using binary search
+        for (int query : queries)
+        {
+            // Find the position of the first price greater than query
+            auto it = upper_bound(max_beauty_for_price.begin(), max_beauty_for_price.end(), vector<int>{query, INT_MAX},
+                                  [](const vector<int>& a, const vector<int>& b) {
+                                      return a[0] < b[0];
+                                  });
+
+            // If we're at the beginning, no valid price exists
+            if (it == max_beauty_for_price.begin())
+                answer.push_back(0);
+            else // Otherwise, move one step back to get the maximum beauty for price <= query
+                answer.push_back((--it)->at(1));
         }
 
         return answer;
