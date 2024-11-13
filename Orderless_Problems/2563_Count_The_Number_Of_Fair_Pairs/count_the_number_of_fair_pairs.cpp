@@ -308,3 +308,69 @@ private:
         return right; // It MUST be index "right"
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Almost equivalent approach, but using STL's functions:
+        1. upper_bound, and
+        2. lower_bound
+
+    In this one, we are NOT trying to get right of "<=" with "upper + 1",
+    because std::upper_bound gets rid of that problem for us.
+
+    And std::lower_bound is EXACTLY what we needed up there.
+
+
+    Now, instead of this:
+
+
+               0  1  2  3  4  5
+        nums = 0, 1, 4, 4, 5, 7          lower = 3, upper = 6
+               X  L        R
+
+
+    We'll have it like this:
+
+
+               0  1  2  3  4  5
+        nums = 0, 1, 4, 4, 5, 7          lower = 3, upper = 6
+               X     L        R
+
+    
+    That's why both work, but here we are using STL's functions so the indices
+    will be like this.
+
+*/
+
+/* Time  Beats: 63.10% */
+/* Space Beats: 61.66% */
+
+/* Time  Complexity: O(n * logn)  */
+/* Space Complexity: O(1) or O(n) */ // Depending on the Sort
+class Solution_STL {
+public:
+    long long countFairPairs(vector<int>& nums, int lower, int upper)
+    {
+        const int n = nums.size();
+        long long result = 0;
+
+        /* Sort */
+        sort(nums.begin(), nums.end());
+
+        for (int i = 0; i < n-1; i++)
+        {
+            auto up  = std::upper_bound(nums.begin() + i + 1, nums.end(), upper - nums[i]);
+            auto low = std::lower_bound(nums.begin() + i + 1, nums.end(), lower - nums[i]);
+
+            result += (up - low);
+        }
+
+        return result;
+    }
+};
