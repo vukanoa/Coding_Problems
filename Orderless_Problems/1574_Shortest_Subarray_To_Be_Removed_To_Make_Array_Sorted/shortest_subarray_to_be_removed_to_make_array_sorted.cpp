@@ -69,6 +69,239 @@
     TODO
     (This one requires a lengthy explanation)
 
+    First thing you should know is that in every array, of length n, there are
+    exatly n^2 subarrays.
+
+    Second, it's important to emphasize that there are asking us to remove a
+    SINGLE subarray. Meaning, if there is some sorted array we could obtain
+    by removing one or more subarrays, we do NOT care about those.
+
+    We only care about the MINIMUM LENGTH of a SINGLE SUBARRAY we can remove
+    after which the remaining elements are in non-decreasing order.
+
+    *******************************
+    *** Note for non-decreasing ***
+    *******************************
+        Non-decreasing means there can be equal elements.
+
+        Strictly increasing:  2, 3, 4, 5, 7, 9
+        Non-decreasing:       2, 3, 3, 3, 7, 9
+
+    
+    Once we understand previous two things, it should be obvious that there are
+    only three ways in which we can remove a single subarray:
+        1) Prefix
+        2) Suffix
+        3) Middle
+
+    
+    1) Prefix
+           Example: arr = [7, 8  2, 2, 1, 2, 3, 4, 5, 6]
+                           ^^^^^^^^^^
+           
+           If we remove this prefix(these 4 elements: [7, 8, 2, 2]) we are
+           left with the longest array that is still sorted.
+
+
+
+    2) Suffix
+           Example: arr = [1, 2, 3, 4, 5, 6, 2, 1, 0, 2]
+                                             ^^^^^^^^^^^
+
+           If we remove this suffix(these 4 elements: [2, 1, 0, 2]) we are
+           left with the longest array that is still sorted.
+
+
+
+    3) Middle
+          Example: arr = [1, 2, 3, 4, 10, 12, 11, 6, 7, 8]
+                                      ^^^^^^^^^^
+
+           If we remove this middle subarray(these 3 elements: [10, 12, 11]) we
+           are left with the longest array that is still sorted.
+
+
+    
+    There are 2 Base-cases that can be checked at the beginning:
+        1) Strictly decreasing array
+        2) Non-decreasing array
+
+
+    1)
+        If the array is sorted in a strictly decreasing order, then we can
+        immediately know what is the answer, the answer is ALWAYS: n-1.
+
+        Consider Example 2:
+            arr = [5, 4, 3, 2, 1]
+
+        We can be either left with [5] or with [1]. There is no other possible
+        solution. However, in both cases the answer is the same ==> n-1.
+
+
+    2)
+        On the other hand, if the whole array is sorted in a non-decreasing
+        order, then the answer is ALWAYS 0.
+
+        Why?
+
+        Let's look at the Example 3:
+            arr = [1,2,3]
+
+        What is the length of the subarray that we have to REMOVE in order to
+        make our array sorted in non-decreasing order?
+
+        The answer is: 0, the array is ALREADY in a non-decreasing order.
+
+
+
+    After we're done with these Base-cases, we can finally move to the main
+    part of this Solution.
+
+
+    This one is kind of tricky to come up with, but it's not too bad.
+    Let's refresh our memory - There are ONLY THREE WAYS in which we can remove
+    a single subarray:
+        1) Prefix
+        2) Suffix
+        3) Middle
+
+    1) 
+        To determine the length of the prefix subarray that we have to remove
+        to obtain a sorted array, all we have to do is iterate from the back
+        and find the first element that is strictly GREATER than the one next
+        to it(to the right of it).
+
+        Once we find that we know that from the index to the right of the
+        current element, until the end of the array, all elements ARE SORTED.
+
+        Let's look at the Example 1:
+
+            arr = [1, 2, 3, 10, 4, 2, 3, 5]
+                   0  1  2   3  4  5  6  7
+                                   i
+
+        We know that from index i=5 (inclusive) until the end of the array -
+        ALL elements are sorted in a non-decreasing order.
+
+        We'll call this 'i' index "sorted_from_idx".
+
+        Now, check if this is the smallest LENGTH of the SUBARRAY we can remove
+        by taking the minimum out of the current value of "result" and this
+        index:
+
+            // i.e. we removed elements from [0 to sorted_from_idx-1]
+            result = min(result, sorted_from_idx);
+
+        Alternatively, we could write this in a verbose way:
+            result = min(result, sorted_from_idx-1 - 0 + 1);
+
+
+
+    2)
+        Conversely, we can do a similar thing for getting rid of the suffix.
+
+        To determine the length of the suffix subarray that we have to remove
+        to obtain a sorted array, all we have to do is iterate from the front
+        and find the first element that is strictly SMALLER than the previous
+        one(one that is to the left of it).
+
+        Once we find that, we know that UP TO that index(NOT INCLUSIVELY!!!) -
+        ALL elements are sorted in non-decreasing order.
+
+
+        Let's, again, look at the Example 1:
+
+            arr = [1, 2, 3, 10, 4, 2, 3, 5]
+                   0  1  2   3  4  5  6  7
+                                i
+
+        We know that from index i=4 (NOT inclusive) until the end of the array
+        - ALL elements are sorted in a non-decreasing order.
+
+        We'll call this 'i' index "sorted_up_to_idx".
+
+        Now, check if this is the smallest LENGTH of the SUBARRAY we can remove
+        by taking the minimum out of the current value of "result" and the
+        length of the subarray from the end until the index we've just found:
+
+            result = min(result, n - sorted_up_to_idx);
+
+        Alternatively, we could write this in a verbose way:
+            result = min(result, n-1 - sorted_up_to_idx + 1);
+
+
+
+    And finally let's look at the CRUX of this Solution - Remove the MIDDLE
+    subarray to obtain a sorted array in non-decreasing order.
+
+    3)
+        For the third time, let's look at the Example 1:
+        
+            arr = [1, 2, 3, 10, 4, 2, 3, 5]
+                   0  1  2   3  4  5  6  7
+
+        It's VERY important to use the information we've gathered so far. We
+        know that from index "sorted_from_idx"=5(inclusively) ALL the elements
+        until the end of the array ARE SORTED!
+
+        We can use that to our advantage.
+
+        This is the idea:
+
+        We can iterate through array "arr", from the beginning, and as long as
+        elements are SORTED FROM THE BEGINNING, we can try to find it's OTHER
+        part from the subarray at the end that we are SURE is SORTED as well.
+
+            arr = [1, 2, 3, 10, 4, 2, 3, 5]
+                   0  1  2   3  4  5  6  7
+                   x               i
+
+        We are currently at element arr[x]=1.
+        We know that from index i=5(inclusively) all the elemensts ARE SORTED
+        until the end of the array.
+
+        Therefore, since we are looking for a MIDDLE SUBARRAY TO REMOVE(!!) we
+        can try to link the sorted part at the beginning with the sorted part
+        at the end of the array.
+
+        However, maybe the element at index i=5 is LESS THAN the current
+        element arr[x]=1, which means we are able to link with i=5 as the
+        beginning of the other part and, thus, we have to linearly scan through
+        this sorted part at the end of the array.
+
+        But that would be a O(n^2) Solution, which is a Brute-Force since we've
+        concluded, at the very beginning, that the number of subarrays in ANY
+        array of length n is n^2.
+
+        But have we heard ourselves. Let's read, or say, that again:
+            "... thus, we have to linearly SCAN THROUGH THIS SORTED PART at the
+            end of the array."
+
+        What is the optimization we can use to SCAN THROUGH THE SORTED array?
+        Of course, it's: Binary Search!
+
+
+        Let's summarize this part:
+
+            We iterate, FROM THE BEGINNING, of the array and AS LONG AS THE
+            ELEMENTS ARE IN NON-DECREASING ORDER, we are trying to find the
+            other part, from the back of the array, that is also sorted, to
+            link with and thus, implicitly REMOVE the MIDDLE SUBARRAY.
+
+            Since the part on the back of the array is ALSO sorted and since we
+            know the index from which that subarrays starts(inclusively), we
+            can perform a Binary Search on that part.
+
+            Each time we find the leftmost element that is EQUAL TO OR GREATER
+            THAN arr[x] in the sorted subarray from the back, we calculate:
+
+                result = min(result, idx - (i+1));
+
+            Once we find the first element, from the beginning, that is a
+            "dip", meaning it's NOT EQUAL TO OR GREATER THAN the previous
+            element, we stop. We break out of the for-loop and return the
+            result.
+
 */
 
 /* Time  Beats: 100.00% */
