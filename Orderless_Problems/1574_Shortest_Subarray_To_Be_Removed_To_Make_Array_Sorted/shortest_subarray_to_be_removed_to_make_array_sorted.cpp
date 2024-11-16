@@ -72,9 +72,9 @@
     First thing you should know is that in every array, of length n, there are
     exatly n^2 subarrays.
 
-    Second, it's important to emphasize that there are asking us to remove a
+    Second, it's important to emphasize that they are asking us to remove a
     SINGLE subarray. Meaning, if there is some sorted array we could obtain
-    by removing one or more subarrays, we do NOT care about those.
+    by removing two or more subarrays, we do NOT care about those.
 
     We only care about the MINIMUM LENGTH of a SINGLE SUBARRAY we can remove
     after which the remaining elements are in non-decreasing order.
@@ -135,7 +135,8 @@
             arr = [5, 4, 3, 2, 1]
 
         We can be either left with [5] or with [1]. There is no other possible
-        solution. However, in both cases the answer is the same ==> n-1.
+        solution. However, in both cases the answer is the same ==> We must
+        remove exactly n-1 elements.
 
 
     2)
@@ -265,7 +266,7 @@
         at the end of the array.
 
         However, maybe the element at index i=5 is LESS THAN the current
-        element arr[x]=1, which means we are able to link with i=5 as the
+        element arr[x]=1, which means we are NOT able to link with i=5 as the
         beginning of the other part and, thus, we have to linearly scan through
         this sorted part at the end of the array.
 
@@ -273,7 +274,7 @@
         concluded, at the very beginning, that the number of subarrays in ANY
         array of length n is n^2.
 
-        But have we heard ourselves. Let's read, or say, that again:
+        But have we heard ourselves? Let's read, or say, that again:
             "... thus, we have to linearly SCAN THROUGH THIS SORTED PART at the
             end of the array."
 
@@ -289,7 +290,7 @@
             link with and thus, implicitly REMOVE the MIDDLE SUBARRAY.
 
             Since the part on the back of the array is ALSO sorted and since we
-            know the index from which that subarrays starts(inclusively), we
+            know the index from which that subarray starts(inclusively), we
             can perform a Binary Search on that part.
 
             Each time we find the leftmost element that is EQUAL TO OR GREATER
@@ -420,6 +421,106 @@ private:
     TODO
     Slight, but VERY important, optimization on the above Solution.
 
+    The only part that differs is how we handle the 3) case, i.e. Middle
+    subarray removal.
+
+    Instead of doing a Brute-Force O(n^2) by doing the following:
+
+        Start from the beginning and as long as the elements are sorted from
+        the beginning, scan through the sorted part from the back linearly.
+
+        I.e. for every element that doesn't infringe on sortedness from the
+        beginning, do a linear scan through sorted subarray from the back.
+
+        That would be O(n^2)
+
+    But, then we've optimized the linear scan through the sorted subarray by
+    using Binary Search.
+
+        This would be O(n * logn)
+
+    Now, we can optimized that part even move. Instead of scanning through that
+    part, we can have TwoPointers approach and do it entirely in O(n).
+
+    Let's look at slightly modified Example 1:
+
+        arr = [1, 3, 4, 10, 4, 2, 3, 5]
+               0  1  2   3  4  5  6  7
+               x               i
+            
+    arr[x=0] = 1 is sorted(because it's the very first element)
+    Now we check: if arr[x]=1 is EQUALS TO OR SMALLER THAN arr[i]=2.
+
+            if (arr[x] <= arr[i])
+
+    If it is TRUE, then that means we can know the length of the
+    subarray we're about to remove in O(1).
+
+    How?
+
+    The left sorted part is of length x+1. Since x=0, the sorted part
+    is of length 0+1=1.
+
+    However, since we know the BEGINNING of the sorted subarray on the
+    "other side", and we've seen that the tail of the LEFT subarray is
+    smaller than the HEAD(i.e. first element) of the RIGHT subarray,
+    then the total length is:
+
+        left_part_length + right_part_length   =  
+            0 + 1        +    N - i            =  
+              1          +    8 - 5            =  
+              1          +      3              = 4
+
+    However, that's not what we are looking for. We are looking for an
+    opposite thing: The length of the subarray we will REMOVE, not the
+    length of the remaining elements.
+
+    Therefore, to do that, take the minimum of either:
+        1) result
+        2) sorted_from_idx - x+1
+
+        // i <==> x in the line below
+        result = min(result, sorted_from_idx - (i+1));
+
+    
+    Now we move to the next element by incrementing 'x'.
+
+        arr = [1, 3, 4, 10, 4, 2, 3, 5]
+               0  1  2   3  4  5  6  7
+                  x            i
+
+    Here, again, we check:
+
+        if (arr[x] <= arr[i])
+
+    But here, that's NOT the case. What do we do now?
+    We simply move 'i' pointer to the right until it becomes EQUAL TO OR
+    GREATER THAN arr[x](or it goes Out-of-Bounds).
+
+    This is the absolute kernel of this Solution.
+
+    Let's say it did go out of bounds, let's say we had something like this:
+
+        arr = [1, 7, 8, 10, 4, 2, 3, 5]
+               0  1  2   3  4  5  6  7
+                  x            i
+
+        In this case, we would move 'i' pointer to Out-Of-Bounds because we
+        wouldn't be able to find an element that is EQUAL TO OR GREATER THAN
+        arr[x].
+
+        In that case, we can stop and we can be certain we've found the result.
+
+        Result is either going to come from 1) Prefix or 2) Suffix or it will
+        come from this new Suffix that was supposed to be Middle.
+
+        We DO NOT have to continue since if the next element, to the right of
+        current x, is in SORTED order, then we won't be able to find EQUAL TO
+        OR GREATER THAN for that element either, thus we can stop.
+
+    This way, we've removed Binary Search and now total Time Complexity is O(n)
+
+
 */
 
 /* Time  Beats: 100.00% */
@@ -469,18 +570,18 @@ public:
         result = min(result, n - sorted_up_to_idx);
 
         // O(n)
-        for (int i = 0; i < n; i++)
+        for (int x = 0; x < n; x++)
         {
-            if (i > 0 && arr[i-1] > arr[i])
+            if (x > 0 && arr[x-1] > arr[x])
                 break;
 
-            while (sorted_from_idx < n && arr[i] > arr[sorted_from_idx])
+            while (sorted_from_idx < n && arr[x] > arr[sorted_from_idx])
                 sorted_from_idx++;
 
             if (sorted_from_idx == n)
                 break;
 
-            result = min(result, sorted_from_idx - (i+1));
+            result = min(result, sorted_from_idx - (x+1));
         }
 
         return result;
