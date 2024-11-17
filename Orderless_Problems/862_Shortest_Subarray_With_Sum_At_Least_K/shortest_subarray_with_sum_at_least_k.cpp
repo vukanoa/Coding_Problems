@@ -2,6 +2,7 @@
 #include <vector>
 #include <queue>
 #include <climits>
+#include <deque>
 
 /*
     ============
@@ -100,7 +101,74 @@ public:
 
             min_heap.push( {curr_sum, right} );
 
-            // Increment
+            // Increment for while-loop
+            right++;
+        }
+
+        return result == INT_MAX ? -1 : result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    Before trying to solve the current one, try solving these one first:
+        + Daily temperatures             (Monotonic Stack)
+        + Largest Rectangle in Histogram (Monotonic Stack)
+        + Sliding Window Maximum         (Sliding Window)
+
+    Otherwise, you have no chance.
+
+*/
+
+/* Time  Beats: 39.24% */
+/* Space Beats: 53.79% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+    int shortestSubarray(vector<int>& nums, int k)
+    {
+        const int n = nums.size();
+
+        long long result = INT_MAX;
+        long long curr_sum = 0;
+
+        // Monotonicly increasing deque
+        deque<pair<long long,int>> deque;
+
+        int right = 0;
+        while (right < n)
+        {
+            curr_sum += nums[right];
+
+            if (curr_sum >= k)
+                result = min(result, static_cast<long long>(right + 1));
+
+            // Find the minimum valid window that is ending at index "right"
+            while ( !deque.empty() && curr_sum - deque.front().first >= k )
+            {
+                int prefix  = deque.front().first;
+                int end_idx = deque.front().second;
+                deque.pop_front();
+
+                result = min(result, static_cast<long long>(right - end_idx));
+            }
+
+            // Validate the monotonic feature of the Deque
+            while ( !deque.empty() && deque.back().first > curr_sum )
+                deque.pop_back();
+
+            deque.push_back( {curr_sum, right} );
+
+            // Increment for while-loop
             right++;
         }
 
