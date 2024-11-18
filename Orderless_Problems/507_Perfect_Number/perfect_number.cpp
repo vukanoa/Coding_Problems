@@ -74,3 +74,38 @@ public:
         return sum == num;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  56.30% */
+
+/* Time  Complexity: O(sqrt(n)) */
+/* Space Complexity: O(1)       */
+class Solution {
+public:
+    bool checkPerfectNumber(int num)
+    {
+        if (num < 5)
+            return false;
+
+        int sum = 1;
+        for (int i = 2; i <= std::sqrt(num); i++)
+        {
+            if (num % i == 0)
+                sum += i + num / i;
+        }
+
+        return sum == num;
+    }
+};
