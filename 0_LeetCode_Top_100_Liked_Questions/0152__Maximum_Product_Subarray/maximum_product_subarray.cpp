@@ -93,6 +93,61 @@ public:
     }
 };
 
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is Optimized Solution from the above.
+    Instead of using the entire vector "dp", we simply use two variables and
+    thus reduce the Time Complexity from O(n) to O(1).
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   6.69% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Concise_Optimized_2024 {
+public:
+    int maxProduct(vector<int>& nums)
+    {
+        const int n = nums.size();
+
+        int dp_max = nums[0];
+        int dp_min = nums[0];
+
+        int result = nums[0];
+        for (int i = 1; i < n; i++)
+        {
+            if (nums[i-1] == 0)
+            {
+                dp_max = dp_min = nums[i];
+
+                result = max(result, dp_max);
+                continue;
+            }
+
+            int largest  = max( {nums[i], nums[i] * dp_max, nums[i] * dp_min} );
+            int smallest = min( {nums[i], nums[i] * dp_max, nums[i] * dp_min} );
+
+            dp_max = largest;
+            dp_min = smallest;
+
+            result = max(result, dp_max);
+        }
+
+        return result;
+    }
+};
+
+
+
+
 /*
     ------------
     --- IDEA ---
