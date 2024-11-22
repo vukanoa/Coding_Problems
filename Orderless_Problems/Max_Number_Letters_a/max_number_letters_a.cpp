@@ -6,32 +6,35 @@ class Solution {
 public:
     int solution(std::string& S)
     {
-        int N = S.length();
-        if (N == 1) return S[0] == 'a' ? 1 : 4;
+        // Check for the presence of "aaa" in the original string
+        if (S.find("aaa") != string::npos)
+            return -1;
 
-        int can_be_inserted = 0;
-        for (int i = 0; i < N; i++)
+        int max_insertions = 0;
+        int n = S.length();
+        int consecutive_A = 0;
+
+        // Traverse the string
+        for (int i = 0; i < n; ++i)
         {
-            int a = 0;
-            while (i < S.length() && S[i] == 'a' && a < 3){
-                a++;
-                i++;
+            if (S[i] == 'a')
+            {
+                consecutive_A++;
             }
-
-            if      (a == 3) return -1;
-            else if (i == N) break;
-
-            if      (i-1 < 0 || S[i-1] != 'a') can_be_inserted += 2;
-            else if (i-2 < 0 || S[i-2] != 'a') can_be_inserted += 1;
+            else
+            {
+                // For non-'a' characters, calculate insertions for the gap
+                max_insertions += max(0, 2 - consecutive_A);
+                consecutive_A = 0;
+            }
         }
 
-        if      (S[N-1] != 'a') can_be_inserted += 2;
-        else if (S[N-2] != 'a') can_be_inserted += 1;
+        // Account for trailing 'a' sequence
+        max_insertions += max(0, 2 - consecutive_A);
 
-        return can_be_inserted;
+        return max_insertions;
     }
 };
-
 
 int
 main()
