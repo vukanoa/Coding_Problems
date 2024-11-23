@@ -87,6 +87,8 @@
 
     Since we MUST actually return the rotated 2D vector, there's no other way
     around it other than actually doing it yourself.
+    (In other words we MUST iterate through the rows and do it ourselves, but
+    as you will see in the 2nd Solution down below, this part CAN be optimized)
 
     That's it.
 
@@ -123,6 +125,72 @@ public:
                         j++;
                     }
                 }
+            }
+        }
+
+        // Rotate
+        vector<vector<char>> result(n, vector<char>(m, '.'));
+        for (int i = 0; i < m; i++)
+        {
+            for (int j = 0; j < n; j++)
+                result[j][m-1 - i] = box[i][j];
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Overall Time Complexity is unchanged, however this one is MUCH more
+    efficient since we are not "moving" each rock cell-by-cell, instead we are
+    swapping with the rightmost empty cell.
+
+    Checkout:LeetCode 26 "Remove Duplicates from Sorted Array" if you aren't
+    familiar with this technique.
+
+    However, in this one that wouldn't be enough, we actually need to SWAP the
+    rock with the empty cell we wish to place rock at.
+
+    In LeetCode 26, we do NOT care about elements after mth unique, but here we
+    very much DO.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  98.78% */
+
+/* Time  Complexity: O(m * n) */
+/* Space Complexity: O(m * n) */
+class Solution_Efficient {
+public:
+    vector<vector<char>> rotateTheBox(vector<vector<char>>& box)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        const int m = box.size();
+        const int n = box[0].size();
+
+        if (m * n == 1)
+            return box;
+
+        // Fall to the right
+        for (int i = 0; i < m; i++)
+        {
+            int to_place_idx = n-1;
+
+            for (int j = n-1; j >= 0; j--)
+            {
+                if (box[i][j] == '#')
+                    swap(box[i][to_place_idx--], box[i][j]);
+                else if (box[i][j] == '*')
+                    to_place_idx = j-1;
             }
         }
 
