@@ -98,7 +98,7 @@
 /* Space Beats: 98.78% */
 
 /* Time  Complexity: O(m * n) */
-/* Space Complexity: O(m * n) */
+/* Space Complexity: O(1)     */ // Result is not considered extra space
 class Solution {
 public:
     vector<vector<char>> rotateTheBox(vector<vector<char>>& box)
@@ -167,7 +167,7 @@ public:
 /* Space Beats:  98.78% */
 
 /* Time  Complexity: O(m * n) */
-/* Space Complexity: O(m * n) */
+/* Space Complexity: O(1)     */ // Result is not considered extra space
 class Solution_Efficient {
 public:
     vector<vector<char>> rotateTheBox(vector<vector<char>>& box)
@@ -200,6 +200,59 @@ public:
         {
             for (int j = 0; j < n; j++)
                 result[j][m-1 - i] = box[i][j];
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Here we are NOT modifying the Input and we're doing both "the fall" and the
+    rotation at the same time.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  98.78% */
+
+/* Time  Complexity: O(m * n) */
+/* Space Complexity: O(1)     */ // Result is not considered extra space
+class Solution_Efficient_Non-Modifying {
+public:
+    vector<vector<char>> rotateTheBox(vector<vector<char>>& box)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        const int m = box.size();
+        const int n = box[0].size();
+
+        vector<vector<char>> result(n, vector<char>(m, '.'));
+
+        // Fall to the right and Rotate at the same time
+        for (int i = 0; i < m; i++)
+        {
+            int to_place_idx = n-1;
+
+            for (int j = n-1; j >= 0; j--)
+            {
+                if (box[i][j] == '#')
+                {
+                    result[to_place_idx][m-1 - i] = '#';
+                    to_place_idx--;
+                }
+                else if (box[i][j] == '*')
+                {
+                    result[j][m-1 - i] = '*';
+                    to_place_idx = j-1;
+                }
+            }
         }
 
         return result;
