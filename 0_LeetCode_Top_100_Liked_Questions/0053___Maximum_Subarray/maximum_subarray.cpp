@@ -6,56 +6,56 @@
 
 
 /*
-	==============
-	=== MEDIUM ===
-	==============
+    ==============
+    === MEDIUM ===
+    ==============
 
-	===========================
-	53) Maximum Subarray
-	===========================
+    ===========================
+    53) Maximum Subarray
+    ===========================
 
-	============
-	Description:
-	============
+    ============
+    Description:
+    ============
 
-	Given an integer array "nums", find the subarray which has the largest sum
-	and return its sum.
+    Given an integer array "nums", find the subarray which has the largest sum
+    and return its sum.
 
-	=============================================
-	FUNCTION: int maxSubArray(vector<int>& nums);
-	=============================================
+    =============================================
+    FUNCTION: int maxSubArray(vector<int>& nums);
+    =============================================
 
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
 
-	--- Example 1 ---
-	Input:  nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]
-	Output: 6
-	Explanation: [4, -1, 2, 1] has the largest sum = 6
+    --- Example 1 ---
+    Input:  nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]
+    Output: 6
+    Explanation: [4, -1, 2, 1] has the largest sum = 6
 
-	--- Example 2 ---
-	Input:  nums = [1]
-	Output: 1
+    --- Example 2 ---
+    Input:  nums = [1]
+    Output: 1
 
-	--- Example 3 ---
-	Input: nums = [5, 4, -1, 7, 8]
-	Output: 23
+    --- Example 3 ---
+    Input: nums = [5, 4, -1, 7, 8]
+    Output: 23
 
-	*** Constraints ***
-	1 <= nums.length <= 10^5
-	-10^4 <= nums[i] <= 10^4
+    *** Constraints ***
+    1 <= nums.length <= 10^5
+    -10^4 <= nums[i] <= 10^4
 
 */
 
 
 /*
-	------------
-	--- IDEA ---
-	------------
+    ------------
+    --- IDEA ---
+    ------------
 
-	Keep adding each integer to the sequence until the "sum" drops below 0.
-	If "sum" is negative, then should reset the sequence.
+    Keep adding each integer to the sequence until the "sum" drops below 0.
+    If "sum" is negative, then should reset the sequence.
 
 */
 
@@ -67,20 +67,20 @@
 /* Space Complexity: O(n) */
 class Solution_Unoptimized{
 public:
-	int maxSubArray(std::vector<int>& nums)
-	{
-		std::vector<int> dp(nums.size(), 0);
-		dp[0]   = nums[0];
-		int max = nums[0];
+    int maxSubArray(std::vector<int>& nums)
+    {
+        std::vector<int> dp(nums.size(), 0);
+        dp[0]   = nums[0];
+        int max = nums[0];
 
-		for (int i = 1; i < nums.size(); i++)
-		{
-			dp[i] = std::max(dp[i - 1] + nums[i], nums[i]);
-			max   = std::max(max, dp[i]);
-		}
+        for (int i = 1; i < nums.size(); i++)
+        {
+            dp[i] = std::max(dp[i - 1] + nums[i], nums[i]);
+            max   = std::max(max, dp[i]);
+        }
 
-		return max;
-	}
+        return max;
+    }
 };
 
 
@@ -93,19 +93,19 @@ public:
 /* Space Complexity: O(1) */
 class Solution_Efficient {
 public:
-	int maxSubArray(std::vector<int>& nums)
-	{
-		int dp  = nums[0];
-		int max = nums[0];
+    int maxSubArray(std::vector<int>& nums)
+    {
+        int dp  = nums[0];
+        int max = nums[0];
 
-		for (int i = 1; i < nums.size(); i++)
-		{
-			dp  = std::max(dp + nums[i], nums[i]);
-			max = std::max(max, dp);
-		}
+        for (int i = 1; i < nums.size(); i++)
+        {
+            dp  = std::max(dp + nums[i], nums[i]);
+            max = std::max(max, dp);
+        }
 
-		return max;
-	}
+        return max;
+    }
 };
 
 
@@ -115,48 +115,48 @@ extern std::vector<int> big_example();
 int
 main()
 {
-	Solution_Unoptimized sol_unopt;
-	Solution_Efficient   sol_eff;
+    Solution_Unoptimized sol_unopt;
+    Solution_Efficient   sol_eff;
 
-	/* Example 1 */
-	std::vector<int> nums = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
+    /* Example 1 */
+    std::vector<int> nums = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
 
-	/* Example 2 */
-	// std::vector<int> nums = {1};
+    /* Example 2 */
+    // std::vector<int> nums = {1};
 
-	/* Example 3 */
-	// std::vector<int> nums = {5, 4, -1, 7, 8};
+    /* Example 3 */
+    // std::vector<int> nums = {5, 4, -1, 7, 8};
 
-	/* Example 4 */
-	// std::vector<int> nums = big_example();
+    /* Example 4 */
+    // std::vector<int> nums = big_example();
 
-	std::cout << "\n\t========================";
-	std::cout << "\n\t=== MAXIMUM SUBARRAY ===";
-	std::cout << "\n\t========================\n";
-
-	
-	/* Write Input */
-	bool first = true;
-	std::cout << "\n\tArray: [";
-	for (auto x: nums)
-	{
-		if (!first)
-			std::cout << ", ";
-
-		std::cout << x;
-		first = false;
-	}
-	std::cout << "]\n";
+    std::cout << "\n\t========================";
+    std::cout << "\n\t=== MAXIMUM SUBARRAY ===";
+    std::cout << "\n\t========================\n";
 
 
-	/* Solution */
-	// int max = sol_unopt.maxSubArray(nums);
-	int max = sol_eff.maxSubArray(nums);
+    /* Write Input */
+    bool first = true;
+    std::cout << "\n\tArray: [";
+    for (auto x: nums)
+    {
+        if (!first)
+            std::cout << ", ";
+
+        std::cout << x;
+        first = false;
+    }
+    std::cout << "]\n";
 
 
-	/* Write Output */
-	std::cout << "\n\tMax SubArray: " << max << "\n\n";
+    /* Solution */
+    // int max = sol_unopt.maxSubArray(nums);
+    int max = sol_eff.maxSubArray(nums);
 
 
-	return 0;
+    /* Write Output */
+    std::cout << "\n\tMax SubArray: " << max << "\n\n";
+
+
+    return 0;
 }
