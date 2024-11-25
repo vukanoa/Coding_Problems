@@ -405,31 +405,32 @@ public:
     Since it is said that s consists of English letters, digits, symbols and
     spaces.
 */
-class Solution_Efficient{
+class Solution_Efficient {
 public:
     int lengthOfLongestSubstring(std::string s)
     {
-        std::vector<int> ascii(128, -1);
+        int result = 0;
+
+        // -1 designates that certan symbol didn't, at least yet, appeared
+        vector<int> ascii_char_last_appeared_at_idx(128, -1);
 
         int left  = 0;
         int right = 0;
-
-        int longest = 0;
-
-        while (right < s.size())
+        while (right < s.length())
         {
-            char curr_char = s[right];
+            int index = ascii_char_last_appeared_at_idx[s[right]];
 
-            int index = ascii[curr_char];
-            if (index != -1 && index >= left && index < right)
+            if (index != -1 && left <= index && index < right)
                 left = index + 1;
+            
+            ascii_char_last_appeared_at_idx[s[right]] = right;
+            result = max(result, right - left + 1);
 
-            longest = std::max(longest, right - left + 1);
-            ascii[curr_char] = right;
+            // Increment
             right++;
         }
 
-        return longest;
+        return result;
     }
 };
 
