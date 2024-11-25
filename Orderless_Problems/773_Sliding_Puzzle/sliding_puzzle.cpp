@@ -1,7 +1,9 @@
 #include <iostream>
 #include <vector>
-#include <stack>
+#include <string>
 #include <queue>
+#include <unordered_set>
+#include <algorithm>
 
 /*
     ============
@@ -89,90 +91,69 @@ using namespace std;
 
 */
 
-/* Time  Beats: 40.72% */
-/* Space Beats: 43.86% */
+/* Time  Beats: 92.19% */
+/* Space Beats: 44.55% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O((m + n) * (m + n)!) */
+/* Space Complexity: O(m + n)              */
 class Solution {
 public:
-    int slidingPuzzle(vector<vector<int>>& board)
+    int slidingPuzzle(std::vector<std::vector<int>>& board)
     {
-        string target = "123450";
-        string s      = "";
-
-        for (int i = 0; i < 2; i++)
+        // Target state and initial state
+        std::string target = "123450";
+        std::string start;
+        for (const auto& row : board)
         {
-            for (int j = 0; j < 3; j++)
-                s += to_string(board[i][j]);
+            for (int num : row)
+                start += std::to_string(num);
         }
 
-        set<string> stack;
-        queue<pair<string,int>> queue;
-        queue.push({s,0});
+        // Neighbors map for each index in the 1D representation of the board
+        std::vector<std::vector<int>> neighbors = {
+            {1, 3},    // Neighbors of index 0
+            {0, 2, 4}, // Neighbors of index 1
+            {1, 5},    // Neighbors of index 2
+            {0, 4},    // Neighbors of index 3
+            {1, 3, 5}, // Neighbors of index 4
+            {2, 4}     // Neighbors of index 5
+        };
 
-        while(!queue.empty())
+        // BFS setup
+        std::queue<std::pair<std::string, int>> queue; // (state, moves)
+        std::unordered_set<std::string> visited;      // To track visited states
+        queue.push({start, 0});
+        visited.insert(start);
+
+        while ( ! queue.empty())
         {
-            string t     = queue.front().first;
-            int    steps = queue.front().second;
+            auto [state, moves] = queue.front();
             queue.pop();
 
-            stack.insert(t);
+            // Check if we've reached the target
+            if (state == target)
+                return moves;
 
-            if (t == target)
-                return steps;
+            // Find the index of zero
+            int zero_index = state.find('0');
 
-            int index = -1;
-            for (int i = 0; i < t.size(); i++)
+            // Generate new states by swapping '0' with its neighbors
+            for (int neighbor : neighbors[zero_index])
             {
-                if (t[i] == '0')
+                // Swap '0' with the neighbor
+                std::string new_state = state;
+                std::swap(new_state[zero_index], new_state[neighbor]);
+
+                // If this new state hasn't been visited, add it to the queue
+                if (visited.find(new_state) == visited.end())
                 {
-                    index = i;
-                    break;
+                    visited.insert(new_state);
+                    queue.push({new_state, moves + 1});
                 }
-            }
-
-            // Up
-            if (index-3 >= 0)
-            {
-                string tmp = t;
-                swap(tmp[index],tmp[index-3]);
-
-                if(stack.find(tmp) == stack.end())
-                    queue.push({tmp,steps+1});
-            }
-
-            // Down
-            if(index+3 <= 5)
-            {
-                string tmp = t;
-                swap(tmp[index],tmp[index+3]);
-
-                if(stack.find(tmp) == stack.end())
-                    queue.push({tmp, steps+1});
-            }
-
-            // Right
-            if (index != 2 && index != 5)
-            {
-                string tmp = t;
-                swap(tmp[index],tmp[index+1]);
-
-                if(stack.find(tmp) == stack.end())
-                    queue.push({tmp,steps+1});
-            }
-
-            // Left
-            if(index != 0 && index != 3)
-            {
-                string tmp = t;
-                swap(tmp[index],tmp[index-1]);
-
-                if(stack.find(tmp) == stack.end())
-                    queue.push({tmp,steps+1});
             }
         }
 
+        // If we exhaust the queue without finding the target
         return -1;
     }
 };
