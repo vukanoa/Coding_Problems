@@ -105,6 +105,24 @@
 
 */
 
+/*
+
+   Which one of the two Solutions listed down below is more efficient?
+   Depends!
+
+
+    | Aspect                      | Solution 1 (BFS)                         | Solution 2 (DP)                           |
+    |-----------------------------+------------------------------------------|-------------------------------------------+
+    | Graph Representation        | `adj_list` (outgoing edges)              | `reversed_adj_list` (incoming edges)      |
+    | Shortest Path Calc          | BFS for node 0 to node n-1               | Bottom-up DP for all nodes                |
+    | Efficiency on Dense Graphs  | Worse (explores reachable nodes only)    | Better (processes all nodes in parallel)  |
+    | Efficiency on Sparse Graphs | Better (stops once destination is found) | Worse (processes all nodes unnecessarily) |
+    | Ease of Implementation      | Relatively simple                        | Moderate                                  |
+    | Total Complexity            | O(Q  (n + E))                            | O(Q  (n + E))                             |
+
+*/
+
+
 using namespace std;
 
 /*
@@ -183,5 +201,71 @@ private:
         }
 
         return -1; // This one will never execute
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 76.19% */
+/* Space Beats: 76.59% */
+
+/* Time  Complexity: O(Q * (n + Q)) */ // Q <==> queries.length()
+/* Space Complexity: O(n + Q)       */
+class Solution_Reversed_Adj_List__Bottom_Up_DP {
+public:
+    vector<int> shortestDistanceAfterQueries(int n, vector<vector<int>>& queries)
+    {
+        vector<int> answer; // Result
+
+        vector<vector<int>> reversed_adj_list(n, vector<int>());
+
+        // Default reversed_adj_list graph-structure for this problem
+        for (int i = 1; i < n; i++)
+            reversed_adj_list[i].push_back(i-1);
+
+        // Add query-by-query in adj_list and calculate shortest-distance
+        for (const vector<int>& query : queries)
+        {
+            const int& src = query[0];
+            const int& dst = query[1];
+
+            reversed_adj_list[dst].push_back(src);
+
+            answer.push_back(shortest_distance(n, reversed_adj_list));
+        }
+
+        return answer;
+    }
+
+private:
+    /* Bottom-Up Dynamic Programming */
+    int shortest_distance(int n, vector<vector<int>>& reversed_adj_list)
+    {
+        const int ONE_MORE_THAN_MAX_POSSIBLE = n+1;
+        vector<int> dp(n, ONE_MORE_THAN_MAX_POSSIBLE);
+        dp[0] = 0;
+
+        for (int i = 1; i < n; i++)
+        {
+            for (const int& nei : reversed_adj_list[i])
+            {
+                // "nei" is a node that POINTS TO current node
+                dp[i] = min(dp[i], dp[nei]);
+            }
+
+            dp[i]++; // Include a jump from the node with min-distance to curr_node
+        }
+
+        return dp[n-1];
     }
 };
