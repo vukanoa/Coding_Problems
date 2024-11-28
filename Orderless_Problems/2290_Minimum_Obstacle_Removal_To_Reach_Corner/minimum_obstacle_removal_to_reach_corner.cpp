@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <priority_queue>
+#include <queue>
 
 /*
     ============
@@ -119,6 +119,75 @@ public:
                     continue;
 
                 min_heap.push({obstacles + grid[nei_row][nei_col], nei_row, nei_col});
+                visited[nei_row][nei_col] = true;
+            }
+        }
+
+        return -1; // We won't get to here
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    Optimized approach. Instead of using a MinHeap, use a Deque and reduce
+    Time Complexity by log(M * N).
+
+*/
+
+/* Time  Beats: 44.48% */
+/* Space Beats: 20.43% */
+
+/* Time  Complexity: O(M * N) */
+/* Space Complexity: O(M * N) */
+class Solution_Optimal {
+public:
+    int minimumObstacles(vector<vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        deque<vector<int>> deque;
+        deque.push_front({0, 0, 0}); // {obstacles, row, col}
+
+        vector<vector<int>> visited(ROWS, vector<int>(COLS, false));
+
+        /* Signing Cross */
+        std::vector<std::pair<int, int>> directions = {{-1,0}, {1,0}, {0,-1}, {0,1}};
+
+        while ( ! deque.empty())
+        {
+            int obstacles = deque.front()[0];
+            int curr_row  = deque.front()[1];
+            int curr_col  = deque.front()[2];
+            deque.pop_front();
+
+            if (curr_row == ROWS-1 && curr_col == COLS-1)
+                return obstacles;
+
+            for (const auto& dir : directions)
+            {
+                // Neighbor <==> nei
+                int nei_row = curr_row + dir.first;
+                int nei_col = curr_col + dir.second;
+
+                if (nei_row < 0 || nei_col < 0 || nei_row == ROWS || nei_col == COLS)
+                    continue;
+
+                if (visited[nei_row][nei_col])
+                    continue;
+
+                if (grid[nei_row][nei_col] == 1) // It's an obstacle
+                    deque.push_back({obstacles  + 1, nei_row, nei_col}); // Push to the back
+                else
+                    deque.push_front({obstacles + 0, nei_row, nei_col}); // Push to the front
+
                 visited[nei_row][nei_col] = true;
             }
         }
