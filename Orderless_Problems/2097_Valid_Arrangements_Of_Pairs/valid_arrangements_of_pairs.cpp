@@ -156,3 +156,79 @@ private:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, but "euler" is implemented in Recursive way.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats: 100.00% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Recursive {
+public:
+    unordered_map<int, vector<int>> adj_list;
+    unordered_map<int, int> net_outdegree; // net outnet_outdegree
+    vector<int> reverse_euler_path;
+
+    vector<vector<int>> validArrangement(vector<vector<int>>& pairs)
+    {
+        const int N = pairs.size();
+        adj_list.reserve(N);
+        net_outdegree.reserve(N);
+
+        /* Builds an Adjacency_List, i.e. Graph */
+        for (auto& edge: pairs)
+        {
+            int start = edge[0];
+            int end   = edge[1];
+
+            adj_list[start].push_back(end);
+            net_outdegree[start]++;
+            net_outdegree[end]--;
+        }
+
+        int i0 = net_outdegree.begin()->first;
+
+        // Find start vertex for Euler path
+        for (auto& [node, outdegree]: net_outdegree)
+        {
+            if (outdegree == 1)
+            {
+                i0 = node;
+                break;
+            }
+        }
+
+        euler(i0);
+
+        vector<vector<int>> result;
+        result.reserve(N);
+
+        for (int i = reverse_euler_path.size()-2; i >= 0; i--)
+            result.push_back({reverse_euler_path[i+1], reverse_euler_path[i]});
+
+        return result;
+    }
+
+private:
+    void euler(int curr_node)
+    {
+        while ( ! adj_list[curr_node].empty())
+        {
+            int next_node = adj_list[curr_node].back();
+            adj_list[curr_node].pop_back();
+            euler(next_node);
+        }
+        reverse_euler_path.push_back(curr_node);   
+    }
+};
