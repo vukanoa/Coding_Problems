@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <unordered_set>
+#include <queue>
 
 /*
     ==============
@@ -61,7 +62,7 @@
                   X
                  / \
                 X   X
-    
+
     Let's say this is a shape of our Graph.
     Does this count as a Valid Tree? Yes!
 
@@ -70,7 +71,7 @@
                   X
                  / \
                 X - X
-    
+
     Does this count as a Valid Tree? No!
     Trees don't have cycles(loops) in them. That's what being a Tree means.
     In this problem they don't tell us that, but you should know that
@@ -79,11 +80,11 @@
     So Trees don't have loops, but there's one more condition in order it to be
     a Tree:
             A Tree needs to be connected
-    
+
     Consider this:
 
                   X
-                 /  
+                 /
                 X   X
 
     Does this count as a Valid Tree? No!
@@ -92,7 +93,7 @@
     To summarize - For it to be a Valid Tree:
             1. We can't have loops inside this Graph
             2. All nodes have to be connected.
-    
+
     Also it's worth pointing out, just in case, that a Tree doesn't have to be
     a BST or Binary Tree in general. Any node can have infinite amount of
     children.
@@ -112,7 +113,7 @@
             1  2  3
             |
             4
-    
+
     Is this a Valid Tree? Yes it is.
     But what kind of Algorithm can we use to determine that?
 
@@ -122,7 +123,7 @@
             2 : 0
             3 : 0
             4 : 1
-    
+
     For all nodes to be connected we can perform a DFS on any node. Each time
     we visit a node we'll put it in a set.
     After we finish the traversal, if set.size() is equal to n, that means that
@@ -153,7 +154,7 @@
             1  2  3
             |
             4
-    
+
     Adjacency List:
             0 : 1, 2, 3
             1 : 0, 4
@@ -192,14 +193,14 @@
     "continue" inside the "for" loop we're using to traverse the neighbors of
     the current node.
 
-    
+
     But what if we really had a Loop inside?
                0
              / | \
             1  2  3
             |    /
             4___/
-    
+
     Adjacency List:
             0 : 1, 2, 3
             1 : 0, 4
@@ -279,5 +280,68 @@ private:
         }
 
         return false;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Similar as above, but implemented using BFS.
+
+*/
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_BFS {
+public:
+    bool validTree(int n, std::vector<std::pair<int, int>> edges)
+    {
+        std::unordered_map<int, std::vector<int>> adj_list;
+
+        for (const auto& entry : edges)
+        {
+            adj_list[edge.first].push_back(edge.second);
+            adj_list[edge.second].push_back(edge.first);
+        }
+
+        unordered_set<int> processed;
+        unordered_set<int> visited;
+        visited.insert(0);
+
+        /* BFS */
+        queue<int> queue;
+        queue.push(0);
+        while ( ! queue.empty())
+        {
+            int size = queue.size();
+
+            for (int x = 0; x < size; x++)
+            {
+                int curr_node = queue.front();
+                queue.pop();
+
+                for (const int& nei : adj_list[curr_node])
+                {
+                    if (processed.count(nei)) // Ignore the very previous one
+                        continue;
+
+                    // If "nei" was already visited ==> Loop exists ==> false
+                    if (visited.count(nei))
+                        return false;
+
+                    queue.push(nei);
+                    visited.insert(nei);
+                }
+
+                processed.insert(curr_node);
+            }
+        }
+
+        return n == visited.size();
     }
 };
