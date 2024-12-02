@@ -44,10 +44,57 @@ public:
 };
 
 
+
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(Y) */
+class Solution_Verbose {
+public:
+    int solution(vector<int>& A, int X, int Y)
+    {
+        const int N = A.size();
+
+        // BOUNDARY <==> first patient that is NOT able to complete all sessions
+        const int BOUNDARY = N - (X-1) * Y;
+        int min_rehab_cost = INT_MAX;
+
+        int costs[Y]; // It's on the stack. A bit faster than using vector
+
+        for (int patient = 0; patient < Y; patient++)
+        {
+            // Not EVERY patient can complete ALL sessions, but at least the
+            // first ONE can
+            if (patient >= BOUNDARY) // If patient CANNOT complete all X sessions
+                break;
+
+            costs[patient] = 0; // Initial to zero(Only for first Y patients)
+
+            for (int session = 0; session < X; session++)
+                costs[patient] += A[patient + session*Y];
+
+            // Only those who HAVE INDEED completed All X sessions
+            min_rehab_cost = min(min_rehab_cost, costs[patient]);
+        }
+
+        // Y Sliding_Windows that were computed so far. Use them
+        for (int patient = Y; patient < BOUNDARY; patient++)
+        {
+            costs[patient % Y] -= A[patient - Y];
+            costs[patient % Y] += A[patient + (X-1)*Y];
+
+            min_rehab_cost = min(min_rehab_cost, costs[patient % Y]);
+        }
+
+        return min_rehab_cost;
+    }
+};
+
+
 int
 main()
 {
-    Solution sol;
+    Solution         sol;
+    Solution_Verbose sol_ver;
 
     /* Example 1 */
     // std::vector<int> A = {4, 2, 3, 7};
