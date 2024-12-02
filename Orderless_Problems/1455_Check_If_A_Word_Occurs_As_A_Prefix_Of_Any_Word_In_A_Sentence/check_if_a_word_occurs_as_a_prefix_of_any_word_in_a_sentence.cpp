@@ -110,3 +110,45 @@ public:
         return -1;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Instead of manually going through each letter and then have additional
+    check-ups, split the sentence into words and then checks those. This way
+    the code is much more concise.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   6.42% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    int isPrefixOfWord(string sentence, string searchWord)
+    {
+        // Split the sentence into words
+        istringstream stream(sentence);
+        string word;
+        int index = 1; // 1-based index
+
+        while (stream >> word)
+        {
+            // Check if the word starts with the searchWord
+            if (word.find(searchWord) == 0)
+                return index;
+
+            index++;
+        }
+
+        // Return -1 if no word starts with the searchWord
+        return -1;
+    }
+};
