@@ -83,7 +83,7 @@ using namespace std;
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution { // Using "String Builder"
 public:
     string addSpaces(string s, vector<int>& spaces)
     {
@@ -102,5 +102,50 @@ public:
         }
 
         return out.str();
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, though this one uses "string" instead of "ostringstream"(aka
+    "String Builder"). This one is considered faster since we've construced a
+    new string of size: s.length() + spaces.size() in advance and then just
+    populated that string.
+
+    In the above Solution we were pushing element-by-element which is a lot
+    slower, at least according to LeetCode.
+
+*/
+
+/* Time  Beats: 96.69% */
+/* Space Beats: 93.30% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    string addSpaces(string& s, vector<int>& spaces)
+    {
+        string result_str(s.length() + spaces.size(), ' ');
+        
+        int i = 0; // Pointer for spaces
+        for (int chr_idx = 0; chr_idx < s.length(); chr_idx++)
+        {
+            if (i < spaces.size() && chr_idx == spaces[i])
+            {
+                result_str[chr_idx + i] = ' '; 
+                i++;
+            }
+
+            result_str[chr_idx + i] = s[chr_idx];
+        }
+
+        return result_str;
     }
 };
