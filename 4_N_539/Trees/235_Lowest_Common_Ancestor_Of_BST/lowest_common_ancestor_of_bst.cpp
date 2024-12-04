@@ -177,3 +177,34 @@ public:
         return lowestCommonAncestor(root->right, p, q);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The most straightforwards and most concise way.
+
+*/
+
+/* Time  Beats: 79.08% */
+/* Space Beats:  6.01% */
+
+/* Time  Complexity: O(logn) */
+/* Space Complexity: O(n)    */
+class Solution_4_Concise {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
+    {
+        if (!root || root == p || root == q)
+            return root;
+
+        TreeNode* left = lowestCommonAncestor(root->left, p, q);
+        TreeNode* right = lowestCommonAncestor(root->right, p, q);
+
+        return left && right ? root : (left ? left : right);
+    }
+};
