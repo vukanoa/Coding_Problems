@@ -4,6 +4,8 @@
 #include <functional> // Lambda
 
 
+
+
 /* Bottom-Up Dynamic Programming */
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -91,6 +93,42 @@ public:
 
 
 
+/* Bottom-Up Dynamic Programming */
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Bottom_Up_3 {
+public:
+    int solution(int N)
+    {
+        if (N == 0)
+            return 0;
+
+        int prev = 0;
+        int curr = 1;
+
+        for (int i = 2; i <= N; i++)
+        {
+            int sum_digits_curr = 0;
+            while (curr)
+            {
+                sum_digits_curr += curr % 10;
+                curr /= 10;
+            }
+
+            // Prev holds a sum of digits of the 2nd element to the left
+            int tmp = prev + sum_digits_curr;
+
+            prev = sum_digits_curr;
+            curr = tmp;
+        }
+
+        return curr;
+    }
+};
+
+
+
+
 /* Top-Down Memoization */
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
@@ -141,6 +179,7 @@ main()
 {
     Solution_Bottom_Up_1 sol_bot_1;
     Solution_Bottom_Up_2 sol_bot_2;
+    Solution_Bottom_Up_3 sol_bot_3;
     Solution_Top_Down    sol_top;
 
     /* Example 1 */
