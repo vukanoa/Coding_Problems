@@ -211,3 +211,59 @@ public:
         return true;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Idea is equivalent to the one above, however this one doesn't uses
+    additional vectors, instead it only uses TwoPointers approach which reduces
+    overall Space Complexity from O(n) to O(1).
+
+*/
+
+/* Time  Beats: 94.83% */
+/* Space Beats: 99.55% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    bool canChange(string& start, string& target)
+    {
+        const int n = start.size();
+
+        int i = 0;
+        int j = 0;
+        while (i < n || j < n)
+        {
+            while (i < n && start[i]  == '_')
+                i++;
+
+            while (j < n && target[j] == '_')
+                j++;
+
+            // Check relative order(1st thing)
+            if (start[i] != target[j])
+                return false;
+
+            // Check if 'L' from start can be moved to match idx of L in target
+            if (start[i] == 'L' && i < j)
+                return false;
+
+            // Check if 'R' from start can be moved to match idx of L in target
+            if (start[i] == 'R' && i > j)
+                return false;
+
+            // Increment
+            i++;
+            j++;
+        }
+
+        return true;
+    }
+};
