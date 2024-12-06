@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <unordered_set>
+#include <bitset>
 
 /*
     ==============
@@ -119,14 +120,79 @@ public:
                 continue;
 
             if (curr_sum + i > maxSum)
-            {
-                return result;
-            }
-            else
-            {
-                curr_sum += i;
-                result++; // Increment number of chosen integers
-            }
+                break;
+
+            curr_sum += i;
+            result++; // Increment number of chosen integers
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    A few considerations here:
+
+    For small banned.size() Examples, it is more efficient to use a HashSet.
+
+    Example 1:
+        banned = [1,6,5], n = 5, maxSum = 6
+
+
+    Using HashSet:
+        banned.size() == 3, which means that Space Complexity is:
+            3 * 32bits = 96bits
+
+    Using Bitsets:
+        We ALWAYS create 10001 bits, which is a LOT more than 96 bits.
+
+
+    However, in the worst-case scenario, Bitset Solution is much more Optimal
+    in terms of Space efficiency.
+
+        banned.size() == 10000
+
+        HashSet: 10000 * 32bits + hash overheard <==> ~40000 Bytes
+
+        Bitset:  10001 <==> ~ 1250 Bytes
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  78.61% */
+
+/* Time  Complexity: O(M + N) */
+/* Space Complexity: O(1)     */
+class Solution_Bitset {
+public:
+    int maxCount(vector<int>& banned, int n, int maxSum)
+    {
+        constexpr int MAX_BANNED_SIZE = 100001;
+        std::bitset<MAX_BANNED_SIZE + 1> bitset; // +1 because it's 0-indexed
+
+        // Mark BANNED integers
+        for (const int num : banned)
+            bitset.set(num);
+
+        int result = 0;
+        int curr_sum = 0;
+        for (int i = 1; i <= n; i++)
+        {
+            if (bitset.test(i))
+                continue;
+
+            if (curr_sum + i > maxSum)
+                break;
+
+            curr_sum += i;
+            result++; // Increment number of chosen integers
         }
 
         return result;
