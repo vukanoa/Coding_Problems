@@ -103,8 +103,8 @@ public:
 
 */
 
-/* Time  Beats: 92.45% */
-/* Space Beats: 48.18% */ // Somehow I cannot get better numbers than above
+/* Time  Beats: 100.00% */
+/* Space Beats:  18.42% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
@@ -112,55 +112,16 @@ class Solution_Space_Efficient {
 public:
     std::vector<int> replaceElements(std::vector<int>& arr)
     {
-        int n = arr.size();
-        int dp_next = arr[n-1];
+        const int n = arr.size();
+        vector<int> result(n);
 
-        for (int i = n-2; i >= 0; i--)
-        {
-            int tmp = arr[i];
-            arr[i]  = std::max(arr[i+1], dp_next);
-
-            dp_next = tmp;
-        }
-        arr[n-1] = -1;
-
-        return arr;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Someone might find this one easier to read than the first Space_Efficient
-    Solution.
-
-*/
-
-/* Time  Beats: 95.24% */
-/* Space Beats: 45.66% */ // Somehow I cannot get better numbers than above
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution_Space_Efficient_2 {
-public:
-    std::vector<int> replaceElements(std::vector<int>& arr)
-    {
-        int n = arr.size();
-        int right_max = -1;
-
+        int dp = -1;
         for (int i = n-1; i >= 0; i--)
         {
-            int new_max = std::max(arr[i], right_max);
-
-            arr[i] = right_max;
-            right_max = new_max;
+            result[i] = dp;
+            dp = max(dp, arr[i]);
         }
 
-        return arr;
+        return
     }
 };
