@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <algorithm> // std::make_heap, std::pop_heap, std::push_heap
 
 /*
     ============
@@ -178,5 +179,62 @@ public:
         }
 
         return max_heap.empty() ? 0 : max_heap.top();
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Absolutely equivalent idea to the one above, however this implementation
+    does NOT use priority_queue structure and thus we do NOT use additional
+    space.
+
+    We are using our given Input vecotr "stones" as a Heap directly by
+    utilizing functions such as:
+
+        1. std::make_heap   // i.e. Heapify       O(n)
+        2. std::pop_heap    // i.e. Heapify-Down  O(logn)
+        3. std::push_heap   // i.e. Heapify-Up    O(logn)
+
+    That way we're operating on our given Input vector and, thus, we're saving
+    space.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  12.91% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(1)        */
+class Solution_Space_Efficient {
+public:
+    int lastStoneWeight(std::vector<int>& stones)
+    {
+        // This way Heapify is done in O(n) AND we do NOT use additional space
+        std::make_heap(stones.begin(), stones.end()); // O(n)
+
+        while (stones.size() > 1)
+        {
+            int y = stones.front();
+            std::pop_heap(stones.begin(), stones.end());  // Moves top to the end and remains Heap property
+            stones.pop_back();                            // Removes the largest element
+
+            int x = stones.front();
+            std::pop_heap(stones.begin(), stones.end()); // Swap + Heapify-Down --> O(logn)
+            stones.pop_back();                           // O(1)
+
+            if (x != y)
+            {
+                stones.push_back(y - x);                      // O(1)
+                std::push_heap(stones.begin(), stones.end()); // Heapify-Up --> O(logn)
+            }
+        }
+
+        return stones.empty() ? 0 : stones[0];
     }
 };
