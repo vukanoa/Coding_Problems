@@ -106,6 +106,56 @@ public:
 };
 
 
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, implemented in another way.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  35.38% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Another_Implementation {
+public:
+    bool checkInclusion(string s1, string s2)
+    {
+        vector<int> letters_one(26, 0);
+        vector<int> letters_two(26, 0);
+
+        for (const char& chr : s1)
+            letters_one[chr - 'a']++;
+
+        int left  = 0;
+        int right = 0;
+        while (right < s2.length())
+        {
+            letters_two[s2[right] - 'a']++;
+
+            // Increment
+            right++;
+
+            if (right < s1.length())
+                continue;
+
+            if (letters_one == letters_two)
+                return true;
+
+            letters_two[s2[left] - 'a']--;
+            left++; // Shrink left-bound, i.e. "Slide Window"
+        }
+
+        return false;
+    }
+};
+
+
 int
 main()
 {
