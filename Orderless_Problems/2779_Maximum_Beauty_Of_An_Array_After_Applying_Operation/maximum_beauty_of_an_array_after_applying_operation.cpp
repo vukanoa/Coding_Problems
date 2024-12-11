@@ -275,7 +275,226 @@ public:
     --- IDEA ---
     ------------
 
-    TODO
+    This one is even more optimal than the above O(N * logN) Solution.
+    This one runs in only O(N) Time.
+
+    The idea is using "Prefix Sum" on ranges. This is something you must know
+    beforehand in order to come up with a Solution that uses it.
+
+    So, what is the idea?
+
+    When you have N ranges, in an unsorted, way, how can we find out what is
+    the length of one or more numbers that are overlapping in most amount of
+    difference ranges?
+
+    Let's draw it:
+        nums = [4,6,1,2]
+                0 1 2 3 // indices
+
+
+        2:       <===========>
+        1:    <===========>
+        6:                   <===========>
+        4:             <===========>
+              |--|--X--|--|--X--|--X--|--|--|
+             -1  0  1  2  3  4  5  6  7  8  9
+
+
+    How can we determine that?
+
+    First thing that we must notice - All the elements in "nums" are >= 0.
+    That means that no matter the value of k, if the left range surpasses the
+    zero(or is at zero itself), we can consider that as an overlap.
+
+    Why?
+    Consider left ranges of this Input:
+        nums = [0, 1, 2, 3, 7]    k = 4
+
+        7:                          <LLLLLLLLLLL_RRRRRRRRRRR>
+        3:             <LLLLLLLLLLL_RRRRRRRRRRR>
+        2:          <LLLLLLLLLLL_RRRRRRRRRRR>
+        1:       <LLLLLLLLLLL_RRRRRRRRRRR>
+        0:    <LLLLLLLLLLL_RRRRRRRRRRR>
+              |--|--|--|--X--X--X--X--|--|--|--X
+             -4 -3 -2 -1  0  1  2  3  4  5  6  7
+
+
+    This is not obvious at a first glance, but read this carefully:
+
+    Since any element in "nums" is 0 or greater than 0, any "left range" that
+    surpasses zero(goes negative) or ends at zero are going to be considred
+    overlapping.
+
+    Read that again.
+
+    Why is it like that?
+    Consider this:
+
+        3:             <LLLLLLLLLLL_RRRRRRRRRRR>
+        0:    <LLLLLLLLLLL_RRRRRRRRRRR>
+              |--|--|--|--X--X--X--X--|--|--|--X
+             -4 -3 -2 -1  0  1  2  3  4  5  6  7
+
+    Since Xs are place only >= 0, any range to the left overlaps. Think about
+    it:
+
+        Starting at X=0, Left range is [-4, 0]
+        Starting at X=3, Left range is [-1, 3]
+
+    We do NOT care which NUMBERS are overlapping, we ONLY care IF ANY number
+    from the left portion of these two ranges overlaps or not.
+
+    Read it again. This is the crux.
+
+    We care about "IF ANY number overlaps" because that is what we are asked
+    to find out and return.
+    We are NOT asked to return THE NUMBER that overlaps in most of these
+    ranges, we are aksed to return BIGGEST FREQUENCY of ANY number in these
+    ranges.
+
+    For example if some number 4 appears in 7 out of 9 ranges, we need to
+    return 7 and NOT 4.
+
+    We do NOT care what is that number, we care about its FREQUENCY!
+
+    Therefore, because all elements in "nums" are >= 0, if any "left part" of
+    any range ends at zero or suprasses zero, we are counting as if its end is
+    at zero. All of such ranges will be counted as if they end at 0.
+
+
+    Let's continue with the rest of this approach, but this was VERY important
+    to understand.
+
+    Let's draw ranges again:
+
+        nums = [4,6,1,2]
+                0 1 2 3 // indices
+
+
+        2:       <===========>
+        1:    <===========>
+        6:                   <===========>
+        4:             <===========>
+              |--|--X--|--|--X--|--X--|--|--|
+             -1  0  1  2  3  4  5  6  7  8  9
+
+    Instead of sorting and then using a "Sliding Window" technique and thus
+    have a Time Complexity of O(n), we can do something more optimal.
+
+    We are going to create a new vector "prefix_sum" that is going to be of
+    size:
+        2 * (10^5 + 1)
+
+    Why this size?
+
+    10^5 is the  maximum possible value for k.
+    10^5 is also maximum possible value for nums[i]
+
+    Thus the rightmost possible range would be: 10^5 + 10^5 which is 2 * 10^5
+    However, because indexing starts at 0, we need to 1.
+
+    But, that would be: 2 * 10^5 + 1, which wouldn't include the left part of
+    this maximum possible range.
+
+    10^5 is the maximum possible value for k.
+    0    is the minimum possible value for nums[i]
+
+    Thus, the leftmost possible range would be: 0 - 10^5 = -10^5
+    But that would mean the total range is:
+
+        [-10^5 ... 2*10^5]
+
+    But, didn't we explain up above that we do NOT need part of the range that
+    is LESS than 0?
+
+    Therefore, the range will:
+        begin at index: 0 and
+        end   at index: 2 * (10^5 + 1)
+
+
+    Let's continue with prefix_sum approach.
+
+    We begin at index 0 where all the ranges that end at 0 or surpass the zero
+    to the left(that are going to negative side) and the all we do is this:
+
+        If any range BEGINS at current index, we include those(there can be
+        more than one, obviously).
+
+        However, if the current index is ONE index AFTER the upper bound of
+        some range, then we subtract one because numbers from that range are
+        no longer overlapping with the current index.
+
+    This is a VERY powerful technique, but you need to spend time thinking
+    about it until it becomes natural.
+
+    Let's dry run our example:
+
+        nums = [4,6,1,2]
+                0 1 2 3 // indices
+
+
+        2:       <===========>
+        1:    <===========>
+        6:                   <===========>
+        4:             <===========>
+              |--|--X--|--|--X--|--X--|--|--|
+             -1  0  1  2  3  4  5  6  7  8  9
+
+
+
+        2:      +1          -1
+        1:      +1       -1
+        6:                  +1          -1
+        4:            +1          -1
+
+                [2  0  1  0  0 -1  0 -1  0 -1   0                ...  0]
+                 0  1  2  3  4  5  6  7  8  9  10 ...           2*(10^5 + 1)
+
+        (Remember that negative ranges are considred to end at zero)
+
+        i=0
+        res=2  // current max
+
+        i=1
+        res=2
+
+        i=2
+        res=3  // current max
+
+        i=3
+        res=3
+
+        i=4
+        res=3
+
+        i=5
+        res=2
+
+        i=6
+        res=2
+
+        i=7
+        res=1
+
+        i=8
+        res=1
+
+        i=9
+        res=0
+
+        i=10
+        res=0
+
+        ... // The result won't change any more because no more ranges begin or
+            // end at any further range untli the end.
+
+
+    Final result = 3
+
+    Try reading this last part and look at this picture and at one point it
+    will click, I promise.
+
+    Once it clicks, now you have a new tool for your toolbox!
 
 */
 
