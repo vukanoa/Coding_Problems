@@ -180,9 +180,9 @@ using namespace std;
 
     Consider this example:
         nums = [4, 1, 6]     k = 2,    Let's draw them on the X-axis:
-                |  |  | 
+                |  |  |
 ----------------   |  |
-|  -----------------  | 
+|  -----------------  |
 |  |   ----------------
 |  |   |
 |  |   v
@@ -193,7 +193,7 @@ using namespace std;
             -1  0  1  2  3  4  5  6  7  8  9
 
 
-    However, if we re-ordered the input like this: 
+    However, if we re-ordered the input like this:
 
         nums = [1, 4, 6]     k = 2
 
@@ -223,10 +223,10 @@ using namespace std;
     approach.
 
     (If you aren't familiar with "Sliding Window" technique, check-out problems
-     such as: 
+     such as:
         1. Best Time to Buy and Sell a Stock
         2. Longest Substring Without Repeating Characters
-        3. Longest Repeating Character Replacement       
+        3. Longest Repeating Character Replacement
     )
 
     If you are indeed familiar with this technique, the code down below is
@@ -243,7 +243,7 @@ class Solution {
 public:
     int maximumBeauty(vector<int>& nums, int k)
     {
-        const int N = nums.size();        
+        const int N = nums.size();
         int result = 1;
 
         /* Sort */
@@ -256,7 +256,7 @@ public:
         {
             while (left < right && nums[left] + k < nums[right] - k)
                 left++;
-                
+
             result = max(result, right - left + 1);
 
             // Increment
@@ -264,5 +264,56 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 28.70% */
+/* Space Beats:  5.17% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution {
+public:
+    int maximumBeauty(vector<int>& nums, int k)
+    {
+        const int n = nums.size();
+        vector<int> prefix_sum(2 * (1e5 + 1), 0);
+
+        for (int i = 0; i < n; i++)
+        {
+            int start_range = nums[i] - k;
+            int end_range   = nums[i] + k;
+
+            if (start_range <= 0) // Because:  0 <= nums[i], k < 10^5
+                prefix_sum[0]++;
+            else
+                prefix_sum[start_range]++;
+
+            // Because at this index current range NO LONGER is able to be
+            // counted. The range ends
+            prefix_sum[end_range + 1]--;
+        }
+
+        int max_beauty = 0;
+
+        for (int i = 1; i < prefix_sum.size(); i++)
+        {
+            prefix_sum[i] += prefix_sum[i - 1];
+            max_beauty = max(max_beauty, prefix_sum[i]);
+        }
+
+        return max_beauty;
     }
 };
