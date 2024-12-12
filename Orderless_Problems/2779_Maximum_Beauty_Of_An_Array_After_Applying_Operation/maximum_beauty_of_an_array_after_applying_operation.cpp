@@ -503,7 +503,7 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_Prefix_Sum {
 public:
     int maximumBeauty(vector<int>& nums, int k)
     {
@@ -534,5 +534,151 @@ public:
         }
 
         return max_beauty;
+    }
+};
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is an additional Optimization, but on the above "Prefix Sum" approach.
+
+    Instead of allocating (2 *(10^5 + 1)) elements and going through it, we
+    know that there is no point in iterating through elements BEFORE the
+    minimum element and AFTER the maximum element.
+
+    Let's look at the previous example:
+
+        nums = [4,6,1,2]
+                0 1 2 3 // indices
+
+
+        2:       <===========>
+        1:    <===========>
+        6:                   <===========>
+        4:             <===========>
+              |--|--X--|--|--X--|--X--|--|--|
+             -1  0  1  2  3  4  5  6  7  8  9
+
+
+
+        2:      +1          -1
+        1:      +1       -1
+        6:                  +1          -1
+        4:            +1          -1
+
+                [2  0  1  0  0 -1  0 -1  0 -1   0                ...  0]
+                 0  1  2  3  4  5  6  7  8  9  10 ...           2*(10^5 + 1)
+
+        (Remember that negative ranges are considred to end at zero)
+
+        Since minimum element is 1, we can use the same trick we used to NOT
+        write negative values.
+
+        Why?
+        Because, as we've said for the zero, we do NOT care WHICH NUMBER is
+        repeating in most amount of different ranges, rather we only care about
+        the AMOUNT OF RANGES in which ANY number is repeating.
+
+        Thus, as we've already seen:
+
+            nums = [0, 1, 2, 3, 7]    k = 4
+
+            7:                          <LLLLLLLLLLL_RRRRRRRRRRR>
+            3:             <LLLLLLLLLLL_RRRRRRRRRRR>
+            2:          <LLLLLLLLLLL_RRRRRRRRRRR>
+            1:       <LLLLLLLLLLL_RRRRRRRRRRR>
+            0:    <LLLLLLLLLLL_RRRRRRRRRRR>
+                  |--|--|--|--X--X--X--X--|--|--|--X
+                 -4 -3 -2 -1  0  1  2  3  4  5  6  7
+
+        If ANY range goes NEGATIVE(surpasses zero), we will count as if that
+        range ends at 0. We don't care which NUMBER they overlap on, we only
+        care that they overlap.
+
+        (This is confusing if you are reading it for the first time, but bear
+        with me)
+
+
+        However, we don't need to "cut off" at 0, we can do THE SAME thing, but
+        "cut off" at minimum element in "nums".
+
+        Why?
+        Since we know there AREN'T any element to the left of that minimum
+        element, we also know that any range that surpasses it can be counted
+        as if it ends at that minimum element. Absolutely equivalent "trick" as
+        the one we've used for the zero.
+
+        However, this way we can improve Space efficiency.
+
+        We could also do the same thing, but for the MAXIMUM element.
+        Simply look at the our first example:
+
+        nums = [4,6,1,2]
+                0 1 2 3 // indices
+
+
+        2:       <===========>
+        1:    <===========>
+        6:                   <===========>
+        4:             <===========>
+              |--|--X--|--|--X--|--X--|--|--|
+             -1  0  1  2  3  4  5  6  7  8  9
+
+
+
+        2:      +1          -1
+        1:      +1       -1
+        6:                  +1          -1
+        4:            +1          -1
+
+                [2  0  1  0  0 -1  0 -1  0 -1   0                ...  0]
+                 0  1  2  3  4  5  6  7  8  9  10 ...           2*(10^5 + 1)
+
+
+        After the maximum value "6", the total result can only DECREASE, which
+        means that we ALREADY have the "maximum beauty". We don't need to
+        iterate through all those 0s all the way up to index: 2 * (10^5 + 1).
+
+
+    This way we've reduced Space Complexity from O(n) down to O(1).
+
+*/
+
+/* Time  Beats: 88.83% */
+/* Space Beats: 39.95% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Prefix_Sum_Another {
+public:
+    int maximumBeauty(vector<int>& nums, int k)
+    {
+        int min_elem = *min_element(nums.begin(), nums.end()) - k;
+        int max_elem = *max_element(nums.begin(), nums.end()) + k;
+
+        const int ELEMENTS_IN_RANGE = max_elem - min_elem + 1;
+
+        vector<int> prefix_sum(ELEMENTS_IN_RANGE + 1, 0);
+
+        for (int num : nums)
+        {
+            prefix_sum[num - k - min_elem]++;
+            prefix_sum[num + k + 1 - min_elem]--;
+        }
+
+        int max_beauty = 0;
+        int result = 0;
+
+        for (int i = 0; i < ELEMENTS_IN_RANGE; ++i)
+        {
+            max_beauty += prefix_sum[i];
+            result = max(result, max_beauty);
+        }
+
+        return result;
     }
 };
