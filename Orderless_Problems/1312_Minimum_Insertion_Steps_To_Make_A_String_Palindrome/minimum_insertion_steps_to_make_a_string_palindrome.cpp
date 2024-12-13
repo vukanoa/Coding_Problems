@@ -120,7 +120,6 @@ private:
 /* Time  Complexity: O(n^2) */
 /* Space Complexity: O(n)   */
 class Solution_DP_Iterative {
-class Solution {
 public:
     int minInsertions(string s)
     {
@@ -158,5 +157,65 @@ private:
         }
 
         return dp[M][n];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Optimized Space Complexity on the above approach.
+
+*/
+
+/* Time  Beats: 72.10% */
+/* Space Beats: 82.12% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(n)   */
+class Solution_DP_Iterative_Optimized {
+public:
+    int minInsertions(string s)
+    {
+        const int n = s.length();
+
+        string s_reverse = s;
+        reverse(s_reverse.begin(), s_reverse.end());
+
+        return n - LCS(s, s_reverse, n, n);
+    }
+
+private:
+    int LCS(string& s1, string& s2, int M, int n)
+    {
+        vector<int> dp(n + 1);
+        vector<int> dp_prev(n + 1);
+
+        for (int row = 0; row <= M; row++)
+        {
+            for (int col = 0; col <= n; col++)
+            {
+                if (row == 0 || col == 0)
+                {
+                    dp[col] = 0; // One of the two strings is empty.
+                }
+                else if (s1[row-1] == s2[col-1])
+                {
+                    dp[col] = 1 + dp_prev[col-1];
+                }
+                else
+                {
+                    dp[col] = max(dp_prev[col], dp[col-1]);
+                }
+            }
+
+            dp_prev = dp;
+        }
+
+        return dp[n];
     }
 };
