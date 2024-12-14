@@ -58,6 +58,8 @@
 
 #include <map>
 #include <vector>
+#include <queue>
+#include <functional>
 
 using namespace std;
 
@@ -142,8 +144,31 @@ using namespace std;
 /* Time  Beats: 79.04% */
 /* Space Beats: 79.83% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/*
+    Time  Complexity: O(n)
+
+    O(n * logk) ~ O(n)
+
+    The outer loop iterates through the array once with the right pointer,
+    taking O(n) operations. For each element, we perform map operations
+    (insertion, deletion, finding min/max) which take O(logk) time, where k is
+    the size of the map. Since we maintain a window where the max - min <= 2,
+    the size of the sorted map k is bounded by 3 (as elements can only differ
+    by 0, 1, or 2). Therefore, logk is effectively constant, making the overall
+    time complexity O(n).
+
+    (This is important to understand!)
+
+*/
+/*
+    Space Complexity: O(n)
+
+    The sorted map stores elements within the current window. Since the
+    difference between any two elements in a valid window cannot exceed 2, the
+    maximum number of unique elements (k) possible in the map at any time is 3.
+    Therefore, the space complexity is constant, O(1)
+
+*/
 class Solution {
 public:
     long long continuousSubarrays(vector<int>& nums)
@@ -172,6 +197,71 @@ public:
                     map.erase(nums[left]);
 
                 left++;
+            }
+
+            // Add count of all valid subarrays ending at right
+            count += right - left + 1;
+            right++;
+        }
+
+        return count;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is the same IDEA as above, however, instead of using a "Red-black map"
+    we use MinHeap and MaxHeap.
+
+*/
+
+/* Time  Beats: 10.18% */
+/* Space Beats: 44.26% */
+
+/* Time  Complexity: O(n) */ // Same reasons as above
+/* Space Complexity: O(1) */ // Same reasons as above
+class Solution_Heap {
+public:
+    long long continuousSubarrays(vector<int>& nums)
+    {
+        int left  = 0;
+        int right = 0;
+        long long count = 0;
+
+        // Min and max heaps storing indices, sorted by nums[index] values
+        priority_queue<int,
+                       vector<int>,
+                       function<bool(int, int)>> min_heap([&nums](int a, int b) { return nums[a] > nums[b]; });
+
+        priority_queue<int,
+                       vector<int>,
+                       function<bool(int, int)>> max_heap([&nums](int a, int b) { return nums[a] < nums[b]; });
+
+
+        while (right < nums.size())
+        {
+            // Add current index to both heaps
+            min_heap.push(right);
+            max_heap.push(right);
+
+            // While window violates |nums[i] - nums[j]| ≤ 2 condition
+            // Shrink window from left and remove outdated indices
+            while (left < right && nums[max_heap.top()] - nums[min_heap.top()] > 2)
+            {
+                left++;
+
+                // Remove indices that are now outside window
+                while ( ! max_heap.empty() && max_heap.top() < left)
+                    max_heap.pop();
+
+                while ( ! min_heap.empty() && min_heap.top() < left)
+                    min_heap.pop();
             }
 
             // Add count of all valid subarrays ending at right
