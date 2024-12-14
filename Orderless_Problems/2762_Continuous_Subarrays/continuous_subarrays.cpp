@@ -56,6 +56,7 @@
 
 */
 
+#include <cstdlib>
 #include <map>
 #include <vector>
 #include <queue>
@@ -344,5 +345,90 @@ public:
         }
 
         return count;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same IDEA as all three above, but we don't even have to have additional
+    data structures. We can keep two pointers "curr_min" and "curr_max" and
+    use those.
+
+    This will be, generally, more efficient for large Inputs, but in terms of
+    Big O notation, it's also O(n) Time and O(1) Space.
+
+*/
+
+/* Time  Beats: 97.90% */
+/* Space Beats: 90.48% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Two_Pointers {
+public:
+    long long continuousSubarrays(vector<int>& nums)
+    {
+        const int n = nums.size();
+
+        int left  = 0;
+        int right = 0;
+
+        int curr_min;
+        int curr_max;
+
+        long long window_len = 0;
+        long long total = 0;
+
+        // Initialize window with the first element
+        curr_min = curr_max = nums[right];
+
+        while (right < n)
+        {
+            // Update min and max for the current window
+            curr_min = min(curr_min, nums[right]);
+            curr_max = max(curr_max, nums[right]);
+
+            // If window condition breaks (i.e. diff > 2)
+            if (curr_max - curr_min > 2)
+            {
+                // Add subarrays from the previous valid window
+                window_len = right - left;
+                total += (window_len * (window_len + 1) / 2); // n * (n+1) / 2
+
+                // Start a new window at the current position
+                left = right;
+                curr_min = curr_max = nums[right];
+
+                // Expand left boundary while maintaining the condition
+                while (left > 0 && abs(nums[right] - nums[left - 1]) <= 2)
+                {
+                    left--;
+                    curr_min = min(curr_min, nums[left]);
+                    curr_max = max(curr_max, nums[left]);
+                }
+
+                // Remove overcounted subarrays if left boundary expanded
+                if (left < right)
+                {
+                    window_len = right - left;
+                    total -= (window_len * (window_len + 1) / 2);
+                }
+            }
+
+            // Increment
+            right++;
+        }
+
+        // Add subarrays from the final window
+        window_len = right - left;
+        total += (window_len * (window_len + 1) / 2);
+
+        return total;
     }
 };
