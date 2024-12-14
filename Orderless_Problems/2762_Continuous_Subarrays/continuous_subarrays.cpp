@@ -169,7 +169,7 @@ using namespace std;
     Therefore, the space complexity is constant, O(1)
 
 */
-class Solution {
+class Solution_Sliding_Window_TreeMap {
 public:
     long long continuousSubarrays(vector<int>& nums)
     {
@@ -226,7 +226,7 @@ public:
 
 /* Time  Complexity: O(n) */ // Same reasons as above
 /* Space Complexity: O(1) */ // Same reasons as above
-class Solution_Heap {
+class Solution_Sliding_Window_Heap {
 public:
     long long continuousSubarrays(vector<int>& nums)
     {
@@ -266,6 +266,80 @@ public:
 
             // Add count of all valid subarrays ending at right
             count += right - left + 1;
+            right++;
+        }
+
+        return count;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Equivalent IDEA as two above, however here we use two DEQUES to do this.
+
+*/
+
+/* Time  Beats: 81.64% */
+/* Space Beats: 47.34% */
+
+/* Time  Complexity: O(n) */ // Same reasons as above
+/* Space Complexity: O(1) */ // Same reasons as above
+class Solution_Sliding_Window_Deque {
+public:
+    long long continuousSubarrays(vector<int>& nums)
+    {
+        const int n = nums.size();
+
+        // Monotonic deque to track maximum and minimum elements
+        deque<int> monotonic_decreasing;
+        deque<int> monotonic_increasing;
+
+        int left  = 0;
+        int right = 0;
+        long long count = 0;
+
+        while (right < n)
+        {
+            // Maintain decreasing monotonic deque for maximum values
+            while (!monotonic_decreasing.empty() && nums[monotonic_decreasing.back()] < nums[right])
+                monotonic_decreasing.pop_back();
+
+            monotonic_decreasing.push_back(right);
+
+            // Maintain increasing monotonic deque for minimum values
+            while (!monotonic_increasing.empty() && nums[monotonic_increasing.back()] > nums[right])
+                monotonic_increasing.pop_back();
+
+            monotonic_increasing.push_back(right);
+
+            // Shrink window if max-min difference exceeds 2
+            while ( ! monotonic_decreasing.empty() &&
+                    ! monotonic_increasing.empty() &&
+                    nums[monotonic_decreasing.front()] - nums[monotonic_increasing.front()] > 2)
+            {
+                // Move left pointer past the element that breaks the condition
+                if (monotonic_decreasing.front() < monotonic_increasing.front())
+                {
+                    left = monotonic_decreasing.front() + 1;
+                    monotonic_decreasing.pop_front();
+                }
+                else
+                {
+                    left = monotonic_increasing.front() + 1;
+                    monotonic_increasing.pop_front();
+                }
+            }
+
+            // Add count of all valid subarrays ending at current right pointer
+            count += right - left + 1;
+
+            // Increment
             right++;
         }
 
