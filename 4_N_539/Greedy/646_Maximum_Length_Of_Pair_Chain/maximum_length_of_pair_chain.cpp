@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <cstring> // For memset
 
 /*
     ==============
@@ -50,6 +52,137 @@
 
 */
 
+
+/*
+    Down below are 3 Solutions:
+        1) Time Complexity: O(n^2)
+        2) Time Complexity: O(n * logn)
+        3) Time Complexity: O(n)
+
+*/
+
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(n)   */
+class Solution_1 {
+public:
+    int findLongestChain(std::vector<std::vector<int>>& pairs)
+    {
+        const int n = pairs.size();
+
+        std::vector<int> dp(n, 1);
+        int longest_chain = 1;
+
+        // Sort
+        sort(pairs.begin(), pairs.end());
+
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < i; j++)
+            {
+                if (pairs[i][0] > pairs[j][1] && 1 + dp[j] > dp[i])
+                    dp[i] = 1 + dp[j];
+            }
+
+            if (dp[i] >= longest_chain)
+                longest_chain = dp[i];
+        }
+
+        return longest_chain;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 89.09% */
+/* Space Beats: 28.99% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n)        */
+class Solution_2 {
+public:
+    int findLongestChain(vector<vector<int>>& pairs)
+    {
+        const int n = pairs.size();
+        sort(pairs.begin(), pairs.end());
+
+        vector<int> dp(n, 1);
+
+        for (int i = n-2; i >= 0; i--)
+        {
+            int target = 1 + pairs[i][1];
+            auto it = lower_bound(pairs.begin(), pairs.end(), vector<int>{target, INT_MIN},
+                [](const vector<int>& a, const vector<int>& b) {
+                    return a[0] < b[0];
+                });
+
+
+            if (it != pairs.end())
+                dp[i] = max(dp[it - pairs.begin()] + 1, dp[i+1]);
+            else
+                dp[i] = max(1, dp[i+1]);
+
+        }
+
+        return dp[0];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 61.61% */
+/* Space Beats: 30.90% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(1)        */
+class Solution_2_Second_Way {
+public:
+    int findLongestChain(vector<vector<int>>& pairs)
+    {
+        // Sort by "end" value
+        sort(pairs.begin(), pairs.end(), [](vector<int>& a, vector<int>& b){
+            return a[1] < b[1];
+        });
+
+        int result = 1;
+
+        vector<int>dp_prev = pairs[0];
+        for (const auto vec : pairs)
+        {
+            if (dp_prev[1] < vec[0])
+            {
+                result++;
+                dp_prev = vec;
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+
 /*
     ------------
     --- IDEA ---
@@ -63,8 +196,8 @@
 /* Space Beats: 83.80% */
 
 /* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution {
+/* Space Complexity: O(1) */
+class Solution_3 {
 public:
     int dp[2002];
     int end_to_min_len[2002];
