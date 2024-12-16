@@ -25,7 +25,7 @@
     all k operations.
 
     ==============================================================================
-    FUNCTION: vector<int> getFinalState(vector<int>& nums, int k, int multiplier); 
+    FUNCTION: vector<int> getFinalState(vector<int>& nums, int k, int multiplier);
     ==============================================================================
 
     ==========================================================================
@@ -112,6 +112,64 @@ public:
             min_heap.pop();
 
             nums[idx] = top;
+        }
+
+        return nums;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, however this Implementattion uses vector "min_heap" as a
+    Heap, instead of creating a priority_queue.
+
+    Why do both things exist?
+
+    make_heap() function Heapifies a vector in O(n), which is faster than
+    pushing it one-by-one and performing O(logk) operations.
+
+    Also by using vector you have flexibillity in accessing elements in any
+    order that you want.
+
+    However, with more complex elements in the Heap, priority_queue is a
+    preferred method.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  29.75% */
+
+/* Time  Complexity: O(n + k * logn) */
+/* Space Complexity: O(n)            */
+class Solution_2 {
+public:
+    vector<int> getFinalState(vector<int>& nums, int k, int multiplier)
+    {
+        vector<pair<int, int>> min_heap;
+
+        // O(n)
+        for (int i = 0; i < nums.size(); i++)
+            min_heap.push_back({nums[i], i});
+
+        // Heapify in O(n)
+        make_heap(min_heap.begin(), min_heap.end(), greater<>());
+
+        while (k--)
+        {
+            pop_heap(min_heap.begin(), min_heap.end(), greater<>());
+            auto [value, i] = min_heap.back();
+            min_heap.pop_back();
+
+            nums[i] *= multiplier;
+
+            min_heap.push_back({nums[i], i});
+            push_heap(min_heap.begin(), min_heap.end(), greater<>());
         }
 
         return nums;
