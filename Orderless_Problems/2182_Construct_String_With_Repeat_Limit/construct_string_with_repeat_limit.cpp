@@ -47,7 +47,7 @@
     --- Example 2 ---
     Input: s = "aababab", repeatLimit = 2
     Output: "bbabaa"
-    Explanation: We use only some of the characters from s to construct the repeatLimitedString "bbabaa". 
+    Explanation: We use only some of the characters from s to construct the repeatLimitedString "bbabaa".
     The letter 'a' appears at most 2 times in a row.
     The letter 'b' appears at most 2 times in a row.
     Hence, no letter appears more than repeatLimit times in a row and the string is a valid repeatLimitedString.
@@ -99,12 +99,12 @@ public:
         ostringstream out;
 
         vector<int> freq(26, 0);
-        
+
         for (const char& chr : s)
             freq[chr - 'a']++;
 
-        int L = 25;
-        int R = 25;
+        int L = 25; // Start from the largest character
+        int R = 25; // Start from the largest character
 
         while (L >= 0 && R >= 0)
         {
@@ -118,6 +118,10 @@ public:
                 continue;
             }
 
+            // If there is a lexicographically greater character that isn't
+            // finished, then output only ONE of current character and get back
+            // to that lexicographically grater character. Do this until you're
+            // done with it.
             if (L != R && freq[R] > 0)
             {
                 out << (char)(L + 'a');
@@ -127,6 +131,7 @@ public:
             }
 
 
+            // Append as much as possible
             int times = min(repeatLimit, freq[L]);
             for (int i = 0; i < times; i++)
             {
@@ -134,12 +139,75 @@ public:
                 freq[L]--;
             }
 
+            // Find next lexicographically greatest character with freq > 0
             while (R >= 0 && freq[R] == 0)
                 R--;
 
+            // Decrement(while-loop)
             L--;
         }
-        
+
         return out.str();
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same IDEA as above, but this is implemented in a slightly different way.
+
+*/
+
+/* Time  Beats: 71.14% */
+/* Space Beats: 32.11% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    string repeatLimitedString(string s, int repeatLimit)
+    {
+        string result;
+        vector<int> freq(26, 0);
+
+        for (char ch : s)
+            freq[ch - 'a']++;
+
+        int L = 25; // Start from the largest character
+        while (L >= 0)
+        {
+            if (freq[L] == 0)
+            {
+                L--;
+                continue;
+            }
+
+            int use = min(freq[L], repeatLimit);
+            result.append(use, 'a' + L);
+            freq[L] -= use;
+
+            if (freq[L] > 0)  // Need to add a smaller character
+            {
+                int R = L - 1;
+
+                while (R >= 0 && freq[R] == 0)
+                {
+                    R--;
+                }
+
+                if (R < 0)
+                    break;
+
+                result.push_back('a' + R);
+                freq[R]--;
+            }
+        }
+
+        return result;
     }
 };
