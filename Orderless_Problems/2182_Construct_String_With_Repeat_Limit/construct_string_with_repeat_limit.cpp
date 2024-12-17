@@ -61,7 +61,9 @@
 
 */
 
+#include <queue>
 #include <string>
+#include <unordered_map>
 #include <vector>
 #include <sstream>
 using namespace std;
@@ -90,8 +92,8 @@ using namespace std;
 /* Time  Beats: 85.82% */
 /* Space Beats:  7.11% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
+/* Time  Complexity: O(n * k) */
+/* Space Complexity: O(k)     */
 class Solution {
 public:
     string repeatLimitedString(string s, int repeatLimit)
@@ -166,8 +168,8 @@ public:
 /* Time  Beats: 71.14% */
 /* Space Beats: 32.11% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
+/* Time  Complexity: O(n * k) */
+/* Space Complexity: O(k)     */
 class Solution_2 {
 public:
     string repeatLimitedString(string s, int repeatLimit)
@@ -196,15 +198,79 @@ public:
                 int R = L - 1;
 
                 while (R >= 0 && freq[R] == 0)
-                {
                     R--;
-                }
 
                 if (R < 0)
                     break;
 
                 result.push_back('a' + R);
                 freq[R]--;
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Instead of devising some weird Solution with a lot of edge cases, we can
+    at least, a little bit easen it up by using Heap.
+
+    This approach is indeed a bit faster. Both in terms of "real runtime" and
+    a Big O notation.
+
+*/
+
+/* Time  Beats: 62.28% */
+/* Space Beats: 25.74% */
+
+/* Time  Complexity: O(n * logk) */
+/* Space Complexity: O(k)        */
+class Solution_3 {
+public:
+    string repeatLimitedString(string s, int repeatLimit)
+    {
+        unordered_map<char, int> freq;
+
+        for (const char& chr : s)
+            freq[chr]++;
+
+        priority_queue<char> max_heap;
+        for (auto& [chr, count] : freq)
+            max_heap.push(chr);
+
+        string result;
+
+        while ( ! max_heap.empty())
+        {
+            char chr = max_heap.top();
+            max_heap.pop();
+            int count = freq[chr];
+
+            int how_many = min(count, repeatLimit);
+            result.append(how_many, chr);
+
+            freq[chr] -= how_many;
+
+            if (!max_heap.empty() && freq[chr] > 0)
+            {
+                char next_chr = max_heap.top();
+                max_heap.pop();
+
+                result.push_back(next_chr);
+                freq[next_chr]--;
+
+                if (freq[next_chr] > 0)
+                    max_heap.push(next_chr);
+
+                max_heap.push(chr);
             }
         }
 
