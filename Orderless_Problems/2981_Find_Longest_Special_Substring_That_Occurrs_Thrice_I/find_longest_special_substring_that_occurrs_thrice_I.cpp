@@ -270,15 +270,15 @@ public:
 
         int result = -1;
 
-        vector<int> subsequence_length(N, 1);
+        vector<int> subarray_length(N, 1);
 
         int upper_bound = 1;
         for (int i = N-2; i >= 0; i--)
         {
             if (s[i] == s[i+1])
-                subsequence_length[i] = 1 + subsequence_length[i+1];
+                subarray_length[i] = 1 + subarray_length[i+1];
 
-            upper_bound = max(upper_bound, subsequence_length[i]);
+            upper_bound = max(upper_bound, subarray_length[i]);
         }
 
         int left  = 1;
@@ -291,7 +291,7 @@ public:
             vector<int> counter(26, 0);
             for (int i = 0; i < N; i++)
             {
-                if (subsequence_length[i] >= mid)
+                if (subarray_length[i] >= mid)
                 {
                     counter[s[i] - 'a']++;
                     max_occurr = max(max_occurr, counter[s[i] - 'a']);
