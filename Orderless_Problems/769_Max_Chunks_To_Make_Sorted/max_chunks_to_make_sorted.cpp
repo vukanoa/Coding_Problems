@@ -51,8 +51,69 @@
 
 */
 
+/*
+   There are 2 Solutions down below.
+
+   1. Monotonicly Increasing Stack. Time: O(n), Space: O(n)
+   2. Natural, intuitive approach,  Time: O(n), Space: O(1)
+
+*/
+
+#include <stack>
 #include <vector>
 using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    A bit unusual Monotonicly Increasing Stack approach. However, if you do
+    know about it, you'd be able to come up with a Solution given enough time.
+
+    Not too different to other, but it's weird to pop elements, but to "save"
+    the top element BEFORe we start popping and then push it after we're done
+    popping. That is a bit unusuall, but it's not too bad.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   7.32% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Monotonic_Stack {
+public:
+    int maxChunksToSorted(vector<int>& arr)
+    {
+        const int N = arr.size();
+        stack<int> stack; // Monotonicly Increasing stack
+
+        for (int i = 0; i < N; i++)
+        {
+            // Case 1: Current element is larger, starts a new chunk
+            if (stack.empty() || stack.top() < arr[i])
+            {
+                stack.push(arr[i]);
+            }
+            else
+            {
+                // Case 2: Merge chunks
+                int max_elem = stack.top();
+
+                while ( ! stack.empty() && stack.top() > arr[i])
+                    stack.pop();
+
+                stack.push(max_elem);
+            }
+        }
+
+        return stack.size();
+    }
+};
+
+
+
 
 /*
     ------------
@@ -153,20 +214,17 @@ public:
     int maxChunksToSorted(vector<int>& arr)
     {
         const int N = arr.size();
-        int result = 0;
+        int chunks = 0;
 
         int bound = -1;
         for (int i = 0; i < N; i++)
         {
             if (bound < i)
-            {
-                result++;
-                bound = arr[i]; // This could be omitted
-            }
+                chunks++;
 
             bound = max(bound, arr[i]);
         }
 
-        return result;
+        return chunks;
     }
 };
