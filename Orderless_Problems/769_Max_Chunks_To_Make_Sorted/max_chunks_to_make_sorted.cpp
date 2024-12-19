@@ -54,14 +54,72 @@
 /*
    There are 2 Solutions down below.
 
-   1. Monotonicly Increasing Stack. Time: O(n), Space: O(n)
-   2. Natural, intuitive approach,  Time: O(n), Space: O(1)
+   1. Prefix Sum approach,          Time: O(n), Space: O(n) // Slowest out of 3
+   2. Monotonicly Increasing Stack. Time: O(n), Space: O(n)
+   3. Natural, intuitive approach,  Time: O(n), Space: O(1)
 
 */
 
 #include <stack>
 #include <vector>
 using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We can either include it in the same chunk as the previous number or create
+    a new chunk for it. However, we must consider the limitation that a new
+    chunk at index i can only be created if all the numbers in the current and
+    previous chunks (the "prefix" of the array) are smaller than all the
+    numbers in the following chunks (the "suffix" of the array). This is
+    equivalent to checking whether:
+
+        max(prefix[0:i]) < min(suffix[i:n])
+
+    Since we aim to find the largest possible number of chunks, we will choose
+    the second option (i.e. create a new chunk) whenever the above condition
+    is satisfied. Therefore, the problem reduces to counting how many indices
+    in the array satisfy this condition.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  42.82% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Prefix_Sum {
+public:
+    int maxChunksToSorted(vector<int>& arr)
+    {
+        const int N = arr.size();
+        vector<int> prefix_max = arr;
+        vector<int> suffix_min = arr;
+
+        // Fill the prefix_max array
+        for (int i = 1; i < N; i++)
+            prefix_max[i] = max(prefix_max[i - 1], prefix_max[i]);
+
+        // Fill the suffix_min array in reverse order
+        for (int i = N - 2; i >= 0; i--)
+            suffix_min[i] = min(suffix_min[i + 1], suffix_min[i]);
+
+        int chunks = 0;
+        for (int i = 0; i < N; i++)
+        {
+            // A new chunk can be created
+            if (i == 0 || suffix_min[i] > prefix_max[i - 1])
+                chunks++;
+        }
+
+        return chunks;
+    }
+};
+
+
+
 
 /*
     ------------
@@ -209,7 +267,7 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Efficient {
 public:
     int maxChunksToSorted(vector<int>& arr)
     {
