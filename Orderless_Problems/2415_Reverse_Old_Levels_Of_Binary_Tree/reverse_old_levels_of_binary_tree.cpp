@@ -109,7 +109,7 @@ struct TreeNode {
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_BFS {
 public:
     TreeNode* reverseOddLevels(TreeNode* root)
     {
@@ -158,5 +158,50 @@ public:
         }
 
         return root;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    If we need to do something per LEVEL, then BFS is usually a preferred
+    option. However, in this problem there exists one DFS approach that is not
+    very intuitive, but once you get it, you'll think it's a genius approach.
+
+    Simply go through the first Example while reading the code and you'll get
+    it.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  70.74% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_DFS {
+public:
+    TreeNode* reverseOddLevels(TreeNode* root)
+    {
+        dfs(root->left, root->right, 0);
+        return root;
+    }
+
+private:
+    void dfs(TreeNode* left_child, TreeNode* right_child, int level)
+    {
+        if (left_child == nullptr || right_child == nullptr)
+            return;
+
+        // If curr level is EVEN(careful!), swap the values of the children
+        if (level % 2 == 0)
+            swap(left_child->val, right_child->val);
+
+        dfs(left_child->left,  right_child->right, level+1);
+        dfs(left_child->right, right_child->left,  level+1);
     }
 };
