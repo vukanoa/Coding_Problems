@@ -124,3 +124,84 @@ private:
         return sum;
     }
 };
+
+
+
+
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+#include <queue>
+
+using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 10.76% */
+/* Space Beats:  7.60% */
+
+/* Time  Complexity: O(n + m) */
+/* Space Complexity: O(n + m) */
+class Solution_BFS {
+public:
+    int maxKDivisibleComponents(int n, vector<vector<int>>& edges, vector<int>& values, int k)
+    {
+        if (n < 2)
+            return 1;
+
+        int component_count = 0;
+        unordered_map<int, unordered_set<int>> graph;
+
+        for (const auto& edge : edges)
+        {
+            graph[edge[0]].insert(edge[1]);
+            graph[edge[1]].insert(edge[0]);
+        }
+
+        vector<long long> long_values(values.begin(), values.end());
+
+        queue<int> queue;
+        for (const auto& [node, neighbors] : graph)
+        {
+            if (neighbors.size() == 1)
+                queue.push(node);
+        }
+
+        while ( ! queue.empty())
+        {
+            int curr_node = queue.front();
+            queue.pop();
+
+            int neighbor_node = -1;
+            if ( ! graph[curr_node].empty())
+                neighbor_node = *graph[curr_node].begin();
+
+            if (neighbor_node >= 0)
+            {
+                graph[neighbor_node].erase(curr_node);
+                graph[curr_node].erase(neighbor_node);
+            }
+
+            if (long_values[curr_node] % k == 0)
+            {
+                component_count++;
+            }
+            else if (neighbor_node >= 0)
+            {
+                long_values[neighbor_node] += long_values[curr_node];
+            }
+
+            if (neighbor_node >= 0 && graph[neighbor_node].size() == 1)
+                queue.push(neighbor_node);
+        }
+
+        return component_count;
+    }
+};
