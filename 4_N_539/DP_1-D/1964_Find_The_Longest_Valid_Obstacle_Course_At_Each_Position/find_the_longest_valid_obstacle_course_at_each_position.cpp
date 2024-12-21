@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 /*
     ============
@@ -124,6 +125,54 @@ public:
                 LIS[low] = obstacles[i];
 
             result[i] = low + 1;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 74.87% */
+/* Space Beats: 10.07% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n)        */
+class Solution {
+public:
+    vector<int> longestObstacleCourseAtEachPosition(vector<int>& obstacles)
+    {
+        const int n = obstacles.size();
+
+        vector<int> LIS;
+        vector<int> result;
+
+        for (int i = 0; i < n; i++)
+        {
+            int target = obstacles[i];
+
+            auto it = upper_bound(LIS.begin(), LIS.end(), target);
+
+            if (it == LIS.end())
+            {
+                LIS.push_back(target);
+                result.push_back(LIS.size());
+            }
+            else
+            {
+                *it = target;
+                result.push_back(it - LIS.begin() + 1);
+            }
         }
 
         return result;
