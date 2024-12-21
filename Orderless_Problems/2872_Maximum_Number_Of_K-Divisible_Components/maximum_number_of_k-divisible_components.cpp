@@ -205,3 +205,84 @@ public:
         return component_count;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 75.95% */
+/* Space Beats: 67.09% */
+
+/* Time  Complexity: O(n + m) */
+/* Space Complexity: O(n + m) */
+class Solution_Topological_or_Onion_Sort {
+public:
+    int maxKDivisibleComponents(int n, vector<vector<int>>& edges, vector<int>& values, int k)
+    {
+        if (n < 2)
+            return 1;
+
+        int component_count = 0;
+        vector<vector<int>> adj_list(n);
+        vector<int> in_degree(n, 0);
+
+        // Build the graph and calculate in-degrees
+        for (const auto& edge : edges)
+        {
+            adj_list[edge[0]].push_back(edge[1]);
+            adj_list[edge[1]].push_back(edge[0]);
+
+            in_degree[edge[0]]++;
+            in_degree[edge[1]]++;
+        }
+
+        // Convert values to long long to prevent overflow
+        vector<long long> long_values(values.begin(), values.end());
+
+        // Initialize the queue with nodes having in-degree of 1 (leaf nodes)
+        queue<int> queue;
+        for (int node = 0; node < n; node++)
+        {
+            if (in_degree[node] == 1)
+                queue.push(node);
+        }
+
+        while ( ! queue.empty())
+        {
+            int curr_node = queue.front();
+            queue.pop();
+            in_degree[curr_node]--;
+
+            long long add_value = 0;
+
+            if (long_values[curr_node] % k == 0)
+                component_count++;
+            else
+                add_value = long_values[curr_node];
+
+            // Propagate the value to the neighbor nodes
+            for (int neighborNode : adj_list[curr_node])
+            {
+                if (in_degree[neighborNode] == 0)
+                    continue;
+
+                in_degree[neighborNode]--;
+                long_values[neighborNode] += add_value;
+
+                // If the neighbor node's in-degree becomes 1, add it to queue
+                if (in_degree[neighborNode] == 1)
+                    queue.push(neighborNode);
+            }
+        }
+
+        return component_count;
+    }
+};
