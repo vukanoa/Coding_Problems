@@ -64,6 +64,7 @@
 
 */
 
+#include <queue>
 #include <utility>
 #include <vector>
 using namespace std;
@@ -149,5 +150,76 @@ private:
         }
 
         return position;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 52.87% */
+/* Space Beats: 28.03% */
+
+/* Time  Complexity: O(M * logM) */
+/* Space Complexity: O(N + M)    */
+class Solution_2 {
+public:
+    vector<int> leftmostBuildingQueries(vector<int>& heights, vector<vector<int>>& queries)
+    {
+        vector<int> answer(queries.size(), -1);
+
+        vector<vector<vector<int>>> store_queries(heights.size());
+        priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>> max_index;
+
+
+        // Store the mappings for all queries in storeQueries.
+        for (int curr_query = 0; curr_query < queries.size(); curr_query++)
+        {
+            int a = queries[curr_query][0];
+            int b = queries[curr_query][1];
+
+            if (a < b && heights[a] < heights[b])
+            {
+                answer[curr_query] = b;
+            }
+            else if (a > b && heights[a] > heights[b])
+            {
+                answer[curr_query] = a;
+            }
+            else if (a == b)
+            {
+                answer[curr_query] = a;
+            }
+            else
+            {
+                store_queries[max(a, b)].push_back( {max(heights[a], heights[b]), curr_query} );
+            }
+        }
+
+        for (int i = 0; i < heights.size(); i++)
+        {
+            // If the priority queue's minimum pair value is less than the
+            // current index of height, it is an answer to the query.
+            while ( ! max_index.empty() && max_index.top()[0] < heights[i])
+            {
+                answer[max_index.top()[1]] = i;
+                max_index.pop();
+            }
+
+            // Push the with their maximum index as the current index in the
+            // priority queue.
+            for (auto& element : store_queries[i])
+                max_index.push(element);
+        }
+
+        return answer;
     }
 };
