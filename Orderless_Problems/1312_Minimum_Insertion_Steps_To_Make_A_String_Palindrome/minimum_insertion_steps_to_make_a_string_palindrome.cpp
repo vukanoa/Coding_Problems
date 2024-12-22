@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === HARD ===
@@ -52,6 +49,10 @@
 
 */
 
+#include <algorithm>
+#include <string>
+#include <vector>
+
 using namespace std;
 
 
@@ -71,7 +72,6 @@ using namespace std;
 /* Time  Complexity: O(n^2) */
 /* Space Complexity: O(n)   */
 class Solution_Memoization {
-class Solution {
 public:
     int minInsertions(string s)
     {
