@@ -56,6 +56,7 @@
 */
 
 #include <algorithm>
+#include <set>
 #include <unordered_map>
 #include <vector>
 using namespace std;
@@ -124,6 +125,57 @@ public:
 
             // Update result with maximum achievable frequency with the hypothetical midpoint
             result = max(result, min(right - left + 1, numOperations));
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    (Sweep Line)
+
+*/
+
+/* Time  Beats:  9.94% */
+/* Space Beats: 14.53% */
+
+/* Time  Complexity: O(n + p * logp) */
+/* Space Complexity: O(n + p) */
+class Solution_Sweep_Line {
+public:
+    int maxFrequency(vector<int>& nums, int k, int numOperations)
+    {
+        int result = 1;
+
+        unordered_map<int,int> counter;
+        unordered_map<int,int> sweep;
+        set<int> points;
+
+        for(auto& num : nums)
+        {
+            counter[num]++;
+
+            sweep[num - k]++;
+            sweep[num + k + 1]--;
+
+            points.insert(num);
+            points.insert(num - k);
+            points.insert(num + k + 1);
+        }
+
+        int sum = 0;
+        for (auto& num : points)
+        {
+            sum += sweep[num];
+            result = max(result, counter[num] + min(sum - counter[num], numOperations));
         }
 
         return result;
