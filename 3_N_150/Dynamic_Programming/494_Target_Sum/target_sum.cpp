@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -61,6 +59,10 @@
 
 */
 
+#include <cstddef>
+#include <functional>
+#include <utility>
+using namespace std;
 
 /*
     ------------
@@ -352,19 +354,19 @@ public:
         std::function<int(int, int)> backtrack;
 
         backtrack = [&](int i, int total) -> int
-                       {
-                           if (i == nums.size())
-                               return total == target ? 1 : 0;
+        {
+            if (i == nums.size())
+                return total == target ? 1 : 0;
 
-                           if (dp.count({i, total}))
-                               return dp[{i, total}];
+            if (dp.count({i, total}))
+                return dp[{i, total}];
 
-                           dp[{i, total}] = backtrack(i+1, total + nums[i]) +
-                                            backtrack(i+1, total - nums[i]);
+            dp[{i, total}] = backtrack(i+1, total + nums[i]) +
+                             backtrack(i+1, total - nums[i]);
 
-                           return dp[{i, total}];
+            return dp[{i, total}];
 
-                       };
+        };
 
         return backtrack(0, 0);
     }
