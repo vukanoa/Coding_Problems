@@ -154,7 +154,7 @@ public:
     int maxScoreSightseeingPair(vector<int>& values)
     {
         ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-        
+
         const int N = values.size();
         int result = 0;
 
@@ -168,6 +168,48 @@ public:
 
             int curr_left_score = values[i] + i;
             max_left_score[i] = max(max_left_score[i - 1], curr_left_score);
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, however we can notice above that we only need ONE element
+    before, from "max_left_score", each time, therefore we can use only a
+    single variable, instead of an entire vector of N size.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  55.58% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_DP_Optimized_Space {
+public:
+    int maxScoreSightseeingPair(vector<int>& values)
+    {
+        const int N = values.size();
+        int result = 0;
+
+        // The left score is initially just the value of the first element.
+        int max_left_score = values[0];
+
+        for (int i = 1; i < N; i++)
+        {
+            int curr_right_score = values[i] - i;
+            result = max(result, max_left_score + curr_right_score);
+
+            int curr_left_score = values[i] + i;
+            max_left_score = max(max_left_score, curr_left_score);
         }
 
         return result;
