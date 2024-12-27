@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -46,449 +43,31 @@
 
 */
 
-/*
-    ============
-    === NOTE ===
-    ============
-
-    There are 4 Solutions down there. In reality it's 2 approaches of which
-    each has both Space O(n) and improvement, i.e. Space O(n).
-
-    Every Solution runs in O(n) Time and Beats 100%.
-
-    In the very first Solution down, in Explanation(IDEA) there is an
-    explanation on how to approach DP problem, but I don't like it how it ended
-    up looking and "sounding", therefore I suggest you reading only the
-    explanation of the 3rd Solution down below.
-
-    I believe that is the most clear on how to solve this problem.
-
-    Update: I added one more Solution, the 5th one. I believe it is the most
-            concise. However, maybe the 3rd one still remains easier to
-            comprehend.
-
-*/
+#include <vector>
+using namespace std;
 
 /*
     ------------
     --- IDEA ---
     ------------
 
-    From good to great. How to approach most of DP problems.
+    There are two wasy to do this problem. One way is to iterate from the left,
+    as you would by default. However this poses a small problem. You need to
+    be cognizant and very careful not to make a mistake.
 
-    There is some frustration when people publish their perfect fine-grained
-    algorithms without sharing any information about how they were derived.
-    This is an attempt to change the situation. There is not much more
-    explanation but it's rather an example of higher level improvements.
-    Converting a solution to the next step shouldn't be as hard as attempting
-    to come up with perfect algorithm at first attempt.
+    Try going through the code with a few examples and you'll understand the
+    reason behind these initial values to "prev" and "curr".
 
-    This particular problem and most of others can be approached using the
-    following sequence:
-        1. Find recursive relation
-        2. Recursive        (top-down)
-        3. Recursive + memo (top-down)
-        4. Iterative + memo (bottom-up)
-        5. Iterative + N variables (bottom-up)
-
-
-    Step 1. Figure out recursive relation.
-
-    A robber has 2 options:
-        a) rob current house "i"
-        b) don't rob current house.
-
-    If an option "a" is selected it means the robber can't rob previous "i-1"
-    house, but can safely proceed to the one before previous, i.e. "i-2" and
-    gets all cumulative loot that follows.
-
-    If an option "b" is selected the robber gets all the possible loot from
-    robbery of "i-1" and all the following buildings.
-
-    So it boils down to calculating what is more profitable:
-        - robbery of current house + loot from houses before the previous
-        - loot from the previous house robbery and any loot captures before
-          that
-
-    rob(i) = Math.max( rob(i - 2) + currentHouseValue, rob(i - 1) )
-
-
-    Step 2. Recursive (top-down)
-    Converting the recurrent relation from Step 1 shouldn't be very hard.
-    ============
-    === CODE ===
-    ============
-
-    int rob(std::vector<int>& nums)
-    {
-        return recursion(nums, nums.size()) - 1);
-    }
-
-    int recursion(std::vector<int> nums, int i)
-    {
-        if (i < 0)
-            return 0;
-
-        return std::max(recursion(nums, i-2) + nums[i], recursion(nums, i-1));
-    }
-
-    This algorithm will process the same "i" multiple times and it needs
-    improvement. Time Complexity: O(2^n)
-
-
-
-    Step 3. Recursive + memo (top-down)
-    ============
-    === CODE ===
-    ============
-
-
-    int rob(std::vector<int>& nums)
-    {
-        std::vector<int> memo(nums.size() + 1), -1);
-
-        return recursion(nums, nums.size() - 1, memo);
-    }
-
-    int recursion(std::vector<int> nums, int i, std::vector<int>& memo)
-    {
-        if (i < 0)
-            return 0;
-
-        if (memo[i] >= 0)
-            return memo[i];
-
-        int result = std::max(nums, i - 2, memo) + nums[i], recursion(nums, i - 1, memo);
-        memo[i] = result;
-
-        return result;
-    }
-
-    Much better. This should run in O(n) time. Space complexity is O(n) as
-    well, because of the recursion stack, let's try to get rid of it.
-
-
-
-    Step 4.
-    ============
-    === CODE ===
-    ============
-
-    int rob(std::vector<int>& nums)
-    {
-        if (nums.size() == 0)
-            return 0;
-
-        std::vector<int> memo(nums.size() + 1, -1);
-
-        memo[0] = 0;
-        memo[1] = nums[0];
-        for (int i = 1; i < nums.size(); i++)
-        {
-            int val = nums[i];
-            memo[i + 1] = std::max(memo[i], memo[i - 1] + val);
-        }
-
-        return memo[nums.size()];
-    }
-
-
-    Step 5. Iterative + 2 variables (bottom-up)
-    We can notice that in the previous step we use only "memo[i]" and
-    "memo[i - 1]", so going just 2 steps back. We can hold them in 2 variables
-    instead. This optimization is met in Fibonacci sequence creation and some
-    other problems.
-    ============
-    === CODE ===
-    ============
-
-    // the order is: prev2, prev1, num
-    int rob(std::vector<int>& nums)
-    {
-        if (nums.size() == 0)
-            return 0;
-
-        int prev_1 = 0;
-        int prev_2 = 0;
-        for (int num : nums)
-        {
-            int tmp = prev_1;
-            prev_1 = std::max(prev_2 + num, prev_1);
-            prev_2 = tmp;
-        }
-
-        return prev1;
-    }
-
-
-
-    --- My Solution ---
-    This is an obvious DP problem.
-
-    If "nums" is Empty => return 0.
-    it "nums" is of size 1 => return nums[0].
-
-    Since nums[0] and nums[1] cannot have "previous houses", dp[0] and dp[1]
-    are set to nums[0] and std::max(nums[0], nums[1]), respecitvely.
-
-    Now we iteratively start from the 2nd index and calculate max of:
-        1. dp[i - 2] + nums[i]
-        2. dp[i - 1]
-
-    and assign that to dp[i].
-
-    At the end, the biggest amount of money we can get away with is in:
-        dp[nums.size() -1]
-    Meaning in the last position of vector "dp".
-
-
-
-    Solution_Concise_3 is the Space efficient equivalent of this Solution.
+    But it is not trivial and easy to come up with. So keep that in mind.
 
 */
-
-/* Time  Beats:   100% */
-/* Space Beats: 58.56% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n)
-   I can use prev_1 and prev_2 instead of the whole vector "dp", but this is
-   way easier to read.
-
-   I wrote a "prev_1, prev_2" solution above.
-*/
-class Solution_1 {
-public:
-    int rob(std::vector<int>& nums)
-    {
-        if (nums.size() == 1)
-            return nums[0];
-
-        std::vector<int> dp(nums.size(), 0);
-        dp[0] = nums[0];
-        dp[1] = std::max(nums[0], nums[1]);
-
-        for (int i = 2; i < nums.size(); i++)
-            dp[i] = std::max(dp[i - 2] + nums[i], dp[i - 1]);
-
-        return dp[nums.size() - 1];
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    I was doing this problem for the 2nd time and this is the Solution I came
-    up with so I wanted to save it as well.
-
-    It's a similar IDEA, , but it's not equivalent. It seems more obvious than
-    the previous ones.
-
-    It's important to note that in the above Solution, we return:
-        return dp[nums.size() - 1];
-
-    However, in this one, we're not doing that. We are return the max rob of
-    all the given houses. Let me explain.
-
-    dp[0] is always nums[0].
-    dp[1] is always nums[1], except when there is only one element in "nums".
-
-    However, now it's not true that dp[1] is max(dp[0], dp[1]) because if I
-    take 1-st(not 0-th, but at index 1) element, then that means that I must
-    not include the value of dp[0] because that's an adjacent house.
-
-    Therefore, dp[1] is equal to nums[1].
-
-    At each step I check if i-3 is >= 0, but that is relevant only for element
-    at index 2, at all the other elements, i-3 will be >=0.
-
-    Then dp[i] becomes max(dp[i - 3], dp[i - 2]) + nums[i];
-
-    Again it's important to note that if I include dp[x], then that means I did
-    not rob dp[x-1].
-
-    Example 1
-    [2, 1, 1, 4]    The answer is 6
-
-    Example 2
-    [2, 1, 1, 4, 1] The answer is still 6, however, dp[n - 1] is not 6.
-
-        dp[n - 1] is 5. If there were other houses as well, and I wanted to
-        include the house at index 4(which is now at index n-1), then that
-        means that I must not have robbed house at index 3. That's the
-        condition for robbing house at index 4.
-
-        But if you look at this whole array, the solution would be 5. The
-        Solution doesn't give us the max rob if we rob the n-1st house in the
-        array, but gives us the max rob value of all the houses that we're
-        given.
-
-    This Solution is different than the previous in so far that this Solution
-    leaves the dp[n - 1] ready for concatenation of other houses, but returns
-    the max rob value of the whole array anyway.
-
-    On the other hand, previous Solution, returns the max rob value of the
-    whole array, but is NOT ready for adding new houses. If we were to add
-    more houses to this array(amount of money of those houses to be precise)
-    we would have to run this program from the beginning as if it's a
-    completely new Example, even though the previous example is a subproblem of
-    this, new, one.
-
-    Whereas this Solution would be able to just continue because saved results
-    in dp truly work as Dynamic Programming algorithm should.
-
-    Conclusion:
-        If we were to add more houses to Solution_1's array, we would have to
-        do the whole problem from the beginning, whereas Solution_Reusable can
-        just continue from newly added houses.
-
-*/
-
-/* Time  Beats:   100% */
-/* Space Beats: 58.56% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_Reusable {
-public:
-    int rob(std::vector<int>& nums)
-    {
-        int n = nums.size();
-
-        if (n == 1)
-            return nums[0];
-
-        std::vector<int> dp(n, 0);
-        dp[0] = nums[0];
-        dp[1] = nums[1];
-
-        int max_rob = std::max(dp[0], dp[1]);
-
-        for (int i = 2; i < n; i++)
-        {
-            if (i - 3 >= 0)
-                dp[i] = std::max(dp[i - 3], dp[i - 2]) + nums[i];
-            else // i - 2 >= 0 is certainly true(this "if" is only for i = 2)
-                dp[i] = dp[i - 2] + nums[i]; // Here prev_3 is i-2nd element
-
-            max_rob = std::max(max_rob, dp[i]);
-        }
-
-        return max_rob;
-    }
-};
-
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Space Efficient of the above Solution.
-
-*/
-
-/* Time  Beats:  100% */
-/* Space Beats: 97.9% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution_Reusable_Space_Efficient {
-public:
-    int rob(std::vector<int>& nums)
-    {
-        int n = nums.size();
-
-        if (n == 1)
-            return nums[0];
-
-        int prev_3 = nums[0];
-        int prev_2 = nums[1];
-        int prev_1 = -1;
-        int curr;
-
-        int max_rob = std::max(prev_3, prev_2);
-
-        for (int i = 2; i < n; i++)
-        {
-            if (i - 3 >= 0)
-                curr = std::max(prev_3, prev_2) + nums[i];
-            else // i - 2 >= 0 is certainly true
-                curr = prev_3 + nums[i]; // Here prev_3 is i-2nd element
-
-            max_rob = std::max(max_rob, curr);
-
-            if (i - 3 >= 0)
-            {
-                prev_3 = prev_2;
-                prev_2 = prev_1;
-            }
-
-            prev_1 = curr;
-        }
-
-        return max_rob;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    The most concise.
-
-*/
-
-/* Time  Beats:   100% */
-/* Space Beats: 94.28% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution_Concise {
-public:
-    int rob(std::vector<int>& nums)
-    {
-        int n = nums.size();
-
-        if (n == 1)
-            return nums[0];
-
-        int prev = 0;
-        int curr = 0;
-
-        for (int i = 0; i < n; i++)
-        {
-            int tmp = std::max(prev + nums[i], curr);
-
-            prev = curr;
-            curr = tmp;
-        }
-
-        return curr;
-    }
-};
-
-
-
 
 /* Time  Beats: 100.00% */
 /* Space Beats:  80.57% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_Concise_2 {
+class Solution_Standard {
 public:
     int rob(std::vector<int>& nums)
     {
@@ -517,99 +96,108 @@ public:
     --- IDEA ---
     ------------
 
-    Important example: nums = [2, 1, 1 2]
+    This is an important "trick" and something you absolutely SHOULD be aware
+    of.
+
+    If there is no specific need to go from left-to-right, ALWAYS choose to go
+    backwards, i.e. right-to-left.
+
+    Why?
+    (This is VERY important)
+
+    When you go from the back, you have some flexibillity that you do NOT have
+    when going from the front.
+
+    Specifically, when creating a vector it's VERY EASY to simply extend the
+    vector by pushing to additional elements, usually "dummy" elements or
+    "default value" elements(0s in this case)
+
+    On the other hand, you DO NOT have that flexibility when working
+    left-to-right.
+
+    As you can see, in the previous Solution up above, we need to have "prev"
+    variable set to 0 at the beginning, but we had to set "curr" to nums[start]
+
+    We also, then, had to begin our for-loop from start+1's index.
+
+    That's WAAAY too much additional work that we DO NOT have to do if we go
+    from the back.
+
+    We are going from the back and we are checking non-adjacent houses to the
+    right at each iteration. Specifically only the house that is two places to
+    the right.
+
+    To do this, we simply push two additional default-values to our "dp" vector
+    or when we use two-pointer to optimize Space Complexity we set both of our
+    "closer" and "farther" to 0.(We'll do this in Solution below, don't worry
+    about it right now)
+
+    And that's it. Now we start from the last element which is at end-1(this is
+    fundamental stuff. If there is an array of size X, then X-1 is the last
+    index).
+
+    So, we simply start from N-1 and we do not have to worry about anything.
+
+    This is the advantage of going backwards. If you CAN choose, ALWAYS choose
+    to go backwards since you have more flebixility.
 
 */
 
-/* Time  Beats:   100% */
-/* Space Beats: 97.92% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  11.31% */
 
 /* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution_Concise_3 {
+/* Space Complexity: O(n) */
+class Solution_From_The_Back {
 public:
     int rob(std::vector<int>& nums)
     {
-        if (nums.size() == 1)
-            return nums[0];
+        const int n = nums.size();
+        vector<int> dp(nums.size() + 2, 0);
 
-        int dp_2 = nums[0];
-        int dp_1 = std::max(nums[0], nums[1]);
+        for (int i = n-1; i >= 0; i--)
+            dp[i] = max(nums[i] + dp[i+2], dp[i+1]);
 
-        for (int i = 2; i < nums.size(); i++)
-        {
-            int tmp = std::max(dp_1, dp_2 + nums[i]);
-
-            dp_2 = dp_1;
-            dp_1 = tmp;
-        }
-
-        return dp_1;
+        return dp[0];
     }
 };
 
 
-int
-main()
-{
-    Solution_1                        sol_1;
-    Solution_Reusable                 sol_reusable;
-    Solution_Reusable_Space_Efficient sol_reusable_space;
-    Solution_Concise                  sol_concise;
-    Solution_Concise_2                sol_concise_2;
-    Solution_Concise_3                sol_concise_3;
 
 
-    /* Example 1 */
-    // std::vector<int> nums = {1, 2, 3, 1};
+/*
+    ------------
+    --- IDEA ---
+    ------------
 
-    /* Example 2 */
-    // std::vector<int> nums = {2, 7, 9, 3, 1};
+    Here we are just using "closer" and "farther" instead of an entire "dp"
+    vector, thus optimizing Space Complexity.
 
-    /* Example 3 */
-    // std::vector<int> nums = {1, 2, 3, 1, 1, 100};
+    This way we've reduced it from O(n) to O(1) Space.
 
-    /* Example 4 */
-    std::vector<int> nums = {3, 6, 9, 2, 7, 5, 8, 4};
+*/
 
-    /* Example 5 */
-    // std::vector<int> nums = {2, 3, 2, 5, 7, 1};
+/* Time  Beats: 100.00% */
+/* Space Beats:  43.04% */
 
-    /* Example 6 */
-    // std::vector<int> nums = {2, 1, 2, 5, 7, 1};
-
-
-    std::cout << "\n\t=====================";
-    std::cout << "\n\t=== HOUSE ROBBERY ===";
-    std::cout << "\n\t=====================\n";
-
-
-    /* Write Input */
-    bool first = true;
-    std::cout << "\n\tArray: [";
-    for (auto x: nums)
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Improved_From_The_Back {
+public:
+    int rob(std::vector<int>& nums)
     {
-        if (!first)
-            std::cout << ", ";
+        const int n = nums.size();
+        int farther = 0; // Farther to the right, i.e. 2nd to the right
+        int closer  = 0; // Closer  to the right, i.e. 1st to the right
 
-        std::cout << x;
-        first = false;
+        for (int i = n-1; i >= 0; i--)
+        {
+            int tmp = max(nums[i] + farther, closer);
+
+            farther = closer;
+            closer  = tmp;
+        }
+
+        return closer;
     }
-    std::cout << "]\n";
-
-
-    /* Solution */
-    // int money = sol_1.rob(nums);
-    // int money = sol_reusable.rob(nums);
-    // int money = sol_reusable_space.rob(nums);
-    // int money = sol_concise.rob(nums);
-    // int money = sol_concise_2.rob(nums);
-    int money = sol_concise_3.rob(nums);
-
-
-    /* Write Output */
-    std::cout << "\n\tMaximum amount of money without alerting the police: " << money << "\n\n";
-
-
-    return 0;
-}
+};
