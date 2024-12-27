@@ -45,6 +45,7 @@
 
 */
 
+#include <iostream>
 #include <vector>
 using namespace std;
 
@@ -121,6 +122,53 @@ public:
 
         for (int i = 0; i < N-1; i++)
             result = max(result, values[i] + i + dp[i+1]);
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same IDEA, however this one uses Dynamic Programming instead of
+    pre-calculating and then doing a pass. This way we're building the "dp",
+    or "max_left_score" as we go.
+
+    Wall-time clock is improved since we only have one pass, but Big O is the
+    same.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  12.23% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_DP {
+public:
+    int maxScoreSightseeingPair(vector<int>& values)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        
+        const int N = values.size();
+        int result = 0;
+
+        vector<int> max_left_score(N);
+        max_left_score[0] = values[0];
+
+        for (int i = 1; i < N; i++)
+        {
+            int curr_right_score = values[i] - i;
+            result = max(result, max_left_score[i - 1] + curr_right_score);
+
+            int curr_left_score = values[i] + i;
+            max_left_score[i] = max(max_left_score[i - 1], curr_left_score);
+        }
 
         return result;
     }
