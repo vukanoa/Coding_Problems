@@ -305,3 +305,99 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  94.85% */
+
+/* Time  Complexity: O(n + k) */
+/* Space Complexity: O(1)     */
+class Solution_Sliding_Window {
+public:
+    vector<int> maxSumOfThreeSubarrays(vector<int>& nums, int k)
+    {
+        // Variables to track the best indices for one, two, and three subarray
+        // configurations
+        int best_single_start = 0;
+        vector<int> best_double_start = {0, k};
+        vector<int> best_triple_start = {0, k, k * 2};
+
+        // Compute the initial sums for the first three subarrays
+        int curr_window_single = 0;
+        for (int i = 0; i < k; i++)
+            curr_window_single += nums[i];
+
+        int curr_window_double = 0;
+        for (int i = k; i < k * 2; i++)
+            curr_window_double += nums[i];
+
+        int curr_window_triple = 0;
+        for (int i = k * 2; i < k * 3; i++)
+            curr_window_triple += nums[i];
+
+        // Track the best sums found so far
+        int best_single_sum = curr_window_single;
+        int best_double_sum = curr_window_single + curr_window_double;
+        int best_triple_sum = curr_window_single + curr_window_double + curr_window_triple;
+
+        // Sliding window pointers for the subarrays
+        int singleStartIndex = 1;
+        int doubleStartIndex = k + 1;
+        int tripleStartIndex = k * 2 + 1;
+
+        // Slide the windows across the array
+        while (tripleStartIndex <= nums.size() - k)
+        {
+            // Update the sums using the sliding window technique
+            curr_window_single = curr_window_single - nums[singleStartIndex - 1] + nums[singleStartIndex + k - 1];
+
+            curr_window_double = curr_window_double - nums[doubleStartIndex - 1] + nums[doubleStartIndex + k - 1];
+
+            curr_window_triple = curr_window_triple - nums[tripleStartIndex - 1] + nums[tripleStartIndex + k - 1];
+
+            // Update the best single subarray start index if a better sum is found
+            if (curr_window_single > best_single_sum)
+            {
+                best_single_start = singleStartIndex;
+                best_single_sum = curr_window_single;
+            }
+
+            // Update the best double subarray start indices if a better sum is found
+            if (curr_window_double + best_single_sum > best_double_sum)
+            {
+                best_double_start[0] = best_single_start;
+                best_double_start[1] = doubleStartIndex;
+                best_double_sum = curr_window_double + best_single_sum;
+            }
+
+            // Update the best triple subarray start indices if a better sum is found
+            if (curr_window_triple + best_double_sum > best_triple_sum)
+            {
+                best_triple_start[0] = best_double_start[0];
+                best_triple_start[1] = best_double_start[1];
+                best_triple_start[2] = tripleStartIndex;
+                best_triple_sum = curr_window_triple + best_double_sum;
+            }
+
+            // Move the sliding windows forward
+            singleStartIndex += 1;
+            doubleStartIndex += 1;
+            tripleStartIndex += 1;
+        }
+
+        // Return the starting indices of the three subarrays with the maximum
+        // sum
+        return best_triple_start;
+    }
+};
