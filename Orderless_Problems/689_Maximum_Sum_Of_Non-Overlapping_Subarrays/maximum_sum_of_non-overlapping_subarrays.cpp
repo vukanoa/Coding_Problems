@@ -212,3 +212,96 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  61.79% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Three_Pointers {
+public:
+    vector<int> maxSumOfThreeSubarrays(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+        int max_sum = 0;
+
+        // Prefix sum array to calculate sum of any subarray
+        vector<int> prefix_sum(N + 1);
+        for (int i = 0; i < N; i++)
+            prefix_sum[i + 1] = prefix_sum[i] + nums[i];
+
+        // Arrays to store the best starting index for the left and right
+        // subarrays
+        vector<int> left_max_idx(N);
+        vector<int> right_max_idx(N);
+
+        // Result array to store the starting indices of the three subarrays
+        vector<int> result(3);
+
+        // Calculate the best starting index for the left subarray for each
+        // position
+        for (int i = k, curr_max_sum = prefix_sum[k] - prefix_sum[0]; i < N; i++)
+        {
+            if (prefix_sum[i + 1] - prefix_sum[i + 1 - k] > curr_max_sum)
+            {
+                left_max_idx[i] = i + 1 - k;
+                curr_max_sum = prefix_sum[i + 1] - prefix_sum[i + 1 - k];
+            }
+            else
+            {
+                left_max_idx[i] = left_max_idx[i - 1];
+            }
+        }
+
+        // Calculate the best starting index for the right subarray for each
+        // position
+        right_max_idx[N - k] = N - k;
+        for (int i = N - k - 1, curr_max_sum = prefix_sum[N] - prefix_sum[N - k]; i >= 0; i--)
+        {
+            if (prefix_sum[i + k] - prefix_sum[i] >= curr_max_sum)
+            {
+                right_max_idx[i] = i;
+                curr_max_sum = prefix_sum[i + k] - prefix_sum[i];
+            }
+            else
+            {
+                right_max_idx[i] = right_max_idx[i + 1];
+            }
+        }
+
+        // Iterate over the middle subarray and calculate the total sum for all
+        // valid combinations
+        for (int i = k; i <= N - 2 * k; i++)
+        {
+            int left_idx  = left_max_idx[i - 1];
+            int right_idx = right_max_idx[i + k];
+
+            int total_sum = (prefix_sum[i + k] - prefix_sum[i]) +
+                            (prefix_sum[left_idx + k] - prefix_sum[left_idx]) +
+                            (prefix_sum[right_idx + k] - prefix_sum[right_idx]);
+
+            if (total_sum > max_sum)
+            {
+                max_sum = total_sum;
+
+                result[0] = left_idx;
+                result[1] = i;
+                result[2] = right_idx;
+            }
+        }
+
+        return result;
+    }
+};
