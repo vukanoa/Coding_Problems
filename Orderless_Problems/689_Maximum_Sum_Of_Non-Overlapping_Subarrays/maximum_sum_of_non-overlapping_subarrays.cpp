@@ -63,7 +63,7 @@ using namespace std;
 
 /* Time  Complexity: O(n * M) ~ O(n) */
 /* Space Complexity: O(n * M) ~ O(n) */
-class Solution {
+class Solution_Memoization {
 public:
     vector<int> maxSumOfThreeSubarrays(vector<int>& nums, int k)
     {
@@ -143,5 +143,72 @@ private:
         {
             dfs(sums, k, idx + 1, rem, memo, indices);
         }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 52.57% */
+/* Space Beats: 30.35% */
+
+/* Time  Complexity: O(n * M) ~ O(n) */
+/* Space Complexity: O(n * M) ~ O(n) */
+class Solution_Tabulation {
+public:
+    vector<int> maxSumOfThreeSubarrays(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+
+        // Prefix sum array to calculate sum of any subarray in O(1) time
+        vector<int> prefix_sum(N + 1, 0);
+        for (int i = 1; i <= N; i++)
+            prefix_sum[i] = prefix_sum[i - 1] + nums[i - 1];
+
+        // Arrays to store the best sum and starting indices for up to 3
+        // subarrays
+        vector<vector<int>> best_sum(4, vector<int>(N + 1, 0));
+        vector<vector<int>> best_idx(4, vector<int>(N + 1, 0));
+
+        // Compute the best sum and indices for 1, 2, and 3 subarrays
+        for (int subarray_count = 1; subarray_count <= 3; subarray_count++)
+        {
+            for (int end_idx = k * subarray_count; end_idx <= N; end_idx++)
+            {
+                int curr_sum = prefix_sum[end_idx] - prefix_sum[end_idx - k] + best_sum[subarray_count - 1][end_idx - k];
+
+                // Check if the current configuration gives a better sum
+                if (curr_sum > best_sum[subarray_count][end_idx - 1])
+                {
+                    best_sum[subarray_count][end_idx] = curr_sum;
+                    best_idx[subarray_count][end_idx] = end_idx - k;
+                }
+                else
+                {
+                    best_sum[subarray_count][end_idx] = best_sum[subarray_count][end_idx - 1];
+                    best_idx[subarray_count][end_idx] = best_idx[subarray_count][end_idx - 1];
+                }
+            }
+        }
+
+        // Trace back the indices of the three subarrays
+        vector<int> result(3, 0);
+        int curr_end = N;
+        for (int subarray_idx = 3; subarray_idx >= 1; subarray_idx--)
+        {
+            result[subarray_idx - 1] = best_idx[subarray_idx][curr_end];
+            curr_end = result[subarray_idx - 1];
+        }
+
+        return result;
     }
 };
