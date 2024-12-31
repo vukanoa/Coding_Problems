@@ -83,7 +83,6 @@ public:
     {
         const int N = target.length();
         vector<string> result = {};
-        // result.push_back(string("a"));
 
         int letter_idx = 0; // Starting from 0
         string curr_str = string("a");
@@ -103,6 +102,46 @@ public:
                 curr_str += chr;
             }
 
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, written in a more concise and neat way.
+
+*/
+
+/* Time  Beats: 96.25% */
+/* Space Beats: 27.95% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    vector<string> stringSequence(string target)
+    {
+        vector<string> result;
+        string curr_str = "";
+
+        for (const char& chr : target)
+        {
+            curr_str += 'a';
+            result.push_back(curr_str);
+
+            while (curr_str.back() != chr)
+            {
+                curr_str.back() = (curr_str.back() == 'z') ? 'a' : curr_str.back() + 1;
+                result.push_back(curr_str);
+            }
         }
 
         return result;
