@@ -47,6 +47,7 @@
 */
 
 #include <string>
+#include <unordered_map>
 using namespace std;
 
 /*
@@ -153,6 +154,54 @@ public:
                     left++;
                 }
             }
+
+            // Increment
+            right++;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    A much much more concise way of writing the same thing as above.
+
+*/
+
+/* Time  Beats: 64.30% */
+/* Space Beats: 46.49% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Concise {
+public:
+    int numberOfSubstrings(string s, int k)
+    {
+        const int N = s.length();
+        int result = 0;
+
+        int left  = 0;
+        int right = 0;
+        unordered_map<char,int> counter;
+
+        while (right < N)
+        {
+            counter[s[right]]++;
+
+            while (counter[s[right]] == k)
+            {
+                counter[s[left]]--;
+                left++;
+            }
+
+            result += left;
 
             // Increment
             right++;
