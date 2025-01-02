@@ -60,6 +60,7 @@
 
 #include <iostream>
 #include <string>
+#include <unordered_set>
 #include <vector>
 using namespace std;
 
@@ -159,5 +160,62 @@ private:
         }
 
         return false;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, though this one is implemented using HashSet and is more
+    concise. It's not bad to see both Solutions if you chose C++ to solve these
+    problems.
+
+*/
+
+/* Time  Beats: 81.49% */
+/* Space Beats: 70.64% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(M)     */
+class Solution_Set {
+public:
+    vector<int> vowelStrings(vector<string>& words, vector<vector<int>>& queries)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        const int N = words.size();
+        const int M = queries.size();
+        vector<int> answer(M, 0);
+
+        unordered_set<char> vowels = {'a', 'e', 'i', 'o', 'u'};
+
+        vector<int> prefix(N, 0);
+        prefix[0] = vowels.count(words[0][0]) && vowels.count(words[0][words[0].length() - 1]);
+
+        for (int i = 1; i < N; i++)
+        {
+            prefix[i] = prefix[i-1];
+
+            int last_letter  = words[i].length() - 1;
+            if (vowels.count(words[i][0]) && vowels.count(words[i][last_letter]))
+            {
+                prefix[i]++;
+            }
+        }
+
+        for (int i = 0; i < M; i++)
+        {
+            const int& begin = queries[i][0];
+            const int& end   = queries[i][1];
+
+            answer[i] = prefix[end] - (begin-1 >= 0 ? prefix[begin-1] : 0);
+        }
+
+        return answer;
     }
 };
