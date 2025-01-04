@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <functional>
-
 /*
     ==============
     === MEDIUM ===
@@ -59,6 +55,11 @@
     1 <= zero, one <= low
 
 */
+
+#include <vector>
+#include <functional>
+using namespace std;
+
 
 /*
     ------------
@@ -141,5 +142,52 @@ public:
             result += dp[i];
 
         return result % mod;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is almost equivalent approach to how Coin-Change is done.
+    If you've done that one, then reading this code will be all you need to do.
+
+    If you haven't done "Coin Change" before, please go and do that one first.
+
+*/
+
+/* Time  Beats: 96.42% */
+/* Space Beats: 55.13% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Similar_to_Coin_Change_Approach {
+public:
+    long long countGoodStrings(int low, int high, int zero, int one)
+    {
+        const int MOD = 1e9 + 7;
+        long long result = 0;
+
+        vector<unsigned long long> dp(high + 1, 0);
+        dp[0] = 1;
+
+        for (int i = 1; i <= high; i++)
+        {
+            if (i - zero >= 0)
+                dp[i] += dp[i - zero] % MOD;
+
+            if (i - one >= 0)
+                dp[i] += dp[i - one] % MOD;
+
+            // Add
+            if (i >= low)
+                result += dp[i];
+        }
+
+        return result % MOD;
     }
 };
