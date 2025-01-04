@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_set>
-
 /*
     ==============
     === MEDIUM ===
@@ -68,164 +64,68 @@
 
 */
 
+#include <climits>
+#include <string>
+#include <vector>
+#include <unordered_set>
+using namespace std;
 
 /*
     ------------
     --- IDEA ---
     ------------
 
-    We are kind of "Sliding the Window". We can notice that we only need to
-    check if some <letter> exists both left and right from the current
-    character.
+    Remember the lefmost occurence of every character.
+    Iterate thorugh stinrg s from the back and do each letter only once.
 
-    First we push only the very first(index 0) element to the left "map" and
-    we push the rest to the right.
-
-    Then we start iterating from the 1st index since we can't form a 3-letter
-    palindrome when starting on the first and last index.
-
-    Therefore, we iterate from i = 1; i < n-1;
-
-    At the beginning of each iteration we have to remove the current element
-    from the right "map"(vector really since only lowercase English characters
-    are allowed).
-
-    So we remove the current one(which is the middle of the palindrome) and
-    we try to iterate through all 26 characters and check if there are some
-    characters that are both present in the left and in the right "map".
-
-    If that is the case, increment "unique" and insert that string into a Set
-    so that we don't have duplicates since that is also required.
-
-    After we finish checking all 26, now we have to push current element into
-    the left "map" since that will be used in our next iteration.
-
-    This repeats until we do all n characters in the string s and at the very
-    end we return "unique".
+    count number of unique letter between left_most occurence of current letter
+    and 'i'(which is the current inx of current letter)
 
 */
 
-/* Time  Complexity: O(26 * n) */
-/* Space Complexity: O(1) */
-class Solution_Passes_Tests_But_TLE_1 {
+/* Time  Beats: 77.00% */
+/* Space Beats: 56.14% */
+
+/* Time  Complexity: O(n^2)   */
+/* Space Complexity: O(n + u) */ // 'u' is the number of unique substrings
+class Solution {
 public:
-    int countPalindromicSubsequence(string s)
+    int countPalindromicSubsequence(std::string s)
     {
-        std::vector<int> left (26, 0);
-        std::vector<int> right(26, 0);
+        const int N = s.length();
+        int result = 0;
 
-        left[s[0] - 'a']++;
 
-        for (int i = 1; i < s.length(); i++)
-            right[s[i] - 'a']++;
-
-        std::unordered_set<std::string> uset;
-
-        int unique = 0;
-        for (int i = 1; i < s.length() - 1; i++)
+        vector<int> letter_left_idx(26, -1);
+        for (int i = 0; i < N; i++)
         {
-            right[s[i] - 'a']--;
-
-            for (int x = 0; x < 26; x++)
-            {
-                std::ostringstream out;
-                if (left[x] > 0 && right[x] > 0)
-                {
-                    char chr = 'a' + x;
-                    out << chr;
-                    out << s[i];
-                    out << chr;
-
-                    if (uset.find(out.str()) == uset.end()) // Doesn't exist
-                    {
-                        unique++;
-                        uset.insert(out.str());
-                    }
-                }
-            }
-
-            left[s[i] - 'a']++;
-
+            if (letter_left_idx[s[i] - 'a'] == -1)
+                letter_left_idx[s[i] - 'a'] = i; // leftmost idx of this letter
         }
 
-        return unique;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    This IDEA is almost equivalent to the one above, however we can notice that
-    we don't need to iterate through all of the 26 characters for each letter
-    in string s.
-
-    We only have to iterate through the set of characters on one side, let's
-    say it's the left side, and check if those characters are present on the
-    right side, or rather in the right Set.
-
-    However it's important to notice that we cannot only have Sets since it's
-    possible that we have two or more letters on one side, so when we are
-    removing the current letter from the "map" we must keep an additional
-    vector to check if by removing the current letter from the right portion,
-    the right portion becomes 0. Only if that's the case, we are allowed to
-    remove that letters from the right Set.
-
-    This is an optimization of the first one, but it still does give us a TLE.
-    Though it is noted that we passed all tests.
-
-*/
-
-/* Time  Complexity: O(26 * n) */ // But this one is better than the one above
-/* Space Complexity: O(1)      */
-class Solution_Passes_Tests_But_TLE_2 {
-public:
-    int countPalindromicSubsequence(string s)
-    {
-        std::vector<int> right(26, 0);
-        for (int i = 1; i < s.length(); i++)
-            right[s[i] - 'a']++;
-
-        std::unordered_set<char> left_uset;
-        std::unordered_set<char> right_uset;
-
-        left_uset.insert(s[0]);
-        for (int i = 1; i < s.length(); i++)
-            right_uset.insert(s[i]);
-
-        std::unordered_set<std::string> result_uset;
-        int unique = 0;
-        for (int mid = 1; mid < s.length() - 1; mid++)
+        vector<bool> done(26, false);
+        for (int i = N-1; i >= 2; i--)
         {
-            right[s[mid] - 'a']--;
-            if (right[s[mid] - 'a'] == 0)
-                right_uset.erase(s[mid]);
+            if (done[s[i] - 'a'])
+                continue;
+            else
+                done[s[i] - 'a'] = true;
+            
+            if (letter_left_idx[s[i] - 'a'] == i)
+                continue;
+            
+            int idx = letter_left_idx[s[i] - 'a'];
+            
+            unordered_set<char> uset_unique;
+            for (int x = idx + 1; x < i; x++)
+                uset_unique.insert(s[x]);
 
-            for (const char& l : left_uset)
-            {
-                if (right_uset.find(l) != right_uset.end())
-                {
-                    std::ostringstream out;
-
-                    out << l;
-                    out << s[mid];
-                    out << l;
-
-                    result_uset.insert(out.str());
-                }
-            }
-
-            left_uset.insert(s[mid]);
+            result += uset_unique.size();
         }
 
-        return result_uset.size();
+        return result;
     }
 };
-
 
 
 
@@ -280,7 +180,7 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_Efficient_1 {
+class Solution_2 {
 public:
     int countPalindromicSubsequence(std::string s)
     {
@@ -331,7 +231,7 @@ public:
 /* Time  Complexity: O(n) */
 
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_3 {
 public:
     int countPalindromicSubsequence(std::string s)
     {
@@ -353,11 +253,11 @@ public:
             if(left == INT_MAX)
                 continue;
 
-            std::unordered_set<char> result_uset;
+            std::unordered_set<char> uset_unique_letters_between;
             for(int i = left+1; i < right; i++)
-                result_uset.insert(s[i]);
+                uset_unique_letters_between.insert(s[i]);
 
-            unique += result_uset.size();
+            unique += uset_unique_letters_between.size();
         }
 
         return unique;
