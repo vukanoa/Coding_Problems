@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -138,6 +135,11 @@
 
 */
 
+#include <iostream>
+#include <vector>
+using namespace std;
+
+
 /* Time  Beats: 41.01% */
 /* Space Beats: 88.42% */
 
@@ -152,7 +154,7 @@ public:
         if (n == 1)
             return 1;
 
-        std::vector<std::pair<int, int>> dp(n, std::pair<int, int>());
+        vector<pair<int, int>> dp(n, pair<int, int>());
         dp[n-1].first  = 1;
         dp[n-1].second = 1;
 
@@ -166,7 +168,7 @@ public:
             {
                 if (nums[i] < nums[j])
                 {
-                    longest_increasing = std::max(longest_increasing, dp[j].first);
+                    longest_increasing = max(longest_increasing, dp[j].first);
                     flag = true;
                 }
             }
@@ -182,7 +184,7 @@ public:
             dp[i].first  += flag ? 1 : 0;
             dp[i].second = flag ? count : 1;
 
-            max_longest_increasing = std::max(max_longest_increasing, dp[i].first);
+            max_longest_increasing = max(max_longest_increasing, dp[i].first);
         }
 
         int result = 0;
@@ -223,7 +225,7 @@ public:
 
         const int n = nums.size();
 
-        std::vector<std::pair<int, int>> dp(n, std::pair<int, int>());
+        vector<pair<int, int>> dp(n, pair<int, int>());
 
         int result = 0;
         int max_longest_increasing = 0;
@@ -261,5 +263,54 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+/* Time  Beats: 94.65% */
+/* Space Beats:  5.64% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(n)   */
+class Solution_Concise {
+public:
+    int findNumberOfLIS(vector<int>& nums)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        
+        const int n = nums.size();
+        int result = 1; // 1 of length 1 is guaranteed
+
+        vector<pair<int,int>> dp(n, {1,1});
+        vector<int> answer(n+1, 0);
+        answer[1] = 1;
+
+        for (int i = n-2; i >= 0; i--)
+        {
+            for (int j = i+1; j < n; j++)
+            {
+                if (nums[i] < nums[j])
+                {
+                    if (dp[i].first < 1 + dp[j].first)
+                    {
+                        dp[i].first  = 1 + dp[j].first;
+                        dp[i].second = dp[j].second;
+                    }
+                    else if (dp[i].first == 1 + dp[j].first)
+                    {
+                        dp[i].second += dp[j].second;
+                    }
+                }
+            }
+
+            answer[dp[i].first] += dp[i].second;
+
+            // Potentially update result
+            if (result < dp[i].first)
+                result = dp[i].first;
+        }
+
+        return answer[result];
     }
 };
