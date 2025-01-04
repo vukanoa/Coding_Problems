@@ -1,8 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-#include <algorithm>
-
 /*
     ==============
     === MEDIUM ===
@@ -73,6 +68,13 @@
     1 <= costs[i] <= 1000
 
 */
+
+#include <climits>
+#include <vector>
+#include <unordered_map>
+#include <algorithm>
+using namespace std;
+
 
 /*
     ------------
@@ -265,5 +267,59 @@ public:
         }
 
         return dp[n-1];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, but this one looks and feels much more similar to: "Coin
+    Change" problem, and thus is much more readable and easier to grasp.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  45.35% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Bottom_Up_Like_Coin_Change {
+public:
+    int mincostTickets(std::vector<int>& days, std::vector<int>& costs)
+    {
+        vector<pair<int,int>> price_periods = {
+            {costs[0],  1},
+            {costs[1],  7},
+            {costs[2], 30}
+        };
+
+        vector<int> dp(days.back() + 1, INT_MAX);
+        dp[0] = 0;
+
+        int idx_unprocessed_day = 0;
+        for (int i = 1; i <= days.back(); i++)
+        {
+            if (days[idx_unprocessed_day] == i)
+            {
+                for (const auto& [price, period] : price_periods)
+                {
+                    int prev_day = std::max(0, i - period);
+                    dp[i] = std::min(dp[i], price + dp[prev_day]);
+                }
+
+                idx_unprocessed_day++;
+            }
+            else
+            {
+                dp[i] = dp[i-1];
+            }
+        }
+
+        return dp[days.back()];
     }
 };
