@@ -184,3 +184,92 @@ public:
         return false;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a much cleaner way of writing the above idea. Similar, but not
+    exactly the same.
+
+    You need to know how "find" and "substr" functions work. After that, there
+    is only one little thing you should notice in order to solve the problem
+    this way.
+
+    The only thing that you should notice is that if you find a prefix part of
+    string p(the part before the '*') in string s, but you fail to match the
+    suffing part(the part after the '*'), then you should stop immediately.
+
+    You don't need to keep searching anymore. If you haven't managed to do it
+    starting from the "lefter" index, that you certainly won't do it starting
+    from some index that is more to the right.
+
+    Consider this:
+
+             0 1 2 3 4 5 6 7          0 1 2 3
+        s = "l e e t c o d e" ,  p = "e e * g"
+               ^ ^
+           ____| |______
+           |           |
+         beginning    end
+           of         of
+         prefix       prefix
+
+
+    We've found prefix "ee" in string s. Now we begin to search for suffix "g"
+    starting from index 3(character 't') in stirng s.
+
+    Since we're unable to find it from here:
+
+                  here
+                   |
+                   v
+             0 1 2 3 4 5 6 7          0 1 2 3
+        s = "l e e t c o d e" ,  p = "e e * g"
+
+
+    What makes you think we will be able to match the suffix part if we start
+    from any index AFTER i=3?
+
+                    here
+                     |
+                     v
+             0 1 2 3 4 5 6 7          0 1 2 3
+        s = "l e e t c o d e" ,  p = "e e * g"
+
+
+    It doesn't make sense, that's why we only need to check it once. To do that
+    we'll use functions "substr" and "find" and make our life much easier.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats: 100.00% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(M) */
+class Solution_Concise {
+public:
+    bool hasMatch(string s, string p)
+    {
+        int i = p.find('*'); // Find the split point *
+
+        string prefix_str = p.substr(0, i); // From 0, exactly i characters
+        string suffix_str = p.substr(i+1);  // From i+1 until the end of string
+
+        int p_idx = s.find(prefix_str); // Find the first index of prefix in s
+        if (p_idx == string::npos) // If p_idx == -1 (not found, i.e. "npos")
+            return false;
+
+        // Find the first index of suffix in s after the prefix end in s
+        int s_idx = s.find(suffix_str, p_idx + prefix_str.size());
+        if (s_idx == string::npos)
+            return false; // If there is no suffix string after the prefix string return false
+
+        return true; // Both are present prefix and suffix so return true
+    }
+};
