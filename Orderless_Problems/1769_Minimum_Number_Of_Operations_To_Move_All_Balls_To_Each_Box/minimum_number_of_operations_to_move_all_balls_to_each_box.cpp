@@ -218,3 +218,53 @@ public:
         return answer;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one does all of the above, but in a single pass and without additional
+    space. It utilizes only 4 variables.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  76.52% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_3 {
+public:
+    vector<int> minOperations(string boxes)
+    {
+        const int N = boxes.size();
+        vector<int> answer(N, 0);
+
+        int balls_to_the_left = 0;
+        int moves_from_the_left = 0;
+
+        int balls_to_the_right = 0;
+        int moves_from_the_right = 0;
+
+        // Single pass: calculate moves from both left and right
+        for (int i = 0; i < N; i++)
+        {
+            // Left pass
+            answer[i] += moves_from_the_left;
+            balls_to_the_left += boxes[i] == '1' ? 1 : 0;
+            moves_from_the_left += balls_to_the_left;
+
+            // Right pass
+            int j = N-1 - i;
+            answer[j] += moves_from_the_right;
+            balls_to_the_right += boxes[j] == '1' ? 1 : 0;
+            moves_from_the_right += balls_to_the_right;
+        }
+
+        return answer;
+    }
+};
