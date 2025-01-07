@@ -51,8 +51,8 @@
 
 */
 
+#include <algorithm>
 #include <string>
-#include <unordered_set>
 #include <vector>
 using namespace std;
 
@@ -88,17 +88,17 @@ using namespace std;
 
 */
 
-/* Time  Beats: 21.77% */
-/* Space Beats: 17.90% */
+/* Time  Beats: 53.69% */
+/* Space Beats: 22.69% */
 
-/* Time  Complexity: O(n^2 * L) */ // 'L' is the average length of word
-/* Space Complexity: O(n * L)   */
+/* Time  Complexity: O(N^2 * L) */ // 'L' is the average length of word
+/* Space Complexity: O(N   * L) */
 class Solution {
 public:
     vector<string> stringMatching(vector<string>& words)
     {
         const int N = words.size();
-        unordered_set<string> uset_result;
+        vector<string> result;
 
         for (const string potential_substr : words)
         {
@@ -108,11 +108,110 @@ public:
                     continue;
 
                 if (word.find(potential_substr) != string::npos)
-                    uset_result.insert(potential_substr);
+                {
+                    result.push_back(potential_substr);
+                    break;
+                }
             }
         }
 
-        vector<string> result(uset_result.begin(), uset_result.end());
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 12.73% */
+/* Space Beats:  7.56% */
+
+/* Time  Complexity: O(N^2 * L) */
+/* Space Complexity: O(N   * L) */
+class Solution_KMP {
+public:
+    vector<string> stringMatching(vector<string>& words)
+    {
+        vector<string> result;
+        sort(words.begin(), words.end(), [](const string& a, const string& b) -> bool{
+            return a.length() < b.length();
+        });
+
+        for (int i = 0; i < words.size(); i++)
+        {
+            for (int j = i+1; j < words.size(); j++)
+            {
+                if (is_pattern_in_text(words[j], words[i]))
+                {
+                    result.push_back(words[i]);
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+private:
+    vector<int> compute_LPS(const string& potential_substr)
+    {
+        const int N = potential_substr.length();
+        vector<int> LPS(N, 0);
+        int len = 0;
+
+        for(int i = 1; i < N; ++i)
+        {
+            while (len > 0 && potential_substr[i] != potential_substr[len])
+                len = LPS[len - 1];
+
+            if (potential_substr[i] == potential_substr[len])
+            {
+                len++;
+                LPS[i] = len;
+            }
+        }
+
+        return LPS;
+    }
+
+    bool is_pattern_in_text(const string& word, const string& potential_substr)
+    {
+        if (potential_substr.empty())
+            return true;
+
+        if (word.length() < potential_substr.length())
+            return false;
+
+        vector<int> LPS = compute_LPS(potential_substr);
+        int i = 0;
+        int j = 0;
+
+        while (i < word.length())
+        {
+            if (word[i] == potential_substr[j])
+            {
+                i++;
+                j++;
+
+                if (j == potential_substr.length())
+                    return true;
+            }
+            else
+            {
+                if (j != 0)
+                    j = LPS[j - 1];
+                else
+                    i++;
+            }
+        }
+
+        return false;
     }
 };
