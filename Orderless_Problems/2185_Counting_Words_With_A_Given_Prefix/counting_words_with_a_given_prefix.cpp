@@ -64,14 +64,20 @@ using namespace std;
     if our "find" funciton returns anything other than 0, we know we did NOT
     find our prefix.
 
+    We could, also, use functions:
+        1) std::string::substr(pos, how_many), and
+        2) std::mismatch(substr, pref)
+
+    To determine if there if a pref prefix in current word.
+
 */
 
 /* Time  Beats: 100.00% */
 /* Space Beats:  85.23% */
 
-/* Time  Complexity: O(n^2) */
-/* Space Complexity: O(1)   */
-class Solution {
+/* Time  Complexity: O(n * m) */
+/* Space Complexity: O(1)     */
+class Solution_Efficient {
 public:
     int prefixCount(vector<string>& words, string pref)
     {
@@ -86,4 +92,85 @@ public:
 
         return result;
     }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one uses a Trie just to show how Tries work and that you can do it
+    this way as well. However, it is more efficient to use the Solution above.
+
+*/
+
+/* Time  Beats: 5.04% */
+/* Space Beats: 5.04% */
+
+/* Time  Complexity: O(n * l + m) */ // Where 'l' is maximum length of a word
+/* Space Complexity: O(n * l)     */
+class Solution_Trie {
+public:
+    int prefixCount(vector<string>& words, string pref)
+    {
+        Trie trie;
+
+        // Add all words to the Trie
+        for (string& word : words)
+            trie.add_word(word);
+
+        return trie.count_prefix(pref);
+    }
+
+private:
+    class Trie {
+        // Node class represents each character in Trie
+        struct Node {
+            vector<Node*> links; // Links to child nodes
+            int count; // Number of strings having prefix till this node
+
+            Node() : links(26, nullptr), count(0) {}
+        };
+
+        Node* root;
+
+    public:
+        Trie() {
+            root = new Node();
+        }
+
+        // Add word to trie and update prefix counts
+        void add_word(string& word)
+        {
+            Node* curr = root;
+
+            for (const char chr : word)
+            {
+                if (curr->links[chr - 'a'] == nullptr)
+                    curr->links[chr - 'a'] = new Node();
+
+                curr = curr->links[chr - 'a'];
+                curr->count++; // Increment count for this prefix
+            }
+        }
+
+        // Return count of strings having pref as prefix
+        int count_prefix(string& pref)
+        {
+            Node* curr = root;
+
+            for (const char chr : pref)
+            {
+                if (curr->links[chr - 'a'] == nullptr)
+                    return 0; // Prefix not found
+
+                curr = curr->links[chr - 'a'];
+            }
+
+            return curr->count; // Return count at last node
+        }
+    };
 };
