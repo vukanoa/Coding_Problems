@@ -46,6 +46,7 @@
 
 */
 
+#include <iostream>
 #include <string>
 #include <vector>
 using namespace std;
@@ -198,8 +199,8 @@ using namespace std;
                |        |
                |________|
                    |
-            Only THESE two are ODD. All of the other could be treater as EVEN.
-        
+            Only THESE two are ODD. All of the other could be treated as EVEN.
+
         So, we must know if the number of these ODD characters (one per
         characters that occurr ODD number of times) is GREATER than k.
 
@@ -213,11 +214,12 @@ using namespace std;
 
 
 
-    
-    Once you understand the above explanation, you'll realize tha tis the only
-    way that prevents us to create exactly 'k' palindrome, i.e. having more
-    characters that occur ODD number of times(not the ACTUAL occurrences), but
-    number of ODD occurring characters, is greater than 'k'.
+    Once you understand the above explanation, you'll realize that this is the
+    only  way that prevents us to create exactly 'k' palindromes, i.e. having
+    more than 'k' characters that occur ODD number of times(not the ACTUAL
+    occurrences).
+
+    We do NOT care about the number of EVEN occurring characters.
 
 */
 
@@ -232,11 +234,8 @@ public:
     {
         const int N = s.length();
 
-        if (N < k)
-            return false;
-
-        if (N == k)
-            return true;
+        if (N < k)  return false;
+        if (N == k) return true;
 
         vector<int> counter(26, 0);
         for (const char& chr : s)
@@ -251,8 +250,6 @@ public:
             {
                 if (counter[i] & 1) // Odd
                     odd++;
-                else
-                    even++;
             }
         }
 
@@ -260,5 +257,147 @@ public:
             return false;
 
         return true;
+    }
+};
+
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, however this one is implemented using Bit-Manipulation.
+
+    These two lines are the crux of this Implementation:
+
+        for (const char& chr : s)
+            odd_counter ^= 1 << (chr - 'a');
+
+    Since an integer is 32-bits or 4B, on 64-bit architectures, we can use
+    those as a "counter" of 26.
+
+    However, since we don't care about the ACTUAL number of occurrences of each
+    letter, but ONLY about the number of letters that occurr ODD number of
+    times, we can use XOR operation to flip the bit at each "index". At the
+    end, we can use this GCC built-in function:
+
+        __builtin_popcount(odd_counter)
+
+    To obtain the number of set-bits, i.e. 1s, in this integer odd_counter.
+
+
+    Let's simulate:
+
+        int odd_counter = 0;
+
+        0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+       31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
+                          z  y  x  w  v  u  t  s  r  q  p  o  n  m  l  k  j  i  h  g  f  e  d  c  b  a
+
+    Now let's explain these two crucial lines:
+
+        for (const char& chr : s)
+            odd_counter ^= 1 << (chr - 'a');
+
+    We are iterating through each character in string s.
+
+    While we're doing that we're going to flip the corresponding bit in our
+    variable odd_counter.
+
+    How does that work?
+
+        chr is the ASCII value of some lowercase english alphabet character.
+
+        chr is [97, 122], inclusivelly.
+
+        chr - 'a' will give us an integer from [0, 25], also inclusivelly,
+        where each number reprenents one character from the alphabet.
+
+        0  represents 'a'
+        1  represents 'b'
+        2  represents 'c'
+        ...
+        25 represents 'z'
+
+
+        Now this part:    1 << (chr - 'a')
+
+        means that the set-bit will be shifted to the LEFT the exact number of
+        times that the current character represents.
+
+        if it's a character 'c', it will be:
+
+            1 << (99 - 'a')
+
+            1 << (99 - 97)
+
+            1 << (2)
+
+            000..00001 << 2
+
+            000..00100
+                   ^
+                   |____________
+                               |
+                               |
+                               |
+            0  0  0  ..  0  0  1  0  0
+            31 30 29 ..  4  3  2  1  0
+                         e  d  c  b  a
+
+
+    This means that character 'c' occurrs ODD number of times. However, if we
+    were to stumble upon anoher 'c', we would flip this bit at index 2 again
+    and it would be turned to 0, which would mean:"Character 'c' occurrs EVEN
+    number of times".
+
+
+    Since we ONLY care about the number of characters that occurr ODD number of
+    times, we ONLY care about the set-bits after we've iterated through entire
+    string s.
+
+    That's where out __builtin_popcount() functions comes in. It's is a GCC
+    built-in function that returns the total number of set-bits in any given
+    number.
+
+    For example:
+
+        __builtin_popcount(5) would return 2.
+
+        Why?
+        Let's represents 5 in binary: 0000.000101
+
+        As we can see it only have two 1s, i.e. two set-bits. That's why it is
+        returning 2.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  51.75% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_BitManipulation{
+public:
+    bool canConstruct(string s, int k)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        const int N = s.length();
+
+        if (N < k)  return false;
+        if (N == k) return true;
+
+        int odd_counter  = 0;
+
+        for (const char& chr : s)
+            odd_counter ^= 1 << (chr - 'a');
+
+        int odd = __builtin_popcount(odd_counter); // How many occurr ODD times
+
+        return odd <= k;
     }
 };
