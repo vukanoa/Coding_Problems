@@ -92,7 +92,7 @@ public:
     bool canBeValid(string s, string lockedStatus)
     {
         ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-        
+
         int N = s.size();
 
         if (N % 2 == 1)
@@ -161,7 +161,7 @@ public:
     bool canBeValid(string s, string locked)
     {
         ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-        
+
         const int N = s.length();
 
         if (N & 1)
@@ -223,6 +223,77 @@ public:
                 if (closed + backward[i] < static_cast<int>(ceil(1.0 * (N-i) / 2)))
                     return false;
             }
+        }
+
+        return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    (This is just Space Optimization of the above Solution)`
+
+*/
+
+/* Time  Beats: 90.61% */
+/* Space Beats: 34.26% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Efficient {
+public:
+    bool canBeValid(string s, string locked)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        int N = s.length();
+
+        if (N % 2 != 0)
+            return false; // Odd length cannot form valid parentheses
+
+        if (s[0]   == ')' && locked[0]   == '1') return false;
+        if (s[N-1] == '(' && locked[N-1] == '1') return false;
+
+
+        // Left-to-right pass: Ensure there are enough open brackets
+        int open_or_unlocked = 0;
+        for (int i = 0; i < N; i++)
+        {
+            if (s[i] == '(' || locked[i] == '0')
+            {
+                open_or_unlocked++;
+            }
+            else // s[i] == ')' and locked[i] == '1'
+            {
+                open_or_unlocked--;
+            }
+
+            if (open_or_unlocked < 0)
+                return false; // Too many locked ')' encountered
+        }
+
+        // Right-to-left pass: Ensure there are enough closing brackets
+        int closed_or_unlocked = 0;
+        for (int i = N - 1; i >= 0; i--)
+        {
+            if (s[i] == ')' || locked[i] == '0')
+            {
+                closed_or_unlocked++;
+            }
+            else // s[i] == '(' and locked[i] == '1'
+            {
+                closed_or_unlocked--;
+            }
+
+            if (closed_or_unlocked < 0)
+                return false; // Too many locked '(' encountered
         }
 
         return true;
