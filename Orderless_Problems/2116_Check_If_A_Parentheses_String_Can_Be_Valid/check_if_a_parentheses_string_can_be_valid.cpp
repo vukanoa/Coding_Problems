@@ -66,9 +66,11 @@
 
 */
 
+#include <cmath>
 #include <iostream>
 #include <stack>
 #include <string>
+#include <vector>
 using namespace std;
 
 /*
@@ -134,5 +136,95 @@ public:
             return unlocked_indices.size() % 2 == 0;
 
         return open_indices.empty();
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 51.52% */
+/* Space Beats:  8.88% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    bool canBeValid(string s, string locked)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        
+        const int N = s.length();
+
+        if (N & 1)
+            return false;
+
+        if (s[0] == ')' && locked[0] == '1')
+            return false;
+
+        if (s[N-1] == '(' && locked[N-1] == '1')
+            return false;
+
+
+
+        // Forward
+        vector<int> forward (N, 0);
+        int open = 0;;
+
+        if (s[0] == '(')
+            open++;
+        else if (locked[0] == '0')
+            forward[0]++;
+
+        for (int i = 1; i < N; i++)
+        {
+            forward[i] = forward[i-1];
+
+            if (s[i] == '(')
+                open++;
+            else if (locked[i] == '0')
+                forward[i]++;
+
+            if (locked[i] == '1' && s[i] == ')')
+            {
+                if (open + forward[i] < static_cast<int>(ceil(1.0 * (i+1) / 2)))
+                    return false;
+            }
+        }
+
+        // Backward
+        vector<int> backward(N, 0);
+        int closed = 0;
+
+        if (s[N-1] == ')')
+            closed++;
+        else if (locked[N-1] == '0')
+            backward[N-1]++;
+
+        for (int i = N-2; i >= 0; i--)
+        {
+            backward[i] = backward[i+1];
+
+            if (s[i] == ')')
+                closed++;
+            else if (locked[i] == '0')
+                backward[i]++;
+
+            if (locked[i] == '1' && s[i] == '(')
+            {
+                if (closed + backward[i] < static_cast<int>(ceil(1.0 * (N-i) / 2)))
+                    return false;
+            }
+        }
+
+        return true;
     }
 };
