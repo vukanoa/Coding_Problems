@@ -48,10 +48,9 @@
 
 */
 
-#include <bitset>
-#include <string>
 #include <string>
 #include <bitset>
+#include <sstream>
 using namespace std;
 
 /*
@@ -190,5 +189,57 @@ private:
 
         // Otherwise, return the substring starting from the first '1'.
         return s.substr(idx_of_most_significant_set_bit);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is yet another Implementation. It uses stringstream and GCC's feature
+    __builtin_clz function.
+
+    Also integer to binary_string is implemented slightly different. It is very
+    handy to be familiar with all these ways to of string manipulation. They
+    are all very important.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  85.11% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_3 {
+public:
+    string convertDateToBinary(string& date)
+    {
+        stringstream ss(date);
+
+        int year;
+        int month;
+        int day;
+
+        char dash_eater;
+        ss >> year >> dash_eater >> month >> dash_eater >> day;
+
+        return to_binary(year) + "-" + to_binary(month) + "-" + to_binary(day);
+    }
+
+private:
+    string to_binary(int x)
+    {
+        int bit = 31 - __builtin_clz(x);
+
+        string result = "1";
+
+        for (int i = bit-1; i >= 0; i--)
+            result += (x & (1 << i)) ? '1' : '0';
+
+        return result;
     }
 };
