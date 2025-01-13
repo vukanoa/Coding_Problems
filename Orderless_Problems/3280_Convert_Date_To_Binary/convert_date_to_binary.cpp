@@ -48,7 +48,10 @@
 
 */
 
+#include <bitset>
 #include <string>
+#include <string>
+#include <bitset>
 using namespace std;
 
 /*
@@ -56,7 +59,8 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    TODO
+    Just a standard string to int, and vice-versa, manipulation.
+    And an integer to binary_string conversion.
 
 */
 
@@ -84,6 +88,7 @@ public:
         string month_bin_str;
         string day_bin_str;
 
+        // Convert int to binary_string
         for (int i = 31; i >= 0; i--)
         {
             // Year
@@ -133,5 +138,57 @@ public:
 
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of implementing it. This one uses bitsets and a few other C++
+    features such as s.find('1').
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  80.97% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    string convertDateToBinary(string date)
+    {
+        size_t first_dash = date.find('-');
+        size_t second_dash = date.find('-', first_dash + 1);
+
+        int year = stoi(date.substr(0, first_dash));
+        int month = stoi(date.substr(first_dash + 1, second_dash - first_dash - 1));
+        int day = stoi(date.substr(second_dash + 1));
+
+        string result = get_binary_string(bitset<32>(year));
+        result += "-" + get_binary_string(bitset<32>(month));
+        result += "-" + get_binary_string(bitset<32>(day));
+
+        return result;
+    }
+
+private:
+    // Function to convert a bitset to a binary string and remove leading zeros
+    string get_binary_string(const bitset<32>& bits)
+    {
+        string s = bits.to_string();
+        size_t idx_of_most_significant_set_bit = s.find('1');
+
+        // If no '1' is found, the value is 0, so return "0".
+        if (idx_of_most_significant_set_bit == string::npos)
+            return "0";
+
+        // Otherwise, return the substring starting from the first '1'.
+        return s.substr(idx_of_most_significant_set_bit);
     }
 };
