@@ -217,3 +217,84 @@ public:
         return C;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is another way of implementing the above Efficient, Linear, Solution.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  76.89% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Efficient_2 {
+public:
+    vector<int> findThePrefixCommonArray(vector<int>& A, vector<int>& B)
+    {
+        const int N = A.size();
+        vector<int> C(N);
+
+        vector<int> frequency(N + 1, 0);
+
+        int count = 0;
+        for (int i = 0; i < N; ++i)
+        {
+            if (++frequency[A[i]] == 2)
+                count++;
+
+            if (++frequency[B[i]] == 2)
+                count++;
+
+            C[i] = count;
+        }
+
+        return C;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is another way of implementing the Efficient Solution. Choose to your
+    liking, but it's always useful to see different possible ways of thinking
+    and approaching the implementation.
+
+*/
+
+/* Time  Beats: 75.81% */
+/* Space Beats: 41.68% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Efficient_3 {
+public:
+    vector<int> findThePrefixCommonArray(vector<int>& A, vector<int>& B)
+    {
+        const int N = A.size();
+        vector<int> C;
+
+        unordered_set<int> uset;
+        for (int i = 0; i < A.size(); i++)
+        {
+            uset.insert(A[i]);
+            uset.insert(B[i]);
+
+            C.push_back(2 * (i + 1) - uset.size());
+        }
+
+        return C;
+    }
+};
