@@ -161,3 +161,59 @@ public:
         return C;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We don't actually need a HashSet and then iterate through the elements of
+    it and check if it's present in the other HashSet, we can simply increment
+    the count of each number, since there are a total of 2 occurrences of each
+    number between two vectors.
+
+    Therefore, once we find out that the counter of some number is 2, it
+    indicates that the number with that count has appeared at thix index or
+    before in BOTH vectors, therefore we can increment C[i] and include that
+    number as well.
+
+    If it's NOT 2, then we "add 0", i.e. do nothing.
+
+*/
+
+/* Time  Beats: 69.55% */
+/* Space Beats: 69.76% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Efficient {
+public:
+    vector<int> findThePrefixCommonArray(vector<int>& A, vector<int>& B)
+    {
+        const int N = A.size();
+        vector<int> C(N, 0);
+
+        vector<int> counter(N+1, 0);
+        for (int i = 0; i < N; i++)
+        {
+            counter[A[i]]++;
+            counter[B[i]]++;
+
+            if (i > 0)
+                C[i] = C[i-1];
+
+            if (A[i] == B[i])
+                C[i] += 1;
+            else
+            {
+                C[i] += counter[A[i]] == 2 ? 1 : 0;
+                C[i] += counter[B[i]] == 2 ? 1 : 0;
+            }
+        }
+
+        return C;
+    }
+};
