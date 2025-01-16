@@ -251,28 +251,27 @@ private:
 /* Space Complexity: O(ROWS * COLS) */
 class Solution_LCS{
 public:
-    int maxUncrossedLines(std::vector<int>& nums1, std::vector<int>& nums2)
+    int maxUncrossedLines(vector<int>& nums1, vector<int>& nums2)
     {
-        int ROWS = nums1.size();
-        int COLS = nums2.size();
+        const int ROWS = nums1.size();
+        const int COLS = nums2.size();
 
-        std::vector<std::vector<int>> dp(ROWS+1, std::vector<int>(COLS+1, 0));
+        vector<vector<int>> dp(ROWS+1, vector<int>(COLS+1, 0));
 
-        for (int i = ROWS-1; i >= 0; i--)
+        for (int row = ROWS-1; row >= 0; row--)
         {
-            for (int j = COLS-1; j >= 0; j--)
+            for (int col = COLS-1; col >= 0; col--)
             {
-                if (nums1[i] == nums2[j])
-                    dp[i][j] = 1 + dp[i+1][j+1];
-
-                dp[i][j] = std::max({dp[i][j], dp[i+1][j], dp[i][j+1]});
+                if (nums1[row] == nums2[col])
+                    dp[row][col] = 1 + dp[row + 1][col + 1];
+                else
+                    dp[row][col] = max(dp[row + 1][col], dp[row][col + 1]);
             }
         }
 
         return dp[0][0];
     }
 };
-
 
 
 

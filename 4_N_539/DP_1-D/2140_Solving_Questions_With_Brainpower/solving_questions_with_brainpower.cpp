@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -69,6 +66,10 @@
     1 <= points_i, brainpower_i <= 10^5
 
 */
+
+#include <vector>
+using namespace std;
+
 
 /*
     ------------
@@ -215,17 +216,15 @@ class Solution {
 public:
     long long mostPoints(std::vector<std::vector<int>>& questions)
     {
-        int n = questions.size();
+        const int n = questions.size();
 
-        std::vector<long long> dp(n, 0);
-        dp[n-1] = questions[n-1][0]; // Points
-
-        long long result = dp[n-1];
+        vector<long long> dp(n, 0);
+        dp[n-1] = questions[n-1][0];
 
         for (int i = n-2; i >= 0; i--)
         {
-            int points     = questions[i][0];
-            int brainpower = questions[i][1];
+            long long  points     = questions[i][0];
+            long long  brainpower = questions[i][1];
 
             /*
                 (i + 1 + brainpower) is the closest question to the right that
@@ -234,14 +233,12 @@ public:
                 Therefore (i + 1 + brainpower < n) means - "Is it possible to
                 solve at least one more question if we solve this one?"
             */
-            if ((i + 1 + brainpower) < n)
-                dp[i] = std::max<long long>(points + dp[i + 1 + brainpower], dp[i + 1]);
+            if (i + brainpower + 1 < n)
+                dp[i] = max(points + dp[i + brainpower + 1], dp[i+1]);
             else
-                dp[i] = std::max<long long>(points, dp[i + 1]);
-
-            result = std::max<long long>(result, dp[i]);
+                dp[i] = max(points, dp[i+1]);
         }
 
-        return result;
+        return dp[0];
     }
 };
