@@ -64,6 +64,7 @@
 
 */
 
+#include <numeric>
 #include <vector>
 using namespace std;
 
@@ -250,6 +251,9 @@ private:
 
 */
 
+/* Time  Beats: 10.28% */
+/* Space Beats:  5.61% */
+
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
 class Solution_2 {
@@ -262,15 +266,132 @@ public:
         for (int i = 0; i < N; i++)
             original.push_back((derived[i] ^ original[i]));
 
-        bool check_for_zero = (original[0] == original[N-1]);
+        bool check_for_zero = (original[0] == original[N]);
 
         original = {1};
 
         for (int i = 0; i < derived.size(); i++)
             original.push_back((derived[i] ^ original[i]));
 
-        bool check_for_one = (original[0] == original[N-1]);
+        bool check_for_one = (original[0] == original[N]);
 
         return check_for_zero | check_for_one;
+    }
+};
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+
+    Observe the following equations that represent the relationship between the
+    elements of the derived and original arrays:
+
+        derived[0] = original[0] XOR original[1]
+        derived[1] = original[1] XOR original[2]
+        derived[2] = original[2] XOR original[3]
+        derived[3] = original[3] XOR original[4]
+
+        ...
+
+        derived[n-1] = original[n-1] XOR original[0]
+
+
+    Each element in original appears exactly twice in the equations: once as
+    original[i] and once as original[i+1]. For example:
+
+        original[0] first appears in derived[0]   (original[0]   XOR original[1])
+        original[0] also  appears in derived[n-1] (original[n-1] XOR original[0])
+
+    Since XOR is both commutative and associative, the order doesn’t matter.
+    When all occurrences of original[i] are XORed together, they cancel each
+    other out:
+        original[0] XOR original[0] XOR original[1] XOR original[1] ... = 0
+
+    If the derived array is valid (i.e., it was generated from some original),
+    then the XOR of all elements in derived must be 0. This is because all
+    elements of original cancel out when XOR-ed.
+
+    Initialize a variable XOR to 0. This will store the cumulative XOR of
+    elements in the derived array.
+
+        Iterate through each element in the derived array:
+
+            For each element, compute the XOR with the current value of XOR and
+            update XOR.
+
+    After the loop, check the value of XOR:
+
+        If XOR == 0, return true (indicating the array is valid).
+
+    Otherwise, return false.
+
+*/
+
+/* Time  Beats: 31.78% */
+/* Space Beats: 23.83% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Cumulative_XOR {
+public:
+    bool doesValidArrayExist(vector<int>& derived)
+    {
+        int result = 0;
+
+        for (const int& element : derived)
+            result = result ^ element;
+
+        return result == 0;
+    }
+};
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+
+    Similar to the previous approach, we can rely on the properties of XOR.
+    However, this time, we focus on the parity (even or odd nature) of the
+    numbers involved.
+
+    The XOR of two binary numbers produces a result based on their bits.
+    Specifically:
+
+        0 XOR 0 = 0
+        1 XOR 1 = 0
+        0 XOR 1 = 1
+        1 XOR 0 = 1
+
+    Notice that when two identical numbers are XOR-ed, the result is 0.
+
+    For an XOR operation to result in a balanced and valid sequence, the total
+    number of 1s in the derived array (which represents mismatched bits) must
+    be even. This is because each 1 in derived corresponds to a mismatch
+    between adjacent elements in the original array, and mismatches can only be
+    resolved in pairs.
+
+    The sum of the elements in derived gives the total count of 1s in the array
+
+    If the sum is even, it means that the mismatches can be paired and
+    resolved, allowing us to construct a valid original array. If the sum is
+    odd, it’s impossible to resolve the mismatches, and no valid original array
+    can exist.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  90.19% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Sum_Parity {
+public:
+    bool doesValidArrayExist(vector<int>& derived)
+    {
+        int sum = accumulate(derived.begin(), derived.end(), 0);
+        return sum % 2 == 0;
     }
 };
