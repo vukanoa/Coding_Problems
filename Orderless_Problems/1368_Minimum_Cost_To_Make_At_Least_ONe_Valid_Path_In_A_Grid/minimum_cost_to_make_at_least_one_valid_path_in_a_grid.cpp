@@ -69,6 +69,7 @@
 */
 
 #include <climits>
+#include <queue>
 #include <vector>
 using namespace std;
 
@@ -150,5 +151,78 @@ public:
         }
 
         return dp[ROWS-1][COLS-1];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 24.33% */
+/* Space Beats: 23.91% */
+
+/* Time  Complexity: O(ROWS * COLS * log(ROWS * COLS)) */
+/* Space Complexity: O(ROWS * COLS)                    */
+class Solution_Dijkstra {
+public:
+    // Direction vectors: right, left, down, up (matching grid values 1, 2, 3, 4)
+    vector<vector<int>> directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+    int minCost(vector<vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        // Min-heap ordered by cost. Each element is {cost, row, col}
+        priority_queue<vector<int>, vector<vector<int>>, greater<>> min_heap;
+        min_heap.push({0, 0, 0});
+
+        // Track minimum cost to reach each cell
+        vector<vector<int>> min_cost(ROWS, vector<int>(COLS, INT_MAX));
+        min_cost[0][0] = 0;
+
+        while ( ! min_heap.empty())
+        {
+            auto curr = min_heap.top();
+            min_heap.pop();
+
+            int cost = curr[0];
+            int row  = curr[1];
+            int col  = curr[2];
+
+            // Skip if we've found a better path to this cell
+            if (min_cost[row][col] != cost)
+                continue;
+
+            for (int dir = 0; dir < 4; dir++)
+            {
+                int new_row = row + directions[dir][0];
+                int new_col = col + directions[dir][1];
+
+                // Check if new position is valid
+                if (new_row >= 0 && new_col >= 0 && new_row < ROWS && new_col < COLS)
+                {
+                    // Add cost=1 if we need to change direction
+                    int new_cost = cost + (dir != (grid[row][col] - 1) ? 1 : 0);
+
+                    // Update if we found a better path
+                    if (min_cost[new_row][new_col] > new_cost)
+                    {
+                        min_cost[new_row][new_col] = new_cost;
+                        min_heap.push( {new_cost, new_row, new_col} );
+                    }
+                }
+            }
+        }
+
+        return min_cost[ROWS-1][COLS-1];
     }
 };
