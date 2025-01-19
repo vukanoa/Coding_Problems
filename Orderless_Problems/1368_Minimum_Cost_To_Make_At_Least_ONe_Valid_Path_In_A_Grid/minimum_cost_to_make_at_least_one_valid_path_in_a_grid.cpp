@@ -173,9 +173,6 @@ public:
 /* Space Complexity: O(ROWS * COLS)                    */
 class Solution_Dijkstra {
 public:
-    // Direction vectors: right, left, down, up (matching grid values 1, 2, 3, 4)
-    vector<vector<int>> directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
-
     int minCost(vector<vector<int>>& grid)
     {
         const int ROWS = grid.size();
@@ -188,6 +185,11 @@ public:
         // Track minimum cost to reach each cell
         vector<vector<int>> min_cost(ROWS, vector<int>(COLS, INT_MAX));
         min_cost[0][0] = 0;
+
+        // Direction vectors: right, left, down, up (matching grid values 1, 2, 3, 4)
+        vector<pair<int,int>> directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+        const int DIRECTIONS = 4;
+
 
         while ( ! min_heap.empty())
         {
@@ -202,27 +204,157 @@ public:
             if (min_cost[row][col] != cost)
                 continue;
 
-            for (int dir = 0; dir < 4; dir++)
+            for (int dir = 0; dir < DIRECTIONS; dir++)
             {
-                int new_row = row + directions[dir][0];
-                int new_col = col + directions[dir][1];
+                int new_row = row + directions[dir].first;
+                int new_col = col + directions[dir].second;
 
-                // Check if new position is valid
-                if (new_row >= 0 && new_col >= 0 && new_row < ROWS && new_col < COLS)
+                // Check if it's Out-of-Bounds
+                if (new_row < 0 || new_col <  0 || new_row == ROWS || new_col == COLS)
+                    continue;
+
+                /*
+                    (dir + 1) because dir is 0-based, but actually directions
+                    are 1-based
+
+                    If ((dir + 1) == grid[row][col]) then that means the
+                    previous cell, i.e. the ones we've from to this one, POINTS
+                    to this current cell and in that case we do NOT need to add
+                    a cost of 1 since we did NOT change the direction of the
+                    arrow
+                */
+                int new_cost = cost + ((dir + 1) == grid[row][col] ? 0 : 1);
+
+                // Update if we found a better path and push that cell again
+                if (min_cost[new_row][new_col] > new_cost)
                 {
-                    // Add cost=1 if we need to change direction
-                    int new_cost = cost + (dir != (grid[row][col] - 1) ? 1 : 0);
-
-                    // Update if we found a better path
-                    if (min_cost[new_row][new_col] > new_cost)
-                    {
-                        min_cost[new_row][new_col] = new_cost;
-                        min_heap.push( {new_cost, new_row, new_col} );
-                    }
+                    min_cost[new_row][new_col] = new_cost;
+                    min_heap.push( {new_cost, new_row, new_col} );
                 }
             }
         }
 
         return min_cost[ROWS-1][COLS-1];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a famous 0-1 BFS technique. Since the cost is either 0 or 1.
+
+
+    Dijkstra's algorithm is a perfect choice when we're looking for a shortest
+    path, however ouw problem has a unique feature: The path costs either 0 or
+    1.
+
+    This is crucial because any path that doesn't have any "penalty", i.e. its
+    entire cost is 0, is always better than the one that uses even a single
+    1-cost edge.
+
+    Therefore, it makes sense to first explore 0-cost edges. Once we're done
+    processing all 0-cost edges, we can move to 1-cost edges.
+
+    This is an algorithm called 0-1 BFS. It's a very famous technique for
+    problems like these.
+
+    In 0-1 BFS, we are using a deque, insetad of a queue. This allows us to
+    prioritize 0-cost edges in a more efficient way. Each element of the deque
+    will store {row, col} of a cell and we'll also have an additional min_cost
+    grid to keep track of the minimum cost to reach each cell.
+
+    Once we visit each cell, we will check its four neighboring cells' values.
+    If moving to a neighbor cell doesn't require a change(,i.e. our current
+    arrow points to that neighoring cell and thus its cost will be 0), we
+    add tha tneighbor to the front of the deque because we first want to
+    explore the ones that do NOT require any modification of arrows.
+
+    However, if we do need to change an arrow in order to move to that neigbor
+    cell, then we'll add the neighbor to the back of the deque. That way we
+    are making sure it's getting explored later, after all 0-cost edges are
+    done.
+
+    For each neighbor we explore, we calculate the cost to teach that cell and
+    compare it otthe current value in our helper min_cist grid. If the
+    calculated cost is lower, we update min_cost to the new, cheaper, value.
+
+
+    Once we're done with our BFS traversal, the minimum cost to reach the
+    bottom-oright corner will be stored in min_cost. We return that as our
+    final result.
+
+*/
+
+/* Time  Beats: 77.22% */
+/* Space Beats: 36.15% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
+class Solution__Zero_One_BFS {
+public:
+    int minCost(vector<vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        // Track minimum cost to reach each cell
+        vector<vector<int>> min_cost(ROWS, vector<int>(COLS, INT_MAX));
+        min_cost[0][0] = 0;
+
+        // Use deque for 0-1 BFS - add zero cost moves to front, cost=1 to back
+        deque<pair<int, int>> deque;
+        deque.push_front({0, 0});
+
+        // Direction vectors: right, left, down, up (matching grid values 1, 2, 3, 4)
+        vector<pair<int,int>> directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+        const int DIRECTIONS = 4;
+
+        while ( ! deque.empty())
+        {
+            auto [row, col] = deque.front();
+            deque.pop_front();
+
+            // Try all four directions
+            for (int dir = 0; dir < 4; dir++)
+            {
+                int new_row = row + directions[dir].first;
+                int new_col = col + directions[dir].second;
+
+                /*
+                    (dir + 1) because dir is 0-based, but actually directions
+                    are 1-based
+
+                    If ((dir + 1) == grid[row][col]) then that means the
+                    previous cell, i.e. the ones we've from to this one, POINTS
+                    to this current cell and in that case we do NOT need to add
+                    a cost of 1 since we did NOT change the direction of the
+                    arrow
+                */
+                int new_cost = ((dir + 1) == grid[row][col] ? 0 : 1);
+
+                // Check if it's Out-of-Bounds
+                if (new_row < 0     || new_col <  0    ||
+                    new_row == ROWS || new_col == COLS ||
+                    min_cost[row][col] + new_cost >= min_cost[new_row][new_col])
+                {
+                    continue;
+                }
+
+                min_cost[new_row][new_col] = new_cost + min_cost[row][col];
+
+                // Add to the front if cost=0, or add to the back if cost=1
+                if (new_cost == 0)
+                    deque.push_front( {new_row, new_col} );
+                else
+                    deque.push_back(  {new_row, new_col} );
+            }
+        }
+
+        return min_cost[ROWS - 1][COLS - 1];
     }
 };
