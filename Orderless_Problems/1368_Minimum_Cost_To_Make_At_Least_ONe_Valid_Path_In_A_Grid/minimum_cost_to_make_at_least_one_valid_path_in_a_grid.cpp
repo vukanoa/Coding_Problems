@@ -358,3 +358,145 @@ public:
         return min_cost[ROWS - 1][COLS - 1];
     }
 };
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We can use the intuition of exploring all 0cost edges first and come up
+    with a different approach.
+
+    This one is a combination of a DFS and BFS.
+
+    Since some paths cost 0 to traverse, we could explore a large portion of
+    the grid without "paying" anything, i.e. with a total cost of 0.
+
+    If we are allowed a cost of 1, we could expand from the parts of the grid
+    that already have been explored and cover an even larger area. This way we
+    can gradually increase the cost that we allow for exploration and thus
+    cover the entire grid eventually.
+
+    The main difference in this approach is that in the previous approaches we
+    tried exploring the grid and populated the cost along the way. However,
+    here we fix the cost and figure out how much can we explore the grid.
+
+    To do that, we'll take use of both DFS and BFS.
+    Imagine our exploration as having levels:
+
+        + Cells reachable with cost 0 is one level.
+        + Cells reachable with cost 1 is another level,
+        + Cells reachable with cost 2 is another level, and so on
+        ...
+
+    Here's how it works:
+
+    Starting at (0,0) we use DFS to follow the arrows without any modification.
+    If a cell points to the right, then go right because that doesn't cost us
+    anything, i.e. it costs 0, it's free.
+
+    We keep following thse 0-cost edges until we can't go further. (Or if we've
+    hit the bottom-right cell, then we immediately return 0)
+
+    Think of this as drawing a continuous line through cells, following arrows
+    until we have to lift our pencil up from the paper.
+
+
+    Every time we reach a cell through DFs, we also add it t the queue. These
+    cells will serve as the strating points for the next level of exploration.
+    (This is a standard BFS behavior)
+
+    After we're done with all 0-cost edges, we switch to BFS. We take a cell
+    from the queue(as we typically do in BFS) and make modification to the
+    direction, while doing that we're increasing the cost by 1. With the new
+    direction of the arrow in the current cell we can now reach new cells.
+
+    We now explore those new cells using DFS like before. As we are exploring
+    the grid using DFS, we maintian a grid min_cost which holds the cost at
+    which we first visited that cell(i.e. the LOWEST cost possible to reach
+    that cell).
+
+    We continue this in all directions until we're done with the current level.
+    After the current level is done, we increase the cost by 1 again and start
+    changing the direction arrows of cells in the queue(if there are any).
+
+    We do this until our queue is NOT empty.
+
+    Once we're done exploring the entire grid(or once we've hit the
+    bottom-right cell) we simply return min_cost[ROWS-1][COLS-1].
+
+*/
+
+/* Time  Beats: 96.06% */
+/* Space Beats: 56.12% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
+class Solution_DFS_and_BFS {
+private:
+    // Direction vectors: right, left, down, up (matching grid values 1,2,3,4)
+    const vector<vector<int>> directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+public:
+    int minCost(vector<vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        int cost = 0;
+
+        // Track minimum cost to reach each cell
+        vector<vector<int>> min_cost(ROWS, vector<int>(COLS, INT_MAX));
+
+        // Queue for BFS part - stores cells that need cost increment
+        queue<pair<int, int>> queue;
+
+        // Start DFS from origin with cost 0
+        dfs(grid, min_cost, queue, 0, 0, cost);
+
+        // BFS part - process cells level by level with increasing cost
+        while ( ! queue.empty())
+        {
+            cost++;
+            int level_size = queue.size();
+
+            for (int x = 0; x < level_size; x++)
+            {
+                auto [row, col] = queue.front();
+                queue.pop();
+
+                // Try all 4 directions for next level
+                for (int dir = 0; dir < 4; dir++)
+                {
+                    dfs(grid, min_cost, queue, row + directions[dir][0], col + directions[dir][1], cost);
+                }
+            }
+        }
+
+        return min_cost[ROWS - 1][COLS - 1];
+    }
+
+private:
+    // DFS to explore all reachable cells with current cost
+    void dfs(vector<vector<int>>& grid,
+             vector<vector<int>>& min_cost,
+             queue<pair<int, int>>& queue,
+             int row,
+             int col,
+             int cost)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        if (row < 0 || col < 0 || row == ROWS || col == COLS || min_cost[row][col] != INT_MAX)
+            return;
+
+        min_cost[row][col] = cost;
+        queue.push({row, col});
+
+        // Follow the arrow direction without cost increase
+        int next_dir = grid[row][col] - 1;
+
+        dfs(grid, min_cost, queue, row + directions[next_dir][0], col + directions[next_dir][1], cost);
+    }
+};
