@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <climits>
-
 /*
     ==============
     === MEDIUM ===
@@ -95,52 +91,129 @@
 
 */
 
+#include <climits>
+#include <iostream>
+#include <numeric>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    TODO
+    Since there are only two rows and since we want to MINIMIZE the maximum
+    path for the second robot, we can do that effectively in one pass, after
+    we've precalculated some information.
+
+    It is VERY important to notice the following:
+
+        Once the first robot goes DOWN, the second robot can have EITHER the
+        remaining(not taken by the first robot) top elements summed OR the
+        bottom elements that were not taken.
+
+    The easy way to precalculate such a thing is to use a prefix_sum.
+
+    We do that, separately for both rows.
+
+    It is also important to notice that the second robot will NEVER get to
+    have elements at mat[0][0], and mat[1][n-1]. Those will ALWAYS be taken by
+    robot one.
+
+
+    Consider this example:
+    +-----+-----+-----+-----+
+    |  1  |  5  |  2  |  7  |
+    +-----+-----+-----+-----+
+    |  4  |  5  |  8  |  3  |
+    +-----+-----+-----+-----+
+
+    prefix_0:
+        +-----+-----+-----+-----+
+        |  1  |  6  |  8  | 15  |
+        +-----+-----+-----+-----+
+
+    prefix_1:
+        +-----+-----+-----+-----+
+        |  4  |  9  | 17  | 20  |
+        +-----+-----+-----+-----+
+
+    for each 'i', SECOND robot can only take "highlighted" cells(with '#')
+    
+        i = 0
+            +-----+#####+-####+#####+
+            |  1  #  5  #  2  #  7  #  <--- Either top '#' cells(none here),or
+            +-----+#####+#####+#####+
+            |  4  |  5  |  8  |  3  |  <--- bot '#' cells
+            +-----+-----+-----+-----+
+
+    
+        i = 1
+            +-----+-----+#####+#####+
+            |  1  #  5  #  2  #  7  #   <--- Either top '#' cells, or
+            +#####+-----+#####+#####+
+            #  4  #  5  #  8  |  3  |   <--- bot '#' cells
+            +#####+-----+-----+-----+
+
+    
+        i = 2
+            +-----+-----+-----+#####+
+            |  1  #  5  |  2  #  7  #   <--- Either top '#' cells, or
+            +#####+#####+-----+#####+
+            #  4  #  5  #  8  |  3  |   <--- bot '#' cells
+            +#####+#####+-----+-----+
+
+    
+        i = 3
+            +-----+-----+-----+-----+
+            |  1  #  5  |  2  |  7  |   <--- Either top '#' cells(none here),or
+            +#####+#####+#####+-----+
+            #  4  #  5  #  8  #  3  |   <--- bot '#' cells
+            +#####+#####+#####+-----+
+
+
+
+        In other words:
+
+            i = 0:
+                max(14, 0) ----------------------------
+                                                      |
+            i = 1:                                    |
+                max(9, 4) ----------------------------|      
+                                                      |----> min of these: 9
+            i = 2:                                    |
+                max(7, 9) ----------------------------|
+                                                      |
+            i = 3:                                    |
+                max(0,17) -----------------------------
+
+
+    And that is the result.
 
 */
 
-/* Time  Beats: 91.05% */
-/* Space Beats: 54.10% */
+/* Time  Beats: 64.71% */
+/* Space Beats: 47.06% */
 
 /* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
+/* Space Complexity: O(n) */
 class Solution {
 public:
     long long gridGame(vector<vector<int>>& mat)
     {
-        long long n = mat[0].size();
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
 
-        long long result = LONG_MAX;
-        long long row0 = 0;
-        long long row1 = 0;
+        const int N = mat[0].size();
 
-        for(int i = 0; i < n; i++)
-        {
-            row0 += mat[0][i];
-            row1 += mat[1][i];
-        }
-        row0 += mat[1][n-1];
-        row1 -= mat[1][n-1];
+        vector<long long> prefix_0(mat[0].begin(), mat[0].end());
+        vector<long long> prefix_1(mat[1].begin(), mat[1].end());
 
-        long long score = 0;
-        long long sum0  = 0;
-        long long sum1  = 0;
+        partial_sum(prefix_0.begin(), prefix_0.end(), prefix_0.begin());
+        partial_sum(prefix_1.begin(), prefix_1.end(), prefix_1.begin());
 
-        for(int i = 0; i < n; i++)
-        {
-            long long c1 = sum1;
-            long long c2 = row0 - sum0 - mat[1][n-1] - mat[0][i];
-            long long score = std::max(c1, c2);
-
-            result = std::min(result, score);
-            sum0 += mat[0][i];
-            sum1 += mat[1][i];
-        }
+        long long result = prefix_0[N-1] - mat[0][0];
+        for (int i = 1; i < N; i++)
+            result = min(result, max(prefix_0[N-1] - prefix_0[i], prefix_1[i-1]));
 
         return result;
     }
