@@ -159,3 +159,62 @@ private:
         return counter;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, but written in another way. It's good to be able to compare.
+
+*/
+
+/* Time  Beats: 37.50% */
+/* Space Beats: 39.97% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(1)     */ // "Result" is NOT counted as additional
+class Solution_Neater {
+public:
+    vector<string> wordSubsets(vector<string>& words1, vector<string>& words2)
+    {
+        vector<string> result;
+
+        vector<int> words2_counter(26, 0);
+
+        for (const string& b : words2)
+        {
+            vector<int> curr_counter(26, 0);
+            for (const char& chr : b)
+                curr_counter[chr - 'a']++;
+
+            for (int i = 0; i < 26; i++)
+                words2_counter[i] = max(words2_counter[i], curr_counter[i]);
+        }
+
+        for (const string& a : words1)
+        {
+            vector<int> curr_counter(26, 0);
+            for (const char& chr : a)
+                curr_counter[chr - 'a']++;
+
+            bool universal = true;
+            for (int i = 0; i < 26; i++)
+            {
+                if (curr_counter[i] < words2_counter[i])
+                {
+                    universal = false;
+                    break;
+                }
+            }
+
+            if (universal)
+                result.push_back(a);
+        }
+
+        return result;
+    }
+};
