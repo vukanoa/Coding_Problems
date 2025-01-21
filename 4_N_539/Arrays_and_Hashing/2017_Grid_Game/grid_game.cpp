@@ -139,7 +139,7 @@ using namespace std;
         +-----+-----+-----+-----+
 
     for each 'i', SECOND robot can only take "highlighted" cells(with '#')
-    
+
         i = 0
             +-----+#####+-####+#####+
             |  1  #  5  #  2  #  7  #  <--- Either top '#' cells(none here),or
@@ -147,7 +147,7 @@ using namespace std;
             |  4  |  5  |  8  |  3  |  <--- bot '#' cells
             +-----+-----+-----+-----+
 
-    
+
         i = 1
             +-----+-----+#####+#####+
             |  1  #  5  #  2  #  7  #   <--- Either top '#' cells, or
@@ -155,7 +155,7 @@ using namespace std;
             #  4  #  5  #  8  |  3  |   <--- bot '#' cells
             +#####+-----+-----+-----+
 
-    
+
         i = 2
             +-----+-----+-----+#####+
             |  1  #  5  |  2  #  7  #   <--- Either top '#' cells, or
@@ -163,7 +163,7 @@ using namespace std;
             #  4  #  5  #  8  |  3  |   <--- bot '#' cells
             +#####+#####+-----+-----+
 
-    
+
         i = 3
             +-----+-----+-----+-----+
             |  1  #  5  |  2  |  7  |   <--- Either top '#' cells(none here),or
@@ -179,7 +179,7 @@ using namespace std;
                 max(14, 0) ----------------------------
                                                       |
             i = 1:                                    |
-                max(9, 4) ----------------------------|      
+                max(9, 4) ----------------------------|
                                                       |----> min of these: 9
             i = 2:                                    |
                 max(7, 9) ----------------------------|
@@ -199,21 +199,66 @@ using namespace std;
 /* Space Complexity: O(n) */
 class Solution {
 public:
-    long long gridGame(vector<vector<int>>& mat)
+    long long gridGame(vector<vector<int>>& grid)
     {
         ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
 
-        const int N = mat[0].size();
+        const int N = grid[0].size();
 
-        vector<long long> prefix_0(mat[0].begin(), mat[0].end());
-        vector<long long> prefix_1(mat[1].begin(), mat[1].end());
+        vector<long long> prefix_0(grid[0].begin(), grid[0].end());
+        vector<long long> prefix_1(grid[1].begin(), grid[1].end());
 
         partial_sum(prefix_0.begin(), prefix_0.end(), prefix_0.begin());
         partial_sum(prefix_1.begin(), prefix_1.end(), prefix_1.begin());
 
-        long long result = prefix_0[N-1] - mat[0][0];
+        long long result = prefix_0[N-1] - grid[0][0];
         for (int i = 1; i < N; i++)
             result = min(result, max(prefix_0[N-1] - prefix_0[i], prefix_1[i-1]));
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same idea as above, however we've realized we don't really need prefix_sum
+    of both rows, we can add and subtract as we go and keep track of only two
+    variables instead.
+
+    This way we've decreased Space Complexity from O(n) down to O(1).
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  76.92% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Space_Efficient {
+public:
+    long long gridGame(vector<vector<int>>& grid)
+    {
+        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+
+        const int N = grid[0].size();
+
+        long long top = accumulate(grid[0].begin(), grid[0].end(), static_cast<long long>(0)) - grid[0][0];
+        long long bot = 0;
+
+        long long result = top;
+        for (int i = 1; i < N; i++)
+        {
+            top -= grid[0][i];
+            bot += grid[1][i-1];
+
+            result = min(result, max(bot, top));
+        }
 
         return result;
     }
