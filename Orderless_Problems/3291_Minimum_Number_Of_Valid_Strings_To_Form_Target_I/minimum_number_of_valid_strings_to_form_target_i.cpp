@@ -107,7 +107,67 @@ public:
     --- IDEA ---
     ------------
 
-    TODO
+    First, we have to make a Trie. It's important to note this part in "insert"
+    function:
+
+    void insert(const string& word)
+    {
+        Node* node = root;
+
+        for (const char chr : word)
+        {
+            if ( ! node->letters[chr - 'a'])
+                node->letters[chr - 'a'] = new Node();
+
+            node = node->letters[chr - 'a'];
+            node->is_word_end = true; // <---------------- This one!
+        }
+    }
+
+    Why are we marking that EVERY CHARACTER is an end of the word?
+
+    Because we ought to find ANY PREFIX! Therefore, every prefix in words MUST
+    be considered a valid word, so that we could find each and every prefix we
+    want.
+
+
+    Now we'll have a "dp" vector. It will represent, for dp[i], how many
+    strings, minimally, is required to form that string ending at 'i' character
+    0-based in target string.
+
+    For example:
+
+        "agk"
+         012
+
+    dp = [INT_MAX, INT_MAX, INT_MAX, INT_MAX]
+             0        1        2        3
+
+
+    dp[2] is what we need. We want to to see what is the LEAST amount of
+    strings we can concatenate in order to form "agk" string.
+
+
+    Once we form a Trie, we'll push all the words from "words" and we'll mark
+    every prefix in every word, through Trie, as if that's a valid string.
+
+    Then, we'll go through all the target characters, starting at each
+    character to see how many prefixes starting at that character are.
+
+    Then, once we see that, strating from that idx in target, we'll update
+    the amount of needed strings in order to make certain prefixes in target.
+
+    At the end we check if we could at all concatenate any number of strings in
+    order to create the target string.
+
+    We are checking that like this:
+
+        return dp[N] == INT_MAX ? -1 : dp[N];
+
+
+    The best advice for Trie type of problems is to Draw a Trie and go through
+    the code. It's difficult to see the reason behind some lines if you don't
+    actually go line-by-line and look at the drawing of the Trie.
 
 */
 
@@ -118,8 +178,8 @@ public:
 /* Space Complexity: O(N)                      */
 class Node {
 public:
-    Node* lists[26];
-    bool flag = false;
+    Node* letters[26];
+    bool is_word_end = false;
 
 };
 
@@ -138,11 +198,11 @@ public:
 
         for (const char chr : word)
         {
-            if ( ! node->lists[chr - 'a'])
-                node->lists[chr - 'a'] = new Node();
+            if ( ! node->letters[chr - 'a'])
+                node->letters[chr - 'a'] = new Node();
 
-            node = node->lists[chr - 'a'];
-            node->flag = true;
+            node = node->letters[chr - 'a'];
+            node->is_word_end = true;
         }
     }
 
@@ -154,12 +214,12 @@ public:
 
         for (int i = start; i < target.length(); i++)
         {
-            if ( ! node->lists[target[i] - 'a'])
+            if ( ! node->letters[target[i] - 'a'])
                 break;
 
-            node = node->lists[target[i] - 'a'];
+            node = node->letters[target[i] - 'a'];
 
-            if (node->flag)
+            if (node->is_word_end)
                 valid_lengths.push_back(i - start + 1);
         }
 
@@ -171,12 +231,13 @@ class Solution {
 public:
     int minValidStrings(vector<string>& words, string target)
     {
+        const int N = target.length();
+
         Trie trie;
 
         for (const string& word : words)
             trie.insert(word);
 
-        const int N = target.length();
         vector<int> dp(N + 1, INT_MAX);
         dp[0] = 0;
 
@@ -187,7 +248,7 @@ public:
 
             vector<int> lengths = trie.search(target, i);
 
-            for (int len : lengths)
+            for (const int& len : lengths)
                 dp[i + len] = min(dp[i + len], dp[i] + 1);
         }
 
