@@ -44,7 +44,7 @@
     *** Constraints ***
     a.length == 4
     4 <= b.length <= 10^5
-    -105 <= a[i], b[i] <= 105
+    -10^5 <= a[i], b[i] <= 10^5
 
 */
 
@@ -57,7 +57,25 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    TODO
+    The is a typical Memoization skip-take approach.
+
+    Since we have ONLY two options:
+        1. Either we take the current element, or
+        2. We skip the current element
+
+    It's also very important to notice that:
+        1. If you TAKE a[0], then you must take b[i], where 'i' is >= 0.
+        2. If you TAKE a[1], then you must take b[i], where 'i' is >= 1.
+        3. If you TAKE a[2], then you must take b[i], where 'i' is >= 2.
+        4. If you TAKE a[3], then you must take b[i], where 'i' is >= 3.
+
+    it's important to know that if you're at, say, position 2 in a, then you
+    need to add two more PRODUCTS.
+
+    But, do you realize that this is a state?
+    It's verly likely that we can end at this very state for more than one
+    combination, therefore we ought to use MEMOIZATION technique, to reduce the
+    Time Complexity drastically.
 
 */
 
