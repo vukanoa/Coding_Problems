@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -59,156 +56,126 @@
 
 */
 
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    This is a messier approach than the second Solution down below(Solution_2).
+    If you do a basic DFS, with some "Sets"(It's important to notice that
+    when you have graph problems and nodes are from [0, n-1], you can ALWAYS
+    use a vector of n booleans instead of HashSets. That makes it faster).
 
-    I wanted to have both slower and faster Implementation to prove a point and
-    to be able to compare and see why Solution_2 is better.
+    Also, it's important to use everything they say, in Description, to your
+    advantage.
 
-    Here we're correctly "remembering" if we've visited some node with a
-    HashSet "visited" and we're having a persisting vector of booleans
-    "safe_nodes".
+    They've told us in "Constraints" that:
 
-    However, each time we finish processing from some starting node, we're
-    going to CLEAR a HashSet. If we were not to do that in this one, we would
-    have incorrect results at the very end.
+        "graph[i] is sorted in a strictly increasing order."
 
-    Therefore, we MUST clear "visited" HashSet, however that's why this
-    Solution is slower than Solution_2.
+    We can, then, begin at node 0 and do a DFS. If any node along the path
+    has 0 outgoing edges, we're going to mark it as a "safe" node in our vector
+    of booleans.
 
-    Here we'd have to go, manually, through every "neighbor"(aka "nei") in
-    every node's list. Even though we'll be hitting that "continue" most of the
-    time, we're still going to iterate over all the "neighbor"s in the list.
+    Similarly, if at any point of doing a DFS on neighbor nodes of some node
+    we realize that not every path leads to a terminal node(or a safe node),
+    therefore we can immediately stop the traversal for the current node and
+    mark the current not as NON_SAFE, i.e. we're going to mark it as "true" in
+    non_safe vector.
 
-    That's why this Solution isn't fast. However, it's good to have it here for
-    didactic purposes.
+    Also, since they've told us that the graph contains self-loops, we need to
+    keep track of "the current path";
+
+    In the first example:
+
+        (Also, note that this is an ADJACENCY LIST!!)
+
+        Input: graph = [[1,2],[2,3],[5],[0],[5],[],[]]
+
+
+        (read this line below until the end, it's not linear)
+        We'd start at node 0, then go to node 1, then to node 2, then to node 5
+
+        This is one path: 0 -> 1 -> 2 -> 5
+
+        If we had the case that from node 5 we are jumping to node 0, then we
+        would need to stop that, to prevent infinite loop, and we'd need to say
+        that all these nodes are NON_SAFE.
+
+        That's the purpose of having a curr_path vector of booleans.
+
+
+    Also, one perk of having both "safe" and "non_safe" vectors of booleans is
+    that we will NEVER visit the same node twice. This optimizes the Time
+    Complexity by a lot, especially on large graphs.
 
 */
 
-/* Time  Beats: 5.01% */
-/* Space Beats: 5.03% */
+/* Time  Beats: 92.06% */
+/* Space Beats: 99.70% */
 
 /* Time  Complexity: O(E + V) */
 /* Space Complexity: O(E + V) */
 class Solution {
 public:
-    std::vector<int> eventualSafeNodes(std::vector<std::vector<int>>& graph)
+    vector<int> eventualSafeNodes(vector<vector<int>>& graph)
     {
         const int N = graph.size();
-        std::vector<int> results;
+        vector<int> result;
 
-        std::unordered_set<int> visited;
-        std::vector<bool> safe_nodes(N, false);
+        vector<bool> curr_path(N, false);
+        vector<bool> safe(N, false);
+        vector<bool> non_safe(N, false);
 
         for (int i = 0; i < N; i++)
         {
-            if (dfs(graph, safe_nodes, visited, i))
-                results.push_back(i);
-
-            visited.clear();
-        }
-
-        return results;
-    }
-
-private:
-    bool dfs(std::vector<std::vector<int>>& graph,
-             std::vector<bool>& safe_nodes,
-             std::unordered_set<int>& visited,
-             int node)
-    {
-        visited.insert(node);
-
-        for (const int& nei : graph[node])
-        {
-            if (safe_nodes[nei])
+            if (safe[i] || non_safe[i]) // Meaning, it's checked already
                 continue;
-            else if (visited.count(nei))
-                return false;
 
-            if (! dfs(graph, safe_nodes, visited, nei))
-                return false;
+            dfs(graph, curr_path, safe, non_safe, i);
         }
 
-        visited.erase(node);
-        safe_nodes[node] = true;
-
-        return true;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    This is an Elegant IDEA of the above Solution. Instead of having a HashSet
-    "visited" and a vector of booleans "safe_nodes", we can have a HashMap
-    named "safe", which will do the trick much more efficient.
-
-    The optimization in this Solution comes from the fact that we're
-    immediately going to return from some node if that node was already
-    processed and put into HashMap "safe" with corresponding boolean value.
-
-    If from that node we're able to get to the terminal node with each path,
-    then, in the HashMap "safe", we'll push {node, true}.
-
-    However, if, on the other hand, we find out that from this node we're not
-    able to get to terminal nodes with any path, i.e. we have a loop at some
-    point, then, in the HashMap "safe", we'll push {node, false}.
-
-    That way once we processed, say, the 0th node and it happens NOT to be a
-    "safe" node, then anytime we stumble upon that node, we can IMMEDIATELY
-    return "false" since we're sure that this node ISN'T "safe".
-
-    That's where the optimization comes in this Solution.
-
-*/
-
-/* Time  Beats: 63.37% */
-/* Space Beats: 60.35% */
-
-/* Time  Complexity: O(E + V) */
-/* Space Complexity: O(E + V) */
-class Solution_2 {
-public:
-    std::vector<int> eventualSafeNodes(std::vector<std::vector<int>>& graph)
-    {
-        const int N = graph.size();
-        std::unordered_map<int, bool> safe;
-
-        std::vector<int> results;
         for (int i = 0; i < N; i++)
         {
-            if (dfs(graph, i, safe))
-                results.push_back(i);
+            if (safe[i])
+                result.push_back(i);
         }
 
-        return results;
+        return result;
     }
 
 private:
-    bool dfs(std::vector<std::vector<int>>& graph, int node, std::unordered_map<int, bool>& safe)
+    bool dfs(vector<vector<int>>& graph, vector<bool>& curr_path, vector<bool>& safe, vector<bool>& non_safe, int node)
     {
-        if (safe.find(node) != safe.end())
-            return safe[node];
+        curr_path[node] = true;
 
-        safe[node] = false;
-
-        for (int& neighbor : graph[node])
+        bool is_safe_node = true;
+        for (const int& neighbor : graph[node])
         {
-            if (!dfs(graph, neighbor, safe))
-                return safe[node]; // False
+            if (safe[neighbor])
+                continue;
+            else if (non_safe[neighbor] || curr_path[neighbor])
+            {
+                is_safe_node = false;
+                break;
+            }
+
+            if ( ! dfs(graph, curr_path, safe, non_safe, neighbor))
+            {
+                is_safe_node = false;
+                break;
+            }
         }
 
-        safe[node] = true;
-        return safe[node]; // True
+        if (is_safe_node)
+            safe[node] = true;
+        else
+            non_safe[node] = true;
+
+        curr_path[node] = false;
+
+        return is_safe_node;
     }
 };
