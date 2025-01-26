@@ -182,3 +182,81 @@ private:
         return max_distance;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    (Topological Sort to Reduce Non-Cyclic nodes)
+
+*/
+
+/* Time  Beats: 99.18% */
+/* Space Beats: 79.92% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Topological {
+public:
+    int maximumInvitations(vector<int>& favorite)
+    {
+        const int N = favorite.size();
+        vector<int> in_degree(N, 0);
+
+        // Calculate in-degree for each node
+        for (int person = 0; person < N; person++)
+            in_degree[favorite[person]]++;
+
+        // Topological sorting to remove non-cycle nodes
+        queue<int> queue;
+        for (int person = 0; person < N; person++)
+        {
+            if (in_degree[person] == 0)
+                queue.push(person);
+        }
+
+        vector<int> depth(N, 1);  // Depth of each node
+        while ( ! queue.empty())
+        {
+            int curr_node = queue.front();
+            queue.pop();
+
+            int next_node = favorite[curr_node];
+            depth[next_node] = max(depth[next_node], depth[curr_node] + 1);
+
+            if (--in_degree[next_node] == 0)
+                queue.push(next_node);
+        }
+
+        int longest_cycle = 0;
+        int two_cycle_invitations = 0;
+
+        // Detect cycles
+        for (int person = 0; person < N; person++)
+        {
+            if (in_degree[person] == 0)
+                continue;  // Already processed
+
+            int cycle_len = 0;
+            int curr_person = person;
+            while (in_degree[curr_person] != 0)
+            {
+                in_degree[curr_person] = 0;  // Mark as visited
+                cycle_len++;
+                curr_person = favorite[curr_person];
+            }
+
+            if (cycle_len == 2) // For 2-cycles, add the depth of both nodes
+                two_cycle_invitations += depth[person] + depth[favorite[person]];
+            else
+                longest_cycle = max(longest_cycle, cycle_len);
+        }
+
+        return max(longest_cycle, two_cycle_invitations);
+    }
+};
