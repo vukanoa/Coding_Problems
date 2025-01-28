@@ -1,8 +1,3 @@
-#include <iostream>
-#include <unordered_map>
-#include <unordered_set>
-#include <queue>
-
 /*
     ==============
     === MEDIUM ===
@@ -78,13 +73,18 @@
 
 */
 
+#include <unordered_map>
+#include <unordered_set>
+#include <queue>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
     If we tried to do a DFS for every "u" in queries, we may traverse the
-    graph mutliple times. To avoid that we'll make sure to save visited nodes
+    graph too many times. To avoid that we'll make sure to save visited nodes
     and its prerequisites.
 
     We'll save it in a Hash Map of Sets named prereq_umap;
@@ -92,12 +92,20 @@
     That way we'll only visit each node once and at the end we can just check
     if "u" exists in prereq_umap[v] and store that in answer for a given query.
 
+
+    Also note that we've created an Adjacency List in a REVERSED order from the
+    one in the pictures.
+
+    It's much easier to think:
+        1. "I am pointing my prerequisites", than
+        2. "I am pointing to nodes which I'm its direct prerequisite"
+
 */
 
 /* Time  Beats: 27.78% */
 /* Space Beats: 5.65%  */
 
-/* 
+/*
     Time  Complexity:
         O(N * (E + N) + Q) -> O(N * (N^2) + Q) -> O(N^3 + Q) -> O(N^3)
 
@@ -108,28 +116,24 @@
 /* Space Complexity: O(N) */
 class Solution {
 public:
-    std::vector<bool> checkIfPrerequisite(
-                                          int numCourses,
-                                          std::vector<std::vector<int>>& prerequisites,
-                                          std::vector<std::vector<int>>& queries
-                                         )
+    vector<bool> checkIfPrerequisite(int numCourses, vector<vector<int>>& prerequisites, vector<vector<int>>& queries)
     {
-        std::vector<bool> answer(queries.size(), false);
+        vector<bool> answer(queries.size(), false);
 
         if (prerequisites.size() == 0)
             return answer;
 
-        std::vector<std::vector<int>> adj(numCourses);
+        vector<vector<int>> adj_list(numCourses);
 
         // Make adjacency matrix(Directed Graph) in the opposite way of what's
         // on the picture
         for (int i = 0; i < prerequisites.size(); i++)
-            adj[prerequisites[i][1]].push_back(prerequisites[i][0]);
+            adj_list[prerequisites[i][1]].push_back(prerequisites[i][0]);
 
         // Traverse the graph and fill Sets
-        std::unordered_map<int, std::unordered_set<int>> prereq_umap;
+        unordered_map<int, unordered_set<int>> prereq_umap;
         for (int course = 0; course < numCourses; course++)
-            dfs(adj, course, prereq_umap);
+            dfs(adj_list, course, prereq_umap);
 
         // Fill answer vector
         for (int i = 0; i < queries.size(); i++)
@@ -144,16 +148,12 @@ public:
     }
 
 private:
-    std::unordered_set<int> dfs(
-                                std::vector<std::vector<int>>& adj,
-                                int course,
-                                std::unordered_map<int, std::unordered_set<int>> &prereq_umap
-                               )
+    unordered_set<int> dfs(vector<vector<int>>& adj, int course, unordered_map<int, unordered_set<int>> &prereq_umap)
     {
         if (prereq_umap.find(course) != prereq_umap.end())
             return prereq_umap[course];
 
-        prereq_umap[course] = std::unordered_set<int>(); // Insert empty set
+        prereq_umap[course] = unordered_set<int>(); // Insert empty set
         for (auto& prereq : adj[course])
         {
             auto uset = dfs(adj, prereq, prereq_umap);
@@ -185,13 +185,9 @@ private:
 /* Space Complexity: O(N^2) */
 class Solution_Floyd_warshall {
 public:
-    std::vector<bool> checkIfPrerequisite(
-                                          int numCourses,
-                                          std::vector<std::vector<int>>& prerequisites,
-                                          std::vector<std::vector<int>>& queries
-                                         )
+    vector<bool> checkIfPrerequisite(int numCourses, vector<vector<int>>& prerequisites, vector<vector<int>>& queries)
     {
-        std::vector<std::vector<bool>> connected = std::vector(numCourses, std::vector<bool>(numCourses, false));
+        vector<vector<bool>> connected = vector(numCourses, vector<bool>(numCourses, false));
 
         for (auto& prereq : prerequisites)
             connected[prereq[0]][prereq[1]] = true;
@@ -205,7 +201,7 @@ public:
             }
         }
 
-        std::vector<bool> answer;
+        vector<bool> answer;
         for (auto& q : queries)
             answer.push_back(connected[q[0]][q[1]]);
 
@@ -251,55 +247,51 @@ public:
 /* Space Complexity: O(N^2) */
 class Solution_Kahn {
 public:
-    std::vector<bool> checkIfPrerequisite(
-                                          int numCourses,
-                                          std::vector<std::vector<int>>& prerequisites,
-                                          std::vector<std::vector<int>>& queries
-                                         )
+    vector<bool> checkIfPrerequisite(int numCourses, vector<vector<int>>& prerequisites, vector<vector<int>>& queries)
     {
-        std::vector<bool> answer;
+        vector<bool> answer;
 
-        std::vector<std::vector<int>> adj_list(numCourses);   
-        std::vector<int> indegree(numCourses, 0);
-        
+        vector<vector<int>> adj_list(numCourses);
+        vector<int> in_degree(numCourses, 0);
+
         // Make adj_listacency & Indegree List
-        for(int i = 0; i < prerequisites.size(); i++)
+        for (int i = 0; i < prerequisites.size(); i++)
         {
             adj_list[prerequisites[i][0]].push_back(prerequisites[i][1]);
-            indegree[prerequisites[i][1]]++;
+            in_degree[prerequisites[i][1]]++;
         }
 
-        std::vector<std::vector<bool>> connected(numCourses, std::vector<bool>(numCourses, false));
+        vector<vector<bool>> connected(numCourses, vector<bool>(numCourses, false));
 
-        std::queue<int> queue;
-        for(int i = 0; i < numCourses; i++)
+        queue<int> queue;
+        for (int i = 0; i < numCourses; i++)
         {
-            if(indegree[i] == 0)
+            if (in_degree[i] == 0)
                 queue.push(i);
         }
 
-        while(!queue.empty())
+        while ( ! queue.empty())
         {
             int curr_course = queue.front();
             queue.pop();
 
-            for(auto &prereq : adj_list[curr_course])
+            for (auto &prereq : adj_list[curr_course])
             {
                 connected[curr_course][prereq] = true;
 
-                for(int i = 0; i < numCourses; i++)
+                for (int i = 0; i < numCourses; i++)
                 {
-                    if(connected[i][curr_course])
+                    if (connected[i][curr_course])
                         connected[i][prereq] = true;
                 }
-                indegree[prereq]--;
+                in_degree[prereq]--;
 
-                if(indegree[prereq] == 0)
+                if (in_degree[prereq] == 0)
                     queue.push(prereq);
             }
         }
 
-        for(int i = 0; i < queries.size(); i++)
+        for (int i = 0; i < queries.size(); i++)
             answer.push_back(connected[queries[i][0]][queries[i][1]]);
 
         return answer;
