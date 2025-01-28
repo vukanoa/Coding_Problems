@@ -86,38 +86,35 @@ class Solution {
 public:
     vector<int> getFinalState(vector<int>& nums, int k, int multiplier)
     {
-        const int n = nums.size();
+        const int N = nums.size();
+        vector<int> result(N, 0);
 
-        std::priority_queue<std::pair<int, int>,
-                            std::vector<std::pair<int, int>>,
-                            std::greater<std::pair<int, int>>> min_heap;
+        priority_queue<pair<int, int>,
+                       vector<pair<int, int>>,
+                       greater<pair<int, int>>> min_heap;
 
-        // Push to Heap
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < N; i++)
             min_heap.push( {nums[i], i} );
 
-        for (int i = 0; i < k; i++)
+        while (k--)
         {
-            auto [top, idx] = min_heap.top();
+            auto [elem, idx] = min_heap.top();
             min_heap.pop();
 
-            top *= multiplier;
-
-            min_heap.push( {top, idx} );
+            min_heap.push( {elem * multiplier, idx} );
         }
 
         while ( ! min_heap.empty())
         {
-            auto [top, idx] = min_heap.top();
+            auto [elem, idx] = min_heap.top();
             min_heap.pop();
 
-            nums[idx] = top;
+            result[idx] = elem;
         }
 
-        return nums;
+        return result;
     }
 };
-
 
 
 
@@ -155,7 +152,7 @@ public:
 
         // O(n)
         for (int i = 0; i < nums.size(); i++)
-            min_heap.push_back({nums[i], i});
+            min_heap.push_back( {nums[i], i} );
 
         // Heapify in O(n)
         make_heap(min_heap.begin(), min_heap.end(), greater<>());
@@ -163,12 +160,10 @@ public:
         while (k--)
         {
             pop_heap(min_heap.begin(), min_heap.end(), greater<>());
-            auto [value, i] = min_heap.back();
+            auto [elem, idx] = min_heap.back();
             min_heap.pop_back();
 
-            nums[i] *= multiplier;
-
-            min_heap.push_back({nums[i], i});
+            min_heap.push_back( {nums[idx] * multiplier, idx} );
             push_heap(min_heap.begin(), min_heap.end(), greater<>());
         }
 
