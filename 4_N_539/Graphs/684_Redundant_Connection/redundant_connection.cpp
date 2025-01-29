@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -70,6 +67,10 @@
 
 */
 
+#include <numeric>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -98,23 +99,23 @@
 /* Space Complexity: O(N) */
 class Solution {
 public:
-    std::vector<int> findRedundantConnection(std::vector<std::vector<int>>& edges)
+    vector<int> findRedundantConnection(vector<vector<int>>& edges)
     {
         const int N = edges.size();
 
-        std::vector<int> parent(N+1);
-        std::vector<int> rank(N+1, 1);
+        std::vector<int> rank  (N+1, 1);
+        std::vector<int> parent(N+1, 0);
 
         // parent = [0, 1, 2, 3, ..., n]
-        std::iota(parent.begin(), parent.end(), 0);
+        iota(parent.begin(), parent.end(), 0);
 
-        std::vector<int> result;
+        vector<int> result;
         for (const auto& edge : edges)
         {
             int node_1 = edge[0];
             int node_2 = edge[1];
 
-            if (! Union(node_1, node_2, parent, rank))
+            if ( ! Union(node_1, node_2, parent, rank))
                 result = edge;
         }
 
@@ -122,7 +123,7 @@ public:
     }
 
 private:
-    int Find(int node, std::vector<int>& parent)
+    int Find(int node, vector<int>& parent)
     {
         while (node != parent[node])
             node = parent[parent[node]]; // We can write it in one line instead
@@ -130,7 +131,7 @@ private:
         return node;
     }
 
-    bool Union(int node_1, int node_2, std::vector<int>& parent, std::vector<int>& rank)
+    bool Union(int node_1, int node_2, vector<int>& parent, vector<int>& rank)
     {
         int p1 = Find(node_1, parent);
         int p2 = Find(node_2, parent);
