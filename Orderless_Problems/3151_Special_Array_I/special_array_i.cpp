@@ -92,3 +92,37 @@ public:
         return true;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We can write the above approach in a much more concice and elegant way by
+    using bitwise operations.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  86.67% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_XOR {
+public:
+    bool isArraySpecial(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        for (int i = 1; i < N; i++)
+        {
+            if (((nums[i-1] & 1) ^ (nums[i] & 1)) == 0)
+                return false;
+        }
+
+        return true;
+    }
+};
