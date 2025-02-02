@@ -172,3 +172,78 @@ public:
         return end + 1 == start && nums[0] >= nums[N-1];
     }
 };
+
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The number of "inversions" in any sorted array is 0.
+    However, the number of "inversions" in any sorted but ROTATED array is 1.
+
+    Since we can have an example where our "nums" array is sorted but NOT
+    rotated, we can have 0 "inversion" and still return "true", however we
+    CANNOT have more than 1 inversion and return "true".
+
+    Now the problem becomes trivial. Scan through the array "nums" from the
+    back and count "inversions".
+
+    Also, do NOT forget to count the potential "inversion" between:
+
+        nums[0] and nums[N-1]
+
+
+    Example:
+        [1, 2, 3, 3, 4, 5, 5, 6]  // No "inversions"
+
+        [6, 5, 5, 1, 2, 3, 3, 4]  // 1 "inversion"
+               ^^^^
+                 |
+                inversion
+
+        [1, 2, 6, 3, 4, 4, 4, 5]  // 2 "inversions", therefore return "false"
+         ^     ^^^^           ^
+         |       |            |
+         |      inversion     |
+         |                    |
+         |____________________|
+                 |
+                inversion between nums[0] and nums[N-1]
+
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  58.89% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    bool check(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        if (N <= 1)
+            return true;
+
+        int inversion_count = 0;
+
+        // For every pair, count the number of inversions.
+        for (int i = 1; i < N; ++i)
+        {
+            if (nums[i-1] > nums[i])
+                inversion_count++;
+        }
+
+        // Also check between the last and the first element due to rotation
+        if (nums[0] < nums[N - 1])
+            inversion_count++;
+
+        return inversion_count <= 1;
+    }
+};
