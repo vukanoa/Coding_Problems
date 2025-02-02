@@ -78,6 +78,26 @@ using namespace std;
     ------------
 
     TODO
+    
+    Be aware of the fact that "idx" refers to indices of startTime and endTime.
+
+    However, the term "position" refers to either:
+        1) startTime[some_idx], or
+        2) endTime[some_idx],   or
+        3) 0, or
+        4) eventTime
+
+
+               0           1                 // These are indices of intervals
+               |           |
+               |           |
+               v           v
+           ________      _____
+           |      |      |   |
+    X------       -------    --------X
+    ^      ^      ^      ^   ^       ^
+    |      |      |      |   |       |
+    0      2      4      6   7    eventTime   // These are POSITIONS(or points)
 
 */
 
@@ -86,7 +106,7 @@ using namespace std;
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution_1 {
+class Solution {
 public:
     int maxFreeTime(int eventTime, int k, vector<int>& startTime, vector<int>& endTime)
     {
@@ -113,25 +133,65 @@ public:
         /* Forward */
         for (int i = 0; i < N; i++)
         {
-            int last_to_move = min(i + k, N-1);
-            int end_of_moving_part = startTime[i] + prefix_sum[last_to_move] - (i == 0 ? 0 : prefix_sum[i-1]);
+            int idx_of_last_interval_to_move_to_the_left = min(i + k, N-1);
+            int len_of_k_merged_intervals                = prefix_sum[idx_of_last_interval_to_move_to_the_left] - (i == 0 ? 0 : prefix_sum[i-1]);
+            int last_position_of_k_merged_intervals      = startTime[i] + len_of_k_merged_intervals;
 
-            int first_fixed_position = (min(i + k + 1, N) == N ? eventTime : startTime[i + k + 1]);
+            int first_position_after_last_interval_to_move_to_the_left = (i + k+1 >= N ? eventTime : startTime[i + k+1]);
 
-            result = max(result, first_fixed_position - end_of_moving_part);
+            /* Easier to read */ 
+            int left_position  = last_position_of_k_merged_intervals;
+            int right_position = first_position_after_last_interval_to_move_to_the_left;
+
+            int diff = difference_between(left_position, right_position);
+
+            result = max(result, diff);
         }
 
+        /*
+            Since down here we're going backwards, think of it like this:
+
+                      (After)    (Before)
+                       Last       First
+                         |         |
+                         |         |
+                         v         v
+                         0  1  2   3
+            startTime = [0, 4, 7, 11]
+              endTime = [2, 5, 9, 13]
+
+            Examples:
+                1) Before position 5 is a position 7
+                2) After  position 4 is a position 2
+                3) First  position is eventTime
+                4) Last   position is 0
+                5) First  position after position 11 is 9
+
+        */
         /* Backward */
         for (int i = N-1; i >= 0; i--)
         {
-            int last_to_move = max(0, i - k);
-            int end_of_moving_part = endTime[i] - postfix_sum[last_to_move] + (i == N-1 ? 0 : postfix_sum[i+1]);
+            int idx_of_last_interval_to_move_to_the_right = max(0, i - k);
+            int len_of_k_merged_intervals                 = postfix_sum[idx_of_last_interval_to_move_to_the_right] - (i+1 == N ? 0 : postfix_sum[i+1]);
+            int last_position_of_k_merged_intervals       = endTime[i] - len_of_k_merged_intervals;
 
-            int first_fixed_position = (max(-1, i - k - 1) == -1 ? 0 : endTime[i - k - 1]);
+            int first_position_after_last_interval_to_move_to_the_right = ((i - k-1) <= -1 ? 0 : endTime[i - k-1]);
 
-            result = max(result, end_of_moving_part - first_fixed_position);
+            /* Easier to read */ 
+            int left_position  = first_position_after_last_interval_to_move_to_the_right;
+            int right_position = last_position_of_k_merged_intervals;
+
+            int diff = difference_between(left_position, right_position);
+
+            result = max(result, difference_between(left_position, right_position));
         }
 
         return result;
+    }
+
+private:
+    int difference_between(int& left_position, int& right_position)
+    {
+        return right_position - left_position;
     }
 };
