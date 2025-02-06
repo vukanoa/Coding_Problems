@@ -92,3 +92,49 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one uses Gaus' formula of calculating the sum of first N natural
+    numbers.
+
+*/
+
+/* Time  Beats: 82.44% */
+/* Space Beats: 45.45% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N)   */
+class Solution_Gaus {
+public:
+    int tupleSameProduct(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        unordered_map<int,int> product_counter;
+
+        for (int i = 0; i < N; i++)
+        {
+            for (int j = i+1; j < N; j++)
+            {
+                int product = nums[i] * nums[j];
+                product_counter[product]++;
+            }
+        }
+
+        for (const auto& [product, cnt] : product_counter)
+        {
+            int pairs = cnt * (cnt - 1) / 2;
+            result += 8 * pairs;
+        }
+
+        return result;
+    }
+};
