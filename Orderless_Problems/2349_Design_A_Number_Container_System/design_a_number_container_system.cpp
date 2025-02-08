@@ -248,3 +248,61 @@ private:
     unordered_map<int, priority_queue<int, vector<int>, greater<int>>> number_heap;
     unordered_map<int,unordered_map<int,int>> number_removed_idx;
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Almost equivalent idea as above, though this one doesn't use
+    "number_removed_idx" HashMap, instead it uses "Lazy Update" technique in
+    MinHeap.
+
+    It's good to see both Solutions. Sometimes "Lazy Update" is difficult to
+    spot.
+
+*/
+
+/* Time  Beats: 89.06% */
+/* Space Beats: 93.13% */
+
+/* Space Complexity: O(N) */
+class NumberContainers_Lazy_Update {
+public:
+    NumberContainers_Lazy_Update () {}
+
+    /* Time  Complexity: O(1) */
+    void change(int index, int number)
+    {
+        idx_to_number[index] = number;
+        number_to_heap[number].push(index);
+    }
+
+    /* Time  Complexity: O(logN) */
+    int find(int number)
+    {
+        if (number_to_heap.find(number) == number_to_heap.end())
+            return -1;
+
+        while ( ! number_to_heap[number].empty())
+        {
+            int index = number_to_heap[number].top();
+
+            // If index still maps to our target number, return it
+            if (idx_to_number[index] == number)
+                return index;
+
+            // Otherwise remove this stale index
+            number_to_heap[number].pop();
+        }
+
+        return -1;
+    }
+
+private:
+    unordered_map<int, priority_queue<int, vector<int>, greater<int>>> number_to_heap;
+    unordered_map<int, int> idx_to_number;
+};
