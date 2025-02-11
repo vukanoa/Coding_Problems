@@ -55,6 +55,7 @@
 
 */
 
+#include <stack>
 #include <string>
 #include <sstream>
 using namespace std;
@@ -74,8 +75,8 @@ using namespace std;
 /* Time  Beats: 5.85% */
 /* Space Beats: 5.32% */
 
-/* Time  Complexity: O(N^2) */
-/* Space Complexity: O(N)   */
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(N)     */
 class Solution {
 public:
     string removeOccurrences(string s, string part)
@@ -102,5 +103,70 @@ public:
         }
 
         return s;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one has the same Time and Space Complexity, but it's a different kind
+    of approach. It's good to be aware of both, even if they are not the most
+    optimal ones.
+
+*/
+
+/* Time  Beats: 5.85% */
+/* Space Beats: 5.32% */
+
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(N)     */
+class Solution_Stack {
+public:
+    string removeOccurrences(string s, string part)
+    {
+        int s_len = s.length();
+        int part_len = part.length();
+
+        stack<char> stack;
+        for (int i = 0; i < s_len; i++)
+        {
+            stack.push(s[i]);
+
+            if (stack.size() >= part_len && check(stack, part, part_len))
+            {
+                for (int j = 0; j < part_len; j++)
+                    stack.pop();
+            }
+        }
+
+        string result = "";
+        while ( ! stack.empty())
+        {
+            result = stack.top() + result;
+            stack.pop();
+        }
+
+        return result;
+    }
+
+private:
+    bool check(stack<char>& stk, string& part, int part_len)
+    {
+        stack<char> tmp_stack = stk;
+
+        for (int part_idx = part_len - 1; part_idx >= 0; part_idx--)
+        {
+            if (tmp_stack.top() != part[part_idx])
+                return false;
+
+            tmp_stack.pop();
+        }
+
+        return true;
     }
 };
