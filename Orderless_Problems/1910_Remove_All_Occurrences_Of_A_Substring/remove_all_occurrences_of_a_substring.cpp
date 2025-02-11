@@ -58,6 +58,7 @@
 #include <stack>
 #include <string>
 #include <sstream>
+#include <vector>
 using namespace std;
 
 /*
@@ -168,5 +169,116 @@ private:
         }
 
         return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    (This one requires a thorough explanation)
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   9.85% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(N)     */
+class Solution_KMP {
+public:
+    string removeOccurrences(string s, string part)
+    {
+        vector<int> kmp_LPS = computeLongestPrefixSuffix(part);
+
+        stack<char> char_stack;
+        vector<int> pattern_indices(s.length() + 1, 0);
+
+        int s_idx    = 0;
+        int part_idx = 0;
+        while (s_idx < s.length())
+        {
+            char curr_char = s[s_idx];
+            char_stack.push(curr_char);
+
+            if (curr_char == part[part_idx])
+            {
+                pattern_indices[char_stack.size()] = part_idx + 1;
+                part_idx++;
+
+                if (part_idx == part.length())
+                {
+                    int remaining_len = part.length();
+
+                    while (remaining_len != 0)
+                    {
+                        char_stack.pop();
+                        remaining_len--;
+                    }
+
+                    if (char_stack.empty())
+                        part_idx = 0;
+                    else
+                        part_idx = pattern_indices[char_stack.size()];
+                }
+
+                s_idx++;
+            }
+            else if (part_idx > 0)
+            {
+                part_idx = kmp_LPS[part_idx - 1];
+                char_stack.pop();
+            }
+            else
+            {
+                pattern_indices[char_stack.size()] = 0;
+                s_idx++;
+            }
+        }
+
+        string result = "";
+        while ( ! char_stack.empty())
+        {
+            result = char_stack.top() + result;
+            char_stack.pop();
+        }
+
+        return result;
+    }
+
+private:
+    vector<int> computeLongestPrefixSuffix(string pattern)
+    {
+        vector<int> LPS(pattern.length(), 0); // LPS = Longest Prefix-Suffix
+
+        int curr_idx   = 1;
+        int prefix_len = 0;
+
+        while (curr_idx < pattern.length())
+        {
+            if (pattern[prefix_len] == pattern[curr_idx])
+            {
+                LPS[curr_idx] = prefix_len + 1;
+
+                prefix_len++;
+                curr_idx++;
+            }
+            else if (prefix_len > 0) // There is prefix to backtrack to
+            {
+                prefix_len = LPS[prefix_len - 1];
+            }
+            else // There is no prefix to backtrack to
+            {
+                LPS[curr_idx] = 0;
+                curr_idx++;
+            }
+        }
+
+        return LPS;
     }
 };
