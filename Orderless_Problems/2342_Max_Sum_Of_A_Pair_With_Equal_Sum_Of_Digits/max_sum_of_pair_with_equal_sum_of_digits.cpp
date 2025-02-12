@@ -155,3 +155,81 @@ private:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    However, since we ALWAYS need only the top two elements for each
+    "sum of digits", we don't really need to use a MaxHeap since that will drag
+    us down in efficiency.
+
+    We can just keep the track of the top two manually, for every
+    "sum of digits".
+
+    This way the total Time Complexity is reduce from O(N * logN) down to O(N).
+
+*/
+
+/* Time  Beats: 81.56% */
+/* Space Beats: 75.41% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Efficient {
+public:
+    int maximumSum(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = -1;
+
+        if (N == 1)
+            return -1;
+
+        unordered_map<int, pair<int,pair<int,int>>> counter;
+        for (int i = 0; i < N; i++)
+        {
+            int sum = sum_digits(nums[i]);
+            counter[sum].first++;
+
+            if (counter[sum].second.first < nums[i])
+            {
+                counter[sum].second.second = counter[sum].second.first;
+                counter[sum].second.first  = nums[i];
+            }
+            else if (counter[sum].second.second < nums[i])
+            {
+                counter[sum].second.second = nums[i];
+            }
+        }
+
+        for (auto& entry : counter)
+        {
+            int one = entry.second.second.first;
+            int two = entry.second.second.second;
+            if (one == 0 || two == 0)
+                continue;
+
+            result = max(result, one + two);
+        }
+
+        return result;
+    }
+
+private:
+    int sum_digits(int num)
+    {
+        int result = 0;
+        while (num)
+        {
+            result += num % 10;
+            num /= 10;
+        }
+
+        return result;
+    }
+};
