@@ -79,6 +79,11 @@ using namespace std;
 
     If you know about the Heap data structure, that's it.
 
+    Unfortunately, we cannot use: make_heap, pop_heap, push_heap
+    functionalities from standard library because we can't change the type of
+    vector "nums", which is "int", but we need "long" at least given these
+    Constraints.
+
 */
 
 /* Time  Beats:  5.57% */
@@ -119,6 +124,51 @@ public:
             less_than_k += new_elem < k ? 1 : 0;
 
             result++; // Count
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, however we don't actually need to keep track of how many
+    elements in "nums" are less than k. Also, this way of initializing Heap is
+    much more elegant as well.
+
+*/
+
+/* Time  Beats: 74.27% */
+/* Space Beats: 90.45% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Elegant {
+public:
+    int minOperations(vector<int>& nums, int k)
+    {
+        int result = 0;
+
+        priority_queue<long,
+                       vector<long>,
+                       greater<long>> min_heap(nums.begin(), nums.end());
+
+        while (min_heap.top() < k)
+        {
+            long x = min_heap.top();
+            min_heap.pop();
+
+            long y = min_heap.top();
+            min_heap.pop();
+
+            min_heap.push(x * 2 + y);
+            result++;
         }
 
         return result;
