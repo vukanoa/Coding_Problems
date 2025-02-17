@@ -45,6 +45,7 @@
 
 */
 
+#include <algorithm>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -146,5 +147,82 @@ private:
         }
 
         return total_count;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 78.62% */
+/* Space Beats: 53.96% */
+
+/* Time  Complexity: O(2^n * n) */
+/* Space Complexity: O(2^n * n) */
+class Solution_Permutations_Combinations {
+public:
+    int numTilePossibilities(string tiles)
+    {
+        unordered_set<string> seen;
+
+        sort(tiles.begin(), tiles.end());
+
+        return generate_sequences(tiles, "", 0, seen) - 1;
+    }
+
+private:
+    int factorial(int n)
+    {
+        if (n <= 1)
+            return 1;
+
+        int result = 1;
+        for (int num = 2; num <= n; num++)
+            result *= num;
+
+        return result;
+    }
+
+    int count_permutations(string& seq)
+    {
+        int counter[26] = {0};
+        for (char ch : seq)
+            counter[ch - 'A']++;
+
+        // Calculate permutations using factorial formula
+        int total = factorial(seq.length());
+        for (int count : counter)
+        {
+            if (count > 1)
+                total /= factorial(count);
+        }
+
+        return total;
+    }
+
+    int generate_sequences(string& tiles,
+                           string current,
+                           int pos,
+                           unordered_set<string>& seen)
+    {
+        if (pos >= tiles.length())
+        {
+            if (seen.insert(current).second)
+                return count_permutations(current);
+
+            return 0;
+        }
+
+        // Try including and excluding current character
+        return generate_sequences(tiles, current             , pos + 1, seen) +
+               generate_sequences(tiles, current + tiles[pos], pos + 1, seen);
     }
 };
