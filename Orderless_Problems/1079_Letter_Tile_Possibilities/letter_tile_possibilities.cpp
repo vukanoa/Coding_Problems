@@ -97,3 +97,54 @@ private:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats: 100.00% */
+
+/* Time  Complexity: O(n!) */
+/* Space Complexity: O(n)  */
+class Solution_Optimized_Recursion {
+public:
+    int numTilePossibilities(string tiles)
+    {
+        // Track frequency of each uppercase letter (A-Z)
+        int counter[26] = {0};
+
+        for (char c : tiles)
+            counter[c - 'A']++;
+
+        return find_sequences(counter);
+    }
+
+private:
+    int find_sequences(int counter[26])
+    {
+        int total_count = 0;
+
+        for (int i = 0; i < 26; i++)
+        {
+            if (counter[i] == 0)
+                continue;
+
+            total_count++;
+
+            counter[i]--;
+            total_count += find_sequences(counter);
+            counter[i]++;
+        }
+
+        return total_count;
+    }
+};
