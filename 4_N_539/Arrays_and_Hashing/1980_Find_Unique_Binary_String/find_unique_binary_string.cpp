@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_set>
-
 /*
     ==============
     === MEDIUM ===
@@ -55,6 +51,13 @@
 
 */
 
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <unordered_set>
+#include <sstream>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -76,17 +79,16 @@
 /* Space Complexity: O(n) */
 class Solution_Intuitive_Naive {
 public:
-    std::string findDifferentBinaryString(std::vector<std::string>& nums)
+    string findDifferentBinaryString(vector<string>& nums)
     {
         int n = nums.size();
 
         if (n == 1)
             return nums[0] == "0" ? "1" : "0";
 
-        std::unordered_set<int> integers;
-        for (std::string& str : nums)
+        unordered_set<int> integers;
+        for (string& str : nums)
             integers.insert(convertFromBinStrToInt(str));
-
 
         for (int i = 0; i < n; i++)
         {
@@ -98,9 +100,9 @@ public:
     }
 
 private:
-    int convertFromBinStrToInt(std::string &str)
+    int convertFromBinStrToInt(string &str)
     {
-        std::reverse(str.begin(), str.end());
+        reverse(str.begin(), str.end());
 
         int num = 0;
         for (int i = 0; i < str.length(); i++)
@@ -109,9 +111,9 @@ private:
         return num;
     }
 
-    std::string convertFromIntToBinStr(int num, int n)
+    string convertFromIntToBinStr(int num, int n)
     {
-        std::ostringstream out;
+        ostringstream out;
 
         while (n--)
         {
@@ -123,10 +125,77 @@ private:
             num >>= 1;
         }
 
-        std::string str = out.str();
-        std::reverse(str.begin(), str.end());
+        string str = out.str();
+        reverse(str.begin(), str.end());
 
         return str;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Given the small number in Constraints for 'n', we can reserve O(N) Space.
+    It will wil 65536, or 2^16 + 1.
+
+    Plus one because it's 0-indexed.
+
+    Now simply go through all 'n' binary strings and convert them to integers.
+    After all, that's what "BINARY STRING" means. It certainly represents some
+    integer.
+
+    No go through those 65536 numbers, starting at 0, and as soon as you see
+    that some number was NOT present as a binary representation in "nums", then
+    that's the number we can return.
+
+    Create a binary representation from that integer and then convert to string
+
+    That's all there is to it.
+
+*/
+
+/* Time  Beats: 28.82% */
+/* Space Beats: 15.41% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Convert_To_Numbers {
+public:
+    std::string findDifferentBinaryString(std::vector<std::string>& nums)
+    {
+        const int N = nums.size();
+
+        vector<bool> present((1 << 16) + 1, false);
+
+        for (int i = 0; i < N; i++)
+        {
+            int number = stoi(nums[i], nullptr, 2);
+            present[number] = true;
+        }
+
+        for (int num = 0; num <= N; num++)
+        {
+            if ( ! present[num])
+            {
+                ostringstream out;
+                for (int i = N-1; i >= 0; i--)
+                {
+                    if (num & (1 << i))
+                        out << 1;
+                    else
+                        out << 0;
+                }
+
+                return out.str();
+            }
+        }
+
+        return "";
     }
 };
 
@@ -207,14 +276,14 @@ private:
 /* Space Complexity: O(n) */
 class Solution_Cantors_Diagonal {
 public:
-    std::string findDifferentBinaryString(std::vector<std::string>& nums)
+    string findDifferentBinaryString(vector<string>& nums)
     {
-        std::string result;
+        string result;
 
         int index = 0;
-        for(auto& binary_str : nums)
+        for (auto& binary_str : nums)
         {
-            result += std::to_string('1' - binary_str[index]);
+            result += to_string('1' - binary_str[index]);
             index++;
         }
 
