@@ -98,6 +98,7 @@
 */
 
 #include <queue>
+#include <unordered_set>
 using namespace std;
 
 /**
@@ -111,6 +112,16 @@ struct TreeNode {
     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Do a BFS to recover the tree. Once the Tree is recovered, simply do a
+    preordered-DFS to find a target in "find" function.
+
+*/
 
 /* Time  Beats: 22.99% */
 /* Space Beats: 88.22% */
@@ -173,4 +184,79 @@ private:
 
         return preorder(root->left, target) || preorder(root->right, target);
     }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Instead of doing a preorder-DFS each time i "find" function, we can put
+    each processed value in "uset_seen" HashSet and thus we can in O(1) check
+    whether some element exists or not.
+
+    This is more efficient than the above approach, but it's nice to see both
+    if you're just starting doing LeetCode.
+
+    Also here, we don't even keep track of the m_root, we don't need it. We
+    didn't need it up there either, but I've included it so that you could see
+    the difference.
+
+    Since it is passed by reference, we can change VALUES inside this passed
+    Tree, however we cannot change what points to it and what it is pointing at
+
+    But we don't need to change pointers anyway, thus we don't need to have a
+    m_root variable.
+
+*/
+
+/* Time  Beats: 22.99% */
+/* Space Beats: 88.22% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class FindElements_2 {
+public:
+    FindElements_2(TreeNode* root)
+    {
+        root->val = 0;
+
+        queue<TreeNode*> queue;
+        queue.push(root);
+
+        /* BFS */
+        while ( ! queue.empty())
+        {
+            int size = queue.size();
+
+            for (int x = 0; x < size; x++)
+            {
+                auto node = queue.front();
+                queue.pop();
+
+                if (node->left)
+                {
+                    node->left->val = node->val * 2 + 1;
+                    queue.push(node->left);
+                }
+
+                if (node->right)
+                {
+                    node->right->val = node->val * 2 + 2;
+                    queue.push(node->right);
+                }
+            }
+        }
+    }
+
+    bool find(int target)
+    {
+        return uset_seen.find(target) != uset_seen.end();
+    }
+
+private:
+    unordered_set<int> uset_seen;
 };
