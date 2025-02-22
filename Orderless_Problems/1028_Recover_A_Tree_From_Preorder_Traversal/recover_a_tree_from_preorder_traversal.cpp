@@ -51,6 +51,7 @@
 
 */
 
+#include <stack>
 #include <string>
 using namespace std;
 
@@ -80,7 +81,7 @@ struct TreeNode {
     That's used when we are creating a node, however--more importantly--it's
     used when we are traversing the nodes from the root, to try and get to our
     desired node at certain depth. ("dfs" functions).
-    
+
     The best way to understand what I'm doing is to literally try to read the
     code and "simulate" it on paper for yourself.
 
@@ -165,5 +166,95 @@ private:
 
         TreeNode* left  = dfs(root->left , depth - 1);
         return left;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Even though the Big O Time and Space Complexities for this one are the same
+    as for the Solution above, this one is MUCH MUCH more efficient.
+
+    Especially if we were to increase the total number of nodes.
+
+    This one uses stack instead of doing a "dfs" each time to position at the
+    right node at the right depth.
+
+    This way we only go once through the string and through the Tree.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  55.58% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Stack {
+public:
+    TreeNode* recoverFromPreorder(string traversal)
+    {
+        const int N = traversal.length();
+
+        if (traversal.find("-") == string::npos)
+            return new TreeNode(stoi(traversal.substr(0)));
+
+        int idx_of_first_hyphen = traversal.find("-");
+        TreeNode* root = new TreeNode(stoi(traversal.substr(0, idx_of_first_hyphen)));
+
+        TreeNode* curr_node = root;
+        int curr_level = 0;
+
+        stack<TreeNode*> stack;
+        stack.push(curr_node);
+
+        // Skip over first_number which is always the value of the first node
+        int i = idx_of_first_hyphen;
+        while (i < N)
+        {
+            int depth = 0;
+            int value = 0;
+            while (traversal[i] == '-')
+            {
+                depth++;
+                i++;
+            }
+
+            int start_val = i;
+            while (i < N && traversal[i] != '-')
+                i++;
+
+            string value_str = traversal.substr(start_val, i - start_val);
+            value = stoi(value_str);
+
+            while ( ! (depth > curr_level))
+            {
+                stack.pop();
+                curr_level--;
+            }
+            curr_node  = stack.top();
+
+
+            if ( ! curr_node->left)
+            {
+                curr_node->left  = new TreeNode(value);
+                curr_node = curr_node->left;
+                curr_level++;
+            }
+            else
+            {
+                curr_node->right = new TreeNode(value);
+                curr_node = curr_node->right;
+                curr_level++;
+            }
+
+            stack.push(curr_node);
+        }
+
+        return root;
     }
 };
