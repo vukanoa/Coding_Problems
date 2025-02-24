@@ -114,7 +114,7 @@ using namespace std;
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution_DFS {
+class Solution_DFS_twice {
 private:
     unordered_map<int, int> bob_path_time;
     vector<bool> opened;
@@ -143,7 +143,6 @@ public:
     }
 
 private:
-
     bool find_bob_path(int curr_node, int time)
     {
         bob_path_time[curr_node] = time;
@@ -184,5 +183,84 @@ private:
             if ( ! opened[neighbor])
                 find_alice_path(neighbor, time + 1, income, amount);
         }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 70.88% */
+/* Space Beats: 55.68% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_DFS_once {
+private:
+    vector<vector<int>> adj_list;
+    vector<int> distanceFromBob;
+    int n;
+
+public:
+    int mostProfitablePath(vector<vector<int>>& edges, int bob, vector<int>& amount)
+    {
+        n = amount.size();
+        adj_list.resize(n, vector<int>());
+
+        for (vector<int> edge : edges)
+        {
+            adj_list[edge[0]].push_back(edge[1]);
+            adj_list[edge[1]].push_back(edge[0]);
+        }
+        distanceFromBob.resize(n);
+
+        return find_paths(0, 0, 0, bob, amount);
+    }
+
+private:
+    int find_paths(int curr_node, int prev_node, int time, int bob, vector<int>& amount)
+    {
+        int max_income = 0;
+        int max_child = INT_MIN;
+
+        // Find the node distances from Bob
+        if (curr_node == bob)
+            distanceFromBob[curr_node] = 0;
+        else
+            distanceFromBob[curr_node] = n;
+
+        for (int adjacentNode : adj_list[curr_node])
+        {
+            if (adjacentNode != prev_node)
+            {
+                max_child = max(max_child, find_paths(adjacentNode, curr_node, time + 1, bob, amount));
+
+                distanceFromBob[curr_node] = min(distanceFromBob[curr_node], distanceFromBob[adjacentNode] + 1);
+            }
+        }
+
+        // Alice reaches the node first
+        if (distanceFromBob[curr_node] > time)
+        {
+            max_income += amount[curr_node];
+        }
+        else if (distanceFromBob[curr_node] == time) // Alice and Bob reach the node at the same time
+        {
+            max_income += amount[curr_node] / 2;
+        }
+
+        // Return max income of Leaf-node
+        if (max_child == INT_MIN)
+            return max_income;
+
+        return max_income + max_child;
     }
 };
