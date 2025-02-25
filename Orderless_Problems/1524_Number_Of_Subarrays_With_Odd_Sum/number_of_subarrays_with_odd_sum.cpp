@@ -61,12 +61,69 @@ using namespace std;
 
 */
 
+/* Time  Beats: 20.44% */
+/* Space Beats: 14.77% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_DP {
+public:
+    int numOfSubarrays(vector<int>& arr)
+    {
+        const int N = arr.size();
+        const int MOD = 1e9 + 7;
+
+        vector<int> dp_even(N);
+        vector<int> dp_odd(N);
+
+        if (arr[0] & 1)
+            dp_odd[0] = 1;
+        else
+            dp_even[0] = 1;
+
+        for (int i = 1; i < N; i++)
+        {
+            if (arr[i] & 1)
+            {
+                dp_odd[i]  = (1 + dp_even[i - 1]) % MOD;
+                dp_even[i] = dp_odd[i - 1];
+            }
+            else
+            {
+                dp_even[i] = (1 + dp_even[i - 1]) % MOD;
+                dp_odd[i]  = dp_odd[i - 1];
+            }
+        }
+
+        int result = 0;
+        for (auto odd_count : dp_odd)
+        {
+            result += odd_count;
+            result %= MOD;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
 /* Time  Beats: 73.02% */
 /* Space Beats: 55.17% */
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Prefix_Sum_and_Odd_Counting {
 public:
     int numOfSubarrays(vector<int>& arr)
     {
