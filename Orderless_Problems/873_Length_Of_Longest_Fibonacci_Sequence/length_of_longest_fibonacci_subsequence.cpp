@@ -227,3 +227,65 @@ public:
         return result > 2 ? result : 0;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    If you understood the above DP approach, then reading through the code will
+    be enough to understand why this one is better.
+
+    There's no better way to understand this problem than actually trying to
+    go through the code and comparing with the above approach(which you must
+    understand beforehand).
+
+*/
+
+/* Time  Beats: 96.15% */
+/* Space Beats: 41.02% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_DP_Optimized {
+public:
+    int lenLongestFibSubseq(vector<int>& arr)
+    {
+        const int N = arr.size();
+        int result = 0;
+
+        // dp[prev][curr] stores len of Fib. seq. ending at indices: prev, curr
+        vector<vector<int>> dp(N, vector<int>(N, 0));
+
+        // Find all possible pairs that sum to arr[curr]
+        for (int curr = 2; curr < N; curr++)
+        {
+            // Use two pointers to find pairs that sum to arr[curr]
+            int left  = 0;
+            int right = curr - 1;
+
+            while (left < right)
+            {
+                int pair_sum = arr[left] + arr[right];
+
+                if (pair_sum > arr[curr])
+                    right--;
+                else if (pair_sum < arr[curr])
+                    left++;
+                else // pairSum == arr[curr]
+                {
+                    dp[right][curr] = dp[left][right] + 1;
+                    result = max(result, dp[right][curr]);
+
+                    right--;
+                    left++;
+                }
+            }
+        }
+
+        return result == 0 ? 0 : result + 2;
+    }
+};
