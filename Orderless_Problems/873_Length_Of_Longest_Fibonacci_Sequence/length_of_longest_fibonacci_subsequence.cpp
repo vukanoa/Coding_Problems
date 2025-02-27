@@ -50,6 +50,7 @@
 
 */
 
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -137,5 +138,92 @@ public:
         // }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Example 1:
+        arr = {1,2,3,4,5,6,7,8}
+
+          |  0  1  2  3  4  5  6  7
+        --+--------------------------
+        0 |  -  2  2  2  2  2  2  2
+        1 |  -  -  3  2  2  2  2  2
+        2 |  -  -  -  3  4  2  2  2
+        3 |  -  -  -  -  3  3  4  2
+        4 |  -  -  -  -  -  3  3  5
+        5 |  -  -  -  -  -  -  3  3
+        6 |  -  -  -  -  -  -  -  3
+        7 |  -  -  -  -  -  -  -  -
+
+    What does, say, dp[2][4] represent?
+
+    It represents the LENGTH of the Fibonacci subsequence that ENDS at indices
+    2 and 4, i.e. it ends with elements 3 and 5, respectively.
+
+    In this case, it would be: {1,2,3,5}
+                                0 1 2 4
+
+    We don't actually care about the previous elements, we only care about the
+    last two elements, since those two are going to be used to form the next
+    number and thus extend the subsequence.
+
+    Now read the code and look at the table above and you'll get it. It's not
+    easy to come up with this, but if you notice some repeated work and
+    ESPECIALLY if you notice that the Constraints are small, you almost
+    certainly can make this table and probably can perform Dynamic Programming.
+
+*/
+
+/* Time  Beats: 29.48% */
+/* Space Beats: 21.37% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_DP {
+public:
+    int lenLongestFibSubseq(vector<int>& arr)
+    {
+        const int N = arr.size();
+        int result = 0;
+
+        // dp[prev][curr] stores len of Fib. seq. ending at indices: prev, curr
+        vector<vector<int>> dp(N, vector<int>(N, 0));
+
+        // Map each value to its index for O(1) lookup
+        unordered_map<int, int> val_to_idx;
+
+        for (int curr = 0; curr < arr.size(); curr++)
+        {
+            val_to_idx[arr[curr]] = curr; // Map it
+
+            for (int prev = 0; prev < curr; prev++)
+            {
+                // Find if there exists a previous number to form Fib. seq.
+                int target_val = arr[curr] - arr[prev];
+
+                int target_idx = -1;
+                if (val_to_idx.find(target_val) != val_to_idx.end())
+                    target_idx = val_to_idx[target_val];
+
+                // Update dp if valid Fibonacci sequence possible
+                // target_val < arr[prev] ensures strictly increasing sequence
+                if (target_idx != -1 && target_val < arr[prev])
+                    dp[prev][curr] = dp[target_idx][prev] + 1;
+                else
+                    dp[prev][curr] = 2;
+
+                result = max(result, dp[prev][curr]);
+            }
+        }
+
+        return result > 2 ? result : 0;
     }
 };
