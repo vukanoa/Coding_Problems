@@ -117,3 +117,51 @@ public:
         return nums;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Identical approach as above, but merged into a Single Pass.
+    Always try to reduce the "Wall Time Clock" if you can.
+
+    It's good to be able to see both if you're a beginner.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  23.58% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_One_Pass {
+public:
+    vector<int> applyOperations(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int non_zero_idx = 0;
+
+        for (int i = 0; i < N; i++)
+        {
+            if (i < N-1 && nums[i] == nums[i + 1] && nums[i] != 0)
+            {
+                nums[i] *= 2;
+                nums[i + 1] = 0;
+            }
+
+            if (nums[i] != 0)
+            {
+                // Can be swapped with itself
+                swap(nums[i], nums[non_zero_idx]);
+
+                non_zero_idx++;
+            }
+        }
+
+        return nums;
+    }
+};
