@@ -124,3 +124,61 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Two Pointers technique. Read the code and you'll get it.
+
+*/
+
+/* Time  Beats: 88.52% */
+/* Space Beats: 87.50% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_TwoPointers {
+public:
+    vector<int> pivotArray(vector<int>& nums, int pivot)
+    {
+        const int N = nums.size();
+        vector<int> result(nums.size());
+
+        int idx_lesser  = 0;
+        int idx_greater = nums.size() - 1;
+
+        int i = 0;
+        int j = N-1;
+        while (i < N)
+        {
+            if (nums[i] < pivot)
+            {
+                result[idx_lesser] = nums[i];
+                idx_lesser++;
+            }
+
+            if (nums[j] > pivot)
+            {
+                result[idx_greater] = nums[j];
+                idx_greater--;
+            }
+
+            // Increment/Decrement
+            i++;
+            j--;
+        }
+
+        while (idx_lesser <= idx_greater)
+        {
+            result[idx_lesser] = pivot;
+            idx_lesser++;
+        }
+
+        return result;
+    }
+};
