@@ -108,3 +108,42 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Just another way to implement it. More concise.
+
+*/
+
+/* Time  Beats: 83.22% */
+/* Space Beats: 58.22% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    int maxOperations(string s)
+    {
+        const int N = s.length();
+        int result = 0;
+
+        for (int i = 0, cnt = 0; i < N; i++, cnt++)
+        {
+            if (s[i] == '0')
+            {
+                result += cnt;
+
+                while (i < N && s[i] != '1')
+                    i++;
+            }
+        }
+
+        return result;
+    }
+};
