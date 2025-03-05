@@ -168,3 +168,90 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    How does anyone come up with this Solution?
+
+    In the above Solution our "FOUNDATION" was 5, i.e. 1 + 4.
+
+    After than, if you laid out the number you'd see the pattern:
+
+        n=1) 1
+        n=2) 1 + 4
+        n=3) 1 + 4 + 8
+        n=4) 1 + 4 + 12
+        n=5) 1 + 4 + 16
+        n=6) 1 + 4 + 20
+        n=7) 1 + 4 + 24
+        ...
+
+    But let's see the pattern for FINAL results for these n values.
+
+        n=1)    0   + 1           -->    0 +  1   -->    1
+        n=2) F(n=1) + 1 + 4       -->    1 +  5   -->    6
+        n=3) F(n=2) + 1 + 4 + 8   -->    6 + 13   -->   18
+        n=4) F(n=3) + 1 + 4 + 12  -->   18 + 17   -->   35
+        n=5) F(n=4) + 1 + 4 + 16  -->   35 + 21   -->   56
+        n=6) F(n=5) + 1 + 4 + 20  -->   56 + 25   -->   81
+        n=7) F(n=6) + 1 + 4 + 24  -->   81 + 29   -->   110
+        ...
+
+    Let's just write it next to n values:
+
+        n=1)   1
+        n=2)   6
+        n=3)  18
+        n=4)  35
+        n=5)  56
+        n=6)  81
+        n=7)  110
+        ..
+
+
+    From our earlier observations, we know that we start with a single blue
+    cell and then successively add multiples of 4:
+
+    first 4 * 1, then 4 * 2, then 4 * 3, and so on, continuing for n - 1 steps.
+
+    This means the total count follows the sum:
+
+        1 + (4 * 1) + (4 * 2) + ... + (4 * (n−1))
+
+
+    Or, we can write it like this:
+
+        1 + 4 * ((n * (n-1)) / 2)
+
+    Or if we cancel 4 and 2. we 'll have:
+
+        1 + 2 * n * (n-1)
+
+
+    However, since we need our result to be of type <long long>, we'll do this:
+
+        return 1 + 2LL * n (n-1);
+
+    2LL is a constant 2 written as a 64-bit integer, that way we won't have an
+    overflow.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  31.17% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Formula {
+public:
+    long long coloredCells(int n)
+    {
+        return 1 + 2LL * n * (n-1);
+    }
+};
