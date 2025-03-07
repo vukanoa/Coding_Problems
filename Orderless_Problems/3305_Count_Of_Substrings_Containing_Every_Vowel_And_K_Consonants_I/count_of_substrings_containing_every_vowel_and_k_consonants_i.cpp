@@ -85,14 +85,14 @@ public:
         for (int i = 0; i < N; i++)
         {
             unordered_map<char,int> umap_vowels;
-            int consonants = 0;
+            int consonants = 0; 
 
             for (int x = i; x < N; x++)
             {
                 if (uset_vowels.count(word[x]))
                     umap_vowels[word[x]]++;
                 else
-                    consonants++;
+                    consonants++;  
 
                 if (umap_vowels.size() == VOWELS_SIZE && consonants == k)
                     result++;
@@ -101,90 +101,7 @@ public:
                 //     break;
             }
         }
-
-        return result;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    TODO
-
-*/
-
-/* Time  Beats: 63.74% */
-/* Space Beats: 28.61% */
-
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(1) */
-class Solution_Efficient {
-public:
-    int countOfSubstrings(string word, int k)
-    {
-        const int N = word.length();
-        int result = 0;
-
-        unordered_set<char> uset_vowels = {'a', 'e', 'i', 'o', 'u'};
-        unordered_map<char, int> vowels_counter;
-        int consonant_counter = 0;
-
-        int L = 0;
-        for (int R = 0; R < N; R++)
-        {
-            if (uset_vowels.count(word[R]))
-                vowels_counter[word[R]]++;
-            else
-                consonant_counter++;
-
-            while (consonant_counter > k)
-            {
-                if (vowels_counter.count(word[L]))
-                {
-                    vowels_counter[word[L]]--;
-
-                    if (vowels_counter[word[L]] == 0)
-                        vowels_counter.erase(word[L]);
-                }
-                else
-                    consonant_counter--;
-
-                L++;
-            }
-
-            if (vowels_counter.size() == 5 && consonant_counter == k)
-            {
-                result++;
-                int lf = L;
-                auto vowelCountCopy = vowels_counter;
-                int consonantCountCopy = consonant_counter;
-
-                while (vowelCountCopy.size() == 5)
-                {
-                    if (vowelCountCopy.count(word[lf]))
-                    {
-                        vowelCountCopy[word[lf]]--;
-                        if (vowelCountCopy[word[lf]] == 0)
-                            vowelCountCopy.erase(word[lf]);
-                    }
-                    else
-                        consonantCountCopy--;
-
-                    lf++;
-                    if (consonantCountCopy == k && vowelCountCopy.size() == 5)
-                        result++;
-
-                    if (consonantCountCopy < k)
-                        break;
-                }
-            }
-        }
-
+            
         return result;
     }
 };
