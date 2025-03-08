@@ -110,3 +110,37 @@ private:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is much more concise and straightforward. However, it is useful to
+    see the above "String manipulation". That one is very handy.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  54.24% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Concise {
+public:
+    int sumRootToLeaf(TreeNode* root, int val = 0)
+    {
+        if ( ! root)
+            return 0;
+
+        val = (val * 2 + root->val);
+
+        if ( ! root->left && ! root->right)
+            return val;
+
+        return sumRootToLeaf(root->left, val) + sumRootToLeaf(root->right, val);
+    }
+};
