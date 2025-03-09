@@ -68,7 +68,7 @@ using namespace std;
 
 */
 
-/* Time  Beats: 50.84% */
+/* Time  Beats: 60.04% */
 /* Space Beats: 13.39% */
 
 /* Time  Complexity: O(N) */
@@ -88,22 +88,87 @@ public:
         while (R < N)
         {
             if (extended_colors[R-1] == extended_colors[R])
-            {
                 L = R;
-                R++;
-            }
-            else
-            {
-                if (R - L + 1 == k)
-                {
-                    result++;
-                    L++;
-                }
 
-                R++;
+            if (R - L + 1 == k)
+            {
+                result++;
+                L++;
             }
+
+            // Increment
+            R++;
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one doesn't extend "colors", instead it uses a MOD logic to access
+    circular elements.
+
+
+    It's important to know this about Modulo:
+    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    @@@@@@@@@@@@@@@  Mathematical modulo vs "operator %" @@@@@@@@@@@@@@@@@@
+    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+    Mathematical modulo works a bit differently than operator '%'.
+
+    In mathematics: (-25) modulo 26 is 1
+    In C++:         (-25) modulo 26 is -25
+
+    Since we need the mathematical verison of modulo, we need to use the
+    function below.
+
+     int mathematical_mod(int num)
+     {
+         const int ALPHABET_LENGTH = 26;
+         return (num % ALPHABET_LENGTH + ALPHABET_LENGTH) % ALPHABET_LENGTH;
+     }
+
+    In our case we DO NOT need to worry about this since we're going to MOD
+    only in case R > 0, but its good to be aware of this stuff.
+
+*/
+
+/* Time  Beats: 33.47% */
+/* Space Beats: 43.10% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Space_Efficient {
+public:
+    int numberOfAlternatingGroups(vector<int>& colors, int k)
+    {
+        const int N = colors.size();
+
+        int count = 0;
+
+        int L = 0;
+        int R = 0;
+
+        while (R < N + k - 1)
+        {
+            if (R > 0 && colors[(R - 1) % N] == colors[R % N])
+                L = R;
+
+            if (R - L + 1 >= k)
+                count++;
+
+            // Increment
+            R++;
+        }
+
+        return count;
     }
 };
