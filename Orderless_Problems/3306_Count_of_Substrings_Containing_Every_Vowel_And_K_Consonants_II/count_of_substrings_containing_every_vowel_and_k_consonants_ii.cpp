@@ -17,9 +17,9 @@
     of word that contain every vowel ('a', 'e', 'i', 'o', and 'u') at least
     once and exactly k consonants.
 
-    ===============================
-    FUNCTION:  
-    ===============================
+    =====================================================
+    FUNCTION: long countOfSubstrings(string word, int k);
+    =====================================================
 
     ==========================================================================
     ================================ EXAMPLES ================================
@@ -139,6 +139,98 @@ public:
             while (L < R && umap_vowels.size() == NUMBER_OF_VOWELS && consonants == k)
             {
                 result += next_consonant[R] - R;
+
+                char leftmost_chr = word[L];
+
+                if (uset_vowels.count(leftmost_chr))
+                {
+                    umap_vowels[leftmost_chr]--;
+
+                    if (umap_vowels[leftmost_chr] == 0)
+                        umap_vowels.erase(leftmost_chr);
+                }
+                else
+                    consonants--;
+
+                L++;
+            }
+
+            R++;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is more in a spirit of "Sliding Window" technique, but it's a bit
+    more UNINTUITIVE nonetheless.
+
+    Unintuitiveness comes from this part:
+
+        return at_least_k(word, k) - at_least_k(word, k + 1);
+
+    and this:
+
+        result += N - R; // This is the CRUX of this Solution
+
+
+    The Explanation would be way too long and cumbersome and you wouldn't be
+    able to understand it better than to take pen and paper and go through one
+    example.
+
+    That way you'll have the famous "Aha" moment. There's no other way around
+    it.
+
+*/
+
+/* Time  Beats: 27.40% */
+/* Space Beats: 50.41% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    long countOfSubstrings(string word, int k)
+    {
+        return at_least_k(word, k) - at_least_k(word, k + 1);
+    }
+
+private:
+    long at_least_k(string word, int k)
+    {
+        const int N = word.size();
+        const int NUMBER_OF_VOWELS = 5;
+        long result = 0;
+
+        int L = 0;
+        int R = 0;
+
+        unordered_set<char> uset_vowels = {'a', 'e', 'i', 'o', 'u'};
+        unordered_map<char, int> umap_vowels;
+        int consonants = 0;
+
+        /* Sliding Window */
+        while (R < word.length())
+        {
+            char curr_chr = word[R];
+
+            if (uset_vowels.count(curr_chr))
+                umap_vowels[curr_chr]++;
+            else
+                consonants++;
+
+            // Shrink window while we have a valid substring.
+            while (umap_vowels.size() == NUMBER_OF_VOWELS && consonants >= k)
+            {
+                result += N - R; // This is the CRUX of this Solution
 
                 char leftmost_chr = word[L];
 
