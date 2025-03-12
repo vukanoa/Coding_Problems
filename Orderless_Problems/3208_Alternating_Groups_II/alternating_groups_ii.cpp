@@ -152,7 +152,7 @@ public:
     {
         const int N = colors.size();
 
-        int count = 0;
+        int result = 0;
 
         int L = 0;
         int R = 0;
@@ -163,12 +163,63 @@ public:
                 L = R;
 
             if (R - L + 1 >= k)
-                count++;
+                result++;
 
             // Increment
             R++;
         }
 
-        return count;
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of implementing it. This one is the most intuitive way of
+    thinking about this problem.
+
+*/
+
+/* Time  Beats:  9.51% */
+/* Space Beats: 61.38% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Another_Implementation { // 56min
+public:
+    int numberOfAlternatingGroups(vector<int>& colors, int k)
+    {
+        const int N = colors.size();
+        int result = 0;
+
+        int L = 0;
+        int R = 1;
+
+        while (R < N + k && L < N)
+        {
+            if (colors[(R - 1) % N] == colors[R % N])
+            {
+                L = R;
+            }
+            else
+            {
+                if (R - L + 1 == k)
+                {
+                    result++;
+                    L++;
+                }
+            }
+
+            // Increment
+            R++;
+        }
+
+        return result;
     }
 };
