@@ -115,3 +115,55 @@ public:
         return max(neg, pos);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Classic Binary Search. Instead of writing Binary Search yourself, which is
+    indeed challenging, you can use C++'s "lower_bound" and "upper_bound"
+    implementations.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  75.85% */
+
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(1)    */
+class Solution_Follow_Up {
+public:
+    int maximumCount(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        auto leftmost_zero_or_pos_iter = lower_bound(nums.begin(), nums.end(), 0);
+        auto leftmost_pos_iter         = upper_bound(nums.begin(), nums.end(), 0);
+
+        int pos = -1;
+        int neg = -1;
+
+        if (leftmost_zero_or_pos_iter == nums.end())
+        {
+            neg = N;
+        }
+        else
+        {
+            neg = leftmost_zero_or_pos_iter - nums.begin();
+
+            if (*leftmost_zero_or_pos_iter > 0)
+                pos = nums.end() - leftmost_zero_or_pos_iter;
+            else
+            {
+                pos = nums.end() - leftmost_pos_iter;
+            }
+        }
+
+        return max(neg, pos);
+    }
+};
