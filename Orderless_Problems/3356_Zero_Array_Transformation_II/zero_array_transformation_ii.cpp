@@ -88,7 +88,7 @@ using namespace std;
 
 /* Time  Complexity: O(logM * (N + M)) */
 /* Space Complexity: O(N)              */
-class Solution {
+class Solution_Bin_Search_plus_Line_Sweep {
 public:
     int minZeroArray(vector<int>& nums, vector<vector<int>>& queries)
     {
@@ -147,5 +147,63 @@ private:
         }
 
         return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  74.49% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(N)     */
+class Solution_Line_Sweep_Only {
+public:
+    int minZeroArray(vector<int>& nums, vector<vector<int>>& queries)
+    {
+        const int N = nums.size();
+        int sum = 0;
+        int k = 0;
+
+        vector<int> line_sweep(N + 1);
+
+        for (int i = 0; i < N; i++)
+        {
+            // Iter through queries while current idx of nums cannot equal zero
+            while (sum + line_sweep[i] < nums[i])
+            {
+                k++;
+
+                // Zero array isn't formed after all queries are processed
+                if (k > queries.size())
+                    return -1;
+
+                int L   = queries[k - 1][0];
+                int R   = queries[k - 1][1];
+                int val = queries[k - 1][2];
+
+                // Process start and end of range
+                if (R >= i)
+                {
+                    line_sweep[max(L, i)] += val;
+                    line_sweep[R + 1]     -= val;
+                }
+            }
+
+            // Update prefix sum at current index
+            sum += line_sweep[i];
+        }
+
+        return k;
     }
 };
