@@ -279,7 +279,30 @@ private:
     --- IDEA ---
     ------------
 
-    TODO
+    This is an important part of the Constraints:
+
+        0 <= li <= ri < nums.length
+
+
+    We've seen above how Line Sweep works. However, we don't really have to do
+    this Binary Search and then Line Sweep, we can do our Line Sweep
+    immediately.
+
+    Since we need to make EACH value 0 given our queries, we're going to do it
+    sequentially.
+
+    If current query's range ends BEFORE our current 'i' value that we're
+    trying to nullify, then we can just ignore it since if we've come to 'i-th'
+    index, that means that all the values BEFORE 'i-th' index can CERTAINLY
+    be nullified gives our already used queries.
+
+    If at any point in our iteration of 'i' we see that even with ALL of our
+    quries used, we still didn't nullify our current nums[i], then we return
+    -1 immediately. Precisely because we've already used all of our queries.
+
+    If we have successfully nullified all our N nums, then we return 'k' as a
+    result which represents the minimum number of queries we needed to use in
+    order to nullify each and every value in our "nums" vector.
 
 */
 
@@ -313,7 +336,14 @@ public:
                 int R   = queries[k - 1][1];
                 int val = queries[k - 1][2];
 
-                // Process start and end of range
+                /*
+                   If R ends BEFORE 'i', then we don't have to update
+                   line_sweep because we've already determined that all of the
+                   values before CAN become 0s given already used queries.
+
+                   The fact that we're at our current 'i' means all of the
+                   PREVIOUS 'i's CAN certainly become 0s.
+                */
                 if (R >= i)
                 {
                     line_sweep[max(L, i)] += val;
