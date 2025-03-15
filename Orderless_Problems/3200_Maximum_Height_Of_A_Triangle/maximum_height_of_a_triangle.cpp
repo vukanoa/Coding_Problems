@@ -147,3 +147,58 @@ public:
         return max(max(1, left), max(1, right));
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Similar as above, but written in a more concise way.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats: 59.17% */
+
+/* Time  Complexity: O(sqrt(max(red, blue))) */
+/* Space Complexity: O(1) */
+class Solution_Concise {
+public:
+    int maxHeightOfTriangle(int red, int blue)
+    {
+        return max(helper(red, blue), helper(blue, red));
+    }
+
+private:
+    int helper(int red, int blue)
+    {
+        int height = 0;
+        int blocks_in_row = 1;
+
+        while (true)
+        {
+            if (blocks_in_row % 2 == 1)
+            {
+                if (red >= blocks_in_row)
+                    red -= blocks_in_row;
+                else
+                    break;
+            }
+            else
+            {
+                if (blue >= blocks_in_row)
+                    blue -= blocks_in_row;
+                else
+                    break;
+            }
+
+            height++;
+            blocks_in_row++;
+        }
+
+        return height;
+    }
+};
