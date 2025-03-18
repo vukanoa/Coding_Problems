@@ -163,3 +163,54 @@ private:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Essentially the same as above, though it uses bitwise on integers and
+    doesn't convert it to string back-and-forth.
+
+    Much more elegant and uses less space by a factor of O(N).
+
+*/
+
+/* Time  Beats: 46.67% */
+/* Space Beats:  7.56% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Elegant_Bitwise {
+public:
+    int longestNiceSubarray(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        int used_bits = 0;  // Tracks bits used in current window
+
+        int L = 0; // Start position of current window
+        int R = 0; // End   position of current window
+
+        for (int R = 0; R < N; R++)
+        {
+            // If current number shares bits with window, shrink window from
+            // left until there's no bit conflict
+            while ((used_bits & nums[R]) != 0)
+            {
+                used_bits ^= nums[L];  // Remove leftmost element's bits
+                L++;
+            }
+
+            used_bits |= nums[R]; // Add current number to the window
+
+            result = max(result, R - L + 1);
+        }
+
+        return result;
+    }
+};
