@@ -103,3 +103,49 @@ public:
         return -1;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above. It's intuitive, but very difficult to prove that it will
+    work in all cases.
+
+*/
+
+/* Time  Beats: 89.05% */
+/* Space Beats: 47.55% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Greedy {
+public:
+    int minOperations(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        int count = 0;
+
+        for (int i = 0; i <= N - 3; i++)
+        {
+            if (nums[i] == 0)
+            {
+                nums[i] = 1;
+
+                nums[i + 1] = nums[i + 1] == 0 ? 1 : 0;
+                nums[i + 2] = nums[i + 2] == 0 ? 1 : 0;
+
+                count++;
+            }
+        }
+
+        if (nums[N - 2] == 0 || nums[N - 1] == 0)
+            return -1;
+
+        return count;
+    }
+};
