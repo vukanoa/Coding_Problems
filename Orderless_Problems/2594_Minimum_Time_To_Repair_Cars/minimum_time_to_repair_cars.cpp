@@ -61,6 +61,8 @@
 
 #include <algorithm>
 #include <cmath>
+#include <queue>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -111,5 +113,91 @@ public:
         }
 
         return L;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 5.00% */
+/* Space Beats: 5.01% */
+
+/* Time  Complexity: O(N + M * logk) */
+/* Space Complexity: O(k)            */
+class Solution_Heap {
+public:
+    long repairCars(vector<int>& ranks, int cars)
+    {
+        unordered_map<int, int> rank_counter;
+        for (int rank : ranks)
+            rank_counter[rank]++;
+
+        /*
+            Create a Min-heap (priority_queue in C++ std library) storing:
+            [time, rank, n, count]
+
+            - time: time for the next repair
+            - rank: mechanic's rank
+            - n: cars repaired by this mechanic
+            - count: number of mechanics with this rank
+
+            Initial time = rank (as rank * 1^2 = rank)
+        */
+        auto comp = [](vector<long>& a, vector<long>& b) {
+            return a[0] > b[0];
+        };
+        priority_queue<vector<long>,
+                      vector<vector<long>>,
+                      decltype(comp)> min_heap(comp);
+
+        // Add initial entries to the heap
+        for (auto iter : rank_counter)
+        {
+            int rank = iter.first;
+
+            // Elements: [time, rank, cars_repaired, mechanic_count]
+            min_heap.push( {rank, rank, 1, iter.second} );
+        }
+
+        long time = 0;
+
+        // Process until all cars are repaired
+        while (cars > 0)
+        {
+            // Pop the mechanic with currently smallest repair time
+            vector<long> current = min_heap.top();
+            min_heap.pop();
+
+            time = current[0];
+
+            int rank       = current[1];
+            long n         = current[2];
+            int mech_count = current[3];
+
+            // Deduct the number of cars repaired by this mechanic group
+            cars -= mech_count;
+
+            // Increment the number of cars repaired by this mechanic
+            n++;
+
+            /*
+                Push the updated repair time back into the heap
+
+                The new repair time is rank * n^2
+                (time increases quadratically with n)
+            */
+            min_heap.push( {rank * n * n, rank, n, mech_count} );
+        }
+
+        return time;
     }
 };
