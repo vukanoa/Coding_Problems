@@ -70,6 +70,7 @@
 
 */
 
+#include <queue>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -161,5 +162,89 @@ private:
         uset_supplies.insert(curr_recipe);
 
         return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Topological Sort, Kahn's algortihm variation.
+
+*/
+
+/* Time  Beats: 93.87% */
+/* Space Beats: 78.44% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(N + M) */
+class Solution_Kahns_Algorithm {
+public:
+    vector<string> findAllRecipes(vector<string>& recipes,
+                                  vector<vector<string>>& ingredients,
+                                  vector<string>& supplies)
+    {
+        const int N = recipes.size();
+        vector<string> result;
+
+        unordered_set<string> uset_supplies(supplies.begin(), supplies.end());
+        unordered_map<string, int> umap_recipe_to_idx;
+
+        unordered_map<string, vector<string>> adj_list;
+
+        for (int idx = 0; idx < recipes.size(); idx++)
+            umap_recipe_to_idx[recipes[idx]] = idx;
+
+        // Count of non-supply ingredients needed for each recipe
+        vector<int> indegree(recipes.size(), 0);
+
+        for (int i = 0; i < N; i++)
+        {
+            for (string& ingredient : ingredients[i])
+            {
+                if ( ! uset_supplies.count(ingredient))
+                {
+                    adj_list[ingredient].push_back(recipes[i]);
+                    indegree[i]++;
+                }
+            }
+        }
+
+        // Start with recipes that only need supplies
+        queue<int> queue;
+        for (int i = 0; i < N; i++)
+        {
+            if (indegree[i] == 0)
+                queue.push(i);
+        }
+
+        // Process recipes in topological order
+        while ( ! queue.empty())
+        {
+            int recipe_idx = queue.front();
+            queue.pop();
+
+            string curr_recipe = recipes[recipe_idx];
+            result.push_back(curr_recipe);
+
+            // Skip if no recipes depend on this one
+            if ( ! adj_list.count(curr_recipe))
+                continue;
+
+            // Update recipes that depend on current recipe
+            for (const string& dependent_recipe : adj_list[curr_recipe])
+            {
+                if (--indegree[umap_recipe_to_idx[dependent_recipe]] == 0)
+                {
+                    queue.push(umap_recipe_to_idx[dependent_recipe]);
+                }
+            }
+        }
+
+        return result;
     }
 };
