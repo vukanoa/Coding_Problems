@@ -61,6 +61,7 @@
 */
 
 #include <algorithm>
+#include <numeric>
 #include <queue>
 #include <string>
 #include <unordered_map>
@@ -388,5 +389,147 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    A complete connected component has a distinct property: it is a disjoint
+    unit of the graph, meaning it does not share any connections with other
+    parts of the graph. Our task is to identify these disjoint units and check
+    whether their vertices and edges meet the criteria for completeness and
+    connectivity.
+
+    One of the most effective ways to find separate groups in a graph is by
+    using the Union-Find algorithm (also known as Disjoint Set Union). This
+    method helps group vertices that belong together. Each group has a
+    representative vertex, known as the leader, which serves as the group's
+    identifier. To determine whether two vertices belong to the same group, we
+    simply check if they share the same leader.
+
+    In our Union-Find implementation, we also track the size of each component.
+    Maintaining size is not only useful for optimizing the merging of
+    components, since attaching a smaller component to a larger one is more
+    efficient, but also plays a crucial role in this problem: it tells us
+    exactly how many vertices exist in each component. To verify whether a
+    component is a valid complete connected component, we check if its edge
+    count matches:
+
+            k * (k-1) / 2,
+
+    where k is the number of vertices in the component.
+
+    Now, let’s implement our solution. First, we initialize a Union-Find
+    structure and perform the "union" operation for each edge in our input.
+
+    Since an edge signifies that two vertices belong to the same component,
+    applying "union" to all edges ensures that all vertices are grouped
+    correctly.
+
+    Next, we count the number of edges in each component. To do this, we use a
+    hash map that associates each component with its edge count. Since
+    Union-Find assigns each component a unique representative (the root of its
+    tree), we use these representatives as keys in the map.
+
+    Finally, we iterate through each group leader and check if the group forms
+    a complete component. A group is complete if its edge count equals:
+
+        k * (k - 1) / 2
+
+   If it does, we increment our final count. Once all components have been
+   processed, we return the total number of complete components as our answer.
+
+*/
+
+/* Time  Beats: 96.55% */
+/* Space Beats: 95.97% */
+
+/*
+    Time  Complexity: O(N + M * alpha(N))
+
+    where alpha(n) is the inverse Ackermann function, which grows extremely
+    slowly and is practically constant.
+*/
+/*
+    Space Complexity: O(N)
+
+*/
+class Solution_Union_and_Find {
+public:
+    int countCompleteComponents(int n, vector<vector<int>>& edges)
+    {
+        int result = 0;
+
+        vector<int> component_size(n, 1);  // Track size of each component
+
+        vector<int> rank(n, 1);
+        vector<int> parent(n);
+
+        iota(parent.begin(), parent.end(), 0);
+
+        for (const auto& edge : edges)
+            Union(edge[0], edge[1], parent, rank, component_size);
+
+        vector<int> edges_count(n, 0);
+        for (const auto& edge : edges)
+        {
+            int root = Find(edge[0], parent);
+            edges_count[root]++;
+        }
+
+        for (int vertex = 0; vertex < n; vertex++)
+        {
+            if (vertex == Find(vertex, parent)) //If vertex is a root component
+            {
+                int k = component_size[vertex];
+
+                // Each edge is counted twice (undirected graph)
+                if (edges_count[vertex] == k * (k - 1) / 2)
+                    result++;
+            }
+        }
+
+        return result;
+    }
+
+private:
+    int Find(int node, vector<int>& parent)
+    {
+        while (node != parent[node])
+            node = parent[parent[node]];
+
+        return node;
+    }
+
+    void Union(int node_1, int node_2, vector<int>& parent, vector<int>& rank, vector<int>& component_size)
+    {
+        int root1 = Find(node_1, parent);
+        int root2 = Find(node_2, parent);
+
+        if (root1 == root2)
+            return;
+
+        if (rank[root1] > rank[root2])
+        {
+            parent[root2] = root1;
+            component_size[root1] += component_size[root2];
+        }
+        else if (rank[root1] < rank[root2])
+        {
+            parent[root1] = root2;
+            component_size[root2] += component_size[root1];
+        }
+        else
+        {
+            parent[root2] = root1;
+            component_size[root1] += component_size[root2];
+            rank[root1]++;
+        }
     }
 };
