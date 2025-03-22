@@ -63,6 +63,7 @@
 #include <algorithm>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 using namespace std;
 
@@ -172,5 +173,113 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Let's now return to traditional graph traversal techniques to solve this
+    problem.
+
+    Depth-first search (DFS) is particularly well-suited for this task.
+    Starting from an unvisited vertex, DFS explores as far as possible along a
+    branch before backtracking, ensuring that every vertex reachable from the
+    starting point is visited.
+
+    But how do we determine if a component is complete?
+
+    One approach is to check every pair of vertices in the component to see if
+    they share an edge, but this would be inefficient.
+
+    Instead, we can take advantage of a key property of complete graphs:
+    In a complete graph with n vertices, there must be exactly:
+
+        n * (n−1) / 2
+
+    unique edges, i.e. equal to the number of pairs of nodes in the graph.
+
+    Since our graph is undirected but our adjacency list counts each edge
+    twice (once from each endpoint), the total edge count from the
+    adjacency lists should be:
+
+        n * (n−1).
+
+    During our DFS traversal, we will track two crucial pieces of information
+    for each component:
+
+    The number of vertices in the component.
+    The total number of edges connected to vertices in the component.
+
+    For each new vertex we visit, we increment the vertex count and add all its
+    edges to the total edge count. Once the traversal is complete, we check if
+    the gathered values match the expected count. We keep track of all
+    components that meet this condition, and after visiting all vertices, we
+    return this count as our final answer.
+
+*/
+
+/* Time  Beats: 44.30% */
+/* Space Beats: 55.32% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(N + M) */
+class Solution_DFS {
+public:
+    int countCompleteComponents(int n, vector<vector<int>>& edges)
+    {
+        int result = 0;
+        vector<vector<int>> adj_list(n);
+
+        /* Adjacency List */
+        for (const auto& edge : edges)
+        {
+            adj_list[edge[0]].push_back(edge[1]);
+            adj_list[edge[1]].push_back(edge[0]);
+        }
+
+        unordered_set<int> visited;
+
+        for (int vertex = 0; vertex < n; vertex++)
+        {
+            if (visited.count(vertex))
+                continue;
+
+            // [0] --> vertices count,
+            // [1] --> total edges count
+            int component_info[2] = {0, 0};
+
+            dfs(adj_list, component_info, visited, vertex);
+
+            // Check if component is complete - edges should be:
+            // vertices * (vertices-1)
+            if (component_info[0] * (component_info[0] - 1) == component_info[1])
+                result++;
+        }
+
+        return result;
+    }
+
+private:
+    void dfs(vector<vector<int>>& adj_list,
+             int componentInfo[2],
+             unordered_set<int>& visited,
+             int curr)
+    {
+        visited.insert(curr);
+
+        componentInfo[0]++;                         // Increment vertex count
+        componentInfo[1] += adj_list[curr].size();  // Add edges from current vertex
+
+        for (int neighbor : adj_list[curr])
+        {
+            if ( ! visited.count(neighbor))
+                dfs(adj_list, componentInfo, visited, neighbor);
+        }
     }
 };
