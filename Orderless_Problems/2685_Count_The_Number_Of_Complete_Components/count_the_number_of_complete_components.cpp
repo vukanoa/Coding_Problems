@@ -61,6 +61,7 @@
 */
 
 #include <algorithm>
+#include <queue>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -281,5 +282,111 @@ private:
             if ( ! visited.count(neighbor))
                 dfs(adj_list, componentInfo, visited, neighbor);
         }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The other quintessential graph traversal algorithm is the Breadth-First
+    Search (BFS), which can also be used to solve this problem.
+
+    BFS explores each component using a queue. We maintain a visited array to
+    track which vertices have been visited. When we encounter an unvisited
+    vertex, we add it to the queue and begin exploring its connected component.
+
+    Along with the queue, we maintain a list called component to store all
+    vertices belonging to the current component. Once the exploration is
+    complete, we need to verify whether the component is fully connected.
+
+    For a component with k vertices to be complete, every vertex must have
+    exactly:
+
+        k - 1
+
+    edges connecting it to the other vertices within the component.
+
+    After finishing the BFS traversal for a component, we iterate through the
+    gathered vertices in component. If the size of the component is k and each
+    vertex has exactly k - 1 edges, we confirm that it is a complete component
+    and increment our count.
+
+    Once all vertices in the graph have been explored, we return this count as
+    our final answer.
+
+*/
+
+/* Time  Beats: 44.30% */
+/* Space Beats: 29.82% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(N + M) */
+class Solution_BFS {
+public:
+    int countCompleteComponents(int n, vector<vector<int>>& edges)
+    {
+        int result = 0;
+        vector<vector<int>> adj_list(n);
+
+        for (const auto& edge : edges)
+        {
+            adj_list[edge[0]].push_back(edge[1]);
+            adj_list[edge[1]].push_back(edge[0]);
+        }
+
+        vector<bool> visited(n, false);
+
+        for (int vertex = 0; vertex < n; vertex++)
+        {
+            if ( ! visited[vertex])
+            {
+                // BFS to find all vertices in the current component
+                vector<int> component;
+                queue<int> queue;
+
+                queue.push(vertex);
+                visited[vertex] = true;
+
+                /* BFS */
+                while ( ! queue.empty())
+                {
+                    int curr = queue.front();
+                    queue.pop();
+
+                    component.push_back(curr);
+
+                    for (int neighbor : adj_list[curr])
+                    {
+                        if ( ! visited[neighbor])
+                        {
+                            queue.push(neighbor);
+                            visited[neighbor] = true;
+                        }
+                    }
+                }
+
+                // Check if component is complete
+                // (all vertices have the right number of edges)
+                bool is_complete = true;
+                for (int node : component)
+                {
+                    if (adj_list[node].size() != component.size() - 1)
+                    {
+                        is_complete = false;
+                        break;
+                    }
+                }
+
+                if (is_complete)
+                    result++;
+            }
+        }
+
+        return result;
     }
 };
