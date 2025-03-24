@@ -240,3 +240,116 @@ public:
         return path_count[n - 1];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Somewhat unusual Floyd-Warshall in the same way that up above we have an
+    unusual Dijkstra.
+
+    Weirdness comes form the fact we need to return all the WAYS that we can
+    arrive at our destination in shortest amount of time.
+
+    Instead of the usual: Return the Shortest amount of time to reach X.
+
+*/
+
+/* Time  Beats: 5.34% */
+/* Space Beats: 5.61% */
+
+/* Time  Complexity: O(N^3) */
+/* Space Complexity: O(N^3) */
+class Solution_Floyd_Warshall {
+public:
+    int countPaths(int n, vector<vector<int>>& roads)
+    {
+        const int MOD = 1e9 + 7;
+
+        /*
+            dp[src][dest][0] stores the minimum time between src and dest
+
+            dp[src][dest][1] stores the num of ways to reach dest from src with
+                             the minimum time
+        */
+        vector<vector<vector<long long >>> dp(n, vector<vector<long long>>(n, vector<long long>(2, 0LL)));
+
+        // Initialize the dp table
+        for (long long src = 0; src < n; src++)
+        {
+            for (long long dest = 0; dest < n; dest++)
+            {
+                if (src != dest)
+                {
+                    // Set a large initial time
+                    dp[src][dest][0] = 1e12;
+
+                    // No paths yet
+                    dp[src][dest][1] = 0;
+                }
+                else
+                {
+                    // Distance from a node to itself is 0
+                    dp[src][dest][0] = 0;
+
+                    // Only one trivial way (staying at the node)
+                    dp[src][dest][1] = 1;
+                }
+            }
+        }
+
+        // Initialize direct roads from the input
+        for (auto& road : roads)
+        {
+            long long start_node  = road[0];
+            long long end_node    = road[1];
+            long long travel_time = road[2];
+
+            dp[start_node][end_node][0] = travel_time;
+            dp[end_node][start_node][0] = travel_time;
+
+            // There is one direct path
+            dp[start_node][end_node][1] = 1;
+
+            // Since the roads are bidirectional
+            dp[end_node][start_node][1] = 1;
+        }
+
+
+        /****************************************************************/
+        /* Apply the Floyd-Warshall algorithm to compute shortest paths */
+        /****************************************************************/
+
+        for (long long  mid = 0; mid < n; mid++) // Intermediate node
+        {
+            for (long long  src = 0; src < n; src++) // Starting node
+            {
+                for (long long  dest = 0; dest < n; dest++) // Destination node
+                {
+                    // Avoid self-loops
+                    if (src != mid && dest != mid)
+                    {
+                        long long  new_time = dp[src][mid][0] + dp[mid][dest][0];
+
+                        if (new_time < dp[src][dest][0]) // Found a shorter time path
+                        {
+                            dp[src][dest][0] = new_time;
+                            dp[src][dest][1] = (dp[src][mid][1] * dp[mid][dest][1]) % MOD;
+                        }
+                        else if (new_time == dp[src][dest][0]) // Another way to achieve the same shortest time
+                        {
+                            dp[src][dest][1] = (dp[src][dest][1] + dp[src][mid][1] * dp[mid][dest][1]) % MOD;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Return the number of shortest paths from node (n-1) to node 0
+        return dp[n - 1][0][1];
+    }
+};
