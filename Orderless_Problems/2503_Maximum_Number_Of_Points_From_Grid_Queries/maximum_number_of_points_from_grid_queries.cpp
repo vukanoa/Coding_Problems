@@ -65,6 +65,7 @@
 #include <algorithm>
 #include <queue>
 #include <vector>
+#include <climits>
 using namespace std;
 
 /*
@@ -144,6 +145,108 @@ public:
             }
 
             answer[query_idx] = total_points;
+        }
+
+        return answer;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 81.88% */
+/* Space Beats: 74.28% */
+
+/* Time  Complexity: O(ROWS * COLS * log(ROWS * COLS) + k * log(ROWS * COLS)) */
+/* Space Complexity: O(ROWS * COLS)                                           */
+class Solution_Dijkstra_plus_Binary_Search {
+public:
+    vector<int> maxPoints(vector<vector<int>>& grid, vector<int>& queries)
+    {
+        int ROWS = grid.size();
+        int COLS = grid[0].size();
+
+        int K = queries.size();
+        vector<int> answer(K);
+
+        int total_cells = ROWS * COLS;
+        vector<int> threshold_for_max_points(total_cells + 1);
+
+        vector<vector<int>> min_value_to_reach(ROWS, vector<int>(COLS, INT_MAX));
+
+        min_value_to_reach[0][0] = grid[0][0];
+
+        priority_queue<pair<int, pair<int, int>>,
+                       vector<pair<int, pair<int, int>>>,
+                       greater<>> min_heap;
+
+        // Start from the top-left cell
+        min_heap.push({grid[0][0], {0, 0}});
+        int visited_cells = 0;
+
+        /* Signing Cross */
+        std::vector<std::pair<int, int>> directions = {{-1,0}, {1,0}, {0,-1}, {0,1}};
+
+        // Dijkstra's algorithm to compute minValueToReach for each cell
+        while ( ! min_heap.empty())
+        {
+            auto [cell_val, position] = min_heap.top();
+            min_heap.pop();
+
+            int curr_row = position.first;
+            int curr_col = position.second;
+
+            // Store the value required to reach `visitedCells` points.
+            threshold_for_max_points[++visited_cells] = cell_val;
+
+            // Explore all possible directions.
+            for (const auto& dir : directions)
+            {
+                int new_row = curr_row + dir.first;
+                int new_col = curr_col + dir.second;
+
+                if (new_row < 0 || new_col < 0 || new_row == ROWS || new_col == COLS)
+                    continue;
+
+                if (min_value_to_reach[new_row][new_col] != INT_MAX)
+                    continue;
+
+                min_value_to_reach[new_row][new_col] = max(cell_val, grid[new_row][new_col]);
+                min_heap.push( {min_value_to_reach[new_row][new_col], {new_row, new_col}} );
+            }
+        }
+
+        // Use binary search to determine the maximum number of points that can
+        // be collected for each query
+        for (int i = 0; i < K; i++)
+        {
+            int threshold = queries[i];
+
+            int L = 0;
+            int R = total_cells;
+
+            // Find the rightmost number of points we can collect before
+            // exceeding the query threshold.
+            while (L < R)
+            {
+                int mid = L + (R - L + 1) / 2;
+
+                if (threshold_for_max_points[mid] < threshold)
+                    L = mid;
+                else
+                    R = mid - 1;
+            }
+
+            answer[i] = L;
         }
 
         return answer;
