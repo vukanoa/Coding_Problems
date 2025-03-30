@@ -46,35 +46,10 @@
 
 */
 
+#include <cstring>
 #include <string>
 #include <vector>
 using namespace std;
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Input:  s = "ababcbacadefegdehijkhklij"
-    Output: [9, 7, 8]
-
-    a {0,   8}  00-------------08
-    b {1,   5}   01------05
-    c {4,   7}         04-----07
-    d {9,  14}                   09--------14
-    e {10, 15}                     10--------15
-    f {11, -1}                       11
-    g {13, -1}                           13
-    h {16, 19}                                 16----19
-    i {17, 22}                                   17--------22
-    j {18, 23}                                     18--------23
-    k {20, -1}                                         20
-    l {21, -1}                                           21
-
-
-    The rest of the Solution is Self-explanatory.
-
-*/
 
 /*
     ------------
@@ -85,20 +60,6 @@ using namespace std;
 
     Input:  s = "ababcbacadefegdehijkhklij"
     Output: [9, 7, 8]
-
-    a {0,   8}  00-------------08
-    b {1,   5}   01------05
-    c {4,   7}         04-----07
-    d {9,  14}                   09--------14
-    e {10, 15}                     10--------15
-    f {11, -1}                       11
-    g {13, -1}                           13
-    h {16, 19}                                 16----19
-    i {17, 22}                                   17--------22
-    j {18, 23}                                     18--------23
-    k {20, -1}                                         20
-    l {21, -1}                                           21
-
 
         "ababcbacadefegdehijkhklij"
          #
@@ -250,6 +211,88 @@ public:
             // Increment
             R++;
         }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Also, you could treat this problem as a "Merge Interval" Problem and solve
+    it that way.
+
+        Input:  s = "ababcbacadefegdehijkhklij"
+        Output: [9, 7, 8]
+
+        a {0,   8}  00-------------08
+        b {1,   5}   01------05
+        c {4,   7}         04-----07
+        d {9,  14}                   09--------14
+        e {10, 15}                     10--------15
+        f {11, -1}                       11
+        g {13, -1}                           13
+        h {16, 19}                                 16----19
+        i {17, 22}                                   17--------22
+        j {18, 23}                                     18--------23
+        k {20, -1}                                         20
+        l {21, -1}                                           21
+
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  97.09% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Merge_Intervals {
+public:
+    vector<int> partitionLabels(string s)
+    {
+        const int N = s.length();
+
+        vector<int> result;
+
+        int first_occurrence[26];
+        int last_occurrence[26];
+
+        // Initialize using "memset" since they're on the Stack
+        memset(last_occurrence,  0, sizeof(last_occurrence));
+        memset(first_occurrence, 0, sizeof(first_occurrence));
+
+        for (int i = 0; i < N; i++)
+            last_occurrence[s[i] - 'a'] = i;
+
+
+        int partition_start = 0;
+        int partition_end   = 0;
+
+        for (int i = 0; i < s.length(); i++)
+        {
+            // Store the first occurrence index of each character (if not set)
+            if ( ! first_occurrence[s[i] - 'a'])
+                first_occurrence[s[i] - 'a'] = i;
+
+            // If we find a new partition start
+            if (partition_end < first_occurrence[s[i] - 'a'])
+            {
+                result.push_back(partition_end - partition_start + 1);
+                partition_start = i;
+                partition_end = i;
+            }
+
+            partition_end = max(partition_end, last_occurrence[s[i] - 'a']);
+        }
+
+        // Add the last partition if it exists
+        if (partition_end - partition_start + 1 > 0)
+            result.push_back(partition_end - partition_start + 1);
 
         return result;
     }
