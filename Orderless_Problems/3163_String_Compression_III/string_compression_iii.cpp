@@ -1,6 +1,3 @@
-#include <iostream>
-#include <sstream>
-
 /*
     ==============
     === MEDIUM ===
@@ -59,6 +56,9 @@
 
 */
 
+#include <sstream>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -67,100 +67,50 @@
     I'm not sure where is the "problem" in this Problem. You literally have to
     do what you're told. You don't have to come up with a solution.
 
-    Since we have to "construct" a string, it's a good idea, in C++, to use a
-    ostringstream.
+    Since we have to "construct" a string, it's a good idea to use some kind of
+    "String Builder". In C++ we have "std::ostringstream".
 
-    Other than that the only "difficult" part is not to mess up indices in if
-    and else-if cases. And to take care of the very last sequence of characters
-    since they can be unprocessed.
+    Other than that the only "difficult" part is not to mess up indices.
+    And to take care of the very last sequence of characters since they can be
+    unprocessed.
 
 */
 
 /* Time  Beats: 68.38% */
 /* Space Beats: 67.50% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */ // We don't want to count what we return as extra
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */ // We don't count what we return as extra Space
 class Solution {
 public:
     string compressedString(string word)
     {
+        const int N = word.size();
+
         ostringstream out;
 
         int L = 0;
         int R = 0;
-
-        while (R < word.length())
+        while (R < N)
         {
-            if (word[L] != word[R])
+            if (R > 0 && (word[R-1] != word[R] || R - L >= 9) )
             {
-                out << R-L << word[L]; // It must be word[L]
+                char chr = word[R-1];
+                out << to_string(R - L) << chr;
+
                 L = R;
             }
-            else if (R-L+1 == 9)
-            {
-                out << R-L+1 << word[L];
-                L = R+1;
-            }
 
+            // Increment
             R++;
         }
 
-        if (L < word.length())
-            out << R-L << word[L];
+        if (L < N)
+        {
+            char chr = word[R-1];
+            out << to_string(R - L) << chr;
+        }
 
         return out.str();
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    This one doesn't use ostringstream. Instead we're using basic string
-    variable and appending to it.
-
-    ostringstream is a more verbose and elegant solution in my opinion, but
-    this one is, I guess, more common or more natural to most people.
-
-*/
-
-/* Time  Beats: 66.67% */
-/* Space Beats: 77.92% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */ // We don't want to count what we return as extra
-class Solution_2 {
-public:
-    string compressedString(string word)
-    {
-        string result = "";
-
-        int n = word.length();
-
-        int count = 1;
-        char chr = word[0];
-
-        for (int i = 1; i < n; i++)
-        {
-            if (word[i] == chr && count < 9)
-                count++;
-            else
-            {
-                result.push_back(count + '0'); // 4 + 48 == 52 ---> '4'
-                result.push_back(chr);
-
-                chr = word[i];
-                count = 1;
-            }
-        }
-        result.push_back(count+'0');
-        result.push_back(chr);
-
-        return result;
     }
 };
