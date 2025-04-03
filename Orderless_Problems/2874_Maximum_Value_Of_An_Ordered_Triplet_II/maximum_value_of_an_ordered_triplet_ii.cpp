@@ -67,6 +67,64 @@ using namespace std;
     --- IDEA ---
     ------------
 
+    This is a famous "trick" when you're asked to do something with triplets
+    such that:
+
+        i < j < k
+
+    You iterate only with 'j' pointer, and the remaining two are pre-calculated
+
+
+    Similar thing is true for when you have quadruplets such that:
+
+        i < j < k < m
+
+    However, this one can't be done in O(N), but it CAN be done in O(N^2) which
+    is an optimization of order O(N^2) as well.
+
+    Here you'd fix 'j' and 'k' and you'd pre-calculate 'i' and 'm'.
+
+
+    This is a fundamental trick for these kinds of problems.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  12.05% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Greedy_and_Prefix_Sum {
+public:
+    long long maximumTripletValue(vector<int>& nums)
+    {
+        const int N = nums.size();
+        long long result = 0;
+
+        vector<int> left_max(N);
+        vector<int> right_max(N);
+
+        for (int i = 1; i < N; i++)
+        {
+            left_max[i]        = max(left_max[i - 1],  nums[i - 1]);
+            right_max[N-1 - i] = max(right_max[N - i], nums[N - i]);
+        }
+
+        for (int j = 1; j < N-1; j++)
+            result = max(result, 1LL * (left_max[j] - nums[j]) * right_max[j]);
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     This is a standard "triplet trick". Essentially fix the middle one and
     iterate calculate the other two along the way.
 
