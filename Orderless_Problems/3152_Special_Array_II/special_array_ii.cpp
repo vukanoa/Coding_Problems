@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -55,8 +52,98 @@
 
 */
 
+#include <algorithm>
+#include <vector>
 using namespace std;
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 41.14% */
+/* Space Beats: 95.80% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Binary_Search {
+public:
+    vector<bool> isArraySpecial(vector<int>& nums, vector<vector<int>>& queries)
+    {
+        const int N = nums.size();
+        const int M = queries.size();
+
+        vector<bool> answer(M);
+
+        vector<bool> vec(N, false);
+        vec[0] = true;
+
+        vector<int> range;
+        for (int i = 1; i < N; i++)
+        {
+            if (nums[i] & 1)
+            {
+                if (nums[i-1] & 1)
+                {
+                    vec[i] = false;
+                    range.push_back(i);
+                }
+                else
+                    vec[i] = true;
+            }
+            else
+            {
+                if ( ! (nums[i-1] & 1))
+                {
+                    vec[i] = false;
+                    range.push_back(i);
+                }
+                else
+                    vec[i] = true;
+            }
+        }
+
+        /* Sort */
+        sort(range.begin(), range.end()); // O(N * logN)
+
+        for (int q = 0; q < M; q++)
+        {
+            int start = queries[q][0];
+            int end   = queries[q][1];
+
+            // O(logn)
+            auto iter = upper_bound(range.begin(), range.end(), start);
+
+            if (iter == range.end())
+                answer[q] = true;
+            else
+            {
+                if (*iter > end)
+                    answer[q] = true;
+                else
+                    answer[q] = false;
+            }
+        }
+
+        return answer;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
 
 /* Time  Beats: 87.50% */
 /* Space Beats: 51.45% */
