@@ -124,7 +124,7 @@ struct TreeNode {
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution {
+class Solution_Complex_Modular {
 public:
     TreeNode* lcaDeepestLeaves(TreeNode* root)
     {
@@ -201,5 +201,51 @@ private:
 
         dfs(root->left,  level+1, deepest_level, umap_node_to_parent);
         dfs(root->right, level+1, deepest_level, umap_node_to_parent);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We can just do an elegant recursive approach. It's really self-explanatory
+    once you look at the code.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  67.37% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution {
+public:
+    TreeNode* lcaDeepestLeaves(TreeNode* root)
+    {
+        return dfs(root).first;
+    }
+
+private:
+    pair<TreeNode*, int> dfs(TreeNode* root)
+    {
+        if ( ! root)
+            return {nullptr, 0};
+
+        // left.first  <==> left_subtree_root
+        // left.second <==> left_subtree_depth
+        auto left_pair  = dfs(root->left);
+        auto right_pair = dfs(root->right);
+
+        if (left_pair.second > right_pair.second)
+            return {left_pair.first, left_pair.second + 1};
+
+        if (left_pair.second < right_pair.second)
+            return {right_pair.first, right_pair.second + 1};
+
+        return {root, left_pair.second + 1};
     }
 };
