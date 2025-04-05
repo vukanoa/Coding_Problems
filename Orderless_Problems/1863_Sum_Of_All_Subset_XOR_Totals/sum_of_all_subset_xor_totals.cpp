@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -71,6 +68,9 @@
 
 */
 
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -89,7 +89,7 @@
 
 /* Time  Complexity: O(2^n * n) */
 /* Space Complexity: O(2^n * n) */
-class Solution {
+class Solution_Brute_Force {
 public:
     int subsetXORSum(std::vector<int>& nums)
     {
@@ -188,7 +188,7 @@ private:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Elegant {
 public:
     int subsetXORSum(vector<int>& nums)
     {
@@ -198,5 +198,46 @@ public:
             total |= num;
 
         return total << (nums.size() - 1);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Skeleton of a Memoization approach.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  42.82% */
+
+/* Time  Complexity: O(2^n) */ // Since n <= 12, this is acceptable
+/* Space Complexity: O(n)   */
+class Solution_Skeleton_of_Memoization {
+public:
+    int subsetXORSum(vector<int>& nums)
+    {
+        int result = 0;
+        solve(nums, 0, 0, result);
+
+        return result;
+    }
+
+private:
+    void solve(vector<int>& nums, int pos, int curr_xor, int& result)
+    {
+        if ((unsigned)pos == nums.size())
+        {
+            result += curr_xor;
+            return;
+        }
+
+        solve(nums, pos+1, curr_xor ^ nums[pos], result); // Take
+        solve(nums, pos+1, curr_xor            , result); // Skip
     }
 };
