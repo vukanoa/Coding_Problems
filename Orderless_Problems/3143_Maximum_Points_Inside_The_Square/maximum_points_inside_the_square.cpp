@@ -70,6 +70,8 @@
 #include <vector>
 using namespace std;
 
+#define SORT(v) sort((v).begin(),(v).end())
+
 /*
     ------------
     --- IDEA ---
@@ -164,5 +166,62 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is slower if N is > than 10^7, however if N is less than that,
+    then it's better to use this one, even if this Time Complexity is:
+
+        O(N * logN)
+
+    But for very large N values, the above Solution is preferable.
+
+*/
+
+/* Time  Beats: 86.73% */
+/* Space Beats: 54.08% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_2 {
+public:
+    int maxPointsInsideSquare(vector<vector<int>>& points, string s)
+    {
+        const int N = points.size();
+        vector<pair<int,int>> threshold_and_tag;
+
+        for (int i = 0; i < N; i++)
+            threshold_and_tag.push_back( {max(abs(points[i][0]), abs(points[i][1])), s[i] - 'a'} );
+
+        // sort(vec.begin(), vec.end());
+        SORT(threshold_and_tag);
+
+        int seen_mask = 0;
+
+        for (int i = 0; i < N;)
+        {
+            int j = i;
+
+            while (j < N && threshold_and_tag[j].first == threshold_and_tag[i].first)
+            {
+                if (seen_mask & (1 << threshold_and_tag[j].second))
+                    return i;
+
+                seen_mask |= (1 << threshold_and_tag[j].second);
+                j++;
+            }
+
+            i = j;
+        }
+
+        return N;
     }
 };
