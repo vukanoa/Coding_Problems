@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -24,7 +21,7 @@
     If there are multiple solutions, return any of them.
 
     ================================================================
-    FUNCTION: vector<int> largestDivisibleSubset(vector<int>& nums); 
+    FUNCTION: vector<int> largestDivisibleSubset(vector<int>& nums);
     ================================================================
 
     ==========================================================================
@@ -48,66 +45,60 @@
 
 */
 
+#include <algorithm>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    TODO
+    Similar DP to "Longest Increasing Subsequence" Problem.
 
 */
 
-/* Time  Beats: 16.09% */
-/* Space Beats:  9.71% */
+/* Time  Beats: 31.03% */
+/* Space Beats: 73.14% */
 
-/* Time  Complexity: O(n^2) */
-/* Space Complexity: O(n^2) */
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N)   */
 class Solution {
 public:
     vector<int> largestDivisibleSubset(vector<int>& nums)
     {
-        int size = nums.size();
-        sort(nums.begin(), nums.end(), [](const int val1, const int val2)->bool{
-            return val1 > val2;
-        });
+        const int N = nums.size();
+        vector<int> result;
 
-        vector<vector<int>> mult_chain(size);
-        int max_chain_size = 0;
+        sort(nums.begin(), nums.end());
 
-        for (int curr_idx = 0; curr_idx < size; curr_idx++)
+        vector<int>   dp(N, 1);
+        vector<int> prev(N, -1);
+
+        int end_idx_of_max_subset = 0;
+        for (int i = 1; i < N; i++)
         {
-            vector<int> curr_chain = {nums[curr_idx]};
-
-            int max_prev_chain_size = 0;
-            int max_prev_chain_idx = -1;
-
-            for (int prev_idx = curr_idx - 1; prev_idx > -1; prev_idx--)
+            for (int j = 0; j < i; j++)
             {
-                int curr_chain_size = mult_chain[prev_idx].size();
-
-                if (max_prev_chain_size <  curr_chain_size && nums[prev_idx] % nums[curr_idx] == 0)
+                if (nums[i] % nums[j] == 0 && dp[i] < dp[j] + 1)
                 {
-                      max_prev_chain_size  = curr_chain_size;
-                      max_prev_chain_idx = prev_idx;
+                    dp[i]   = dp[j] + 1;
+                    prev[i] = j;
                 }
             }
 
-            if (max_prev_chain_idx != -1)
-            {
-                for (auto mult : mult_chain[max_prev_chain_idx])
-                    curr_chain.push_back(mult);
-            }
-
-            mult_chain[curr_idx] = curr_chain;
-            max_chain_size = max(max_chain_size, (int)curr_chain.size());
+            if (dp[i] > dp[end_idx_of_max_subset])
+                end_idx_of_max_subset = i;
         }
 
-        for (auto &curr_chain : mult_chain)
+        for (int i = end_idx_of_max_subset; i >= 0; i = prev[i])
         {
-            if (max_chain_size == curr_chain.size())
-                return curr_chain;
+            result.push_back(nums[i]);
+
+            if (prev[i] == -1)
+                break;
         }
 
-        return {};
-    }    
+        return result;
+    }
 };
