@@ -1,9 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <set>
-#include <numeric>
-#include <algorithm>
-
 /*
     ==============
     === MEDIUM ===
@@ -45,6 +39,12 @@
 
 */
 
+#include <cstring>
+#include <vector>
+#include <set>
+#include <numeric>
+#include <algorithm>
+using namespace std;
 
 /*
     ------------
@@ -183,7 +183,7 @@
 /* Space Complexity: O(n * sum(nums)) */
 class Solution{
 public:
-    bool canPartition(std::vector<int>& nums)
+    bool canPartition(vector<int>& nums)
     {
         int sum = 0;
         for (const auto& n : nums)
@@ -192,7 +192,7 @@ public:
         if (sum & 1) // Odd number
             return false;
 
-        std::set<int> dp_set;
+        set<int> dp_set;
         dp_set.insert(0);
 
         int target = sum / 2;
@@ -200,7 +200,7 @@ public:
 
         for (int i = n - 1; i >= 0; i--)
         {
-            std::set<int> tmp_set;
+            set<int> tmp_set;
             for (const auto& elem : dp_set)
             {
                 if ((elem + nums[i]) == target)
@@ -239,16 +239,16 @@ public:
 /* Space Complexity: O(n * sum(nums)) */
 class Solution_Optimized_1{
 public:
-    bool canPartition(std::vector<int>& nums)
+    bool canPartition(vector<int>& nums)
     {
         int n = nums.size();
-        int sum = std::accumulate(nums.begin(), nums.end(), 0);
+        int sum = accumulate(nums.begin(), nums.end(), 0);
 
         if (sum % 2 != 0)
             return false;
 
         int target = sum / 2;
-        std::vector<std::vector<bool>> dp(n, std::vector<bool>(target + 1, false));
+        vector<vector<bool>> dp(n, vector<bool>(target + 1, false));
 
         // Populate the first column
         dp[0][0] = true;
@@ -291,18 +291,20 @@ public:
 /* Space Complexity: O(n * sum(nums)) */
 class Solution_Optimized_2_Efficient{
 public:
-    bool canPartition(std::vector<int>& nums)
+    bool canPartition(vector<int>& nums)
     {
         int n = nums.size();
-        int sum = std::accumulate(nums.begin(), nums.end(), 0);
+        int sum = accumulate(nums.begin(), nums.end(), 0);
 
-        std::sort(nums.rbegin(), nums.rend());
+        // These two sorts are effectively EQUIVALENT(sort in DESCENDING order)
+        sort(nums.rbegin(), nums.rend());
+        // sort(nums.begin(), nums.end(), greater<int>());
 
         if (sum % 2 != 0)
             return false;
 
         int target = sum / 2;
-        std::vector<bool> dp(target + 1, false);
+        vector<bool> dp(target + 1, false);
         dp[0] = true;
 
         for (int i = 0; i < n; i++)
@@ -325,97 +327,80 @@ public:
     --- IDEA ---
     ------------
 
-    TODO
+    By-the-book Memoization Problem.
+
+    Constraits of:
+
+        1 <= N <= 200
+        1 <= nums[i] <= 100
+
+    scream:"Memoization!" as 2^N would be to inefficient, whereas the "total
+    number of states" would be the Time Complexity of O(200 * 20000).
+
+    How did I get these numbers?
+    We'll have "memo" that will be declared like this:
+
+        int memo[201][20001];
+
+    But why these numbers specifically?
+
+    201 is obvious. It's the total number of elements of "nums". That is always
+    a part of "memo" in any Memoization Problem.
+
+    However, 20001 seems to come from nowhere. Actually it's just the worst
+    case scenario pertaining to our "sum" part.
+
+    We need to be able to represent ANY sum, therefore the biggest possible sum
+    is to sum all of the elements.
+
+    But imagine that each element is 100(which is the maximum according to our
+    Constrints).
+
+    Now imagine that N=200, i.e. number of elements in total is 200.
+
+    Therefore in the worst case, at the last element we will have a state that
+    represents the sum of ALL the elements.
+
+    If we have 200 elements and each one is 100, then the total sum is 20000.
+    And that needs to be able to be represented, therefore 20001(because it's
+    0-indexed).
 
 */
 
-/* Time  Beats: 94.80% */
-/* Space Beats: 17.99% */
+/* Time  Beats: 11.10% */
+/* Space Beats: 51.86% */
 
-/* Time  Complexity: O(n * sum(nums)) */
-/* Space Complexity: O(n * sum(nums)) */
+/* Time  Complexity: O(N * sum / 2) ---> O(N * sum) */
+/* Space Complexity: O(N * sum / 2) ---> O(N * sum) */
 class Solution_Memoization {
+private:
+    int memo[201][20001]; // 200 * 100 = 20000
 public:
-    bool canPartition(std::vector<int>& nums)
+    bool canPartition(vector<int>& nums)
     {
-        int sum = std::accumulate(nums.begin(), nums.end(), 0);
+        memset(memo, -1, sizeof(memo)); // It MUST be -1, and not "false"!!!
 
+        int sum = accumulate(nums.begin(), nums.end(), 0);
         if (sum & 1)
             return false;
 
-        std::vector<std::vector<int>> memo(nums.size()+1, std::vector<int>(sum/2 + 1, -1));
-
-        return backtracking(nums, memo, 0, sum/2);
+        return memoization(nums, 0, sum / 2);
     }
 
 private:
-    bool backtracking(std::vector<int>& nums,
-                      std::vector<std::vector<int>>& memo,
-                      int index,
-                      int sum)
+    bool memoization(vector<int>& nums, int idx, int sum)
     {
         if (sum == 0)
             return true;
-        else if (index >= nums.size() || sum < 0)
+        else if (static_cast<unsigned>(idx) == nums.size() || sum < 0)
             return false;
-        else if (memo[index][sum] != -1)
-            return memo[index][sum];
 
-        memo[index][sum] = backtracking(nums, memo, index+1, sum - nums[index]) ||
-                           backtracking(nums, memo, index+1, sum);
+        if (memo[idx][sum] != -1)
+            return memo[idx][sum];
 
-        return memo[index][sum];
+        bool take = memoization(nums, idx+1, sum - nums[idx]);
+        bool skip = memoization(nums, idx+1, sum            );
+
+        return memo[idx][sum] = take || skip;
     }
 };
-
-
-
-int
-main()
-{
-    Solution                       sol;
-    Solution_Optimized_1           sol_opt_1;
-    Solution_Optimized_2_Efficient sol_opt_2_eff;
-    Solution_Memoization           sol_memo;
-
-    /* Example 1 */
-    std::vector<int> nums = {1, 5, 11, 5};
-
-    /* Example 2 */
-    // std::vector<int> nums = {1, 2, 3, 5};
-
-    /* Example 3 */
-    std::cout << "\n\t==================================";
-    std::cout << "\n\t=== PARTITION EQUAL SUBSET SUM ===";
-    std::cout << "\n\t==================================\n";
-
-
-    /* Write Input */
-    bool first = true;
-    std::cout << "\n\tArray: [";
-    for (auto x: nums)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        std::cout << x;
-        first = false;
-    }
-    std::cout << "]\n";
-
-    std::cout << "\n\t\tIs it possible to make 2 equal subset sums?\n";
-
-    /* Solution */
-    // bool possible = sol.canPartition(nums);
-    // bool possible = sol_opt_1.canPartition(nums);
-    bool possible = sol_opt_2_eff.canPartition(nums);
-
-    /* Write Output */
-    if (possible)
-        std::cout << "\n\tOutput: It is INDEED possible!\n\n";
-    else
-        std::cout << "\n\tOutput: It is NOT possible!\n\n";
-
-
-    return 0;
-}
