@@ -46,6 +46,8 @@
 
 */
 
+#include <numeric>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -76,6 +78,86 @@ public:
             {
                 if (nums[i] == nums[j] && ((i * j) % k == 0))
                     result++;
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    If you know how to get factors of a number in O(sqrt(number)), then this
+    shouldn't be that much of a problem.
+
+        vector<int> factors;
+        for (int f = 1; f * f <= k; f++)
+        {
+            if (f * f == k)
+            {
+                factors.push_back(f); // To STOP counting the same one twice
+            }
+            else if (k % f == 0)
+            {
+                factors.push_back(f);
+                factors.push_back(k / f);
+            }
+        }
+
+*/
+
+/* Time  Beats: 28.60% */
+/* Space Beats:  6.09% */
+
+/* Time  Complexity: O(N * (logK + sqrt(K))) */
+/* Space Complexity: O(N)           */
+class Solution_Map_and_GCD {
+public:
+    int countPairs(vector<int>& nums, int k)
+    {
+        int result = 0;
+
+        unordered_map<int, vector<int>> umap;
+
+        for (int i = 0; i < nums.size(); i++)
+            umap[nums[i]].push_back(i);
+
+        vector<int> factors;
+        for (int f = 1; f * f <= k; f++)
+        {
+            if (f * f == k)
+            {
+                factors.push_back(f); // To STOP counting the same one twice
+            }
+            else if (k % f == 0)
+            {
+                factors.push_back(f);
+                factors.push_back(k / f);
+            }
+        }
+
+        for (auto& [num, vec_of_indices] : umap)
+        {
+            unordered_map<int, int> umap_tmp;
+
+            for (int i : vec_of_indices)
+            {
+                int curr_gcd = gcd(i, k);
+                int need = k / curr_gcd;
+
+                // Adding all previous j with j % need == 0
+                result += umap_tmp[need];
+                for (const int& f : factors)
+                {
+                    if (i % f == 0)
+                        umap_tmp[f]++;
+                }
             }
         }
 
