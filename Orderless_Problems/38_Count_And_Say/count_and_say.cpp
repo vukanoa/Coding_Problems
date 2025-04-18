@@ -66,6 +66,7 @@
 
 */
 
+#include <algorithm>
 #include <string>
 using namespace std;
 
@@ -122,5 +123,62 @@ public:
         result += to_string(count) + prev_str[L];
 
         return helper(idx + 1, n, result); // Tail-recursion
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Iterative way of implementing it, utilizing "std::find_if".
+
+*/
+
+/* Time  Beats: 83.88% */
+/* Space Beats: 53.06% */
+
+/* Time  Complexity: O(2^N) */
+/* Space Complexity: O(2^N) */
+class Solution_Iterative {
+public:
+    string countAndSay(int n)
+    {
+        if (n == 1)
+            return "1";
+
+        string result = "1";
+        while (n > 1)
+        {
+            string tmp = "";
+            int i = 0;
+            while (i < result.size())
+            {
+                char target = result[i];
+
+                auto it = std::find_if(result.begin() + i, result.end(), [&](char c) { return c != target; });
+                size_t distance = std::distance(result.begin() + i, it);
+
+                tmp += to_string(distance);
+                tmp += target;
+
+                if (it == result.end())
+                    break;
+
+                // Increment
+                i += distance;
+            }
+
+            result.clear();
+            result = tmp;
+
+            // Decrement
+            n--;
+        }
+
+        return result;
     }
 };
