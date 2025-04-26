@@ -66,6 +66,78 @@ using namespace std;
     --- IDEA ---
     ------------
 
+    This is the first messy thought you probably have immediately upon reading
+    the problem.
+
+    Check out the 2nd Solutoin down below.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  87.49% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    int longestMonotonicSubarray(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        if (N == 1)
+            return 1;
+
+        int state = 0;
+        int curr = 1;
+
+        for (int i = 1; i < N; i++)
+        {
+            if (nums[i-1] == nums[i])
+            {
+                state = 0;
+                curr = 1;
+            }
+            else if (nums[i-1] < nums[i])
+            {
+                if (state == 1)
+                {
+                    curr++;
+                }
+                else
+                {
+                    state = 1;
+                    curr = 2;
+                }
+            }
+            else if (nums[i-1] > nums[i])
+            {
+                if (state == 2)
+                {
+                    curr++;
+                }
+                else
+                {
+                    state = 2;
+                    curr = 2;
+                }
+            }
+
+            result = max(result, curr);
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     Instead of trying some weird if-else conditions, simply try to find longest
     increasing subarray from the front and longest increasing subarray but
     going from the back.
@@ -80,7 +152,7 @@ using namespace std;
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Elegant {
 public:
     int longestMonotonicSubarray(vector<int>& nums)
     {
