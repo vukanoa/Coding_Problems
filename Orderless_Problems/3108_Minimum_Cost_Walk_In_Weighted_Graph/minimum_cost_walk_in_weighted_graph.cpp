@@ -74,6 +74,7 @@
 
 */
 
+#include <numeric>
 #include <vector>
 using namespace std;
 
@@ -86,12 +87,12 @@ using namespace std;
 
 */
 
-/* Time  Beats: 61.69% */
-/* Space Beats: 92.21% */
+/* Time  Beats: 91.53% */
+/* Space Beats: 26.47% */
 
-/* Time  Complexity: O(M + Q) */  // M - number of edges, Q - number of queries
+/* Time  Complexity: O(E + Q) */  // E - number of edges, Q - number of queries
 /* Space Complexity: O(N)     */
-class Solution {
+class SolutionQ4444 {
 public:
     vector<int> parent;
     vector<int> depth;
@@ -100,10 +101,11 @@ public:
     {
         vector<int> answer;
 
-        parent.resize(n, -1);
         depth.resize(n, 0);
+        parent.resize(n);
+        iota(parent.begin(), parent.end(), 0);
 
-        vector<unsigned int> component_cost(n, -1);
+        vector<unsigned int> component_cost(n, 0xffffffff); // (n, -1)
 
         for (auto& edge : edges)
             Union(edge[0], edge[1]);
@@ -136,10 +138,18 @@ public:
 private:
     int Find(int node)
     {
-        if (parent[node] == -1)
-            return node;
+        // Get root parent
+        while (node != parent[node])
+        {
+            // Huge Optimization(From O(n) to Amortized O(α(n))Time Complexity)
+            // O(α(n)) is effectively as O(1)
+            // If there is no grandparent, nothing will happen
+            parent[node] = parent[parent[node]];
 
-        return parent[node] = Find(parent[node]);
+            node = parent[node];
+        }
+
+        return node;
     }
 
     void Union(int node1, int node2)
@@ -150,12 +160,15 @@ private:
         if (root1 == root2)
             return;
 
-        if (depth[root1] < depth[root2])
-            swap(root1, root2);
-
-        parent[root2] = root1;
-
-        if (depth[root1] == depth[root2])
-            depth[root1]++;
+        if (depth[root1] > depth[root2])
+        {
+            parent[root2] = root1;
+            depth[root1] += depth[root2];
+        }
+        else // if (depth[root2] > depth[root1])
+        {
+            parent[root1] = root2;
+            depth[root2] += depth[root1];
+        }
     }
 };
