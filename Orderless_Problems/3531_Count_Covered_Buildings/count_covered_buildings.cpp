@@ -61,7 +61,7 @@
 
     *** Constraints ***
     2 <= n <= 10^5
-    1 <= buildings.length <= 10^5 
+    1 <= buildings.length <= 10^5
     buildings[i] = [x, y]
     1 <= x, y <= n
     All coordinates of buildings are unique.
@@ -120,6 +120,81 @@ public:
                 {
                     result++;
                 }
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Memorize the minimum and maximum Y at every X.
+    Memorize the minimum and maximum X at every Y.
+
+    Then for every point, check if there are Y points greater and lower for
+    this current X.
+
+    And vice verca. Check if there are "lefter" Xs than the current X for this
+    Y and if there are "righter" Xs than the current X for this Y.
+
+
+    It sounds complicated at first, but it's not. Just draw it out and it'll
+    make sense.
+
+    Make sure you don't mess up coordinates, as it is very easy to make a
+    mistake.
+
+*/
+
+/* Time  Beats: 90.96% */
+/* Space Beats: 91.43% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Simple {
+public:
+    int countCoveredBuildings(int n, vector<vector<int>>& buildings)
+    {
+        unordered_map<int, pair<int,int>> umap_x;
+        unordered_map<int, pair<int,int>> umap_y;
+
+        for (const auto& entry : buildings)
+        {
+            const int& x = entry[0];
+            const int& y = entry[1];
+
+            if (umap_x.find(x) == umap_x.end()) // x does NOT exist in umap_x
+                umap_x[x] = {y, y};
+
+            if (umap_y.find(y) == umap_y.end()) // y does NOT exist in umap_y
+                umap_y[y] = {x, x};
+
+
+            umap_x[x].first  = min(umap_x[x].first,  y);
+            umap_x[x].second = max(umap_x[x].second, y);
+
+            umap_y[y].first  = min(umap_y[y].first,  x);
+            umap_y[y].second = max(umap_y[y].second, x);
+        }
+
+        int result = 0;
+
+        for (const auto& entry : buildings)
+        {
+            const int& x = entry[0];
+            const int& y = entry[1];
+
+            if (umap_x[x].first < y && umap_x[x].second > y &&
+                umap_y[y].first < x && umap_y[y].second > x)
+            {
+                result++;
             }
         }
 
