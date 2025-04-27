@@ -57,7 +57,7 @@ using namespace std;
 /* Time  Beats: 100.00% */
 /* Space Beats:  55.56% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
@@ -76,6 +76,44 @@ public:
 
             left++;
             right++;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    More elegant way of writing it. If you are a beginner it's beneficial to
+    see both implementations.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  45.56% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    int countSubarrays(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        for (int i = 1; i < N-1; i++)
+        {
+            if (nums[i] & 1)
+                continue;
+
+            if (nums[i] / 2 == (nums[i-1] + nums[i+1]))
+                result++;
         }
 
         return result;
