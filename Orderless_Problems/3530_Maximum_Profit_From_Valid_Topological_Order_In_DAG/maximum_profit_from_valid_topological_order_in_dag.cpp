@@ -131,3 +131,73 @@ private:
         return memo[mask];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+    dp[5] represents: dp[000..00101]
+
+    00000.000101
+             ^ ^
+             | |
+         ____| |____
+         |         |
+     node_2       node_0
+
+    i.e. when node_2 and node_0 are the only processed, max score is: X
+
+*/
+
+/* Time  Beats: 25.00% */
+/* Space Beats: 16.67% */
+
+/* Time  Complexity: O(N * 2^N) */
+/* Space Complexity: O(N)       */
+class Solution_Bitmask_Bottom_Up_DP {
+public:
+    int maxProfit(int n, vector<vector<int>>& edges, vector<int>& score)
+    {
+        vector<int> need(n, 0);
+
+        for (auto& e : edges)
+        {
+            int src = e[0];
+            int dst = e[1];
+
+            need[dst] |= (1 << src);
+        }
+
+        vector<int> dp(1 << n, -1);
+        dp[0] = 0;
+
+        // Set-bits in "mask" represents all of the processed nodes
+        for (int mask = 0; mask < (1 << n); mask++)
+        {
+            if (dp[mask] == -1)
+                continue;
+
+            int mul = __builtin_popcount(mask) + 1;
+            for (int i = 0; i < n; ++i)
+            {
+                // If "I am not processed" &&  all the nodes that I depend on
+                //                             are processed
+                if (((mask >> i) & 1) == 0 && (mask & need[i]) == need[i])
+                {
+                    int new_mask = mask | (1 << i);
+                    int gain     = score[i] * mul;
+
+                    dp[new_mask] = max(dp[new_mask], dp[mask] + gain);
+                }
+            }
+        }
+
+        return dp[(1 << n) - 1];
+    }
+};
