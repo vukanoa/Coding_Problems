@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
 /*
     ==============
     === MEDIUM ===
@@ -50,62 +46,9 @@
 
 */
 
+#include <vector>
+#include <algorithm>
 using namespace std;
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    TODO
-
-*/
-
-/* Time  Beats: 98.57% */
-/* Space Beats: 32.34% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution {
-public:
-    long long countSubarrays(vector<int>& nums, int k)
-    {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-
-        const int n = nums.size();
-        int max_elem = *std::max_element(nums.begin(), nums.end());
-        int max_cnt  = 0;
-
-        long long result = 0;
-
-        int left  = 0;
-        int right = 0;
-
-        while (right < n)
-        {
-            if (nums[right] == max_elem)
-                max_cnt++;
-
-            while (max_cnt > k || (left <= right && max_cnt == k && nums[left] != max_elem))
-            {
-                if (nums[left] == max_elem)
-                    max_cnt--;
-
-                left++;
-            }
-
-            if (max_cnt == k)
-                result += left + 1;
-
-            right++;
-        }
-
-        return result;
-    }
-};
-
-
-
 
 /*
     ------------
@@ -121,13 +64,11 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_Concise {
+class Solution_Sliding_Window {
 public:
     long long countSubarrays(vector<int>& nums, int k)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-
-        const int n = nums.size();
+        const int N = nums.size();
         int max_elem = *std::max_element(nums.begin(), nums.end());
         int max_cnt  = 0;
 
@@ -136,7 +77,7 @@ public:
         int left  = 0;
         int right = 0;
 
-        while (right < n)
+        while (right < N)
         {
             if (nums[right] == max_elem)
                 max_cnt++;
@@ -151,7 +92,72 @@ public:
 
             result += left;
 
+            // Increment
             right++;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one does NOT use any nested while-loop, instead it uses "smart"
+    counting.
+
+    It's usually better to use the above approach, but it's beneficial to know
+    that you can sometimes count it in ways like this.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  12.30% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Counting {
+public:
+    long long countSubarrays(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+        long long result = 0;
+
+        int max_elem = *max_element(nums.begin(), nums.end());
+
+        vector<int> indices;
+        int idx = -1;
+
+        int add = 0;
+
+        int L = 0;
+        int R = 0;
+
+        while (R < N)
+        {
+            if (nums[R] == max_elem)
+            {
+                indices.push_back(R);
+
+                if (indices.size() >= k)
+                    idx++;
+
+                if (idx == 0)
+                    add += indices[idx] - L + 1;
+                else if (idx > 0)
+                    add += indices[idx] - indices[idx-1];
+            }
+
+            if (indices.size() >= k)
+                result += add;
+
+            // Increment
+            R++;
         }
 
         return result;
