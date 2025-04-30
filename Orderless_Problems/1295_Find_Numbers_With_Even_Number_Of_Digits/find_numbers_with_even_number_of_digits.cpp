@@ -201,3 +201,81 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    + We can use the __builtin_clz function which basically returns the number
+      of 0's in the binary format of a number.
+
+    + Find the most significant bit in the number using 31 - __builtin_clz(i)
+
+    + As we'd used log 10 in an earlier approach to compute the number of
+      digits similarly here we can use
+
+    int digits = (msb * 0.30103) + 1;
+
+    + Where 0.30103 is the value of log10(2) written in integer form to avoid
+      floating point errors.
+
+    + Lastly we simply check whether i >= pow(10, digits) i.e whether there is
+      an extra digit present in i.
+
+    + Check whether the digits is even or odd.
+
+    + For example : for 127,
+        + int msb = 31 - 25 = 6
+        + digits = (6 * 0.30103) + 1 = floor(1.80618) + 1 = 2
+        + if (i >= pow(10, digits)) → (127 >= pow(10, 2)) so
+        + count = 1 + 2 = 3
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  28.23% */
+
+/* Time  Complexity: O(N * log10(M)) */
+/* Space Complexity: O(log10(M))     */
+class Solution_Bit_Manipulation {
+public:
+    int findNumbers(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        constexpr double LOG10_OF_2 = 0.30102999566;
+
+        for (int i = 0; i < N; i++)
+        {
+            /*
+                unsigned int x = 18;     // binary: 00000000 00000000 00000000 00010010
+                                                                             ...  43210
+                __builtin_clz(x) == 27   // 27 leading zeros                      ^
+                                                                                  |
+                                                            ______________________|
+                                                            |
+                31 - 27 == 4             // MSB is at index 4 (bit position of 16)
+
+                Note:
+                If nums[i] == 0, then __builtin_clz(0) is undefined behavior
+
+            */
+            unsigned highest_set_bit_idx = nums[i] ? 31 - __builtin_clz(nums[i]) : -1;
+
+            int digits = (highest_set_bit_idx * LOG10_OF_2) + 1;
+
+            if (nums[i] >= pow(10, digits))
+                digits++;
+
+            if (digits % 2 == 0)
+                result++;
+        }
+
+        return result;
+    }
+};
