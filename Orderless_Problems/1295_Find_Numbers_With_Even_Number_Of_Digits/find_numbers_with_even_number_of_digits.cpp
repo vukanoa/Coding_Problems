@@ -47,6 +47,7 @@
 */
 
 #include <cmath>
+#include <string>
 #include <vector>
 using namespace std;
 
@@ -125,6 +126,76 @@ public:
             {
                 result++;
             }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another good way of doing it. For these constraints log10(10^) is O(1),
+    however in the general case, if the number of digits of the highest number
+    is very high, then it would be considered O(log10(M)), where M is the
+    highest number possible given the Constraints.
+
+*/
+
+/* Time  Complexity: O(N * log10(M)) */
+/* Space Complexity: O(log10(M))     */
+class Solution_Convert_To_String {
+public:
+    int findNumbers(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        for (int i = 0; i < N; i++)
+        {
+            int len = to_string(nums[i]).length();
+
+            if (len % 2 == 0)
+                result++;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Similar as above, but we are directly using math instead of masking it with
+    strings.
+
+*/
+
+/* Time  Complexity: O(N * log10(M)) */
+/* Space Complexity: O(log10(M))     */
+class Solution_Using_Logarithm_Base_10 {
+public:
+    int findNumbers(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        for (int i = 0; i < N; i++)
+        {
+            int count = static_cast<int>(floor(log10(nums[i])) + 1);
+
+            if (count % 2 == 0)
+                result++;
         }
 
         return result;
