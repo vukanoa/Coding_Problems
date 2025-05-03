@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-
 /*
     ==============
     === MEDIUM ===
@@ -57,129 +53,63 @@
 
 */
 
-/* Time  Beats: 44.29% */
-/* Space Beats: 5.79% */
-class Solution {
-public:
-    int minDominoRotations(vector<int>& tops, vector<int>& bottoms)
-    {
-        std::unordered_map<int, int> map_tops;
-        std::unordered_map<int, int> map_bots;
+#include <climits>
+#include <vector>
+using namespace std;
 
-        /* Step 1: Store frequence of all elements in map */
+/*
+    ------------
+    --- IDEA ---
+    ------------
 
-        // O(N)
-        for (int& num : tops)
-            map_tops[num]++;
+    TODO
 
-        // O(N)
-        for (int& num : bottoms)
-            map_bots[num]++;
+*/
 
+/* Time  Beats: 34.91% */
+/* Space Beats: 48.71% */
 
-        /* Step 2: Bucket Sort's first step */
-        // O(N)
-        int max_freq_top = 0;
-        std::vector<std::vector<int>> freq_top(tops.size() + 1);
-        for (const auto& it: map_tops)
-        {
-            if (it.second > max_freq_top)
-                max_freq_top = it.second;
-
-            freq_top[it.second].push_back(it.first);
-        }
-
-        // O(N)
-        int max_freq_bot = 0;
-        std::vector<std::vector<int>> freq_bot(tops.size() + 1);
-        for (const auto& it: map_bots)
-        {
-            if (it.second > max_freq_bot)
-                max_freq_bot = it.second;
-
-            freq_bot[it.second].push_back(it.first);
-        }
-
-        // Finish
-        int swaps = (max_freq_top >= max_freq_bot) ? fun(tops,    bottoms, freq_top, max_freq_top)
-                                                   : fun(bottoms, tops,    freq_bot, max_freq_bot);
-
-        if (swaps != -1)
-            return swaps;
-
-        return (max_freq_top < max_freq_bot) ? fun(tops,    bottoms, freq_top, max_freq_top)
-                                             : fun(bottoms, tops,    freq_bot, max_freq_bot);
-    }
-
-private:
-    int fun(std::vector<int>& tops, std::vector<int>& bottoms, std::vector<std::vector<int>>& freq, int max_freq)
-    {
-        for (int i = 0; i < freq[max_freq].size(); i++)
-        {
-            int curr_non_swap = freq[max_freq][i];
-
-            int swapped = 0;
-            for (int j = 0; j < tops.size(); j++)
-            {
-                if (tops[j] == curr_non_swap)
-                    continue;
-
-                if (bottoms[j] == curr_non_swap)
-                    swapped++;
-                else
-                    break;
-            }
-
-            if (swapped == tops.size() - max_freq)
-                return swapped;
-        }
-
-        return -1;
-    }
-};
-
-
-
-
-/* Time  Beats: 15.18% */
-/* Space Beats: 83.72% */
-
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution1 {
 public:
     int minDominoRotations(vector<int>& tops, vector<int>& bottoms)
     {
+        const int N = tops.size();
+        const int MIN_DOMINO_VALUE = 1;
+        const int MAX_DOMINO_VALUE = 6;
+
         int result = INT_MAX;
 
-        for(int i = 1; i <= 6; i++)
+        for (int val = MIN_DOMINO_VALUE; val <= MAX_DOMINO_VALUE; val++)
         {
-            bool is_top_row_all_equal_possible    = true;
-            bool is_bottom_row_all_equal_possible = true;
+            bool possible = true;
 
-            int swaps_in_top    = 0;
-            int swaps_in_bottom = 0;
+            int swaps_in_top = 0;
+            int swaps_in_bot = 0;
 
-            for(int j = 0; j < tops.size(); j++)
+            for (int j = 0; j < N; j++)
             {
-                if(tops[j] == i);
-                else if(bottoms[j] == i)
+                if (tops[j] != val && bottoms[j] != val)
+                {
+                    possible = false;
+                    break;
+                }
+                else if (tops[j] != val)
+                {
                     swaps_in_top++;
-                else
-                    is_top_row_all_equal_possible = false;
-
-                if(bottoms[j] == i);
-                else if(tops[j] == i)
-                    swaps_in_bottom++;
-                else
-                    is_bottom_row_all_equal_possible = false;
+                }
+                else if (bottoms[j] != val)
+                {
+                    swaps_in_bot++;
+                }
             }
 
-            if(is_top_row_all_equal_possible)
-                result = std::min(result, swaps_in_top);
-
-            if(is_bottom_row_all_equal_possible)
-                result = std::min(result, swaps_in_bottom);
+            if (possible)
+            {
+                result = min(result, swaps_in_top);
+                result = min(result, swaps_in_bot);
+            }
         }
 
         return result == INT_MAX ? -1 : result;
