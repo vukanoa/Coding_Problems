@@ -43,7 +43,6 @@
 
 */
 
-#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -85,8 +84,42 @@ public:
         }
 
         for (const auto& entry : umap)
-        {
             result += (entry.second * (entry.second - 1) / 2);
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  48.50% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    int numEquivDominoPairs(vector<vector<int>>& dominoes)
+    {
+        int result = 0;
+
+        vector<int> counter(100, 0);
+        for (auto& d : dominoes)
+        {
+            int val = (d[0] < d[1]) ? d[0] * 10 + d[1] : d[1] * 10 + d[0];
+
+            result += counter[val];
+            counter[val]++;
         }
 
         return result;
