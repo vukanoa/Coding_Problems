@@ -1,8 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <set>
-#include <unordered_set>
-
 /*
     ==============
     === MEDIUM ===
@@ -54,6 +49,12 @@
 */
 
 
+#include <cstring>
+#include <string>
+#include <unordered_set>
+#include <vector>
+using namespace std;
+
 
 
 /* TLE (Time Limit Exceeded) */
@@ -62,14 +63,14 @@
 /* Space Complexity: O(n) */
 class Solution_Brute{
 private:
-    bool backtracking(std::string& s, std::unordered_set<std::string>& dict_uset, int start)
+    bool backtracking(string& s, unordered_set<string>& dict_uset, int start)
     {
         if (start == s.length())
             return true;
 
         for (int i = start; i < s.length(); i++)
         {
-            std::string current_str = s.substr(start, i - start + 1);
+            string current_str = s.substr(start, i - start + 1);
 
             if (dict_uset.find(current_str) != dict_uset.end())
             {
@@ -82,9 +83,9 @@ private:
     }
 
 public:
-    bool wordBreak(std::string s, std::vector<std::string>& wordDict)
+    bool wordBreak(string s, vector<string>& wordDict)
     {
-        std::unordered_set<std::string> dict_uset(wordDict.begin(), wordDict.end());
+        unordered_set<string> dict_uset(wordDict.begin(), wordDict.end());
 
         return backtracking(s, dict_uset, 0);
     }
@@ -125,8 +126,8 @@ public:
     At first glance, this will seem more efficient than the Memoization
     solution explained below, but consider this example:
 
-    std::string s = "aaaaaaaaaaaaaaaaaaaab";
-    std::vector<std::string> wordDict = {"a","aa","aaa","aaaa","aaaaa","aaaaaa","aaaaaaa","aaaaaaaa","aaaaaaaaa"};
+    string s = "aaaaaaaaaaaaaaaaaaaab";
+    vector<string> wordDict = {"a","aa","aaa","aaaa","aaaaa","aaaaaa","aaaaaaa","aaaaaaaa","aaaaaaaaa"};
 
     If you try to simulate this program, you'll find that it will have an
     enormous amount of inefficient, unnecessary attempts in finding if this
@@ -258,10 +259,10 @@ public:
 */
 class Solution_DP {
 public:
-    bool wordBreak(std::string s, std::vector<std::string>& wordDict)
+    bool wordBreak(string s, vector<string>& wordDict)
     {
-        std::unordered_set<std::string> dict(wordDict.begin(), wordDict.end());
-        std::vector<bool> dp(s.length() + 1, false);
+        unordered_set<string> dict(wordDict.begin(), wordDict.end());
+        vector<bool> dp(s.length() + 1, false);
 
         dp[s.length()] = true;
 
@@ -269,7 +270,7 @@ public:
         {
             for (int i = start; i < s.length(); i++)
             {
-                std::string current_substr = s.substr(start, i - start + 1);
+                string current_substr = s.substr(start, i - start + 1);
 
                 // if (dict.find(current_substr) != dict.end() && dp[start + current_substr.length()])
                 if (dict.find(current_substr) != dict.end() && dp[i + 1])
@@ -318,12 +319,12 @@ public:
 */
 class Solution_DP_Neat {
 public:
-    bool wordBreak(std::string& s, std::vector<std::string> wordDict)
+    bool wordBreak(string& s, vector<string> wordDict)
     {
         int n = s.length();
         int m = wordDict.size();
 
-        std::vector<bool> dp(n + 1, false);
+        vector<bool> dp(n + 1, false);
         dp[n] = true; // Empty String is always possible to make
 
         for (int i = n-1; i >= 0; i--)
@@ -349,77 +350,59 @@ public:
 };
 
 
-int
-main()
-{
-    Solution_Brute   sol_brute;
-    Solution_DP      sol_dp;
-    Solution_DP_Neat sol_dp_neat;
-
-    /* Example 1 */
-    // std::string s = "leetcode";
-    // std::vector<std::string> wordDict = {"leet", "code"};
-
-    /* Example 2 */
-    // std::string s = "applepenapple";
-    // std::vector<std::string> wordDict = {"apple", "pen"};
-
-    /* Example 3 */
-    std::string s = "catsandog";
-    std::vector<std::string> wordDict = {"cats", "dog", "and", "sand", "cat"};
-
-    /* Example 4 */
-    // std::string s = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab";
-    // std::vector<std::string> wordDict = {"a","aa","aaa","aaaa","aaaaa","aaaaaa","aaaaaaa","aaaaaaaa","aaaaaaaaa","aaaaaaaaaa"};
-
-    /* Example 5 */
-    // std::string s = "a";
-    // std::vector<std::string> wordDict = {"b"};
-
-    /* Example 6 */
-    // std::string s = "ttttttt"; // 7
-    // std::vector<std::string> wordDict = {"tttt", "ttt"};
 
 
-    std::cout << "\n\t==================";
-    std::cout << "\n\t=== WORD BREAK ===";
-    std::cout << "\n\t==================\n\n";
+/*
+    ------------
+    --- IDEA ---
+    ------------
 
+    A very unnatural Memoization. Bottom-Up DP feels much more natural.
 
-    /* Write Input */
-    std::cout << "\tString     = \"";
-    for (const char& x : s)
-        std::cout << x;
-    std::cout << "\"\n";
+*/
 
+/* Time  Beats: 48.93% */
+/* Space Beats: 36.66% */
 
-    bool first = true;
-    std::cout << "\n\tDictionary = [";
-    for (auto x: wordDict)
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Memoization {
+private:
+    bool memo[301];
+public:
+    bool wordBreak(string s, vector<string>& wordDict)
     {
-        if (!first)
-            std::cout << ", ";
+        const int N = s.length();
 
-        std::cout << "\"";
-        std::cout << x;
-        std::cout << "\"";
-        first = false;
+        unordered_set<string> uset(wordDict.begin(), wordDict.end());
+
+        /* Allocate on the Stack */
+        memset(memo, false, sizeof(memo));
+        memo[N] = true;
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            solve(i, s, uset, N);
+        }
+
+        return memo[0];
     }
-    std::cout << "]\n\n";
 
+private:
+    void solve(int idx, string& s, unordered_set<string>& uset, const int& N)
+    {
+        if (idx == N)
+            return;
 
-    /* Solution */
-    // bool possible = sol_brute.wordBreak(s, wordDict);
-    // bool possible = sol_dp.wordBreak(s, wordDict);
-    bool possible = sol_dp_neat.wordBreak(s, wordDict);
+        for (int j = idx; j < N; j++)
+        {
+            string substr = s.substr(idx, j - idx + 1);
 
-
-    /* Write Output */
-    if (possible)
-        std::cout << "\n\tIt is INDEED possible to create a word out of those in the dictionary!\n\n";
-    else
-        std::cout << "\n\tIt is NOT possible to create a word out of those in the dictionary!\n\n";
-
-
-    return 0;
-}
+            if (uset.count(substr) && memo[j+1])
+            {
+                memo[idx] = true;
+                return;
+            }
+        }
+    }
+};
