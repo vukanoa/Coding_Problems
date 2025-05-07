@@ -73,12 +73,12 @@ using namespace std;
     ------------
 
     TODO
-    (Dijkstra)
+    (Dijkstra on a 2D grip)
 
 */
 
-/* Time  Beats: 99.13% */
-/* Space Beats: 37.23% */
+/* Time  Beats: 22.47% */
+/* Space Beats: 18.40% */
 
 /* Time  Complexity: O(ROWS * COLS * log(ROWS * COLS)) */
 /* Space Complexity: O(ROWS * COLS)                    */
@@ -86,82 +86,11 @@ class Solution {
 public:
     int minTimeToReach(vector<vector<int>>& moveTime)
     {
-
         const int ROWS = moveTime.size();
         const int COLS = moveTime[0].size();
 
-        priority_queue<tuple<int, int, int>,
-                            vector<tuple<int, int, int>>,
-                            greater<tuple<int, int, int>>> min_heap;
-
-        vector<vector<int>> time(ROWS, vector<int>(COLS, INT_MAX));
-
-        min_heap.emplace(0, 0, 0); // time, x, y
-        time[0][0] = 0;
-
-        /* Signing Cross */
-        vector<pair<int, int>> directions = {{-1,0}, {1,0}, {0,-1}, {0,1}};
-
-        while ( ! min_heap.empty())
-        {
-            auto [curr_time, x, y] = min_heap.top();
-            min_heap.pop();
-
-            if (x == ROWS-1 && y == COLS-1)
-                return curr_time;
-
-            for (const auto& dir : directions)
-            {
-                int new_row = x + dir.first;
-                int new_col = y + dir.second;
-
-                // Out of bounds
-                if (new_row < 0 || new_col < 0 || new_row == ROWS || new_col == COLS)
-                    continue; // Skip
-
-
-                int wait_time = max(moveTime[new_row][new_col] - curr_time, 0);
-                int new_time = curr_time + 1 + wait_time;
-
-                if (new_time < time[new_row][new_col])
-                {
-                    time[new_row][new_col] = new_time;
-                    min_heap.emplace(new_time, new_row, new_col);
-                }
-            }
-        }
-
-        return -1; // Unreachable code
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Another way of implementing it. This one is a bit easier I would say, but
-    it's always beneficial to look at the same problem from different angles.
-
-*/
-
-/* Time  Beats: 28.25% */
-/* Space Beats: 22.81% */
-
-/* Time  Complexity: O(ROWS * COLS * log(ROWS * COLS)) */
-/* Space Complexity: O(ROWS * COLS)                    */
-class Solution_2 {
-public:
-    int minTimeToReach(vector<vector<int>>& moveTime)
-    {
-        const int ROWS = moveTime.size();
-        const int COLS = moveTime[0].size();
-
-        vector<vector<bool>> visited(ROWS, vector<bool>(COLS, false));
-        visited[0][0] = true;
+        vector<vector<int>> used(ROWS, vector<int>(COLS, false));
+        used[0][0] = true;
 
         priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>> min_heap;
         min_heap.push( {0, 0, 0} );
@@ -175,31 +104,31 @@ public:
             min_heap.pop();
 
             int curr_time = top[0];
-            int curr_row  = top[1];
-            int curr_col  = top[2];
+            int row       = top[1];
+            int col       = top[2];
 
-            for (auto dir : directions)
+            if (row == ROWS-1 && col == COLS-1) // If we're on the goal-cell
+                return curr_time;
+
+
+            for (const auto& dir : directions)
             {
-                int new_row = curr_row + dir.first;
-                int new_col = curr_col + dir.second;
+                int new_row = row + dir.first;
+                int new_col = col + dir.second;
 
                 if (new_row < 0 || new_col < 0 || new_row == ROWS || new_col == COLS)
                     continue;
 
-                if (visited[new_row][new_col])
+                if (used[new_row][new_col])
                     continue;
 
-                int new_time = curr_time >= moveTime[new_row][new_col] ? curr_time + 1 : moveTime[new_row][new_col] + 1;
+                int new_curr_time = curr_time >= moveTime[new_row][new_col] ? curr_time + 1 : moveTime[new_row][new_col] + 1;
 
-                // If we've reached last cell
-                if (new_row == ROWS-1 && new_col == COLS-1)
-                    return new_time >= moveTime[ROWS-1][COLS-1] ? new_time : moveTime[ROWS-1][COLS-1] + 1;
-
-                min_heap.push( {new_time, new_row, new_col} );
-                visited[new_row][new_col] = true;
+                min_heap.push( { new_curr_time, new_row, new_col} );
+                used[new_row][new_col] = true;
             }
         }
 
-        return -1; // Unreachable code
+        return 0; // Unreachable code
     }
 };
