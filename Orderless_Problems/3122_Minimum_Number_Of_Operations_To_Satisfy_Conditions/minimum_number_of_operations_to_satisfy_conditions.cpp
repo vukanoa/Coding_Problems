@@ -137,3 +137,56 @@ private:
         return memo[idx][prev] = min_change;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  96.74% */
+
+/* Time  Complexity: O(ROWS * COLS + COLS * 10 * 10) */
+/* Space Complexity: O(COLS)                         */
+class Solution_Bottom_Up {
+public:
+    int minimumOperations(vector<vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        // dp[col parity][value] = max count of unchanged values ending in elem
+        int dp[2][10] = {};
+
+        for (int col = 1; col <= COLS; ++col)
+        {
+            int count[10] = {};
+
+            for (int row = 0; row < ROWS; ++row)
+                count[grid[row][col - 1]]++;
+
+            for (int curr_elem = 0; curr_elem < 10; curr_elem++)
+            {
+                dp[col % 2][curr_elem] = 0; // Reset current dp state
+
+                for (int prev_elem = 0; prev_elem < 10; prev_elem++)
+                {
+                    if (prev_elem != curr_elem)
+                    {
+                        dp[col % 2][curr_elem] = max(dp[(col+0) % 2][curr_elem],
+                                                     dp[(col+1) % 2][prev_elem] + count[curr_elem]);
+                    }
+                }
+            }
+        }
+
+        return COLS * ROWS - *max_element(begin(dp[COLS % 2]), end(dp[COLS % 2]));
+    }
+};
