@@ -98,7 +98,7 @@ using namespace std;
     D = The number of possible digit svalues [0, 9], i.e. D == 10
     S = total_sum / 2 * S = total_sum / 2,
 */
-class Solution {
+class Solution_Memoization {
 public:
     constexpr static long long MOD = 1e9 + 7;
 
@@ -177,5 +177,111 @@ public:
         };
 
         return dfs(0, 0, max_odd);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 93.10% */
+/* Space Beats: 73.56% */
+
+/*
+    Time  Complexity: O(N^2 * S)
+
+    Where:
+    N = num.length()
+    D = The number of possible digit svalues [0, 9], i.e. D == 10
+    S = total_sum / 2 * S = total_sum / 2,
+*/
+/*
+    Space Complexity: O(N^2 + N * S)
+
+    Where:
+    N = num.length()
+    D = The number of possible digit svalues [0, 9], i.e. D == 10
+    S = total_sum / 2 * S = total_sum / 2,
+*/
+class Solution_DP_Tabulation {
+public:
+    constexpr static long long MOD = 1e9 + 7;
+
+    int countBalancedPermutations(string num)
+    {
+        int total = 0;
+        const int N = num.size();
+
+        vector<int> count(10);
+        for (const char& chr : num)
+        {
+            int digit = chr - '0';
+            count[digit]++;
+
+            total += digit;
+        }
+
+        if (total % 2 != 0)
+            return 0;
+
+        int target = total / 2;
+        int max_odd = (N + 1) / 2;
+        vector<vector<long long>> comb(max_odd + 1, vector<long long>(max_odd + 1));
+
+        vector<vector<long long>> dp(target + 1, vector<long long>(max_odd + 1));
+        for (int i = 0; i <= max_odd; i++)
+        {
+            comb[i][i] = comb[i][0] = 1;
+
+            for (int j = 1; j < i; j++)
+            {
+                comb[i][j] = (comb[i - 1][j] + comb[i - 1][j - 1]) % MOD;
+            }
+        }
+
+        dp[0][0] = 1;
+        int prefix_sum = 0;
+        int total_sum = 0;
+        for (int i = 0; i <= 9; i++)
+        {
+            /* Sum of the number of the first i digits */
+            prefix_sum += count[i];
+
+            /* Sum of the first i numbers */
+            total_sum += i * count[i];
+
+            for (int odd_count = min(prefix_sum, max_odd); odd_count >= max(0, prefix_sum - (N - max_odd)); odd_count--)
+            {
+                // The number of bits that need to be filled in even numbered
+                // positions
+                int even_count = prefix_sum - odd_count;
+
+                for (int curr_sum = min(total_sum, target); curr_sum >= max(0, total_sum - target); curr_sum--)
+                {
+                    long long result = 0;
+
+                    for (int j = max(0, count[i] - even_count); j <= min(count[i], odd_count) && i * j <= curr_sum; j++)
+                    {
+                        // The current digit is filled with j positions at odd
+                        // positions, and cnt[i] - j positions at even positions
+                        long long ways = comb[odd_count][j] * comb[even_count][count[i] - j] % MOD;
+
+                        result = (result + ways * dp[curr_sum - i * j][odd_count - j] % MOD) % MOD;
+                    }
+
+                    dp[curr_sum][odd_count] = result % MOD;
+                }
+            }
+        }
+
+        return dp[target][max_odd];
     }
 };
