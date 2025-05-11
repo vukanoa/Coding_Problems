@@ -15,7 +15,7 @@
     ============
 
     Given an integer array arr, return true if there are three consecutive odd
-    numbers in the array. Otherwise, return false. 
+    numbers in the array. Otherwise, return false.
 
     ======================================================
     FUNCTION: bool threeConsecutiveOdds(vector<int>& arr);
@@ -42,6 +42,8 @@
 
 */
 
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -58,7 +60,7 @@
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    bool threeConsecutiveOdds(std::vector<int>& arr)
+    bool threeConsecutiveOdds(vector<int>& arr)
     {
         int window = 0;
         for (int i = 0; i < 3 && i < arr.size(); i++)
@@ -73,6 +75,47 @@ public:
             window -= arr[i - 3] % 2;
 
             if (window == 3)
+                return true;
+        }
+
+        return false;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Self_explanatory.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  59.60% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    bool threeConsecutiveOdds(vector<int>& arr)
+    {
+        const int N = arr.size();
+        int concecutive_odds = 0;
+
+        // Loop through each element in the array
+        for (int i = 0; i < N; i++)
+        {
+            if (arr[i] & 1)
+                concecutive_odds++;
+            else
+                concecutive_odds = 0;
+
+
+            if (concecutive_odds == 3)
                 return true;
         }
 
