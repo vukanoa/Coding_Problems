@@ -59,6 +59,8 @@
 */
 
 #include <algorithm>
+#include <cmath>
+#include <cstring>
 #include <string>
 using namespace std;
 
@@ -67,7 +69,8 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    It looks like a Memoization problem, but it's actually much more simple.
+    It looks like a Memoization problem(and it can be! Check out the 2nd
+    Solution down below), but it's actually much more simple.
     The key is to realize that we MUST take all zeroes. We're not "allowed" to
     skip it.
 
@@ -107,5 +110,67 @@ public:
         }
 
         return count(s.begin(), s.end(), '0') + ones;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is indeed less Space-efficient, however, this is a much more
+    natural way given the Constraints.
+
+    It's a classic take-skip Memoization problem.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  18.71% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Memoization {
+private:
+    int memo[1001];
+
+public:
+    int longestSubsequence(string s, int k)
+    {
+        int N = s.length();
+
+        /* Allocating Memory on the Stack */
+        memset(memo, -1, sizeof(memo));
+
+        return solve(s, N-1, 0, 0LL, k);
+    }
+
+private:
+    int solve(string &s, int idx, int power, long long value, int &k)
+    {
+        if (idx < 0)
+            return 0;
+
+        if (memo[idx] != -1)
+            return memo[idx];
+
+        int take = 0;
+        if (s[idx] == '1')
+        {
+            // If we can take the 1 and not exceed k and not Overflow
+            if (power < 63 && value + (1LL << power) <= k)
+                take = 1 + solve(s, idx-1, power+1, value + (1LL << power), k);
+        }
+        else // We CAN always and SHOULD always take 0
+        {
+            take = 1 + solve(s, idx-1, power+1, value, k);
+        }
+
+        int skip = solve(s, idx-1, power, value, k);
+
+        return memo[idx] = max(take, skip);
     }
 };
