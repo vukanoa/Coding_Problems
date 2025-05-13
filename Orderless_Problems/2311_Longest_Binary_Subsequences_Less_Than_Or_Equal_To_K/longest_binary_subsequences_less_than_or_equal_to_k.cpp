@@ -1,0 +1,111 @@
+/*
+    ==============
+    === MEDIUM ===
+    ==============
+
+    ========================================================
+    2311) Longest Binary Subsequnces Less Than or Equal to K
+    ========================================================
+
+    ============
+    Description:
+    ============
+
+    You are given a binary string s and a positive integer k.
+
+    Return the length of the longest subsequence of s that makes up a binary
+    number less than or equal to k.
+
+    =====
+    Note: The subsequence can contain leading zeroes.
+          The empty string is considered to be equal to 0.
+          A subsequence is a string that can be derived from another string by
+          deleting some or no characters without changing the order of the
+          remaining characters.
+    =====
+
+    ==================================================
+    FUNCTION: int longestSubsequence(string s, int k);
+    ==================================================
+
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
+
+    --- Example 1 ---
+    Input: s = "1001010", k = 5
+    Output: 5
+    Explanation: The longest subsequence of s that makes up a binary number
+                 less than or equal to 5 is "00010", as this number is equal to
+                 2 in decimal. Note that "00100" and "00101" are also possible,
+                 which are equal to 4 and 5 in decimal, respectively. The
+                 length of this subsequence is 5, so 5 is returned.
+
+
+    --- Example 2 ---
+    Input: s = "00101001", k = 1
+    Output: 6
+    Explanation: "000001" is the longest subsequence of s that makes up a
+                 binary number less than or equal to 1, as this number is equal
+                 to 1 in decimal. The length of this subsequence is 6, so 6 is
+                 returned.
+
+
+    *** Constraints ***
+    1 <= s.length <= 1000
+    s[i] is either '0' or '1'.
+    1 <= k <= 10^9
+
+*/
+
+#include <algorithm>
+#include <string>
+using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    It looks like a Memoization problem, but it's actually much more simple.
+    The key is to realize that we MUST take all zeroes. We're not "allowed" to
+    skip it.
+
+    Once we realize that, we take as many 1s from the right as we can, before
+    exceeding k.
+
+    It can be shown that greedily using 1s from the right is always better than
+    to skip it.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  74.82% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    int longestSubsequence(string s, int k)
+    {
+        const int N = s.length();
+
+        int ones = 0;
+
+        int val = 0;
+        int pow = 1;
+
+        for (int i = N-1; i >= 0 && val + pow <= k; i--)
+        {
+            if (s[i] == '1')
+            {
+                ones++;
+                val += pow;
+            }
+
+            pow <<= 1;
+        }
+
+        return count(s.begin(), s.end(), '0') + ones;
+    }
+};
