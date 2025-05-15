@@ -262,3 +262,66 @@ public:
         return false;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Multi-Source BFS.
+
+*/
+
+/* Time  Beats: 5.01% */
+/* Space Beats: 9.76% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Multi_Source_BFS {
+public:
+    bool validPath(int n, vector<vector<int>>& edges, int source, int destination)
+    {
+        if (source == destination)
+            return true;
+
+        unordered_map<int, vector<int>> adj_list;
+
+        for (auto& edge : edges)
+        {
+            adj_list[edge[0]].push_back(edge[1]);
+            adj_list[edge[1]].push_back(edge[0]);
+        }
+
+        queue<pair<int, int>> queue;
+        queue.push({source, 0});
+        queue.push({destination, 1});
+
+        vector<int> visited(n, -1);
+        visited[source] = 0;
+        visited[destination] = 1;
+
+        while ( ! queue.empty())
+        {
+            auto [current_node, origin] = queue.front();
+            queue.pop();
+
+            for (const auto& neighbor : adj_list[current_node])
+            {
+                if (visited[neighbor] == -1)
+                {
+                    visited[neighbor] = origin;
+                    queue.push({neighbor, origin});
+                }
+                else if (visited[neighbor] != origin)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+};
