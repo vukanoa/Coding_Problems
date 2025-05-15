@@ -58,6 +58,7 @@
 */
 
 #include <numeric>
+#include <queue>
 #include <unordered_map>
 #include <vector>
 using namespace std;
@@ -192,6 +193,71 @@ public:
         }
 
         // visited[node] = false;
+
+        return false;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Fundamental BFS.
+
+*/
+
+/* Time  Beats: 5.01% */
+/* Space Beats: 9.76% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_BFS {
+public:
+    bool ValidPath(int n, vector<vector<int>>& edges, int source, int destination)
+    {
+        if (source == destination)
+            return true;
+
+        unordered_map<int, vector<int>> adj_list;
+
+        for (auto& edge : edges)
+        {
+            adj_list[edge[0]].push_back(edge[1]);
+            adj_list[edge[1]].push_back(edge[0]);
+        }
+
+        queue<int> queue;
+        queue.push(source);
+
+        vector<bool> visited(n, false);
+
+        while ( ! queue.empty())
+        {
+            int size = queue.size();
+
+            for (int x = 0; x < size; x++)
+            {
+                int node = queue.front();
+                queue.pop();
+
+                visited[node] = true;
+
+                for (const auto& neighbor : adj_list[node])
+                {
+                    if (visited[neighbor])
+                        continue;
+
+                    if (neighbor == destination)
+                        return true;
+
+                    queue.push(neighbor);
+                }
+            }
+        }
 
         return false;
     }
