@@ -58,6 +58,7 @@
 */
 
 #include <numeric>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -92,7 +93,7 @@ using namespace std;
 /*
     Space Complexity: O(N)
 */
-class Solution {
+class Solution_Union_Find {
 public:
     bool validPath(int n, vector<vector<int>>& edges, int source, int destination)
     {
@@ -137,5 +138,61 @@ private:
             parent[p1] = p2;
             rank[p2] += rank[p1];
         }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Fundamental DFS.
+
+*/
+
+/* Time  Beats: 28.92% */
+/* Space Beats: 24.44% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_DFS {
+public:
+    bool validPath(int n, vector<vector<int>>& edges, int source, int destination)
+    {
+        unordered_map<int, vector<int>> adj_list;
+
+        for (auto& entry : edges)
+        {
+            adj_list[entry[0]].push_back(entry[1]);
+            adj_list[entry[1]].push_back(entry[0]);
+        }
+
+        vector<bool> visited(n, false);
+
+        return dfs(source, destination, adj_list, visited);
+    }
+
+    bool dfs(int node, int& destination, unordered_map<int, vector<int>>& adj_list, vector<bool>& visited)
+    {
+        if (node == destination)
+            return true;
+
+        visited[node] = true;
+
+        for (const auto& neighbor : adj_list[node])
+        {
+            if (visited[neighbor])
+                continue;
+
+            if (dfs(neighbor, destination, adj_list, visited))
+                return true;
+        }
+
+        // visited[node] = false;
+
+        return false;
     }
 };
