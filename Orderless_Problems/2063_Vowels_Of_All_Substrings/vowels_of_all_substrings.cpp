@@ -62,6 +62,7 @@
 */
 
 #include <string>
+#include <unordered_set>
 #include <vector>
 using namespace std;
 
@@ -114,5 +115,41 @@ private:
             return true;
 
         return false;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of implementing it.
+
+*/
+
+/* Time  Beats: 21.09% */
+/* Space Beats: 33.75% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    long long countVowels(string word)
+    {
+        const int N = word.length();
+        long long result = 0;
+
+        unordered_set<char> vowel = {'a', 'e', 'i', 'o', 'u'};
+
+        for (int i = 0; i < N; i++)
+        {
+            if (vowel.count(word[i]))
+                result += (i + 1) * (word.length() - i);
+        }
+
+        return result;
     }
 };
