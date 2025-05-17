@@ -97,3 +97,49 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of implementing it.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  54.21% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Reverse {
+public:
+    string reverseOnlyLetters(string s)
+    {
+        const int N = s.length();
+
+        string result;
+        int right_index = N - 1;
+
+        for (int left_index = 0; left_index < N; left_index++)
+        {
+            if (isalpha(s[left_index]))
+            {
+                while (!isalpha(s[right_index]))
+                {
+                    right_index--;
+                }
+                result += s[right_index--];
+            }
+            else
+            {
+                result += s[left_index];
+            }
+        }
+
+        return result;
+    }
+};
