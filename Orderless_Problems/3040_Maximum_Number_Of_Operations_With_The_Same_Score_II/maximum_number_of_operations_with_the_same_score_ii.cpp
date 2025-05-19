@@ -59,6 +59,7 @@
 */
 
 #include <cstring>
+#include <unordered_set>
 #include <vector>
 using namespace std;
 
@@ -118,5 +119,70 @@ private:
             result = max(result, 1 + solve(L  , R-2, sum, nums));
 
         return memo[L][R] = result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Tabulation Solution, i.e. Bottom-Up Dynamic Programming.
+
+*/
+
+/* Time  Beats: 30.54% */
+/* Space Beats: 31.14% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_Tabulation {
+public:
+    int maxOperations(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        if (N < 2)
+            return 0;
+
+        unordered_set<int> uset_sum {
+            nums[0    ] + nums[1    ],
+            nums[0    ] + nums[N - 1],
+            nums[N - 2] + nums[N - 1]
+        };
+
+        for (const int& target_sum : uset_sum)
+        {
+            vector<vector<int>> dp(N + 1, vector<int>(N + 1));
+
+            for (int idx = 2; idx <= N; idx++)
+            {
+                int L = 0;
+                int R = L + idx - 1;
+
+                while (R < N)
+                {
+                    if (L + 1 < N && nums[L] + nums[L + 1] == target_sum)
+                        dp[idx][L] = max(dp[idx][L], 1 + dp[idx - 2][L + 2]);
+
+                    if (R < N && nums[L] + nums[R] == target_sum)
+                        dp[idx][L] = max(dp[idx][L], 1 + dp[idx - 2][L + 1]);
+
+                    if (R - 1 >= 0 && nums[R - 1] + nums[R] == target_sum)
+                        dp[idx][L] = max(dp[idx][L], 1 + dp[idx - 2][L   ]);
+
+                    L++;
+                    R++;
+                }
+            }
+
+            result = max(result, dp[N][0]);
+        }
+
+        return result;
     }
 };
