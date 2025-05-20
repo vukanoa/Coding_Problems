@@ -47,6 +47,9 @@
 
 */
 
+#include <stack>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -65,6 +68,7 @@
 /**
  * Definition for singly-linked list.
 */
+
 struct ListNode {
     int val;
     ListNode *next;
@@ -131,5 +135,73 @@ private:
         }
 
         return prev;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  17.12% */
+
+/* Time  Complexity: O(M + N) */
+/* Space Complexity: O(M + N) */
+class Solution_Stack {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
+    {
+        stack<int> stack1;
+        stack<int> stack2;
+
+        while (l1 != nullptr)
+        {
+            stack1.push(l1->val);
+            l1 = l1->next;
+        }
+
+        while (l2 != nullptr)
+        {
+            stack2.push(l2->val);
+            l2 = l2->next;
+        }
+
+        int total_sum = 0;
+        int carry = 0;
+        ListNode* result = new ListNode();
+
+        while ( ! stack1.empty() ||  ! stack2.empty())
+        {
+            if ( ! stack1.empty())
+            {
+                total_sum += stack1.top();
+                stack1.pop();
+            }
+
+            if ( ! stack2.empty())
+            {
+                total_sum += stack2.top();
+                stack2.pop();
+            }
+
+            result->val = total_sum % 10;
+            carry = total_sum / 10;
+
+            ListNode* new_node = new ListNode(carry);
+            new_node->next = result;
+
+            result = new_node;
+            total_sum = carry;
+        }
+
+        return carry == 0 ? result->next : result;
     }
 };
