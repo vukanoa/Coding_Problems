@@ -80,6 +80,7 @@
 */
 
 #include <cstring>
+#include <set>
 #include <unordered_map>
 #include <vector>
 using namespace std;
@@ -144,6 +145,82 @@ private:
         return memo[vertex][k][sum] = max_sum;
     }
 
+    void build_adjacency_list(const vector<vector<int>>& edges, int n)
+    {
+        adj_list.assign(n, unordered_map<int, int>());
+
+        for (const auto& entry : edges)
+        {
+            int u = entry[0];
+            int v = entry[1];
+            int w = entry[2];
+
+            adj_list[u][v] = w;
+        }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 80.78% */
+/* Space Beats: 37.86% */
+
+/* Time  Complexity: O(n * k * t * logt) */
+/* Space Complexity: O(n * k * t       ) */
+class Solution_Tabulation {
+private:
+    vector<unordered_map<int, int>> adj_list;
+    vector<vector<set<int>>> dp;
+
+public:
+    int maxWeight(int n, vector<vector<int>>& edges, int k, int t)
+    {
+        build_adjacency_list(edges, n);
+
+        dp.assign(n, vector<set<int>>(k + 1));
+
+        // Base case: zero edges, zero weight
+        for (int vertex = 0; vertex < n; vertex++)
+            dp[vertex][0].insert(0);
+
+        for (int edges_used = 0; edges_used < k; edges_used++)
+        {
+            for (int vertex = 0; vertex < n; vertex++)
+            {
+                for (const auto& [neighbor, weight] : adj_list[vertex])
+                {
+                    for (int current_weight : dp[vertex][edges_used])
+                    {
+                        int new_weight = current_weight + weight;
+
+                        if (new_weight < t)
+                            dp[neighbor][edges_used + 1].insert(new_weight);
+                    }
+                }
+            }
+        }
+
+        int result = -1;
+        for (int vertex = 0; vertex < n; vertex++)
+        {
+            if ( ! dp[vertex][k].empty())
+                result = max(result, *prev(dp[vertex][k].end()));
+        }
+
+        return result;
+    }
+
+private:
     void build_adjacency_list(const vector<vector<int>>& edges, int n)
     {
         adj_list.assign(n, unordered_map<int, int>());
