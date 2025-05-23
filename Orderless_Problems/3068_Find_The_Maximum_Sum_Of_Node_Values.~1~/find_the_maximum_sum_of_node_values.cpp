@@ -1,3 +1,7 @@
+#include <iostream>
+#include <vector>
+#include <numeric> // accumulate
+
 /*
     ============
     === HARD ===
@@ -76,12 +80,6 @@
 
 */
 
-#include <climits>
-#include <cstdlib>
-#include <vector>
-#include <numeric>
-using namespace std;
-
 /*
     ------------
     --- IDEA ---
@@ -94,37 +92,37 @@ using namespace std;
 /* Time  Beats: 92.00% */
 /* Space Beats: 67.56% */
 
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
 class Solution {
 public:
-    long long maximumValueSum(vector<int>& nums,
+    long long maximumValueSum(std::vector<int>& nums,
                               int k,
-                              vector<vector<int>>& edges)
+                              std::vector<std::vector<int>>& edges)
     {
-        long long total_sum = accumulate(nums.begin(), nums.end(), 0LL);
+        long long total = accumulate(nums.begin(), nums.end(), 0ll);
 
         long long total_diff = 0;
         long long diff;
         int positive_count = 0;
-        long long min_abs_diff = LLONG_MAX;
+        long long min_abs_diff = numeric_limits<int>::max();
 
-        for (const auto& num : nums)
+        for(const auto& num : nums)
         {
             diff = (num ^ k) - num;
 
-            if (diff > 0)
+            if(diff > 0)
             {
                 total_diff += diff;
                 positive_count++;
             }
 
-            min_abs_diff = min(min_abs_diff, abs(diff));
+            min_abs_diff = std::min(min_abs_diff, std::abs(diff));
         }
 
-        if (positive_count & 1)
+        if(positive_count % 2 == 1)
             total_diff = total_diff - min_abs_diff;
 
-        return total_sum + total_diff;
+        return total + total_diff;
     }
 };
