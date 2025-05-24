@@ -124,7 +124,7 @@ public:
 
         vector<int> parent(N, -1);
 
-        // memo[node][since_last][flip_flag] = result
+        // memo[node][since_last_flip][flip_flag] = result
         memo = vector<vector<vector<long long>>>(N, vector<vector<long long>>(k + 1, vector<long long>(2, LLONG_MIN)));
         // or (both are fine)
         // memo.assign(N, vector<vector<long long>>(k + 1, vector<long long>(2, LLONG_MIN)));
@@ -134,15 +134,15 @@ public:
 
 private:
     long long dfs(int curr_node,
-                  int since_last,
+                  int since_last_flip,
                   int flip_flag,
                   int max_k,
                   const vector<int>& nums,
                   const vector<vector<int>>& adj_list,
                   vector<int>& parent)
     {
-        if (memo[curr_node][since_last][flip_flag] != LLONG_MIN)
-            return memo[curr_node][since_last][flip_flag];
+        if (memo[curr_node][since_last_flip][flip_flag] != LLONG_MIN)
+            return memo[curr_node][since_last_flip][flip_flag];
 
         long long no_flip = flip_flag ? -nums[curr_node] : nums[curr_node];
         long long if_flip = -no_flip;
@@ -153,19 +153,129 @@ private:
                 continue;
 
             parent[neighbor] = curr_node;
-            no_flip += dfs(neighbor, min(since_last + 1, max_k), flip_flag, max_k, nums, adj_list, parent);
+            no_flip += dfs(neighbor, min(since_last_flip + 1, max_k), flip_flag, max_k, nums, adj_list, parent);
 
-            if (since_last == max_k)
+            if (since_last_flip == max_k)
             {
                 if_flip += dfs(neighbor, 1, !flip_flag, max_k, nums, adj_list, parent);
             }
         }
 
-        if (since_last == max_k)
-            memo[curr_node][since_last][flip_flag] = max(no_flip, if_flip);
+        if (since_last_flip == max_k)
+            memo[curr_node][since_last_flip][flip_flag] = max(no_flip, if_flip);
         else
-            memo[curr_node][since_last][flip_flag] = no_flip;
+            memo[curr_node][since_last_flip][flip_flag] = no_flip;
 
-        return memo[curr_node][since_last][flip_flag];
+        return memo[curr_node][since_last_flip][flip_flag];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This Solution seems equivalent to the above one, but it's not. Effectively
+    it is, but conceptually how you tink about the Solution is different.
+
+    It's beneficial to if you can solve in both ways, that's why it's handy to
+    look at this one even if you've solved it in an above fashion.
+
+    This Keep_or_Flip is similar to many Take_or_Skip Memoization problems, so
+    it's maybe more intuitive to most people.
+
+*/
+
+/* Time  Beats: 16.56% */
+/* Space Beats:  5.00% */
+
+/* Time  Complexity: O(N * k) */
+/* Space Complexity: O(N * k) */
+class Solution_Keep_or_Flip {
+private:
+    vector<vector<vector<long long>>> memo;
+
+public:
+    long long subtreeInversionSum(vector<vector<int>>& edges, vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+
+        vector<vector<int>> adj_list(N);
+        for (const auto& edge : edges)
+        {
+            int u = edge[0];
+            int v = edge[1];
+
+            adj_list[u].push_back(v);
+            adj_list[v].push_back(u);
+        }
+
+        memo.assign(N, vector<vector<long long>>(k + 1, vector<long long>(3, LLONG_MIN)));
+
+        // Start DFS from node 0, with no parent, initial sign +1, and
+        // since_last_flip = k (means flip allowed now)
+        return dfs(adj_list, nums, k, -1, 0, k, 1);
+    }
+
+private:
+    long long dfs(vector<vector<int>>& adj_list, vector<int>& nums, int k, int parent, int node, int since_last_flip, int sign)
+    {
+        if (memo[node][since_last_flip][sign + 1] != LLONG_MIN)
+            return memo[node][since_last_flip][sign + 1];
+
+        long long base = nums[node] * sign;
+        long long result;
+
+        if (since_last_flip < k)
+        {
+            // Cannot flip yet, increment since_last_flip
+            result = base;
+            for (int child : adj_list[node])
+            {
+                if (child != parent)
+                    result += dfs(adj_list, nums, k, node, child, since_last_flip + 1, sign);
+            }
+        }
+        else
+        {
+            // since_last_flip == k: flip allowed here, but it's NOT mandatory
+
+            /*
+                No remaining inversions available (constraint == 0),
+                so we decide whether to:
+
+                1.Keep the current sign throughout the subtree (don't flip)
+
+                    OR
+
+                2. Flip the entire subtree rooted at this node(use 1 inversion)
+            */
+
+
+            // Case 1: Do not flip subtree
+            long long keep = base;
+
+            // Case 2: Flip this subtree — flip this node (base becomes -base),
+            //         flip all children with opposite sign
+            long long flip = -base;
+
+            for (int neighbor : adj_list[node])
+            {
+                if (neighbor != parent)
+                {
+                    keep += dfs(adj_list, nums, k, node, neighbor, k,  sign);
+                    flip += dfs(adj_list, nums, k, node, neighbor, 1, -sign);
+
+                    // After flipping, since_last_flip resets to 1 (just flipped here)
+                }
+            }
+
+            result = max(keep, flip);
+        }
+
+        return memo[node][since_last_flip][sign + 1] = result;
     }
 };
