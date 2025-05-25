@@ -228,3 +228,59 @@ public:
         return result + extra_middle_palindromic_word * LEN_OF_WORD;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Yet another way of implementing it.
+
+*/
+
+/* Time  Beats: 98.97% */
+/* Space Beats: 20.37% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_3 {
+public:
+    int longestPalindrome(vector<string>& words)
+    {
+        const int LEN_OF_WORD = 2;
+        int result = 0;
+
+        vector<vector<int>> counter(26, vector<int>(26, 0));
+        int middle = 0;
+
+        for (const string& word : words)
+        {
+            int x = word[0] - 'a';
+            int y = word[1] - 'a';
+
+            if (counter[y][x] > 0)
+            {
+                counter[y][x]--;
+                result += 2 * LEN_OF_WORD;
+
+                if (x == y)
+                    middle--;
+            }
+            else
+            {
+                counter[x][y]++;
+
+                if (x == y)
+                    middle++;
+            }
+        }
+
+        if (middle > 0)
+            result += LEN_OF_WORD;
+
+        return result;
+    }
+};
