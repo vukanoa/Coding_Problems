@@ -171,3 +171,60 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of implementing it.
+
+*/
+
+/* Time  Beats: 71.81% */
+/* Space Beats: 92.59% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_2 {
+public:
+    int longestPalindrome(vector<string>& words)
+    {
+        const int LEN_OF_WORD = 2;
+        int result = 0;
+
+        unordered_map<string, int> counter;
+        for (const string& word : words)
+            counter[word]++;
+
+        int extra_middle_palindromic_word = 0;
+
+        for (auto& [word, freq] : counter)
+        {
+            string rev_word = word;
+            reverse(rev_word.begin(), rev_word.end());
+
+            if (word == rev_word) // i.e. "aa", "bb", "gg", etc.
+            {
+                if (freq & 1)
+                {
+                    result += (freq - 1) * LEN_OF_WORD;
+                    extra_middle_palindromic_word = 1;
+                }
+                else
+                {
+                    result += freq * LEN_OF_WORD;
+                }
+            }
+            else if (word < rev_word && counter.count(rev_word))
+            {
+                result += min(freq, counter[rev_word]) * 2 * LEN_OF_WORD;
+            }
+        }
+
+        return result + extra_middle_palindromic_word * LEN_OF_WORD;
+    }
+};
