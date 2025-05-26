@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-
 /*
     ============
     === HARD ===
@@ -62,6 +58,9 @@
 
 */
 
+#include <string>
+#include <vector>
+#include <queue>
 using namespace std;
 
 /*
@@ -73,78 +72,79 @@ using namespace std;
 
 */
 
-/* Time  Beats: 39.13% */
-/* Space Beats: 53.35% */
+/* Time  Beats: 80.90% */
+/* Space Beats: 86.66% */
 
 /* Time  Complexity: O(V + E) */
 /* Space Complexity: O(V + E) */
 class Solution {
 public:
-    int largestPathValue(string s, vector<vector<int>>& e)
+    int largestPathValue(string colors, vector<vector<int>>& edges)
     {
-        const int n = s.size();
+        const int N = colors.size();
 
-        vector<int> ad[n];
-        vector<int> ind(n,0);
+        vector<int> adj_list[N];
+        vector<int> indegree(N, 0);
 
-        for (auto i : e)
+        for (const auto& entry : edges)
         {
-            ad[i[0]].push_back(i[1]);
-            ind[i[1]]++;
+            adj_list[entry[0]].push_back(entry[1]);
+            indegree[entry[1]]++;
         }
 
-        vector<int> col(n);
+        vector<int> color_of_vertex(N);
 
-        for (int i = 0; i < s.size(); i++)
-            col[i] = s[i]-'a';
+        for (int vertex = 0; vertex < N; vertex++)
+            color_of_vertex[vertex] = colors[vertex] - 'a';
 
         queue<int> queue;
 
-        int result = 0;
-        int mx = 1;
+        int visited_count  = 0;
+        int max_color_freq = 1;
 
-        vector<vector<int>> dp(n, vector<int>(26, 0));
-        vector<bool> visited(n, 0);
+        vector<vector<int>> dp(N, vector<int>(26, 0)); // ROW=vertex, COL=color
+        vector<bool> visited(N, false);
 
-        for (int i = 0; i < n; i++)
+        for (int vertex = 0; vertex < N; vertex++)
         {
-            if (ind[i] == 0)
+            if (indegree[vertex] == 0)
             {
-                visited[i] = true;
-                queue.push(i);
+                visited[vertex] = true;
+                queue.push(vertex);
 
-                dp[i][col[i]]++;
+                dp[vertex][color_of_vertex[vertex]]++;
             }
         }
 
+        /* BFS */
         while ( ! queue.empty())
         {
-            int x = queue.front();
-
+            int curr_vertex = queue.front();
             queue.pop();
-            result++;
 
-            for (auto i : ad[x])
+            visited_count++;
+
+            for (const auto& neighbor : adj_list[curr_vertex])
             {
-                if ( ! visited[i])
+                if ( ! visited[neighbor])
                 {
-                    for (int j = 0; j < 26; j++)
+                    for (int color = 0; color < 26; color++)
                     {
-                        dp[i][j] = max(dp[i][j],dp[x][j] + (j == col[i]));
-                        mx = max(mx,dp[i][j]);
+                        dp[neighbor][color] = max(dp[neighbor][color], dp[curr_vertex][color] + (color == color_of_vertex[neighbor]));
+                        max_color_freq = max(max_color_freq, dp[neighbor][color]);
                     }
                 }
 
-                ind[i]--;
+                indegree[neighbor]--;
 
-                if (ind[i] == 0)
-                    queue.push(i);
+                if (indegree[neighbor] == 0)
+                    queue.push(neighbor);
             }
         }
 
-        if (result != n)
+        if (visited_count != N)
             return -1;
 
-        return mx;
+        return max_color_freq;
     }
 };
