@@ -1,8 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <unordered_map>
-
 /*
     ==============
     === MEDIUM ===
@@ -81,6 +76,12 @@
     0 <= node1, node2 < n
 
 */
+
+#include <climits>
+#include <unordered_set>
+#include <vector>
+#include <queue>
+using namespace std;
 
 /*
     ------------
@@ -191,15 +192,15 @@ class Solution_BFS {
 public:
     int closestMeetingNode(vector<int>& edges, int node1, int node2)
     {
-        std::vector<int> node1_dist = BFS(node1, edges);
-        std::vector<int> node2_dist = BFS(node2, edges);
+        vector<int> node1_dist = BFS(node1, edges);
+        vector<int> node2_dist = BFS(node2, edges);
 
         int result_node = -1;
         int min_dist = INT_MAX;
 
         for (int i = 0; i < edges.size(); i++)
         {
-            int curr_max_dist = std::max(node1_dist[i], node2_dist[i]);
+            int curr_max_dist = max(node1_dist[i], node2_dist[i]);
 
             if (curr_max_dist < min_dist)
             {
@@ -212,10 +213,10 @@ public:
     }
 
 private:
-    std::vector<int> BFS(int src, std::vector<int>& edges)
+    vector<int> BFS(int src, vector<int>& edges)
     {
-        std::vector<int> distance(edges.size(), INT_MAX);
-        std::queue<int> queue;
+        vector<int> distance(edges.size(), INT_MAX);
+        queue<int> queue;
         queue.push(src);
         distance[src] = 0;
 
@@ -312,9 +313,9 @@ public:
     {
         const int n = edges.size();
 
-        std::vector<int> distances_from_node_1(n, -1);
-        std::vector<int> distances_from_node_2(n, -1);
-        std::unordered_set<int> visited;
+        vector<int> distances_from_node_1(n, -1);
+        vector<int> distances_from_node_2(n, -1);
+        unordered_set<int> visited;
 
         dfs(edges, distances_from_node_1, visited, 0, node1);
         visited.clear();
@@ -327,7 +328,7 @@ public:
             if (distances_from_node_1[i] == -1 || distances_from_node_2[i] == -1)
                 continue;
 
-            int maximum = std::max(distances_from_node_1[i], distances_from_node_2[i]);
+            int maximum = max(distances_from_node_1[i], distances_from_node_2[i]);
             if (maximum < min_distance)
             {
                 min_distance = maximum;
@@ -339,9 +340,9 @@ public:
     }
 
 private:
-    void dfs(std::vector<int>& edges,
-             std::vector<int>& distances_from_node,
-             std::unordered_set<int>& visited,
+    void dfs(vector<int>& edges,
+             vector<int>& distances_from_node,
+             unordered_set<int>& visited,
              int distance,
              int node)
     {
