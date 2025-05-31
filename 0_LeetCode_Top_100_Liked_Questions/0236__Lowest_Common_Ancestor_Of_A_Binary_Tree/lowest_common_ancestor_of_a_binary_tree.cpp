@@ -1,10 +1,3 @@
-#include <iostream>
-#include <stack>
-#include <vector>
-
-// Printing
-#include <queue>
-
 /*
     ==============
     === MEDIUM ===
@@ -59,7 +52,9 @@
 
 */
 
-
+#include <stack>
+#include <vector>
+using namespace std;
 
 // Definition for a binary tree node.
 struct TreeNode {
@@ -430,179 +425,60 @@ private:
 
 
 
+
 /*
-    =============================
-    === This is just printing ===
-    =============================
+    ------------
+    --- IDEA ---
+    ------------
+
+    There are so many ways to solve this problem, so it's great to include as
+    many different solutions as possible.
+
+    If you are a beginner, make sure to read each and every one of them.
+
 */
 
-void
-print_array(std::vector<std::string>& nums)
-{
-    bool first = true;
-    std::cout << "\n\t\t\t(TODO: Implement a Visual representation of a Binary Tree)\n\n";
-    std::cout << "\n\t*** Level Order ***";
-    std::cout << "\n\tTree: [";
-    for (auto x: nums)
-    {
-        if (!first)
-            std::cout << ", ";
+/* Time  Beats: 89.70% */
+/* Space Beats: 41.24% */
 
-        std::cout << x;
-        first = false;
+/* Time  Complexity: O() */
+/* Space Complexity: O(`) */
+class Solution_Counting {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
+    {
+        if (root == p || root == q)
+            return root;
+
+        TreeNode* lca = nullptr;
+        dfs(root, p, q, &lca);
+
+        return lca;
     }
-    std::cout << "]\n\n";
-}
 
-
-void
-print_levelorder(TreeNode* root)
-{
-    if (root == nullptr)
-        return;
-
-    std::queue<TreeNode*> queue;
-    queue.push(root);
-
-    std::vector<std::string> vector_print;
-
-    while (!queue.empty())
+private:
+    int dfs(TreeNode* root, TreeNode* p, TreeNode* q, TreeNode** lca)
     {
-        int size = queue.size();
+        if ( ! root)
+            return 0;
 
-        for (int i = 0; i < size; i++)
+        if (root == p || root == q) // Beacuse every Node.val is UNIQUE
         {
-            TreeNode* node = queue.front();
-            queue.pop();
+            if (*lca == nullptr)
+                *lca = root; // Assume that the current node is LCA
 
-            if (node == nullptr)
-            {
-                vector_print.push_back("null");
-                continue;
-            }
-            else
-                vector_print.push_back(std::to_string(node->val));
-
-            if (node->left != nullptr)
-                queue.push(node->left);
-            else
-                queue.push(nullptr);
-
-            if (node->right != nullptr)
-                queue.push(node->right);
-            else
-                queue.push(nullptr);
+            return 1;
         }
+
+        int left  = dfs(root->left,  p, q, lca);
+        if (left == 2) return 2; // We already found LCA
+
+        int right = dfs(root->right, p, q, lca);
+        if (right == 2) return 2; // We already found LCA
+
+        if (left + right == 2) // If our assumption was wrong--update
+            *lca = root;
+
+        return left + right;
     }
-
-    int x = vector_print.size() - 1;
-    while (vector_print[x] == "null")
-    {
-        vector_print.pop_back();
-        x--;
-    }
-
-    print_array(vector_print);
-}
-
-
-int
-main()
-{
-    Solution              sol;
-    Solution_Clean        sol_clean;
-    Solution_Clean_2      sol_clean_2;
-    Solution_DFS          sol_dfs;
-    Solution_Intersection sol_intersect;
-
-
-    /* Example 1 */
-    // TreeNode three(3);
-    // TreeNode five(5);
-    // TreeNode one(1);
-    // TreeNode six(6);
-    // TreeNode two(2);
-    // TreeNode zero(0);
-    // TreeNode eight(8);
-    // TreeNode seven(7);
-    // TreeNode four(4);
-
-    // three.left  = &five;
-    // three.right = &one;
-    // five.left   = &six;
-    // five.right  = &two;
-    // one.left    = &zero;
-    // one.right   = &eight;
-    // two.left    = &seven;
-    // two.right   = &four;
-
-    // TreeNode* root = &three;
-    // TreeNode* p    = &five;
-    // TreeNode* q    = &one;
-
-
-
-    /* Example 2 */
-    TreeNode three(3);
-    TreeNode five(5);
-    TreeNode one(1);
-    TreeNode six(6);
-    TreeNode two(2);
-    TreeNode zero(0);
-    TreeNode eight(8);
-    TreeNode seven(7);
-    TreeNode four(4);
-
-    three.left  = &five;
-    three.right = &one;
-    five.left   = &six;
-    five.right  = &two;
-    one.left    = &zero;
-    one.right   = &eight;
-    two.left    = &seven;
-    two.right   = &four;
-
-    TreeNode* root = &three;
-    TreeNode* p    = &five;
-    TreeNode* q    = &four;
-
-
-
-    /* Example 3 */
-    // TreeNode one(1);
-    // TreeNode two(2);
-
-    // one.left = &two;
-
-    // TreeNode* root = &one;
-    // TreeNode* p    = &one;
-    // TreeNode* q    = &two;
-
-
-
-
-    std::cout << "\n\t===============================================";
-    std::cout << "\n\t=== LOWEST COMMON ANCESTOR OF A BINARY TREE ===";
-    std::cout << "\n\t===============================================\n\n";
-
-
-    /* Write Input */
-    print_levelorder(root);
-    std::cout << "\tp: " << p->val << "\n";
-    std::cout << "\tq: " << q->val << "\n";
-
-
-    /* Solution */
-    // TreeNode* ancestor = sol.lowestCommonAncestor(root, p, q);
-    // TreeNode* ancestor = sol_clean.lowestCommonAncestor(root, p, q);
-    TreeNode* ancestor = sol_clean_2.lowestCommonAncestor(root, p, q);
-    // TreeNode* ancestor = sol_dfs.lowestCommonAncestor(root, p, q);
-    // TreeNode* ancestor = sol_intersect.lowestCommonAncestor(root, p, q);
-
-
-    /* Write Output */
-    std::cout << "\n\n\tLCA is: " << ancestor->val << "\n\n";
-
-
-    return 0;
-}
+};
