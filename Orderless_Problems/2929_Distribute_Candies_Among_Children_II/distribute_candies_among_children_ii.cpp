@@ -77,3 +77,68 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 84.12% */
+/* Space Beats: 84.71% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Math {
+public:
+    long long H3(long long n)
+    {
+        /*
+           In General:
+
+                           a! 
+           C(a, b) = --------------
+                      b! * (a - b)!
+
+
+          In our problem:
+
+
+                          (n + 2)! 
+           C(n + 2, 2) = -----------
+                          2! * n!
+
+
+                          (n + 2) * (n + 1) * n! 
+           C(n + 2, 2) = ----------------------
+                                2! * n!
+
+
+                          (n + 2) * (n + 1) 
+           C(n + 2, 2) = ----------------------
+                                2!
+
+
+                          (n + 2) * (n + 1) 
+           C(n + 2, 2) = ----------------------
+                                2
+
+        */
+
+        return n < 0 ? 0 : (n+1) * (n+2) / 2;
+    }
+
+    long long distributeCandies(int n, int limit) 
+    {
+        return H3(n)                       -
+               3LL * H3(n - limit - 1)     +
+               3LL * H3(n - 2*(limit + 1)) -
+               1LL * H3(n - 3*(limit + 1));
+    }
+};
