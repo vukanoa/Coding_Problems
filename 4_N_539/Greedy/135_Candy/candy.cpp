@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <numeric>
-
 /*
     ============
     === HARD ===
@@ -57,6 +53,10 @@
 
 */
 
+#include <vector>
+#include <numeric>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -73,23 +73,23 @@
 /* Space Complexity: O(n) */
 class Solution {
 public:
-    int candy(std::vector<int>& ratings)
+    int candy(vector<int>& ratings)
     {
-        const int n = ratings.size();
-        std::vector<int> candies(n, 1);
+        const int N = ratings.size();
+        vector<int> candies(N, 1);
 
-        for (int i = 0; i < n; i++)
+        for (int i = 1; i < N; i++)
         {
-            if (i-1 >= 0 && ratings[i-1] < ratings[i])
+            if (ratings[i-1] < ratings[i])
                 candies[i] = candies[i-1] + 1;
         }
 
-        for (int i = n-1; i >= 0; i--)
+        for (int i = N-2; i >= 0; i--)
         {
-            if (i+1 < n && ratings[i] > ratings[i+1] && candies[i] <= candies[i+1])
+            if (ratings[i] > ratings[i+1] && candies[i] <= candies[i+1])
                 candies[i] = candies[i+1] + 1;
         }
 
-        return std::accumulate(candies.begin(), candies.end(), 0);
+        return accumulate(candies.begin(), candies.end(), 0);
     }
 };
