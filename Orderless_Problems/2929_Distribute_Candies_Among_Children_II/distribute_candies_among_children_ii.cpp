@@ -97,7 +97,30 @@ public:
 /* Space Complexity: O(1) */
 class Solution_Math {
 public:
-    long long H3(long long n)
+    long long distributeCandies(int n, int limit) 
+    {
+        const int KIDS = 3;
+
+        long long total = choose(n, KIDS);
+
+        long long A = choose(n - (limit + 1), KIDS);
+        long long B = choose(n - (limit + 1), KIDS);
+        long long C = choose(n - (limit + 1), KIDS);
+
+
+        long long A_intersect_B = choose(n - 2 * (limit + 1), KIDS);
+        long long A_intersect_C = choose(n - 2 * (limit + 1), KIDS);
+        long long B_intersect_C = choose(n - 2 * (limit + 1), KIDS);
+
+
+        long long A_intersects_B_intersects_C = choose(n - 3 * (limit + 1), KIDS);
+
+
+        return total - (A + B + C) + (A_intersect_B + A_intersect_C + B_intersect_C) - A_intersects_B_intersects_C;
+    }
+
+private:
+    long long choose(long long n, const int& KIDS)
     {
         /*
            In General:
@@ -107,7 +130,18 @@ public:
                       b! * (a - b)!
 
 
-          In our problem:
+          In our problem: (KIDS = 3)
+
+
+                                                    (n + KIDS - 1)! 
+           C(n + KIDS - 1, KIDS - 1) = -----------------------------------------
+                                        (KIDS - 1)! * (n + KIDS - 1 - KIDS + 1)!
+
+
+                                            (n + 3 - 1)! 
+           C(n + 3 - 1, 3 - 1) = -------------------------------------------
+                                      (3 - 1)! * (n + 3 - 1 - 3 + 1)!
+
 
 
                           (n + 2)! 
@@ -125,20 +159,18 @@ public:
                                 2!
 
 
+           Finally, we simplified it to:
+
+
                           (n + 2) * (n + 1) 
            C(n + 2, 2) = ----------------------
                                 2
 
         */
 
-        return n < 0 ? 0 : (n+1) * (n+2) / 2;
-    }
+        if (n < 0)
+            return 0;
 
-    long long distributeCandies(int n, int limit) 
-    {
-        return H3(n)                       -
-               3LL * H3(n - limit - 1)     +
-               3LL * H3(n - 2*(limit + 1)) -
-               1LL * H3(n - 3*(limit + 1));
+        return (n + KIDS - 1) * (n + KIDS - 2) / 2;
     }
 };
