@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
 /*
     ==============
     === MEDIUM ===
@@ -76,6 +72,12 @@
 
 */
 
+#include <iostream>
+#include <queue>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -119,7 +121,7 @@ public:
         long long result = 0;
 
         // O(n)
-        std::priority_queue<int> max_heap(happiness.begin(), happiness.end());
+        priority_queue<int> max_heap(happiness.begin(), happiness.end());
 
         // O(k * logn)
         for (int i = 0; i < k; i++)
@@ -178,6 +180,47 @@ public:
     --- IDEA ---
     ------------
 
+    Another Sorting Solution, but implemented differently. It's good to see
+    both.
+
+*/
+
+/* Time  Beats: 83.09% */
+/* Space Beats: 91.10% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(logN)     */ // LogN because of Introsort's TC
+class Solution_Sorting_2 {
+public:
+    long long maximumHappinessSum(vector<int>& happiness, int k)
+    {
+        const int N = happiness.size();
+        long long result = 0;
+
+        /* Sort */
+        sort(happiness.begin(), happiness.end());
+
+        long long decrement = 0;
+
+        while (k-- > 0)
+        {
+            result += max(0LL, happiness.back() - decrement);
+            happiness.pop_back();
+            decrement++;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     Instead of Heap or some standard sorting algorithm, we are using:
     Partial Sort.
 
@@ -206,7 +249,6 @@ class Solution_Partial_Sort {
 public:
     long long maximumHappinessSum(std::vector<int>& happiness, int k)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
         long long result = 0;
 
         // O(n * logk)
