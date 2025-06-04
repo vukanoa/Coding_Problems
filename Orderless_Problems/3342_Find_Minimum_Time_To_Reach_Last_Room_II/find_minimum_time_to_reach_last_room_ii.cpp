@@ -73,7 +73,18 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    TODO
+    It may seem to you that this can be done using Memoizaton, however,
+    especially if you're allocating "memo" on the stack, it would take:
+
+        751 * 751 * 2 = 1128002
+
+    Which is more than 10^6 and that is the unoffocial maximum for Stack Size
+    on LeetCode.
+
+
+    But even if it didn't look like a Memoization problem at all, the fact that
+    it says "Find MINIMUM time to reach cell X" is highgly indicative that you
+    ought to use Dijkstra's algorithm.
 
 */
 
@@ -84,32 +95,39 @@ using namespace std;
 /* Space Complexity: O(ROWS * COL)                     */
 class Solution {
 private:
-    const int INF = 0x3f3f3f3f;
+    struct State {
+        int row;
+        int col;
+        int distance;
+
+        State(int r, int c, int d) : row(r), col(c), distance(d) {}
+    };
+
+    static const inline auto cmp = [](const State& a, const State& b) { return a.distance > b.distance; };
+
+    const int INF = 0x3f3f3f3f; // Safe value, to prevent Overflow
 
 public:
     int min_time_to_reach(vector<vector<int>>& move_time)
     {
         const int ROWS = move_time.size();
         const int COLS = move_time[0].size();
-        vector<vector<int>> distances(ROWS, vector<int>(COLS, INF));
-        vector<vector<bool>> visited(ROWS, vector<bool>(COLS, false));
 
-        struct State {
-            int row, col, distance;
-            State(int r, int c, int d) : row(r), col(c), distance(d) {}
-        };
+        vector<vector<int>>  distances(ROWS, vector<int> (COLS, INF));
+        vector<vector<bool>> visited  (ROWS, vector<bool>(COLS, false));
 
-        auto cmp = [](const State& a, const State& b) { return a.distance > b.distance; };
-        priority_queue<State, vector<State>, decltype(cmp)> heap(cmp);
-        heap.push(State(0, 0, 0));
+        priority_queue<State, vector<State>, decltype(cmp)> min_heap(cmp);
+        min_heap.push(State(0, 0, 0));
         distances[0][0] = 0;
 
-        int directions[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        /* Signing Cross */
+        vector<pair<int, int>> directions = {{-1,0}, {1,0}, {0,-1}, {0,1}};
 
-        while ( ! heap.empty())
+        /* Dijkstra */
+        while ( ! min_heap.empty())
         {
-            State current = heap.top();
-            heap.pop();
+            State current = min_heap.top();
+            min_heap.pop();
 
             if (visited[current.row][current.col])
                 continue;
@@ -121,19 +139,19 @@ public:
 
             for (const auto& dir : directions)
             {
-                int next_row = current.row + dir[0];
-                int next_col = current.col + dir[1];
+                int next_row = current.row + dir.first;
+                int next_col = current.col + dir.second;
 
-                if (next_row < 0 || next_row >= ROWS || next_col < 0 || next_col >= COLS)
+                if (next_row < 0 || next_col < 0 || next_row >= ROWS || next_col >= COLS)
                     continue;
 
-                int time_penalty = (current.row + current.col) % 2 + 1;
-                int new_distance = max(distances[current.row][current.col], move_time[next_row][next_col]) + time_penalty;
+                int time_penalty = (current.row + current.col) % 2 + 1; // Since penalties are alternating
+                int new_distance = time_penalty + max(distances[current.row][current.col], move_time[next_row][next_col]);
 
                 if (new_distance < distances[next_row][next_col])
                 {
                     distances[next_row][next_col] = new_distance;
-                    heap.push(State(next_row, next_col, new_distance));
+                    min_heap.push(State(next_row, next_col, new_distance));
                 }
             }
         }
