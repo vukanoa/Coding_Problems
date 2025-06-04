@@ -39,7 +39,7 @@
     --- Example 1 ---
     Input: word = "dbca", numFriends = 2
     Output: "dbc"
-    Explanation: 
+    Explanation:
     All possible splits are:
         "d" and "bca".
         "db" and "ca".
@@ -49,7 +49,7 @@
     --- Example 2 ---
     Input: word = "gggg", numFriends = 4
     Output: "g"
-    Explanation: 
+    Explanation:
     The only possible split is: "g", "g", "g", and "g".
 
 
@@ -106,5 +106,68 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  87.31% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Two_Pointers {
+public:
+    string answerString(string word, int numFriends)
+    {
+        if (numFriends == 1)
+            return word;
+
+        const int N = word.size();
+
+        string last = last_substring(word);
+        const int M = last.size();
+
+        int len = min(M, N - numFriends + 1);
+
+        return last.substr(0, len);
+    }
+
+private:
+    string last_substring(string s)
+    {
+        const int N = s.size();
+
+        int i = 0;
+        int j = 1;
+        while (j < N)
+        {
+            int k = 0;
+            while (j + k < N && s[i + k] == s[j + k])
+                k++;
+
+            if (j + k < N && s[i + k] < s[j + k])
+            {
+                int tmp = i;
+                i = j;
+                j = max(j + 1, tmp + k + 1);
+            }
+            else
+            {
+                j = j + k + 1;
+            }
+        }
+
+        return s.substr(i, N - i);
     }
 };
