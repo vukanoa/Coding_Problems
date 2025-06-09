@@ -168,3 +168,55 @@ private:
         return memo[n];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    It's equivalent to the above Solution, however here we don't actually need
+    to use Memoization to calculate Factorials, in this problem we can simply
+    multiply all the elements' indices from [1, n-1].
+
+    It's important to see this explicitly like this so that you're aware of it
+    even if it seem trivial and obvious.
+
+    It's a much more concise and straightforward way to implement it and it's
+    much faster for implementation, however it is good that you're able to
+    write Memoization version of factorial calculation.
+
+
+    Also, with this approach, we're saving N space, which is indeed better.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   9.09% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Space_Optimized {
+private:
+    const int MOD = 1e9 + 7;
+
+public:
+    int countPermutations(vector<int>& complexity)
+    {
+        const int N = complexity.size();
+        long long result = 1;
+
+        for (int i = 1; i < N; i++)
+        {
+            if (complexity[i] <= complexity[0])
+                return 0;
+
+            result *= i;
+            result %= MOD;
+        }
+
+        return result;
+    }
+};
