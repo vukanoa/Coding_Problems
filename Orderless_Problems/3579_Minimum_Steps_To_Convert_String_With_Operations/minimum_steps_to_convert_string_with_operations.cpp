@@ -88,13 +88,21 @@
 #include <vector>
 using namespace std;
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
 
 /* Time  Beats: 5.12% */
 /* Space Beats: 5.12% */
 
 /* Time  Complexity: O(N^2 * 26^2)  --->  O(N^2)  */
 /* Space Complexity: O(N^2)                       */
-class Solution {
+class Solution_Memoization {
 private:
     vector<vector<int>> memo;
 
@@ -162,6 +170,110 @@ private:
 
             copy_i++;
             idx += mul;
+        }
+
+        return operations;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 95.35% */
+/* Space Beats: 83.81% */
+
+/* Time  Complexity: O(N^2 * 26^2)  --->  O(N^2)  */
+/* Space Complexity: O(N^2)                       */
+class Solution_Tabulation {
+private:
+    static const int MAXN = 1005;
+    static const int INF  = 1000000000;
+    int dp[MAXN][MAXN];
+
+public:
+    int minOperations(const string& word1, const string& word2)
+    {
+        const int N = word1.size();
+
+        // const char* s1 = word1.c_str();
+        // const char* s2 = word2.c_str();
+
+        for (int i = 0; i <= N; ++i)
+        {
+            for (int j = 0; j <= N; ++j)
+                dp[i][j] = INF;
+        }
+        dp[0][0] = 0;
+
+        for (int i = 0; i < N; ++i)
+        {
+            int base = dp[i][i];
+
+            if (base < INF)
+            {
+                for (int j = i; j < N; ++j)
+                {
+                    int cost_normal  = mininumOpr(word1, word2, i, j, false);
+                    int cost_reverse = mininumOpr(word1, word2, i, j, true) + 1;
+
+                    int total_min = cost_normal < cost_reverse ? cost_normal : cost_reverse;
+                    int candidate = base + total_min;
+
+                    if (candidate < dp[j+1][j+1])
+                        dp[j+1][j+1] = candidate;
+                }
+            }
+
+            for (int k = i + 1; k <= N; k++)
+            {
+                if (dp[i][k-1] < dp[i][k])
+                    dp[i][k] = dp[i][k-1];
+            }
+        }
+
+        return dp[N][N];
+    }
+
+private:
+    static inline int mininumOpr(const string& word1, const string& word2, int i, int j, bool rev)
+    {
+        int operations = 0;
+
+        int idx_1 = i;
+        int idx_2 = rev ? j : i;
+
+        int step = rev ? -1 : 1;
+        int freq[26][26] = {};
+
+        for (int k = i; k <= j; ++k, ++idx_1, idx_2 += step)
+        {
+            char chr_1 = word1[idx_1];
+            char chr_2 = word2[idx_2];
+
+            if (chr_1 != chr_2)
+            {
+                int want = chr_1 - 'a';
+                int got  = chr_2 - 'a';
+
+                if (freq[got][want] > 0)
+                {
+                    freq[got][want]--;
+                }
+                else
+                {
+                    freq[want][got]++;
+                    operations++;
+                }
+            }
         }
 
         return operations;
