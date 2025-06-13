@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -61,6 +58,11 @@
 
 */
 
+#include <string>
+#include <unordered_map>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -79,38 +81,38 @@ class Solution {
 public:
     int longestCommonPrefix(vector<int>& arr1, vector<int>& arr2)
     {
-        unordered_map<string, int> prefix_map;
+        unordered_map<string, int> umap_prefix;
 
         // Step 1: Build the prefix map for arr1
-        for (int num : arr1)
+        for (const int& num : arr1)
         {
-            string strNum = to_string(num);
+            string str_num = to_string(num);
             string prefix = "";
 
-            for (char ch : strNum)
+            for (const char& chr : str_num)
             {
-                prefix += ch;
-                prefix_map[prefix]++;
+                prefix += chr;
+                umap_prefix[prefix]++;
             }
         }
 
-        int maxLength = 0;
+        int max_len = 0;
 
         // Step 2: Check for common prefixes in arr2
-        for (int num : arr2)
+        for (const int& num : arr2)
         {
-            string strNum = to_string(num);
+            string str_num = to_string(num);
             string prefix = "";
 
-            for (char ch : strNum)
+            for (const char& chr : str_num)
             {
-                prefix += ch;
+                prefix += chr;
 
-                if (prefix_map.find(prefix) != prefix_map.end())
-                    maxLength = max(maxLength, static_cast<int>(prefix.length()));
+                if (umap_prefix.find(prefix) != umap_prefix.end())
+                    max_len = max(max_len, static_cast<int>(prefix.length()));
             }
         }
 
-        return maxLength;
+        return max_len;
     }
 };
