@@ -61,6 +61,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <string>
 using namespace std;
 
 /*
@@ -186,5 +187,51 @@ public:
         }
 
         return num_max - num_min;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is essentially the same, however it uses C++'s built-in library
+    string functions.
+
+    It is VERY handy to know these exist and how to use them, that's why this
+    additional Solution, even though it's equivalent conceptually, is being
+    included here.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  18.49% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_str {
+public:
+    int minMaxDifference(int num)
+    {
+        /* Max */
+        string max_num_str = to_string(num);
+
+        size_t idx = max_num_str.find_first_not_of('9');
+        if (idx != string::npos)
+        {
+            char digit = max_num_str[idx];
+            replace(max_num_str.begin(), max_num_str.end(), digit, '9');
+        }
+
+        /* Min */
+        string min_num_str = to_string(num);
+
+        char digit = min_num_str[0];
+        replace(min_num_str.begin(), min_num_str.end(), digit, '0');
+
+        return stoi(max_num_str) - stoi(min_num_str);
     }
 };
