@@ -67,7 +67,7 @@ using namespace std;
     subsequence starting at idx=2 can be either at: 4,5,6,7, ... N-1
 
         m = 3
-        
+
         _ _ X _ _ _ _ _ _ _
         0 1 2 3 4 5 6 7 8 9
 
@@ -97,7 +97,7 @@ using namespace std;
         m = 3       // N = 10
 
         (N - m + 1) <==> 10 - 3 + 1 = 8
-        
+
         _ _   _ _ _ _ _ X _
         0 1 2 3 4 5 6 7 8 9
                         ^
@@ -147,6 +147,65 @@ public:
             min_map[nums[i + m - 1]]--;
             if (min_map[nums[i + m - 1]] == 0)
                 min_map.erase(nums[i + m - 1]);
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one doesn't use extra space and it's even more simple.
+
+    If you understand the above one, you'll understand this one as well just
+    by reading the code.
+
+*/
+
+/* Time  Beats: 78.15% */
+/* Space Beats: 86.60% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Optimized {
+public:
+    long long maximumProduct(vector<int>& nums, int m)
+    {
+        const int N = nums.size();
+        long long result = LLONG_MIN;
+
+        int best_min = INT_MAX;
+        int best_max = INT_MIN;
+
+        for (int i = 0; i < N; i++)
+        {
+            if (i >= m - 1)
+            {
+                best_min = min(best_min, nums[i - (m - 1)]);
+                best_max = max(best_max, nums[i - (m - 1)]);
+            }
+
+            int value = nums[i];
+
+            if (best_min != INT_MAX)
+            {
+                long long product = value * best_min;
+                if (product > result)
+                    result = product;
+            }
+
+            if (best_max != INT_MIN)
+            {
+                long long product = value * best_max;
+                if (product > result)
+                    result = product;
+            }
         }
 
         return result;
