@@ -79,19 +79,63 @@ public:
         const int N = nums.size();
         int result = -1;
 
-        vector<int> max_to_the_right(N, 0);
-        max_to_the_right[N-1] = nums.back();
+        vector<int> max_right(N, 0);
+        max_right[N-1] = nums.back();
 
         for (int i = N-2; i >= 0; i--)
-            max_to_the_right[i] = max(nums[i], max_to_the_right[i+1]);
+            max_right[i] = max(nums[i], max_right[i+1]);
 
-        int min_to_the_left = nums[0];
+        int min_left = nums[0];
         for (int i = 1; i < N; i++)
         {
-            if (min_to_the_left < max_to_the_right[i])
-                result = max(result, max_to_the_right[i] - min_to_the_left);
+            if (min_left < max_right[i])
+                result = max(result, max_right[i] - min_left);
 
-            min_to_the_left = min(min_to_the_left, nums[i]);
+            min_left = min(min_left, nums[i]);
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    If you look closely, we don't really need vector max_right, instead we can
+    update our min_left as we go.
+
+    Each time current min_left is strictly SMALLER than nums[i], we try to
+    update our result.
+
+    Otherwise, it's certain the nums[i] is LESS THAN OR EQUALS to min_left,
+    therefore we update min_left.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  71.76% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Optimized {
+public:
+    int maximumDifference(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = -1;
+
+        int min_left = nums[0];
+        for (int i = 1; i < N; ++i)
+        {
+            if (min_left < nums[i])
+                result = max(result, nums[i] - min_left);
+            else
+                min_left = nums[i]; // It's LESS THAN OR EQUAL to current min
         }
 
         return result;
