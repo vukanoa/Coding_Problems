@@ -132,3 +132,46 @@ public:
         return N - low;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Adding even more ways to implement it. It's never enough for Binary Search
+    problems, especially when they are so weird.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  45.86% */
+
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(1)    */
+class Solution_3 {
+public:
+    int hIndex(vector<int>& citations)
+    {
+        const int N = citations.size();
+        int L = 0;
+        int R = N-1;
+
+        while (L <= R)
+        {
+            int mid = L + (R - L) / 2;
+
+            if (citations[mid] == (N - mid))
+                return citations[mid];
+
+            if (citations[mid] > (N - mid))
+                R = mid - 1;
+            else
+                L = mid + 1;
+        }
+
+        return N - (R+1);
+    }
+};
