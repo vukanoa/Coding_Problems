@@ -116,3 +116,41 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Big O Time Complexiy is the same, however once we have a vector of sorted
+    elements--Why not just use Binary Search to improve that part as well?
+
+    That's what we're doing here.
+
+*/
+
+/* Time  Beats: 48.25% */
+/* Space Beats: 39.38% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(logn)     */ // C++'s sort is taking O(logN) extra space
+class Solution_Optimization {
+public:
+    static int partitionArray(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+        int partitions = 0;
+
+        sort(nums.begin(), nums.end());
+        for (int i = 0; i < N;)
+        {
+            i = upper_bound(nums.begin()+i, nums.end(), nums[i]+k) - nums.begin();
+            partitions++;
+        }
+
+        return partitions;
+    }
+};
