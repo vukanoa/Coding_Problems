@@ -73,6 +73,9 @@
 
 */
 
+#include <cmath>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -136,5 +139,70 @@ private:
             result *= base;
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This question can also be done as a combinatorial problem.
+
+    Let us assume that we have p pigs, and our goal is to determine whether
+    they can help identify the poisoned bucket with 100% accuracy.
+
+    Now, consider the number of test rounds we are allowed to perform. Each pig
+    can be tested every minutesToDie minutes. If the total time available for
+    all testing is minutesToTest, then the number of full tests we can
+    conduct is:
+
+        T = minutesToTest / minutesToDie
+
+
+
+    In each test round, a pig can either die or survive. But since a pig may
+    die in the 1st, 2nd, ..., or T-th round--or survive all T rounds--there
+    are a total of T + 1 possible outcomes for each pig.
+
+    Therefore, for p pigs, the total number of outcome combinations is:
+
+        (T + 1) * (T + 1) * ... * (T + 1)  [p times] = (T + 1)^p
+
+    Each unique combination of pig outcomes allows us to identify one unique
+    bucket. Thus, to be able to distinguish between all N buckets, the number
+    of combinations must be at least N. Hence, the condition is:
+
+
+        (T + 1)^p >= N
+
+    To solve for the minimum number of pigs p, we take the logarithm of both
+    sides:
+
+        p >= log(N) / log(T + 1)
+
+    Since p must be an integer (you can't have a fraction of a pig), we take
+    the ceiling of the result:
+
+        p = ceil(log(N) / log(T + 1))
+
+    This gives us the minimum number of pigs required to determine the poisoned
+    bucket within the given time constraints.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  26.86% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Math {
+public:
+    int poorPigs(int buckets, int poisonTime, int totalTime)
+    {
+        return ceil(log2(buckets) / log2(totalTime / poisonTime + 1));
     }
 };
