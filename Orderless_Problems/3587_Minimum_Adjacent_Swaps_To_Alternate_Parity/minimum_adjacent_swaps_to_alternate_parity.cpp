@@ -218,10 +218,85 @@ public:
                     next_even += 2;
                 }
             }
-            
+
             total = min(total, static_cast<long long>(ceil(1.0 * result / 2)));
         }
 
         return static_cast<int>(total);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one uses Extra space, but it's a MUCH more clear and concise way of
+    solving this problem.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats: 32.07% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_2 {
+public:
+    int minSwaps(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        vector<int> idx_of_odd_num;
+        vector<int> idx_of_even_num;
+
+        for (int i = 0; i < N; i++)
+        {
+            if (nums[i] % 2)
+                idx_of_odd_num.push_back(i);
+            else
+                idx_of_even_num.push_back(i);
+        }
+
+        int odd_size  = idx_of_odd_num.size();
+        int even_size = idx_of_even_num.size();
+
+        if (abs(odd_size - even_size) > 1)
+            return -1;
+
+        int result = 0;
+        if (N % 2 == 0) // Even
+        {
+            int swaps_when_odd_start = 0;
+            for (int i = 0; i < odd_size; i++)
+                swaps_when_odd_start += abs(idx_of_odd_num[i] - i*2);
+
+            int swaps_when_even_start = 0;
+            for (int i = 0; i < even_size; i++)
+                swaps_when_even_start += abs(idx_of_even_num[i] - i*2);
+
+            result = min(swaps_when_odd_start, swaps_when_even_start);
+        }
+        else // Odd
+        {
+            int swaps = 0;
+            if (odd_size > even_size)
+            {
+                for (int i = 0; i < odd_size; i++)
+                    swaps += abs(idx_of_odd_num[i] - i*2);
+            }
+            else
+            {
+                for (int i = 0; i < even_size; i++)
+                    swaps += abs(idx_of_even_num[i] - i*2);
+            }
+
+            result = swaps;
+        }
+
+        return result;
     }
 };
