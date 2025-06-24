@@ -36,13 +36,13 @@
     - For index 4, |4 - 5| <= k and nums[5] == key, so 4 is a k-distant index.
     - For index 5, |5 - 5| <= k and nums[5] == key, so 5 is a k-distant index.
     - For index 6, |6 - 5| <= k and nums[5] == key, so 6 is a k-distant index.
-    Thus, we return [1,2,3,4,5,6] which is sorted in increasing order. 
+    Thus, we return [1,2,3,4,5,6] which is sorted in increasing order.
 
     --- Example 2 ---
     Input: nums = [2,2,2,2,2], key = 2, k = 2
     Output: [0,1,2,3,4]
     Explanation: For all indices i in nums, there exists some index j such that
-    |i - j| <= k and nums[j] == key, so every index is a k-distant index. 
+    |i - j| <= k and nums[j] == key, so every index is a k-distant index.
     Hence, we return [0,1,2,3,4].
 
 
@@ -90,6 +90,62 @@ public:
                 for (int j = L; j < R; j++)
                     result.push_back(j);
             }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Even though this one is less Space efficient, it's beneficial to be aware
+    of this "Sweep Line" technique as it comes were frequently, especially in
+    contests.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  32.45% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Line_Sweep {
+public:
+    vector<int> findKDistantIndices(vector<int>& nums, int key, int k)
+    {
+        const int N = nums.size();
+        vector<int> result;
+
+        int sweep_line[1001] = {0};
+        int rightmost_modified_index = -1;
+
+        for (int current_index = 0; current_index < N; current_index++)
+        {
+            if (nums[current_index] == key)
+            {
+                int interval_start_idx = max(0, current_index - k);
+                int interval_end_idx = min(N, current_index + k + 1);
+
+                sweep_line[interval_start_idx]++;
+                sweep_line[interval_end_idx]--;
+
+                rightmost_modified_index = max(rightmost_modified_index, interval_end_idx);
+            }
+        }
+
+        int current_coverage = 0;
+        for (int index = 0; index <= rightmost_modified_index; index++)
+        {
+            current_coverage += sweep_line[index];
+
+            if (current_coverage > 0)
+                result.push_back(index);
         }
 
         return result;
