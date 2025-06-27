@@ -143,3 +143,61 @@ public:
         return *max_element(dp.begin(), dp.end());
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 98.79% */
+/* Space Beats: 98.18% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(logN)     */ // This is Space Comp. of C++'s Sort
+class Solution_Space_Optimized {
+public:
+    int maxSelectedElements(vector<int>& nums)
+    {
+        /* Sort */
+        sort(nums.begin(), nums.end());
+
+        int pre = -10;
+        int result = 1;
+        int c1 = 1;
+        int c2 = 1;
+
+        for (const int& num : nums)
+        {
+            if (num == pre)
+            {
+                c2 = c1 + 1;
+            }
+            else if (num == pre + 1)
+            {
+                c1++;
+                c2++;
+            }
+            else if (num == pre + 2)
+            {
+                c1 = c2 + 1;
+                c2 = 1;
+            }
+            else
+            {
+                c1 = c2 = 1;
+            }
+
+            result = max(result, max(c1, c2));
+            pre = num;
+        }
+
+        return result;
+    }
+};
