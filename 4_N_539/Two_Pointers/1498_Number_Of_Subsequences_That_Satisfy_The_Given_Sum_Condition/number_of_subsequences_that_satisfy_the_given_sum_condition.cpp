@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
 /*
     ==============
     === MEDIUM ===
@@ -61,6 +57,11 @@
     1 <= target <= 10^6
 
 */
+
+#include <algorithm>
+#include <cmath>
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -245,24 +246,30 @@
 
 class Solution_Does_NOT_work_CPP {
 public:
-    int numSubseq(std::vector<int>& nums, int target)
+    int numSubseq(vector<int>& nums, int target)
     {
+        const int N = nums.size();
         unsigned long long result = 0;
-        int mod_value = std::pow(10, 9) + 7;
 
-        std::sort(nums.begin(), nums.end());
+        int mod_value = pow(10, 9) + 7;
 
-        int right = nums.size() - 1;
-        for (int left = 0; left < nums.size(); left++)
+        sort(nums.begin(), nums.end());
+
+        int L = 0;
+        int R = N - 1;
+        while (L < N)
         {
-            while (left <= right && (nums[left] + nums[right]) > target)
-                right--;
+            while (L <= R && (nums[L] + nums[R]) > target)
+                R--;
 
-            if (left <= right)
+            if (L <= R)
             {
-                result += (1 << (right - left));
+                result += (1 << (R - L));
                 result %= mod_value;
             }
+
+            // Increment
+            L++;
         }
 
         return static_cast<int>(result);
@@ -330,52 +337,54 @@ public:
 /* Time  Beats: 24.01% */
 /* Space Beats: 39.74% */
 
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
 class Solution_Inefficient {
-public:
-    int numSubseq(std::vector<int>& nums, int target)
-    {
-        std::sort(nums.begin(), nums.end());
-        int result = 0;
-        int mod_value = 1e9 + 7;
+private:
+    const int MOD = 1e9 + 7;
 
-        for(int i = 0; i < nums.size(); ++i)
+public:
+    int numSubseq(vector<int>& nums, int target)
+    {
+        const int N = nums.size();
+
+        int result = 0;
+
+        /* Sort */
+        sort(nums.begin(), nums.end());
+
+        for (int i = 0; i < nums.size(); i++)
         {
             int val = target - nums[i];
 
             // First Greater than "val"
-            auto bigger_val = std::upper_bound(nums.begin(), nums.end(), val);
+            auto bigger_val = upper_bound(nums.begin(), nums.end(), val);
 
-            int idx = std::distance(nums.begin(), bigger_val);
+            int idx = distance(nums.begin(), bigger_val);
             idx--;
 
-            if(idx >= i)
-                result = (result + power(2, idx-i, mod_value)) % mod_value;
+            if (idx >= i)
+                result = (result + modular_exponentiation(2, idx-i)) % MOD;
         }
 
-        return result % mod_value;
+        return result % MOD;
     }
 
 private:
-    int power(unsigned long long x, unsigned long long y, unsigned long long p)
+    // It's basiclaly: (base^exp) % mod
+    long long modular_exponentiation(long long base, long long exp)
     {
-        int res = 1;
-        x = x % p;
-
-        if (x == 0)
-            return 0;
-
-        while (y > 0)
+        long long result = 1;
+        while (exp > 0)
         {
-            if (y & 1)
-                res = (res * x) % p;
+            if (exp & 1)
+                result = (result * base) % MOD;
 
-            y = y >> 1;
-            x = (x * x) % p;
+            base = (base * base) % MOD;
+            exp /= 2;
         }
 
-        return res;
+        return result;
     }
 };
 
@@ -396,33 +405,33 @@ private:
 /* Time  Beats: 96.76% */
 /* Space Beats: 54.46% */
 
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
 class Solution_Efficient {
 public:
     int numSubseq(std::vector<int>& nums, int target)
     {
-        int n = nums.size();
-        int MOD = 1e9 + 7;
+        const int N = nums.size();
+        const int MOD = 1e9 + 7;
 
         /* Sort */
-        std::sort(nums.begin(), nums.end());
+        sort(nums.begin(), nums.end());
 
         int result = 0;
 
-        int left  = 0;
-        int right = n-1;
+        int L  = 0;
+        int R = N-1;
 
-        std::vector<int> pow(n, 1);
-        for(int i = 1; i < n; i++)
+        vector<int> pow(N, 1);
+        for (int i = 1; i < N; i++)
             pow[i] = (pow[i-1] * 2) % MOD;
 
-        while(left <= right)
+        while (L <= R)
         {
-            if(nums[left] + nums[right] <= target)
-                result = (result + pow[right - left++]) % MOD;
+            if (nums[L] + nums[R] <= target)
+                result = (result + pow[R - L++]) % MOD;
             else
-                right--;
+                R--;
         }
 
         return result;
