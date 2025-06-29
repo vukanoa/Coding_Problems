@@ -70,6 +70,7 @@
 
 */
 
+#include <climits>
 #include <queue>
 #include <string>
 #include <vector>
@@ -97,7 +98,7 @@ public:
 
         if (N == 1)
             return {0};
-        
+
         if (N == 2)
             return {0, 0};
 
@@ -157,6 +158,100 @@ public:
 
             int LCP = longest_common_prefix(words[i-1], words[i]);
             max_heap.push( {LCP, i-1, i} );
+        }
+
+        return answer;
+    }
+
+private:
+    int longest_common_prefix(string& w1, string& w2)
+    {
+        const int N = w1.length();
+        const int M = w2.length();
+
+        int result = 0;
+
+        int i = 0;
+        int j = 0;
+        while (i < N && j < M)
+        {
+            if (w1[i] != w2[j])
+                break;
+
+            i++;
+            j++;
+
+            result++;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 51.55% */
+/* Space Beats: 73.07% */
+
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(N)     */
+class Solution_2 {
+public:
+    vector<int> longestCommonPrefix(vector<string>& words)
+    {
+        const int N = words.size();
+        vector<int> answer(N, 0);
+
+        if (N == 1)
+            return answer;
+
+        vector<int> prefix(N-1, INT_MIN);
+        vector<int> suffix(N-1, INT_MIN);
+
+        vector<int> LCP_between_adjacent_words(N-1, 0);
+
+        for(int i = 0; i < N-1; i++)
+            LCP_between_adjacent_words[i] = (longest_common_prefix(words[i], words[i + 1]));
+
+        prefix[0]     = LCP_between_adjacent_words[0];
+        suffix[N - 2] = LCP_between_adjacent_words[N - 2];
+
+        for (int i = 1; i < N-1; i++)
+            prefix[i] = max(prefix[i - 1], LCP_between_adjacent_words[i]);
+
+        for (int i = N-3; i >= 0; i--)
+            suffix[i] = max(suffix[i + 1], LCP_between_adjacent_words[i]);
+
+
+        for (int i = 0; i < N; i++)
+        {
+            if (i == 0)
+            {
+                answer[i] = (i + 1 <= N - 2) ? suffix[i + 1] : 0;
+            }
+            else if (i == N - 1)
+            {
+                answer[i] = (i - 2 >= 0) ? prefix[i - 2] : 0;
+            }
+            else
+            {
+                int tmp = longest_common_prefix(words[i - 1], words[i + 1]);
+
+                int prefix_max = (i - 2 >= 0)     ? prefix[i - 2] : 0;
+                int suffix_max = (i + 1 <= N - 2) ? suffix[i + 1] : 0;
+
+                answer[i] = max( {tmp, prefix_max, suffix_max} );
+            }
         }
 
         return answer;
