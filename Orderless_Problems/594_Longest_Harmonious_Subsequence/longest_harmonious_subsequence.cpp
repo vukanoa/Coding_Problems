@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-
 /*
     ============
     === EASY ===
@@ -55,12 +51,19 @@
 
 */
 
+#include <algorithm>
+#include <vector>
+#include <unordered_map>
+
+using namespace std;
+
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Create a Frequency-HashMap, --> {element, frequence}
+    Create a Frequency-HashMap ---> {element, frequence}
 
     Go through this (unordered) HashMap and each time take the current element
     and check if current_element_plus_1 exists in the Hashmap. It if does, then
@@ -74,8 +77,8 @@
 /* Time  Beats: 15.59% */
 /* Space Beats: 52.07% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution {
 public:
     int findLHS(vector<int>& nums)
@@ -93,6 +96,51 @@ public:
 
             if (umap_counter.find(key + 1) != umap_counter.end()) // It DOES exist
                 result = max(result, val + umap_counter[key + 1]);
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 94.27% */
+/* Space Beats: 84.89% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(logN)     */ // This is Space Comp. for C++'s sort
+class Solution_Sliding_Window {
+public:
+    static int findLHS(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        /* Sort */
+        sort(nums.begin(), nums.end());
+
+        int L = 0;
+        int R = 0;
+        while (R < N)
+        {
+            while (L < R && nums[L] < (nums[R] - 1))
+                L++;
+
+            if (nums[L] == (nums[R] - 1))
+                result = max(result, R - L + 1);
+
+            // Increment
+            R++;
         }
 
         return result;
