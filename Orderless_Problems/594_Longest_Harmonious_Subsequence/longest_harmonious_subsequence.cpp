@@ -110,7 +110,9 @@ public:
     --- IDEA ---
     ------------
 
-    TODO
+    Both this "Sliding Window" and "Binary Search" Solutions are LESS efficient
+    however it is good to know these technique even of trivial problems like
+    this.
 
 */
 
@@ -141,6 +143,54 @@ public:
 
             // Increment
             R++;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 87.57% */
+/* Space Beats: 94.99% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(logN)     */ // This is Space Comp. for C++'s sort
+class Solution_Binary_search {
+public:
+    int findLHS(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        /* Sort */
+        sort(nums.begin(), nums.end());
+
+        int L = 0;
+        int R = 0;
+        while (L < N)
+        {
+            R = upper_bound(nums.begin() + L + 1, nums.end(), nums[L] + 1) - nums.begin() - 1;
+
+            if ((nums[L] + 1) == nums[R])
+            {
+                result = max(result, R - L + 1);
+
+                L = lower_bound(nums.begin() + L + 1, nums.end(), nums[L]) - nums.begin() - 1;
+            }
+
+            // Increment
+            L++;
         }
 
         return result;
