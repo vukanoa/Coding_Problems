@@ -161,3 +161,84 @@ public:
         return image;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats:  97.59% */
+/* Space Beats: 100.00% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(1)           */
+class Solution_Space_Optimized {
+public:
+    vector<vector<int>> resultGrid(vector<vector<int>>& image, int threshold)
+    {
+        const int ROWS = image.size();
+        const int COLS = image[0].size();
+
+        for (int row = 0; row < ROWS - 2; row++)
+        {
+            for (int col = 0; col < COLS - 2; col++)
+            {
+                int sum = 0;
+                bool is_region = true;
+
+                for (int i = row; i < row + 3; i++)
+                {
+                    for (int j = col; j < col + 3; j++)
+                    {
+                        int pixel = image[i][j] & 255;
+                        sum += pixel;
+
+                        if (i > row && abs(pixel - (image[i - 1][j] & 255)) > threshold)
+                            is_region = false;
+                        if (j > col && abs(pixel - (image[i][j - 1] & 255)) > threshold)
+                            is_region = false;
+                    }
+                }
+
+                if (is_region)
+                {
+                    int avg = sum / 9;
+                    for (int i = row; i < row + 3; i++)
+                    {
+                        for (int j = col; j < col + 3; j++)
+                        {
+                            image[i][j] += (avg << 16); // Add to sum
+                            image[i][j] += (1 << 8);    // Increment count
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < ROWS; i++)
+        {
+            for (int j = 0; j < COLS; j++)
+            {
+                int count = (image[i][j] >> 8) & 255;
+                if (count > 0)
+                {
+                    int total_sum = image[i][j] >> 16;
+                    image[i][j] = total_sum / count;
+                }
+                else
+                {
+                    image[i][j] &= 255;
+                }
+            }
+        }
+
+        return image;
+    }
+};
