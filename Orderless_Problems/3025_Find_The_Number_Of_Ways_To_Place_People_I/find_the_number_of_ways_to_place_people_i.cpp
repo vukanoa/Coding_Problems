@@ -72,6 +72,7 @@
 
 */
 
+#include <algorithm>
 #include <vector>
 using namespace std;
 
@@ -163,6 +164,68 @@ public:
                     if (valid)
                         result++;
                 }
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Turns out we can improve Time Complexiy by sorting.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  31.62% */
+
+/* Time  Complexity: O(N^2)  */
+/* Space Complexity: O(logN) */ // Because that's the SC for C++'s Sort
+class Solution_Optimized {
+private:
+    static bool comparator(vector<int>& a, vector<int>& b) {
+        if (a[0] == b[0])
+            return a[1] > b[1];
+
+        return a[0] < b[0];
+    }
+
+public:
+    int numberOfPairs(vector<vector<int>>& points)
+    {
+        const int N = points.size();
+        int result = 0;
+
+        /* Sort */
+        sort(points.begin(),points.end(),comparator);
+
+        for (int i = 0; i < N; i++)
+        {
+            int x1 = points[i][0];
+            int y1 = points[i][1];
+
+            long long k = -10000000000;
+
+            for (int j = i+1; j < N; j++)
+            {
+                int x2 = points[j][0];
+                int y2 = points[j][1];
+
+                if (y2 > y1)
+                    continue;
+
+                if (y2 > k)
+                    result++;
+
+                if (y2 > k)
+                    k = y2;
             }
         }
 
