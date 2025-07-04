@@ -48,6 +48,7 @@
 
 */
 
+#include <queue>
 #include <unordered_map>
 #include <vector>
 using namespace std;
@@ -122,6 +123,88 @@ private:
             // If other_person is NOT_COLORED, then try to color it with an opposite color of person_id and try recursively
             if (color_table[other_person] == NOT_COLORED && !dfs_helper(other_person, -color, adj_list, color_table))
                 return false;
+        }
+
+        return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 25.35% */
+/* Space Beats: 43.96% */
+
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V + E) */
+class Solution_BFS {
+private:
+    enum COLOR_CONSTANT {
+        GREEN = -1,  // -1
+        NOT_COLORED, // 0
+        BLUE         // 1
+    };
+
+public:
+    bool possibleBipartition(int n, vector<vector<int>>& dislikes)
+    {
+        if (n == 1 || dislikes.size() == 0) // Edge case
+            return true;
+
+        // Each person maintains a list of people he/she dislikes
+        unordered_map<int, vector<int>> adj_list;
+
+        // Build an undirected graph
+        for (const auto& entry : dislikes)
+        {
+            adj_list[entry[0]].push_back(entry[1]);
+            adj_list[entry[1]].push_back(entry[0]);
+        }
+
+        // key:   person_id
+        // value: color_of_person
+        unordered_map<int, int> color_table; // {person_id, color_of_person}
+
+        for (int person_id = 1; person_id <= n; person_id++)
+        {
+            // Skip if this person has already been colored
+            if (color_table[person_id] != NOT_COLORED)
+                continue;
+
+            // Start BFS from this person with BLUE color
+            queue<pair<int, int>> queue;
+            queue.push({person_id, BLUE});
+
+            color_table[person_id] = BLUE;
+
+            while ( ! queue.empty())
+            {
+                int curr_person = queue.front().first;
+                int curr_color  = queue.front().second;
+                queue.pop();
+
+                for (const int& other_person : adj_list[curr_person])
+                {
+                    if (color_table[other_person] == NOT_COLORED)
+                    {
+                        color_table[other_person] = -curr_color;
+                        queue.push({other_person, color_table[other_person]});
+                    }
+                    else if (color_table[other_person] == curr_color)
+                    {
+                        return false;
+                    }
+                }
+            }
         }
 
         return true;
