@@ -112,3 +112,37 @@ public:
         return 'a' + (operation_count % 26);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  73.42% */
+
+/* Time  Complexity: O(logK) */
+/* Space Complexity: O(1)    */
+class Solution_Math {
+public:
+    char kthCharacter(long long k, vector<int>& operations)
+    {
+        int result = 0;
+        k--;
+
+        for (int curr_bit_idx = __lg(k); curr_bit_idx >= 0; curr_bit_idx--)
+        {
+            if (k >> curr_bit_idx & 1)
+                result += operations[curr_bit_idx];
+        }
+
+        return 'a' + (result % 26);
+    }
+};
