@@ -210,3 +210,77 @@ public:
         return true;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 37.04% */
+/* Space Beats: 53.44% */
+
+/* Time  Complexity: O(V + E * alfa(V)) */ // Wheres the alfa(V) inverse
+                                           // Ackermann function, nearly
+                                           // constant in practice
+/* Space Complexity: O(V + E)           */
+class Solution_Union_and_Find {
+private:
+    vector<int> parent;
+public:
+    bool possibleBipartition(int n, vector<vector<int>>& dislikes)
+    {
+        parent.resize(n + 1);
+        for (int i = 0; i <= n; i++) // Can be done using std::iota
+            parent[i] = i;
+
+        unordered_map<int, vector<int>> adj_list;
+        for (const auto& entry : dislikes)
+        {
+            adj_list[entry[0]].push_back(entry[1]);
+            adj_list[entry[1]].push_back(entry[0]);
+        }
+
+        for (int person_id = 1; person_id <= n; person_id++)
+        {
+            if (adj_list[person_id].empty())
+                continue;
+
+            for (const int& enemy : adj_list[person_id])
+            {
+                // If person and enemy are in same group, it's impossible
+                if (find_parent(person_id) == find_parent(enemy))
+                    return false;
+
+                // Union all enemies into the same group
+                union_groups(adj_list[person_id][0], enemy);
+            }
+        }
+
+        return true;
+    }
+
+private:
+    int find_parent(int person)
+    {
+        if (parent[person] != person)
+            parent[person] = find_parent(parent[person]);
+
+        return parent[person];
+    }
+
+    void union_groups(int person_one, int person_two)
+    {
+        int root_one = find_parent(person_one);
+        int root_two = find_parent(person_two);
+
+        parent[root_one] = root_two;
+    }
+
+};
