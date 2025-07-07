@@ -49,6 +49,7 @@
 */
 
 #include <algorithm>
+#include <queue>
 #include <vector>
 using namespace std;
 
@@ -70,7 +71,7 @@ class Solution {
 public:
     int maxEvents(vector<vector<int>>& events)
     {
-        
+        /* Sort */
         sort(events.begin(), events.end(), [](const vector<int>& a, const vector<int>& b) {
             return a[1] < b[1]; // ASCENDING by end_time value
         });
@@ -114,5 +115,60 @@ private:
         }
 
         return day;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 82.32% */
+/* Space Beats: 64.45% */
+
+/* Time  Complexity: O(N * logN + max_end * logN) */
+/* Space Complexity: O(N)                    */
+class Solution_Greedy {
+public:
+    int maxEvents(vector<vector<int>>& events)
+    {
+        const int N = events.size();
+        int result = 0;
+
+        int max_day = 0;
+        for (int i = 0; i < events.size(); i++)
+            max_day = max(max_day, events[i][1]);
+
+        priority_queue<int, vector<int>, greater<>> min_heap;
+
+        /* Sort in ASCENDING */
+        sort(events.begin(), events.end());
+
+        for (int i = 0, j = 0; i <= max_day; i++)
+        {
+            while (j < N && events[j][0] <= i)
+            {
+                min_heap.emplace(events[j][1]);
+                j++;
+            }
+
+            while ( ! min_heap.empty() && min_heap.top() < i)
+                min_heap.pop();
+
+            if ( ! min_heap.empty())
+            {
+                min_heap.pop();
+                result++;
+            }
+        }
+
+        return result;
     }
 };
