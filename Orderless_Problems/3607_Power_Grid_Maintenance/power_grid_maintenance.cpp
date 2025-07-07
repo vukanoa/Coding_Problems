@@ -87,6 +87,7 @@
 #include <queue>
 #include <unordered_map>
 #include <vector>
+#include <queue>
 using namespace std;
 
 /*
@@ -197,5 +198,127 @@ private:
 
             dfs(neighbor, adj_list, visited, parent, start, min_heap);
         }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Even if this one is longer, this is a much more straightfowards
+    implementation. It's elegant and much easier to grasp.
+
+    It's much faster in practice, not in Big O notation. Big O is equivalent to
+    the one above.
+
+*/
+
+/* Time  Beats: 99.07% */
+/* Space Beats: 98.96% */
+
+/* Time  Complexity: O((V + E) * Q * logV) */
+/* Space Complexity: O(V^2)                */
+class DSU {
+public:
+    vector<int> parent;
+
+    DSU(int n)
+    {
+        parent.resize(n + 1);
+
+        for (int i = 0; i <= n; ++i) // Because stations are from [1, n]
+            parent[i] = i;
+    }
+
+    int find_root_node(int node)
+    {
+        // Get root parent
+        while (node != parent[node])
+        {
+            // Huge Optimization (From O(n) to Amortized O(1) Time Complexity)
+            // If there is no grandparent, nothing will happen
+            parent[node] = parent[parent[node]];
+
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    bool union_components(int node1, int node2)
+    {
+        int root1 = find_root_node(node1);
+        int root2 = find_root_node(node2);
+
+        if (root1 == root2)
+            return false;
+
+        // Make sure that to merge TOWARDS the smaller node, i.e. root1
+        parent[root2] = root1;
+
+        return true;
+    }
+};
+
+
+class Solution_DSU {
+public:
+    vector<int> processQueries(int c,
+                               vector<vector<int>>& connections,
+                               vector<vector<int>>& queries)
+    {
+        vector<int> result;
+
+        DSU dsu(c);
+        vector<bool> online(c + 1, true);
+
+        for (const auto& entry : connections)
+        {
+            int u = entry[0];
+            int v = entry[1];
+
+            dsu.union_components(u, v);
+        }
+
+        unordered_map<int, priority_queue<int, vector<int>, greater<int>>> component_root_to_min_heap;
+        for (int station = 1; station <= c; station++)
+        {
+            int root = dsu.find_root_node(station);
+            component_root_to_min_heap[root].push(station);
+        }
+
+        for (auto& query : queries)
+        {
+            int type = query[0];
+            int node = query[1];
+
+            if (type == 2)
+            {
+                online[node] = false;
+            }
+            else
+            {
+                if (online[node])
+                {
+                    result.push_back(node);
+                }
+                else
+                {
+                    int root = dsu.find_root_node(node);
+                    auto& min_heap = component_root_to_min_heap[root];
+
+                    while ( ! min_heap.empty() &&  ! online[min_heap.top()])
+                        min_heap.pop();
+
+                    result.push_back(min_heap.empty() ? -1 : min_heap.top());
+                }
+            }
+        }
+
+        return result;
     }
 };
