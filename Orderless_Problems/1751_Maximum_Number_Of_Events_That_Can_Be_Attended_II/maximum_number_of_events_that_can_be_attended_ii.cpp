@@ -80,7 +80,7 @@ using namespace std;
 
 /* Time  Complexity: O(k * N * logN) */
 /* Space Complexity: O(k * N)        */
-class Solution {
+class Solution_Memoization {
 private:
     vector<vector<int>> memo;
     int N;
@@ -100,7 +100,7 @@ public:
     {
         N = events.size();
 
-        /* Sort */
+        /* Sort in ASCENDING by start_day */
         sort(events.begin(), events.end(), compare_events);
 
         // Allocate and initialize "memo"
@@ -136,5 +136,73 @@ private:
 
 
         return memo[remaining_count][curr_idx] = max(skip, take);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Bottom-up implementation. It's very beneficial to know both since sometimes
+    Memoization is too costly because of the Stack-call.
+
+    However, to me Memoizaiton i much more straightforward for writing,
+    therefore it's good to know how to convert your Memoization Solution to a
+    Bottom-Up Dynamic Programming one.
+
+*/
+
+/* Time  Beats: 8.73% */
+/* Space Beats: 9.68% */
+
+/* Time  Complexity: O(k * N * logN) */
+/* Space Complexity: O(k * N) */
+class Solution_Bottom_Up {
+private:
+    static bool compare_events(const vector<int>& event_a, const vector<int>& event_b)
+    {
+        return event_a[0] < event_b[0]; // ASCENDING by 0th element, i.e. "start"
+    }
+
+    static bool compare_target_with_start_day(int target_day, const vector<int>& event)
+    {
+        return target_day < event[0];
+    }
+
+public:
+    int maxValue(vector<vector<int>>& events, int k)
+    {
+        const int N = events.size();
+
+        /* Sort in ASCENDING by start_day */
+        sort(events.begin(), events.end(), compare_events);
+
+        vector<vector<int>> dp(k + 1, vector<int>(N + 1, 0));
+
+        for (int curr_idx = N-1; curr_idx >= 0; curr_idx--)
+        {
+            for (int remaining_count = 1; remaining_count <= k; remaining_count++)
+            {
+                /* Reference Aliasing */
+                const int& start_day   = events[curr_idx][0];
+                const int& end_day     = events[curr_idx][1];
+                const int& event_value = events[curr_idx][2];
+
+                /* Binary Search */
+                auto iter                = upper_bound(events.begin(), events.end(), end_day, compare_target_with_start_day);
+                int next_valid_event_idx = distance(events.begin(), iter);
+
+                int skip =     0       + dp[remaining_count    ][curr_idx + 1        ];
+                int take = event_value + dp[remaining_count - 1][next_valid_event_idx];
+
+                dp[remaining_count][curr_idx] = max(skip, take);
+            }
+        }
+
+        return dp[k][0];
     }
 };
