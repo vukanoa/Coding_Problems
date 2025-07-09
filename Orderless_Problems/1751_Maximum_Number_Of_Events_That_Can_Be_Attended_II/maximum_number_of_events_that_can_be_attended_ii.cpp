@@ -206,3 +206,82 @@ public:
         return dp[k][0];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    In terms of Big O notation it has the same Time and Space Complexities as
+    the two Solutions above, however this one practically runs faster,
+    especially on bigger Inputs.
+
+*/
+
+/* Time  Beats: 96.19% */
+/* Space Beats:  8.57% */
+
+/* Time  Complexity: O(k * N * logN) */
+/* Space Complexity: O(k * N)        */
+class Solution_Memoization_Plus_Cached_Binary_Search {
+private:
+    vector<vector<int>> memo;
+    vector<int> next_non_overlapping_event_idx_after;
+    int N;
+
+    static bool compare_events(const vector<int>& event_a, const vector<int>& event_b)
+    {
+        return event_a[0] < event_b[0]; // ASCENDING by 0th element, i.e. "start"
+    }
+
+    static bool compare_target_with_start_day(int target_day, const vector<int>& event)
+    {
+        return target_day < event[0];
+    }
+
+public:
+    int maxValue(vector<vector<int>>& events, int k)
+    {
+        N = events.size();
+
+        /* Sort in ASCENDING by start_day */
+        sort(events.begin(), events.end(), compare_events);
+
+        // Precompute "next valid event idx" for each event
+        next_non_overlapping_event_idx_after.resize(N);
+        for (int event_idx = 0; event_idx < N; event_idx++)
+        {
+            int target_day = events[event_idx][1];
+            auto iter = upper_bound(events.begin(), events.end(), target_day, compare_target_with_start_day);
+
+            next_non_overlapping_event_idx_after[event_idx] = distance(events.begin(), iter);
+        }
+
+        memo = vector<vector<int>>(k + 1, vector<int>(N, -1));
+
+        return solve(0, k, events);
+    }
+
+private:
+    int solve(int curr_idx, int remaining_count, const vector<vector<int>>& events)
+    {
+        if (curr_idx == N || remaining_count == 0)
+            return 0;
+
+        if (memo[remaining_count][curr_idx] != -1)
+            return memo[remaining_count][curr_idx];
+
+        /* Reference Aliasing */
+        const int& start_day  = events[curr_idx][0];
+        const int& end_day    = events[curr_idx][1];
+        const int& curr_value = events[curr_idx][2];
+
+        int skip =          0 + solve(curr_idx + 1                                  , remaining_count    , events);
+        int take = curr_value + solve(next_non_overlapping_event_idx_after[curr_idx], remaining_count - 1, events);
+
+        return memo[remaining_count][curr_idx] = max(skip, take);
+    }
+};
