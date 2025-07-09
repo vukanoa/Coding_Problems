@@ -223,3 +223,112 @@ private:
         return true;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The "trick" here is to sort edges in DESCENDING order by TIME!
+
+    Once we do that, we start connecting edges and if two edges are NOT in the
+    same components(i.e. they do NOT have the sam root), we need to merge them
+    hence making the number of components LESS BY ONE.
+
+    The moment we realize that after connecting the current edge, our total
+    number of components is LESS than k now, we return current edge's time as
+    a result.
+
+    Since current edge's time denotes that if we remove the CURRENT edge and
+    ALL of the remaining(and remember we sorted by time in DESCENDING order)
+    edges, we still have AT LEAST k components.
+
+*/
+
+/* Time  Beats: 98.32% */
+/* Space Beats: 95.16% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Descending_by_time {
+public:
+    int minTime(int n, vector<vector<int>>& edges, int k)
+    {
+        if (edges.empty())
+            return 0;
+
+        /* Sort DESCENDING by time */
+        sort(edges.begin(), edges.end(), [](const vector<int>& a, const vector<int>& b){
+            return a[2] > b[2]; // DESCENDING by the time
+        });
+
+        int components = n;
+
+        /* ---- DSU ----- */
+        vector<int> parent(n);
+        vector<int> rank(n, 1);
+
+        iota(parent.begin(), parent.end(), 0); // [0, 1, 2, ..., n-1]
+        /* -------------- */
+
+
+        int idx = 0;
+        int time = 0;
+        while (idx < edges.size())
+        {
+            time = edges[idx][2];
+
+            int node_1 = edges[idx][0];
+            int node_2 = edges[idx][1];
+
+            if (union_components(node_1, node_2, parent, rank))
+                components--;
+
+            // As soon as the current edge makes components LESS than k,
+            // return current edge's time as the final result
+            if (components < k)
+                return time;
+
+            idx++;
+        }
+
+        return 0;
+    }
+
+private:
+    int find_root(int node, vector<int>& parent)
+    {
+        // Get root parent
+        while (node != parent[node])
+        {
+            // Huge Optimization (From O(n) to Amortized O(1) Time Complexity)
+            // If there is no grandparent, nothing will happen
+            parent[node] = parent[parent[node]];
+
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    bool union_components(int node_1, int node_2, vector<int>& parent, vector<int>& rank)
+    {
+        int root1 = find_root(node_1, parent);
+        int root2 = find_root(node_2, parent);
+
+        if (root1 == root2)
+            return false;
+
+        if (rank[root1] < rank[root2])
+            swap(root1, root2);
+
+        // Union component rooted in root2 with component rooted in root1
+        parent[root2] = root1;
+        rank[root1]  += rank[root2];
+
+        return true;
+    }
+};
