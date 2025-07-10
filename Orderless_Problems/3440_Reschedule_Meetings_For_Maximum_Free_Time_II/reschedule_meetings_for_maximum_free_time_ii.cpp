@@ -205,3 +205,63 @@ private:
         return right_position - left_position;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Much more concise way of solving it, though this one has a WORSE Space
+    Complexity, so keep that in mind.
+
+    But it's infinitely easier to grasp by reading.
+
+*/
+
+/* Time  Beats: % */
+/* Space Beats: `% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Greedy {
+public:
+    int maxFreeTime(int eventTime, vector<int>& startTime, vector<int>& endTime)
+    {
+        int N = startTime.size();
+
+        vector<bool> removable_event_flags(N);
+
+        int max_left_gap  = 0;
+        int max_right_gap = 0;
+        for (int i = 0; i < N; i++)
+        {
+            if (endTime[i] - startTime[i] <= max_left_gap)
+                removable_event_flags[i] = true;
+
+            max_left_gap = max(max_left_gap, startTime[i] - (i == 0 ? 0 : endTime[i - 1]));
+
+
+            if (endTime[N - i - 1] - startTime[N - i - 1] <= max_right_gap)
+                removable_event_flags[N - i - 1] = true;
+
+            max_right_gap = max(max_right_gap, (i == 0 ? eventTime : startTime[N - i]) - endTime[N - i - 1]);
+        }
+
+        int result = 0;
+        for (int i = 0; i < N; i++)
+        {
+            int L = i == 0     ?     0     : endTime[i - 1];
+            int R = i == N - 1 ? eventTime : startTime[i + 1];
+
+            if (removable_event_flags[i])
+                result = max(result, R - L);
+            else
+                result = max(result, R - L - (endTime[i] - startTime[i]));
+        }
+
+        return result;
+    }
+};
