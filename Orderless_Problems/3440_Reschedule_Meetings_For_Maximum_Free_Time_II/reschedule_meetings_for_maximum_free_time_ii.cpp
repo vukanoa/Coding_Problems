@@ -221,8 +221,8 @@ private:
 
 */
 
-/* Time  Beats: % */
-/* Space Beats: `% */
+/* Time  Beats: 96.22% */
+/* Space Beats: 89.46% */
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
@@ -260,6 +260,57 @@ public:
                 result = max(result, R - L);
             else
                 result = max(result, R - L - (endTime[i] - startTime[i]));
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Space Optimized way of doing the same thing as above.
+
+*/
+
+/* Time  Beats: 94.05% */
+/* Space Beats: 91.62% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Space_Optimized {
+public:
+    int maxFreeTime(int eventTime, vector<int>& startTime, vector<int>& endTime)
+    {
+        int N = startTime.size();
+        int result = 0;
+
+        int max_left_gap  = 0;
+        int max_right_gap = 0;
+        for (int i = 0; i < N; i++)
+        {
+            int L_boundary_time_forward = i == 0     ?     0     : endTime[i - 1];
+            int R_boundary_time_forward = i == N - 1 ? eventTime : startTime[i + 1];
+
+            if (endTime[i] - startTime[i] <= max_left_gap)
+                result = max(result, R_boundary_time_forward - L_boundary_time_forward);
+
+            max_left_gap = max(max_left_gap, startTime[i] - (i == 0 ? 0 : endTime[i - 1]));
+
+            result = max(result, R_boundary_time_forward - L_boundary_time_forward - (endTime[i] - startTime[i]));
+
+            int L_boundary_time_backward = i == N - 1 ?     0     : endTime[N - i - 2];
+            int R_boundary_time_backward = i == 0     ? eventTime : startTime[N - i];
+
+            if (endTime[N - i - 1] - startTime[N - i - 1] <= max_right_gap)
+                result = max(result, R_boundary_time_backward - L_boundary_time_backward);
+
+            max_right_gap = max(max_right_gap, (i == 0 ? eventTime : startTime[N - i]) - endTime[N - i - 1]);
         }
 
         return result;
