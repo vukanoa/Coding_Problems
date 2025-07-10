@@ -195,3 +195,44 @@ private:
         return right_position - left_position;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Much more concise way of implementing it.
+
+*/
+
+/* Time  Beats: 32.46% */
+/* Space Beats: 49.77% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Greedy_plus_Sliding_Window {
+public:
+    int maxFreeTime(int eventTime, int k, vector<int>& startTime, vector<int>& endTime)
+    {
+        int N = startTime.size();
+        int result = 0;
+
+        vector<int> sum(N + 1);
+
+        for (int i = 0; i < N; i++)
+            sum[i + 1] = sum[i] + endTime[i] - startTime[i];
+
+        for (int i = k - 1; i < N; i++)
+        {
+            int R = i == N - 1 ? eventTime : startTime[i + 1];
+            int L = i == k - 1 ?     0     : endTime[i - k];
+
+            result = max(result, R - L - (sum[i + 1] - sum[i - k + 1]));
+        }
+
+        return result;
+    }
+};
