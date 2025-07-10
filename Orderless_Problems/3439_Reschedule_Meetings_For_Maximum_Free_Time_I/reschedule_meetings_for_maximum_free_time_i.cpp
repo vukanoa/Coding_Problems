@@ -78,7 +78,7 @@ using namespace std;
     ------------
 
     TODO
-    
+
     Be aware of the fact that "idx" refers to indices of startTime and endTime.
 
     However, the term "position" refers to either:
@@ -139,7 +139,7 @@ public:
 
             int first_position_after_last_interval_to_move_to_the_left = (i + k+1 >= N ? eventTime : startTime[i + k+1]);
 
-            /* Easier to read */ 
+            /* Easier to read */
             int left_position  = last_position_of_k_merged_intervals;
             int right_position = first_position_after_last_interval_to_move_to_the_left;
 
@@ -177,7 +177,7 @@ public:
 
             int first_position_after_last_interval_to_move_to_the_right = ((i - k-1) <= -1 ? 0 : endTime[i - k-1]);
 
-            /* Easier to read */ 
+            /* Easier to read */
             int left_position  = first_position_after_last_interval_to_move_to_the_right;
             int right_position = last_position_of_k_merged_intervals;
 
@@ -213,24 +213,69 @@ private:
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution_Greedy_plus_Sliding_Window {
+class Solution_Greedy_plus_Prefix_Sum {
 public:
     int maxFreeTime(int eventTime, int k, vector<int>& startTime, vector<int>& endTime)
     {
         int N = startTime.size();
         int result = 0;
 
-        vector<int> sum(N + 1);
+        vector<int> prefix_sum(N + 1);
 
         for (int i = 0; i < N; i++)
-            sum[i + 1] = sum[i] + endTime[i] - startTime[i];
+            prefix_sum[i + 1] = prefix_sum[i] + endTime[i] - startTime[i];
 
         for (int i = k - 1; i < N; i++)
         {
-            int R = i == N - 1 ? eventTime : startTime[i + 1];
             int L = i == k - 1 ?     0     : endTime[i - k];
+            int R = i == N - 1 ? eventTime : startTime[i + 1];
 
-            result = max(result, R - L - (sum[i + 1] - sum[i - k + 1]));
+            result = max(result, R - L - (prefix_sum[i + 1] - prefix_sum[i - k + 1]));
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We do NOT have to use prefix_sum, instead we can only use a single variable
+    named "curr_window_total_event_time" and thus optimize Space Complexity.
+
+    Pretty standard technique for "Sliding Window".
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  91.38% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Greedy_plus_Sliding_Window {
+public:
+    int maxFreeTime(int eventTime, int k, vector<int>& startTime, vector<int>& endTime)
+    {
+        int N = startTime.size();
+        int result = 0;
+        int curr_window_total_event_time = 0;
+
+        for (int i = 0; i < N; i++)
+        {
+            curr_window_total_event_time += endTime[i] - startTime[i];
+
+            int L = i <= k - 1 ?     0     : endTime[i - k];
+            int R = i == N - 1 ? eventTime : startTime[i + 1];
+
+            result = max(result, R - L - curr_window_total_event_time);
+
+            if (i >= k - 1)
+                curr_window_total_event_time -= endTime[i - k + 1] - startTime[i - k + 1];
         }
 
         return result;
