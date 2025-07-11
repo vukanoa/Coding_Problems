@@ -19,7 +19,7 @@
     of the elements in each subset is equal to target.
 
     Return true if such a partition exists and false otherwise.
-    A subset of an array is a selection of elements of the array. 
+    A subset of an array is a selection of elements of the array.
 
     =========================================================================
     FUNCTION: bool checkEqualPartitions(vector<int>& nums, long long target);
@@ -51,6 +51,7 @@
 
 */
 
+#include <map>
 #include <vector>
 using namespace std;
 
@@ -114,7 +115,7 @@ public:
 
 /* Time  Complexity: O(2^N * N) */
 /* Space Complexity: O(1)       */
-class Solution_33 {
+class Solution_Optimized {
 public:
     bool checkEqualPartitions(vector<int>& nums, long long target)
     {
@@ -177,5 +178,93 @@ public:
         }
 
         return false;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one has the best Big O Time Complexity, but in practice it's NOT the
+    most optimized.
+
+    It also uses O(N) additional Space, but it's a nice clean approach.
+
+*/
+
+/* Time  Beats: 10.69% */
+/* Space Beats: 9.77% */
+
+/* Time  Complexity: O(N * target^2) */
+/* Space Complexity: O(N * target^2) */
+class Solution_Memo {
+public:
+    bool checkEqualPartitions(vector<int>& nums, long long target)
+    {
+        memo.clear();
+        return dfs(nums, 0, 1, 1, target, false, false);
+    }
+
+private:
+    using State = tuple<int, unsigned long long, unsigned long long, bool, bool>;
+    map<State, bool> memo;
+
+    bool dfs(vector<int>& nums,
+             int index,
+             unsigned long long product_in_first_partition,
+             unsigned long long product_in_second_partition,
+             unsigned long long target,
+             bool is_first_partition_used,
+             bool is_second_partition_used)
+    {
+        if (index == nums.size())
+        {
+            return is_first_partition_used &&
+                   is_second_partition_used &&
+                   (product_in_first_partition == target) &&
+                   (product_in_second_partition == target);
+        }
+
+        if (product_in_first_partition > target || product_in_second_partition > target)
+        {
+            return false;
+        }
+
+        State current_state = make_tuple(index,
+                                         product_in_first_partition,
+                                         product_in_second_partition,
+                                         is_first_partition_used,
+                                         is_second_partition_used);
+
+        if (memo.count(current_state))
+            return memo[current_state];
+
+        unsigned long long updated_product_first  = product_in_first_partition  * nums[index];
+        unsigned long long updated_product_second = product_in_second_partition * nums[index];
+
+        bool assign_to_first = dfs(nums,
+                                   index + 1,
+                                   updated_product_first,
+                                   product_in_second_partition,
+                                   target,
+                                   true,
+                                   is_second_partition_used);
+
+        if (assign_to_first)
+            return memo[current_state] = true;
+
+        bool assign_to_second = dfs(nums,
+                                    index + 1,
+                                    product_in_first_partition,
+                                    updated_product_second,
+                                    target,
+                                    is_first_partition_used,
+                                    true);
+
+        return memo[current_state] = assign_to_second;
     }
 };
