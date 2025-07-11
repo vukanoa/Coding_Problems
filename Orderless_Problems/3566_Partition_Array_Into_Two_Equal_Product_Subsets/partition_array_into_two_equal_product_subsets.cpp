@@ -95,3 +95,87 @@ public:
         return 0;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a bit more optimized in practice. It's a bit longer implementation
+    and looks more messy, but it's a bit more efficient.
+
+*/
+
+/* Time  Beats: 69.03% */
+/* Space Beats: 46.47% */
+
+/* Time  Complexity: O(2^N * N) */
+/* Space Complexity: O(1)       */
+class Solution_33 {
+public:
+    bool checkEqualPartitions(vector<int>& nums, long long target)
+    {
+        const int N = nums.size();
+        const int TOTAL_MASKS = 1 << N;
+
+        for (int mask = 1; mask < TOTAL_MASKS - 1; mask++)
+        {
+            unsigned long long product1 = 1;
+            unsigned long long product2 = 1;
+
+            bool valid1 = true;
+            bool valid2 = true;
+
+            for (int i = 0; i < N; ++i)
+            {
+                if (mask & (1 << i))
+                {
+                    if (target % nums[i] != 0)
+                    {
+                        valid1 = false;
+                        break;
+                    }
+
+                    product1 *= nums[i];
+
+                    if (product1 > target)
+                    {
+                        valid1 = false;
+                        break;
+                    }
+                }
+            }
+
+            if ( ! valid1 || product1 != target)
+                continue;
+
+            for (int i = 0; i < N; ++i)
+            {
+                if ((mask & (1 << i)) == 0)
+                {
+                    if (target % nums[i] != 0)
+                    {
+                        valid2 = false;
+                        break;
+                    }
+
+                    product2 *= nums[i];
+
+                    if (product2 > target)
+                    {
+                        valid2 = false;
+                        break;
+                    }
+                }
+            }
+
+            if (valid2 && product2 == target)
+                return true;
+        }
+
+        return false;
+    }
+};
