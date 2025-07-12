@@ -55,6 +55,7 @@
 
 */
 
+#include <algorithm>
 #include <vector>
 using namespace std;
 
@@ -84,6 +85,55 @@ public:
 
             for (const auto& point : points)
                 count += (query[0] - point[0]) * (query[0] - point[0]) + (query[1] - point[1]) * (query[1] - point[1]) <= rr;
+
+            result.push_back(count);
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Even if this Solutions runs slower on LeetCode, in practice the bigger the
+    numbers the faster it will be, meaning the difference will be more
+    noticeable.
+
+*/
+
+/* Time  Beats: 81.42% */
+/* Space Beats: 20.69% */
+
+/* Time  Complexity: O(P * logP + Q * logP + Q * K) */
+/* Space Complexity: O(P + Q)                       */
+class Solution_Optimized {
+public:
+    vector<int> countPoints(vector<vector<int>>& points, vector<vector<int>>& queries)
+    {
+        vector<int> result;
+        vector<vector<int>> sorted_points;
+
+        for (const auto& point : points)
+            sorted_points.push_back({point[0], point[1]});
+
+        /* Sort */
+        sort(sorted_points.begin(), sorted_points.end());
+
+        for (const auto& q : queries)
+        {
+            int count = 0;
+            int rr = q[2] * q[2];
+
+            auto it = lower_bound(begin(sorted_points), end(sorted_points), vector<int>{q[0] - q[2], 0});
+
+            for (; it != sorted_points.end() && (*it)[0] <= q[0] + q[2]; it++)
+                count += (q[0] - (*it)[0]) * (q[0] - (*it)[0]) + (q[1] - (*it)[1]) * (q[1] - (*it)[1]) <= rr;
 
             result.push_back(count);
         }
