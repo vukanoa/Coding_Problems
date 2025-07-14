@@ -142,3 +142,37 @@ private:
         return prev;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We don't even have to reverse a linked list, we can just keep multiplying
+    the reuslt by 2 and potentiall adding bits to the end.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  71.97% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Without_Reversing {
+public:
+    int getDecimalValue(ListNode* head)
+    {
+        int result = 0;
+
+        while (head)
+        {
+            result = (result << 1) | head->val;
+            head = head->next;
+        }
+
+        return result;
+    }
+};
