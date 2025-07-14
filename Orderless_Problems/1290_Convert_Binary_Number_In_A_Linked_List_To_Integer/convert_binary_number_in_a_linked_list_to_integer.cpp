@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ============
     === EASY ===
@@ -81,10 +79,29 @@
 
 */
 
-/* Time  Beats: 100.00% */
-/* Space Beats:  31.05% */
+// Definition for singly-linked list.
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
+};
 
-/* Time  Complexity: O(n) */
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The only remotely "difficult" part here is to know how to reverse a singly
+    linked list.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  71.97% */
+
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
@@ -92,14 +109,15 @@ public:
     {
         head = reverse_linked_list(head);
 
-        int degree = 0;
         int result = 0;
+
+        int bit = 0;
         while (head)
         {
             if (head->val == 1)
-                result += 1 << degree;
+                result += 1 << bit;
 
-            degree++;
+            bit++;
             head = head->next;
         }
 
