@@ -80,7 +80,7 @@ using namespace std;
 */
 
 /* Time  Beats: 100.00% */
-/* Space Beats:   5.45% */
+/* Space Beats:   9.47% */
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
@@ -88,21 +88,23 @@ class Solution {
 public:
     bool isValid(string word)
     {
+        const int N = word.length();
+
         unordered_set<int> vowels = {'a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'};
 
-        int vow  = 0;
+        int vows = 0;
         int cons = 0;
         for (const char& chr : word)
         {
             if ( ! isalnum(chr))
                 return false;
 
-            if (vowels.find(chr) != vowels.end())
-                vow++;
-            else if ( chr < '0' || chr > '9')
+            if (vowels.count(chr))
+                vows++;
+            else if ( ! isdigit(chr))
                 cons++;
         }
 
-        return (word.length() >= 3 && vow >= 1 && cons >= 1);
+        return N >= 3 && vows >= 1 && cons >= 1;
     }
 };
