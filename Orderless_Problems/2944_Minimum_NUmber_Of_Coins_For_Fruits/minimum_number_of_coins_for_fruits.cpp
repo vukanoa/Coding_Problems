@@ -75,6 +75,7 @@
 
 #include <climits>
 #include <cstring>
+#include <deque>
 #include <vector>
 using namespace std;
 
@@ -123,5 +124,48 @@ private:
             take_free = min(take_free, solve(idx + 1, prev, prices));
 
         return memo[idx][prev + 1] = min(buy, take_free);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 73.79% */
+/* Space Beats: 37.24% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_Deque {
+public:
+    int minimumCoins(vector<int>& prices)
+    {
+        const int N = prices.size();
+        vector<int> dp(N+1, 0);
+
+        deque<int> deque;
+
+        for (int i = 0; i < N; i++)
+        {
+            while ( ! deque.empty() && (deque.front()+1)*2 < i+1)
+                deque.pop_front();
+
+            while ( ! deque.empty() && dp[deque.back()] + prices[deque.back()] >= dp[i] + prices[i])
+                deque.pop_back();
+
+            deque.push_back(i);
+
+            dp[i + 1] = dp[deque.front()] + prices[deque.front()];
+        }
+
+        return dp[N];
     }
 };
