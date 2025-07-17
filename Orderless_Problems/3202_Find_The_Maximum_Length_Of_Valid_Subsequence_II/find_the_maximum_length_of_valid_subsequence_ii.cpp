@@ -47,6 +47,7 @@
 
 */
 
+#include <cstring>
 #include <vector>
 using namespace std;
 
@@ -79,6 +80,49 @@ public:
                 dp[prev][num] = dp[num][prev] + 1;
 
                 result = max(result, dp[prev][num]);
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats: 100.00% */
+
+/* Time  Complexity: O(K * N) */
+/* Space Complexity: O(K)     */
+class Solution_Optimize {
+private:
+    int dp[1000];
+
+public:
+    int maximumLength(vector<int>& nums, int k)
+    {
+        int result = 0;
+
+        for (int curr_k = 0; curr_k < k; curr_k++)
+        {
+            memset(dp, 0, sizeof(dp));
+
+            for (const int& num : nums)
+            {
+                int capped_num = num % k;
+
+                dp[capped_num] = max(dp[capped_num], dp[(curr_k - capped_num + k ) % k] + 1);
+                result = max(result, dp[capped_num]);
             }
         }
 
