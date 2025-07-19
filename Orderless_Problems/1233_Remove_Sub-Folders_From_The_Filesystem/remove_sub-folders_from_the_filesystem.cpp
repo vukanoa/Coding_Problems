@@ -1,9 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_set>
-#include <algorithm>
-#include <cstring> // memset
-
 /*
     ==============
     === MEDIUM ===
@@ -68,6 +62,16 @@
 
 */
 
+#include <algorithm>
+#include <cstring>
+#include <string>
+#include <unordered_set>
+#include <vector>
+#include <sstream>
+
+using namespace std;
+
+
 /*
     ------------
     --- IDEA ---
@@ -112,8 +116,6 @@
 
 */
 
-using namespace std;
-
 /* Time  Beats: 92.31% */
 /* Space Beats: 55.22% */
 
@@ -124,7 +126,7 @@ public:
     vector<string> removeSubfolders(vector<string>& folder)
     {
         // Sort by length in ascending order (shorter strings first)
-        std::sort(folder.begin(), folder.end(), [](const std::string& a, const std::string& b) {
+        sort(folder.begin(), folder.end(), [](const string& a, const string& b){
             return a.size() < b.size();
         });
 
@@ -288,24 +290,23 @@ struct Trie {
     }
 };
 
-class Solution {
+class Solution_Using_Trie {
 public:
     Trie trie;
     vector<string> removeSubfolders(vector<string>& folder)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-
         // First pass: Insert all folder paths into the trie
-        int n = folder.size();
-        int i = 0;
-        vector<int> positions(n);
+        const int N = folder.size();
+
+        int idx = 0;
+        vector<int> positions(N);
         for (string_view path : folder)
-            positions[i++] = trie.insert(path);
+            positions[idx++] = trie.insert(path);
 
         vector<string> result;
 
         // Second pass: Check each folder to see if it's a subfolder
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < N; i++)
         {
             string path = folder[i];
             if ( ! trie.isSubfolder(path, positions[i]))
