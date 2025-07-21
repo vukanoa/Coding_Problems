@@ -1,6 +1,3 @@
-#include <iostream>
-#include <sstream>
-
 /*
     ============
     === EASY ===
@@ -85,6 +82,20 @@
 
 */
 
+#include <sstream>
+#include <string>
+
+using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Self-explanatory. Simulation problem almost.
+
+*/
+
 /* Time  Beats: 83.12% */
 /* Space Beats:  5.35% */
 
@@ -94,7 +105,9 @@ class Solution {
 public:
     string makeFancyString(string s)
     {
-        if (s.length() < 3)
+        const int N = s.length();
+
+        if (N < 3)
             return s;
 
         int L = 0; // Left
@@ -102,7 +115,7 @@ public:
         int R = 2; // Right
 
         ostringstream out;
-        while (R < s.length())
+        while (R < N)
         {
             if (s[L] != s[M] || s[M] != s[R]) // If they're not three-way equal
                 out << s[L];
@@ -115,5 +128,37 @@ public:
         out << s.substr(L);
 
         return out.str();
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Quicker way of implementing it.
+
+*/
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */ // But O(1) Auxiliary space. Output is necessary
+class Solution_Concise {
+public:
+    string makeFancyString(string s)
+    {
+        string result;
+
+        for (const char chr : s)
+        {
+            if (result.size() >= 2 && result.back() == chr && result[result.size() - 2] == chr)
+                continue;
+
+            result.push_back(chr);
+        }
+
+        return result;
     }
 };
