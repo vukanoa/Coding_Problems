@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <stack>
 
@@ -65,7 +66,7 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    Difficult Greedy Algorithm.
+    TODO
 
 */
 
@@ -81,10 +82,17 @@ public:
         ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
         
         int result = 0;
-        string pair = x > y ? "ab" : "ba";
+        string HIGHCOST_STR = "ab";
+        string LOWCOST_STR  = "ba";
 
-        result += remove_pairs(s, pair,                         max(x, y));
-        result += remove_pairs(s, string(1, pair[1]) + pair[0], min(x, y));
+        if (x < y)
+        {
+            swap(HIGHCOST_STR, LOWCOST_STR);
+            swap(x, y);
+        }
+
+        result += remove_pairs(s, HIGHCOST_STR, x);
+        result += remove_pairs(s, LOWCOST_STR,  y);
 
         return result;
     }
@@ -95,19 +103,19 @@ private:
         int result = 0;
         stack<char> stack;
 
-        for (char c : s)
+        for (const char& chr : s)
         {
-            if (c == pair[1] && !stack.empty() && stack.top() == pair[0])
+            if (chr == pair[1] && !stack.empty() && stack.top() == pair[0])
             {
-                stack.pop();
                 result += score;
+                stack.pop();
             }
             else
-                stack.push(c);
+                stack.push(chr);
         }
 
         string new_s;
-        while (!stack.empty())
+        while ( ! stack.empty())
         {
             new_s += stack.top();
             stack.pop();
@@ -118,6 +126,86 @@ private:
 
         return result;
     };
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a more straight-forward implementation of the above idea.
+    It's a bit more complicated to follow the logic in the above Solution.
+
+    It's beneficial to understand and look at both.
+
+*/
+
+/* Time  Beats:  7.92% */
+/* Space Beats: 70.02% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Stack {
+public:
+    int maximumGain(string s, int x, int y)
+    {
+        const int N = s.length();
+        int result = 0;
+
+        string HIGHCOST_STR = "ab";
+        string LOWCOST_STR  = "ba";
+
+        if (x < y)
+        {
+            swap(HIGHCOST_STR, LOWCOST_STR);
+            swap(x, y);
+        }
+
+        /* Find the HIGHCOST_STR first */
+        string str = s;
+        string stack = "";
+        for (unsigned i = 0; i < str.size(); i++)
+        {
+            stack.push_back(str[i]);
+
+            if (stack.size() > 1)
+            {
+                string last_two = stack.substr(stack.size()-2, 2);
+
+                if (last_two == HIGHCOST_STR)
+                {
+                    result += x;
+                    stack.pop_back();
+                    stack.pop_back();
+                }
+            }
+        }
+
+        /* Find the LOWCOST_STR now in the same from remaining characters */
+        str = stack;
+        stack = "";
+        for (unsigned i = 0; i < str.size(); i++)
+        {
+            stack.push_back(str[i]);
+
+            if (stack.size() > 1)
+            {
+                string last_two = stack.substr(stack.size()-2, 2);
+
+                if (last_two == LOWCOST_STR)
+                {
+                    result += y;
+                    stack.pop_back();
+                    stack.pop_back();
+                }
+            }
+        }
+
+        return result;
+    }
 };
 
 
@@ -150,15 +238,15 @@ public:
 
         int lesser = std::min(x, y);
 
-        for (char c : s)
+        for (const char& chr : s)
         {
-            if (c > 'b')
+            if (chr > 'b')
             {
                 result += std::min(a_count, b_count) * lesser;
                 a_count = 0;
                 b_count = 0;
             }
-            else if (c == 'a')
+            else if (chr == 'a')
             {
                 if (x < y && b_count > 0)
                 {
