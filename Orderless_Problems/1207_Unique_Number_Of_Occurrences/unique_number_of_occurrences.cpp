@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
 
 /*
 	============
@@ -46,6 +43,10 @@
 
 */
 
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+
 /* Time  Beats: 100% */
 /* Space Beats: 45.28% */
 
@@ -71,4 +72,32 @@ public:
 
 		return true;
 	}
+};
+
+
+
+
+/* Time  Beats: 100% */
+/* Space Beats: 45.28% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution2 {
+public:
+    bool uniqueOccurrences(vector<int>& arr)
+    {
+        unordered_map<int, int> freq;
+        for (auto x : arr)
+        {
+            freq[x]++;
+        }
+
+        unordered_set<int> s;
+        for (auto x : freq)
+        {
+            s.insert(x.second);
+        }
+
+        return freq.size() == s.size();
+    }
 };
