@@ -49,6 +49,48 @@
     --- IDEA ---
     ------------
 
+    This one is O(N^2), but it's much easier to come up with.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  80.97% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(n)   */
+class Solution {
+public:
+    string shortestPalindrome(string s)
+    {
+        int N = s.length();
+        if (N == 0)
+            return s;
+
+        int L = 0;
+        for (int R = N-1; R >= 0; R--)
+        {
+            if (s[R] == s[L])
+                L++;
+        }
+
+        if (L == N)
+            return s;
+
+        string non_palindrome_suffix = s.substr(L);
+        string reverse_suffix = string(non_palindrome_suffix.rbegin(), non_palindrome_suffix.rend());
+
+        return reverse_suffix + shortestPalindrome(s.substr(0, L)) + non_palindrome_suffix;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     TODO
 
 */
