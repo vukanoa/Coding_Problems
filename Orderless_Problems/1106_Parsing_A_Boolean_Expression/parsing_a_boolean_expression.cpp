@@ -1,6 +1,3 @@
-#include <iostream>
-#include <stack>
-
 /*
     ============
     === HARD ===
@@ -75,6 +72,8 @@
 
 */
 
+#include <stack>
+
 /*
     ------------
     --- IDEA ---
@@ -135,5 +134,87 @@ public:
         }
 
         return stack.top() == 't';
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Easier to come up with. It's less efficient, but much
+    more realistic to come up with.
+
+    TODO
+
+*/
+
+/* Time  Beats:  75.22% */
+/* Space Beats:  11.42% */
+
+/* Time  Complexity: O(n^2) */
+/* Space Complexity: O(n)   */
+class Solution {
+public:
+    bool parseBoolExpr(string expression)
+    {
+        int index = 0;
+        return evaluate(expression, index);
+    }
+
+private:
+    bool evaluate(string& expr, int& index)
+    {
+        char curr_char = expr[index++];
+
+        if (curr_char == 't') return true;
+        if (curr_char == 'f') return false;
+
+        if (curr_char == '!')
+        {
+            index++;
+            bool result = !evaluate(expr, index);
+            index++;
+
+            return result;
+        }
+
+        vector<bool> values;
+        index++;
+        while (expr[index] != ')')
+        {
+            if (expr[index] != ',')
+                values.push_back(evaluate(expr, index));
+            else
+                index++;
+        }
+        index++;
+
+        if (curr_char == '&')
+        {
+            for (const bool& v : values)
+            {
+                if (!v)
+                return false;
+            }
+
+            return true;
+        }
+
+        if (curr_char == '|')
+        {
+            for (const bool& v : values)
+            {
+                if (v)
+                    return true;
+            }
+
+            return false;
+        }
+
+        return false;
     }
 };
