@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-
 /*
     ============
     === HARD ===
@@ -57,6 +53,8 @@
 
 */
 
+#include <vector>
+#include <queue>
 using namespace std;
 
 /*
@@ -71,9 +69,9 @@ using namespace std;
 /* Time  Beats: 70.17% */
 /* Space Beats: 92.27% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(k) */
-class Solution {
+class Solution_Monotonic_Deque {
 public:
     int constrainedSubsetSum(vector<int>& nums, int k)
     {
@@ -96,5 +94,44 @@ public:
         }
 
         return max_sum;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Much easier to come up with.
+
+*/
+
+/* Time  Beats: 42.80% */
+/* Space Beats: 37.47% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N) */
+class Solution_Heap {
+public:
+    int constrainedSubsetSum(vector<int>& nums, int k)
+    {
+        priority_queue<pair<int, int>> max_heap;
+        max_heap.push( {nums[0], 0} );
+        int result = nums[0];
+
+        for (int i = 1; i < nums.size(); i++)
+        {
+            while (i - max_heap.top().second > k)
+                max_heap.pop();
+
+            int curr = max(0, max_heap.top().first) + nums[i];
+            result = max(result, curr);
+            max_heap.push( {curr, i} );
+        }
+
+        return result;
     }
 };
