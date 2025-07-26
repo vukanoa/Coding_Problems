@@ -59,56 +59,37 @@
 
 */
 
-/* Time  Beats: 76.51% */
-/* Space Beats: 75.12% */
+/* Time  Beats: 87.11% */
+/* Space Beats: 92.27% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
+
 class Solution {
 public:
     int findTheLongestSubstring(string s)
     {
-        vector<int> position(32, -2);
-        position[0] = -1;
+        const int N = s.length();
 
-        int max_len = 0;
-        int mask = 0;
+        int prefix_xor = 0;
+        int character_map[26] = {0};
+        character_map['a' - 'a'] = 1;
+        character_map['e' - 'a'] = 2;
+        character_map['i' - 'a'] = 4;
+        character_map['o' - 'a'] = 8;
+        character_map['u' - 'a'] = 16;
+        vector<int> map(32, -1);
+        int longest_substring = 0;
 
-        for (int i = 0; i < s.size(); ++i)
+        for (int i = 0; i < N; i++)
         {
-            char ch = s[i];
+            prefix_xor ^= character_map[s[i] - 'a'];
+            if (map[prefix_xor] == -1 and prefix_xor != 0)
+                map[prefix_xor] = i;
 
-            switch (ch)
-            {
-                case 'a':
-                    mask ^= 1;
-                    break;
-
-                case 'e':
-                    mask ^= 2;
-                    break;
-
-                case 'i':
-                    mask ^= 4;
-                    break;
-
-                case 'o':
-                    mask ^= 8;
-                    break;
-
-                case 'u':
-                    mask ^= 16;
-                    break;
-            }
-
-            int prev = position[mask];
-
-            if (prev == -2)
-                position[mask] = i;
-            else
-                max_len = max(max_len, i - prev);
+            longest_substring = max(longest_substring, i - map[prefix_xor]);
         }
 
-        return max_len;
+        return longest_substring;
     }
 };
