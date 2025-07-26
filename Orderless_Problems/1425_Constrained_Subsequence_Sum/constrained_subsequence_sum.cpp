@@ -55,6 +55,7 @@
 
 #include <vector>
 #include <queue>
+#include <map>
 using namespace std;
 
 /*
@@ -133,5 +134,50 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Also easy to come up with and even more efficient than
+    one above.
+
+*/
+
+/* Time  Beats: 14.52% */
+/* Space Beats: 15.01% */
+
+/* Time  Complexity: O(N * logk) */
+/* Space Complexity: O(N) */
+class Solution_RedBlack_Tree_DP {
+public:
+    int constrainedSubsetSum(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+
+        map<int, int> map_window;
+        map_window[0] = 0;
+        vector<int> dp(N);
+
+        for (int i = 0; i < N; i++)
+        {
+            dp[i] = nums[i] + map_window.rbegin()->first;
+            map_window[dp[i]]++;
+
+            if (i >= k)
+            {
+                map_window[dp[i - k]]--;
+                if (map_window[dp[i - k]] == 0)
+                    map_window.erase(dp[i - k]);
+            }
+        }
+
+        return *max_element(dp.begin(), dp.end());
     }
 };
