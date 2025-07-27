@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -40,6 +37,9 @@
 
 */
 
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -49,8 +49,8 @@
 
 */
 
-/* Time  Beats: 97.62% */
-/* Space Beats: 96.96% */
+/* Time  Beats: 98.62% */
+/* Space Beats: 97.49% */
 
 /* Time  Complexity: O(n + k) */
 /* Space Complexity: O(k)     */
@@ -58,24 +58,21 @@ class Solution {
 public:
     bool canArrange(vector<int>& arr, int k)
     {
+        const int N = arr.size();
         vector<int> freq(k, 0);
 
-        for (int num : arr)
+        for (int i = 0; i < N; i++)
         {
-            int rem = num % k;
-
-            if (rem < 0)
-                rem += k;
-
-            freq[rem]++;
+            int remainder = (k + arr[i] % k) % k;
+            freq[remainder]++;
         }
 
-        if (freq[0] % 2 != 0)
+        if (freq[0] & 1)
             return false;
 
-        for (int i = 1; i <= k / 2; i++)
+        for (int remainder = 1; remainder <= k / 2; remainder++)
         {
-            if (freq[i] != freq[k - i])
+            if (freq[remainder] != freq[k - remainder])
                 return false;
         }
 
