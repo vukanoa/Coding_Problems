@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -59,6 +56,7 @@
 
 */
 
+#include <vector>
 using namespace std;
 
 /*
@@ -75,46 +73,100 @@ using namespace std;
 
 /* Time  Complexity: O(n^3) */
 /* Space Complexity: O(n^2) */
-class Solution {
+class Solution_Memoization {
 public:
     int stoneGameII(vector<int>& piles)
     {
-        if (piles.size() == 1)
+        const int N = piles.size();
+
+        if (N == 1)
             return piles[0];
 
-        const int n = piles.size();
-        vector<vector<vector<int>>> dp(2, vector<vector<int>>(n, vector<int>(n, -1)));
+        vector<vector<vector<int>>> dp(2, vector<vector<int>>(N, vector<int>(N, -1)));
 
         return dfs(piles, 1, 0, 1, dp);
     }
 
 private:
-    int dfs(vector<int>& piles, int alice, int i, int M, vector<vector<vector<int>>>& dp)
+    int dfs(vector<int>& piles, int alice, int i, int j, vector<vector<vector<int>>>& dp)
     {
-        if (i >= piles.size())
+        const int N = piles.size();
+
+        if (i >= N)
             return 0;
 
-        if (dp[alice][i][M] != -1)
-            return dp[alice][i][M];
+        if (dp[alice][i][j] != -1)
+            return dp[alice][i][j];
 
         int result = (alice == 1) ? 0 : INT_MAX;
 
         int total = 0;
-        for (int X = 1; X <= 2 * M; X++)
+        for (int X = 1; X <= 2 * j; X++)
         {
-            if (i + X - 1 >= piles.size())
+            if (i + X - 1 >= N)
                 break;
 
             total += piles[i + X - 1];
 
             if (alice == 1) // Alice tries to maximize her score
-                result = max(result, total + dfs(piles, alice ^ 1, i + X, max(M, X), dp));
+                result = max(result, total + dfs(piles, alice ^ 1, i + X, max(j, X), dp));
             else // Bob tries to minimize Alice's score
-                result = min(result, dfs(piles, alice ^ 1, i + X, max(M, X), dp));
+                result = min(result, dfs(piles, alice ^ 1, i + X, max(j, X), dp));
         }
 
-        dp[alice][i][M] = result;
+        dp[alice][i][j] = result;
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 73.45% */
+/* Space Beats: 52.69% */
+
+/* Time  Complexity: O(n^3) */
+/* Space Complexity: O(n^2) */
+class Solution_Bottom_Up {
+public:
+    int stoneGameII(vector<int>& piles)
+    {
+        const int N = piles.size();
+        
+        vector<vector<int>> dp(N, vector<int>(N + 1, 0));
+        vector<int> suffix_sum(N, 0);
+
+        suffix_sum[N - 1] = piles[N - 1];
+        
+        for (int i = N-2; i >= 0; i--)
+            suffix_sum[i] = suffix_sum[i + 1] + piles[i];
+        
+        for (int i = N-1; i >= 0; i--)
+        {
+            for (int j = 1; j <= N; j++)
+            {
+                if (i + 2*j >= N)
+                {
+                    dp[i][j] = suffix_sum[i];
+                }
+                else
+                {
+                    for (int x = 1; x <= 2 * j; x++)
+                        dp[i][j] = max(dp[i][j], suffix_sum[i] - dp[i + x][max(j, x)]);
+                }
+            }
+        }
+        
+        return dp[0][1];
     }
 };
