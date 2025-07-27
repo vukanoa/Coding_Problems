@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -58,17 +56,20 @@
 
 */
 
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
- *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- * };
- */
+// Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
+
+#include <vector>
+#include <queue>
+using namespace std;
+
 
 /*
     ------------
@@ -89,14 +90,14 @@ public:
     int maxLevelSum(TreeNode* root)
     {
         /* BFS */
-        std::queue<TreeNode*> queue;
+        queue<TreeNode*> queue;
         queue.push(root);
 
         long long max_sum = LLONG_MIN;
         int result = 0;
 
         int level = 0;
-        while(!queue.empty())
+        while ( ! queue.empty())
         {
             level++;
             long long sum = 0;
@@ -124,5 +125,55 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Classic DFS.
+
+*/
+
+/* Time  Beats: 71.55% */
+/* Space Beats: 96.58% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_DFS {
+public:
+    int maxLevelSum(TreeNode* root)
+    {
+        vector<int> level_sums;
+        dfs(root, level_sums, 0);
+
+        int max_index = 0;
+        for (int i = 1; i < level_sums.size(); ++i)
+        {
+            if (level_sums[i] > level_sums[max_index])
+                max_index = i;
+        }
+
+        return max_index + 1; // levels are 1-based
+    }
+
+private:
+    void dfs(TreeNode* node, vector<int>& sums, int level)
+    {
+        if (node == nullptr)
+            return;
+
+        if (sums.size() == level)
+            sums.push_back(node->val);
+        else
+            sums[level] += node->val;
+
+        dfs(node->left, sums, level + 1);
+        dfs(node->right, sums, level + 1);
     }
 };
