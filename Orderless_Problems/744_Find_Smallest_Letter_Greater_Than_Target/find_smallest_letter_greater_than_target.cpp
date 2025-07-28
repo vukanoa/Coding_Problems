@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === EASY ===
@@ -60,6 +57,9 @@
 
 */
 
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -89,12 +89,60 @@
 /* Time  Beats: 84.63% */
 /* Space Beats: 52.69% */
 
-/* Time  Complexity: O(logn) */
+/* Time  Complexity: O(logN) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
     char nextGreatestLetter(vector<char>& letters, char target)
     {
         return letters[(upper_bound(letters.begin(), letters.end(), target) - letters.begin()) % letters.size()];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Manually written Binary Search. It's really handy to really undertand
+    how it all works "under the hood".
+
+    You should know how to write Binary Search properly without errors.
+    It is NOT trivial.
+
+*/
+/* Time  Beats: 100.00% */
+/* Space Beats:  87.82% */
+
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(1) */
+class Solution_Binary_Search {
+public:
+    char nextGreatestLetter(vector<char>& letters, char target) 
+    {
+        const int N = letters.size();
+
+        int low  = 0;
+        int high = N-1;
+
+        int idx = -1;
+
+        while (low <= high) 
+        {
+            int mid = low + (high - low) / 2;
+
+            if (letters[mid] <= target)
+                low = mid + 1;
+            else 
+            {
+                high = mid - 1;
+                idx  = high + 1;
+            }
+        }
+
+        return idx == -1 ? letters[0] : letters[idx];
     }
 };
