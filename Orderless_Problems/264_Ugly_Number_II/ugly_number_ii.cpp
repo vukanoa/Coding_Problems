@@ -1,8 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <unordered_set>
-
 /*
     ==============
     === MEDIUM ===
@@ -11,6 +6,7 @@
     ===========================
     264) Ugly Number II
     ===========================
+
 
     ============
     Description:
@@ -48,7 +44,49 @@
 
 */
 
+#include <vector>
+#include <queue>
+#include <unordered_set>
 using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 35.01% */
+/* Space Beats: 25.51% */
+
+/* Time  Complexity: O(n * logn) */
+/* Space Complexity: O(n)        */
+class Solution_Set {
+public:
+    int nthUglyNumber(int n) 
+    {
+        set<long> ugly_numbers_set;
+        ugly_numbers_set.insert(1);
+
+        long current_ugly = 1;
+        for (int i = 0; i < n; i++) 
+        {
+            current_ugly = *ugly_numbers_set.begin();
+            ugly_numbers_set.erase(ugly_numbers_set.begin());
+
+            ugly_numbers_set.insert(current_ugly * 2);
+            ugly_numbers_set.insert(current_ugly * 3);
+            ugly_numbers_set.insert(current_ugly * 5);
+        }
+
+        return static_cast<int>(current_ugly);
+    }
+};
+
+
+
 
 /*
     ------------
@@ -64,11 +102,10 @@ using namespace std;
 
 /* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(n)        */
-class Solution {
+class Solution_Heap {
 public:
     int nthUglyNumber(int n)
     {
-        // Use a min-heap (priority queue with greater<int>)
         priority_queue<int, vector<int>, greater<int>> min_heap;
         min_heap.push(1);
 
