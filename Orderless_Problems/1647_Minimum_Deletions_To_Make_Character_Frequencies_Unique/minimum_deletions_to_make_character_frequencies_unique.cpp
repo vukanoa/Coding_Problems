@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
 	==============
 	=== MEDIUM ===
@@ -56,52 +54,42 @@
 	s contains only lowercase English letters.
 
 */
+#include <vector>
+#include <algorithm>
+using namespace std;
 
-
-/* Time  Beats: 80.98% */
-/* Space Beats: 52.46% */
+/* Time  Beats: 32.12% */
+/* Space Beats: 89.44% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution{
+class Solution {
 public:
-	int minDeletions(std::string s)
-	{
-		std::unordered_map<int,int> map_freq;
-		std::vector<int> vec(26,0);
+    int minDeletions(string s) 
+    {
+        const int ALPHABET_CHARACTERS = 26;
+        vector<int> freq(26, 0);
 
-		for(const char& c : s)
-			vec[c - 'a']++;
+        for (const char& chr : s) 
+            freq[chr - 'a']++;
 
-		for(int i = 0; i < 26; i++)
-			map_freq[vec[i]]++;
+        /* Sort */
+        sort(freq.begin(), freq.end());
 
-		map_freq[0] = 0;
-		int deletions = 0;
+        int deletions = 0;
+        for (int i = ALPHABET_CHARACTERS - 2; i >= 0; i--) 
+        {
+            if (freq[i] == 0)
+                break;
 
-		for(int i = 0; i < 26; i++)
-		{
-			int freq = vec[i];
+            if (freq[i] >= freq[i + 1]) 
+            {
+                int prev = freq[i];
+                freq[i] = max(0, freq[i + 1] - 1);
+                deletions += prev - freq[i];
+            }
+        }
 
-			if(map_freq[freq] > 1)
-			{                        
-				for(int j = freq-1; j >= 0; j--)
-				{
-					if(j == 0)
-						deletions += freq;
-					else if(map_freq.count(j) == 0)
-					{
-						map_freq[j] = 1;
-						deletions += freq - j;
-
-						break;
-					} 
-				}
-
-				map_freq[freq]--;
-			}   
-		} 
-
-		return deletions;
-	}
+        return deletions;
+    }
 };
