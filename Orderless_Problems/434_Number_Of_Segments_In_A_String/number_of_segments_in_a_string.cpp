@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ============
     === EASY ===
@@ -42,6 +40,9 @@
 
 */
 
+#include <string>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -71,16 +72,17 @@
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    int countSegments(std::string s)
+    int countSegments(string s)
     {
+        const int N = s.length();
         int result = 0;
 
         int i = 0;
-        while (i < s.length())
+        while (i < N)
         {
             bool segment = false;
 
-            while (i < s.length() && s[i] != ' ')
+            while (i < N && s[i] != ' ')
             {
                 i++;
                 segment = true;
@@ -89,10 +91,45 @@ public:
             if (segment)
                 result++;
 
-            while (i < s.length() && s[i] == ' ')
+            while (i < N && s[i] == ' ')
                 i++;
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one also solves it in-place, but it's MUCH more elegant.
+    It's beneficial to see both solution and realize why and how
+    to obtain the more elegant one.
+
+*/
+/* Time  Beats: 100.00% */
+/* Space Beats:  81.12% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    int countSegments(string s)
+    {
+        const int N = s.length();
+        int segment_count = 0;
+
+        for (int i = 0; i < N; i++)
+        {
+            if ((i == 0 || s[i - 1] == ' ') && s[i] != ' ')
+                segment_count++;
+        }
+
+        return segment_count;
     }
 };
