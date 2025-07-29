@@ -67,8 +67,8 @@ using namespace std;
 /* Time  Beats: 56.78% */
 /* Space Beats: 90.48% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N)   */
 class Solution {
 public:
     string reverseParentheses(string s)
@@ -94,5 +94,65 @@ public:
                 result += s[i];
             }
         }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    (This one requires extensive explanation)
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  70.66% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Wormhole {
+public:
+    string reverseParentheses(string s)
+    {
+        const int N = s.length();
+        string result;
+
+        vector<int> opened;
+        vector<int> pair(N);
+
+        for (int i = 0; i < N; i++)
+        {
+            if (s[i] == '(')
+            {
+                opened.push_back(i);
+            }
+            if (s[i] == ')')
+            {
+                int j = opened.back();
+                opened.pop_back();
+
+                pair[i] = j;
+                pair[j] = i;
+            }
+        }
+
+        int direction = 1;
+        for (int i = 0; i < N; i += direction)
+        {
+            if (s[i] == '(' || s[i] == ')')
+            {
+                i = pair[i];
+                direction = -direction;
+            }
+            else
+                result += s[i];
+        }
+
+        return result;
     }
 };
