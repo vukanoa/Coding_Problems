@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -53,6 +51,10 @@
 
 */
 
+#include <vector>
+#include <string>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -62,47 +64,35 @@
 
 */
 
-/* Time  Beats: 49.64% */
-/* Space Beats: 37.01% */
+/* Time  Beats: 56.78% */
+/* Space Beats: 90.48% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
 class Solution {
 public:
-    std::string reverseParentheses(std::string s)
+    string reverseParentheses(string s)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-        
-        int i = 0;
-        return helper(s, i);
-    }
+        string result;
 
-private:
-    std::string helper(std::string& s, int& i)
-    {
-        std::string result;
-
-        while (i < s.length())
+        vector<int> opened;
+        for (int i = 0; i < s.length(); i++)
         {
-            if (s[i] == ')')
+            if (s[i] == '(')
             {
-                i++;
-                std::reverse(result.begin(), result.end());
-                return result;
+                opened.push_back(result.length());
             }
-            else if (s[i] == '(')
+            else if (s[i] == ')')
             {
-                i++;
-                string st = helper(s, i);
-                result += st;
+                int j = opened.back();
+                opened.pop_back();
+
+                reverse(result.begin() + j, result.end());
             }
             else
             {
                 result += s[i];
-                i++;
             }
         }
-
-        return result;
     }
 };
