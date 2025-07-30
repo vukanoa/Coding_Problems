@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -58,45 +55,60 @@
 
 */
 
+#include <algorithm>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    TODO
+    The biggest "bitwise AND" value is CERTAINLY the max element of the "nums".
+
+    How do we know that?
+    If you try to represent every number from "nums" in binary, you'll see that
+    if you do "bitwise AND" of the max element with ANY OTHER non-max
+    element(i.e. any element that is LESS than the max element), you'd
+    certainly DECREASE the value.
+
+    Therefore, it's better not to touch it at all - Hence, max element is the
+    biggest obtainable "bitwise AND" value.
+
+
+    Once you realize that, the problem becomes trivial. It's a standard
+    "Sliding Window" technique, or it could also be considered "Two Pointers".
 
 */
 
-/* Time  Beats: 26.16% */
-/* Space Beats: 34.15% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  86.04% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
     int longestSubarray(vector<int>& nums)
     {
-        int len = 1;
+        const int N = nums.size();
+        int result = 1;
 
-        // step 01
-        int mx = *max_element(nums.begin(), nums.end());
+        int L = 0;
+        int R = 0;
 
-        // step 02
-        int tmp_len = 0;
+        int max_bitwise_AND = *max_element(nums.begin(), nums.end());
 
-        for (int i=0;i<nums.size();i++)
+        while (R < N)
         {
-            if (nums[i] == mx)
-                tmp_len++;
-            else
-            {
-                len = max(len, tmp_len);
-                tmp_len = 0;
-            }
+            if ((nums[R] & max_bitwise_AND) != max_bitwise_AND)
+                L = R+1;
+
+            result = max(result, R - L + 1);
+
+            // Increment
+            R++;
         }
 
-        len = max(len, tmp_len);
-
-        return len;
+        return result;
     }
 };
