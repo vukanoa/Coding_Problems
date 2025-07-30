@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === HARD ===
@@ -73,6 +70,10 @@
 
 */
 
+#include <cstring>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -87,7 +88,7 @@
 
 /* Time  Complexity: O(ROWS * COLS) */
 /* Space Complexity: O(ROWS * COLS) */
-class Solution {
+class Solution_Memoization {
 public:
     int ROWS;
     int COLS;
@@ -121,5 +122,48 @@ private:
         int result = std::min(down, right) - dungeon[i][j];
 
         return dp[i][j] = result > 0 ? result : 1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   9.41% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
+class Solution_Bottom_Up {
+public:
+    int calculateMinimumHP(vector<vector<int> > &dungeon)
+    {
+        int ROWS = dungeon.size();
+        int COLS = dungeon[0].size();
+
+        vector<vector<int> > dp(ROWS+1, vector<int>(COLS+1, 1e9));
+        dp[ROWS  ][COLS-1] = 1;
+        dp[ROWS-1][COLS  ] = 1;
+
+        for (int i = ROWS-1; i >= 0; i--) 
+        {
+            for (int j = COLS-1; j >= 0; j--) 
+            {
+                int need = min(dp[i+1][j], dp[i][j+1]) - dungeon[i][j];                
+
+                // Store this value
+                dp[i][j] = need <= 0 ? 1 : need;
+            }
+        }
+
+        return dp[0][0];
     }
 };
