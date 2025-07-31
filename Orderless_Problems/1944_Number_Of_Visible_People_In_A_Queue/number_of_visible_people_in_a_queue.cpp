@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <stack>
-
 /*
     ============
     === HARD ===
@@ -27,9 +23,9 @@
     Return an array answer of length n where answer[i] is the number of people
     the ith person can see to their right in the queue.
 
-    ===============================
-    FUNCTION:   
-    ===============================
+    ===============================================================
+    FUNCTION: vector<int> canSeePersonsCount(vector<int>& heights);
+    ===============================================================
 
     ==========================================================================
     ================================ EXAMPLES ================================
@@ -59,50 +55,47 @@
 
 */
 
+#include <vector>
+#include <stack>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
     TODO
+    (Classic "Monotonic Stack" problem)
 
 */
 
-/* Time  Beats: 72.34% */
-/* Space Beats: 5.88%  */
+/* Time  Beats: 67.67% */
+/* Space Beats: 96.02% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution {
 public:
-    std::vector<int> canSeePersonsCount(std::vector<int>& h)
+    vector<int> canSeePersonsCount(vector<int>& heights)
     {
-        const int n = h.size();
+        int N = heights.size();
+        vector<int> result(N);
 
-        std::stack<int> stack;
-        stack.push(h[n-1]);
-
-        std::vector<int> result;
-        result.push_back(0);
-
-        for(int i = n-2; i >= 0; i--)
+        stack<int> monotonic_stack;
+        for (int i = N-1; i >= 0; i--)
         {
-            int c = 0;
-
-            while ( ! stack.empty() && stack.top()<h[i])
+            while ( ! monotonic_stack.empty() && heights[i] > monotonic_stack.top())
             {
-                stack.pop();
-                c++;
+                monotonic_stack.pop();
+                result[i]++;
             }
 
-            if ( ! stack.empty())
-                c++;
+            if ( ! monotonic_stack.empty())
+                result[i]++;
 
-            stack.push(h[i]);
-            result.push_back(c);
+            monotonic_stack.push(heights[i]);
         }
 
-        std::reverse(result.begin(), result.end());   
         return result;
     }
 };
