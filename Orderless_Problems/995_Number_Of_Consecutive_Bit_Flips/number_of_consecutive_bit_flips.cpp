@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === HARD ===
@@ -59,6 +56,10 @@
 
 */
 
+#include <deque>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -71,36 +72,90 @@
 /* Time  Beats: 96.31% */
 /* Space Beats: 81.35% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution {
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Auxiliary_Array {
 public:
-    int minKBitFlips(std::vector<int>& nums, int k)
+    int minKBitFlips(vector<int>& nums, int k)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-
         const int N = nums.size();
 
-        std::vector<bool> flipped(N-k+1, 0);  // Track where flips are made
-        int count = 0;
+        vector<bool> flipped(N - k + 1, 0);
+        int count  = 0;
         int flip_x = 0;
 
         for (int i = 0; i < N; i++)
         {
             if (i >= k)
-                flip_x -= flipped[i-k]; // Outside of sized k window
+                flip_x -= flipped[i - k];
 
-            if ((flip_x & 1) == nums[i])   // Need to flip this window
+            if ((flip_x & 1) == nums[i])
             {
-                if (i+k > N)
-                    return -1;  // Not enough elements to flip
+                if (i + k > N)
+                    return -1;
 
-                flipped[i] = 1;  // Mark the flip
+                flipped[i] = 1;
 
-                flip_x++;  // flip
+                flip_x++;
                 count++;
             }
         }
+
         return count;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 11.19% */
+/* Space Beats: 40.49% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution {
+public:
+    int minKBitFlips(vector<int>& nums, int k)
+    {
+        int N = nums.size();
+        int result = 0;
+
+        deque<int> flip_queue;
+        int flipped = 0; // Initially false
+
+        for (int i = 0; i < N; i++)
+        {
+            if (i >= k)
+            {
+                flipped ^= flip_queue.front();
+                flip_queue.pop_front();
+            }
+
+            if (flipped == nums[i])
+            {
+                if (i + k > N)
+                    return -1;
+
+                flip_queue.push_back(1);
+
+                flipped ^= 1;
+                result += 1;
+            }
+            else
+            {
+                flip_queue.push_back(0);
+            }
+        }
+
+        return result;
     }
 };
