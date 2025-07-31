@@ -159,3 +159,48 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 50.54% */
+/* Space Beats: 89.38% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Space_Efficient {
+public:
+    int minKBitFlips(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        int curr_flips = 0;
+        for (int i = 0; i < N; ++i)
+        {
+            if (i >= k && nums[i - k] == 2)
+                curr_flips--;
+
+            if ((curr_flips % 2) == nums[i])
+            {
+                if (i + k > N)
+                    return -1;
+
+                nums[i] = 2;
+                curr_flips++;
+                result++;
+            }
+        }
+
+        return result;
+    }
+};
