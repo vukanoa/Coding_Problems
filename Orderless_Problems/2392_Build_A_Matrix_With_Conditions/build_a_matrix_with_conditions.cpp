@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-
 /*
     ============
     === HARD ===
@@ -40,9 +36,9 @@
     Return any matrix that satisfies the conditions. If no answer exists,
     return an empty matrix.
 
-    ========================================================================
-    FUNCTION: vector<int> topo_sort(int k, vector<vector<int>>& conditions);  
-    ========================================================================
+    =========================================================================================================================
+    FUNCTION: vector<vector<int>> buildMatrix(int k, vector<vector<int>>& rowConditions, vector<vector<int>>& colConditions);
+    =========================================================================================================================
 
     ==========================================================================
     ================================ EXAMPLES ================================
@@ -93,7 +89,102 @@
 
 */
 
+#include <algorithm>
+#include <queue>
+#include <vector>
 using namespace std;
+
+
+
+/* Time  Beats: 96.75% */
+/* Space Beats: 80.85% */
+
+/* Time  Complexity: O(max(k^2, N)) */
+/* Space Complexity: O(max(k^2, N)) */
+class Solution_DFS {
+public:
+    vector<vector<int>> buildMatrix(int k, vector<vector<int>>& rowConditions, vector<vector<int>>& colConditions)
+    {
+        vector<int> order_rows = topological_sort(rowConditions, k);
+        vector<int> order_cols = topological_sort(colConditions, k);
+
+        if (order_rows.empty() || order_cols.empty())
+            return {};
+
+        vector<vector<int>> matrix(k, vector<int>(k, 0));
+        for (int i = 0; i < k; i++)
+        {
+            for (int j = 0; j < k; j++)
+            {
+                if (order_rows[i] == order_cols[j])
+                    matrix[i][j] = order_rows[i];
+            }
+        }
+
+        return matrix;
+    }
+
+private:
+    vector<int> topological_sort(vector<vector<int>>& edges, const int& k)
+    {
+        vector<vector<int>> adj_list(k + 1);
+        vector<int> order;
+
+        // Legend:
+        // 0: not visited
+        // 1: visiting
+        // 2: visited
+        vector<int> visited(k + 1, 0);
+        bool has_cycle = false;
+
+        // Build an adjacency list
+        for (const auto& e : edges)
+            adj_list[e[0]].push_back(e[1]);
+
+        for (int i = 1; i <= k; i++)
+        {
+            if (visited[i] == 0)
+            {
+                dfs(i, adj_list, visited, order, has_cycle);
+
+                if (has_cycle)
+                    return {};
+            }
+        }
+
+        // Reverse to get the correct order
+        reverse(order.begin(), order.end());
+
+        return order;
+    }
+
+    void dfs(int node, vector<vector<int>>& adj_list, vector<int>& visited, vector<int>& order, bool& has_cycle)
+    {
+        visited[node] = 1; // Visiting
+
+        for (int neighbor : adj_list[node])
+        {
+            if (visited[neighbor] == 0)
+            {
+                dfs(neighbor, adj_list, visited, order, has_cycle);
+
+                if (has_cycle)
+                    return;
+            }
+            else if (visited[neighbor] == 1)
+            {
+                has_cycle = true;
+                return;
+            }
+        }
+
+        visited[node] = 2; // Visited
+        order.push_back(node);
+    }
+};
+
+
+
 
 /*
     ------------
@@ -104,85 +195,76 @@ using namespace std;
 
 */
 
-/* Time  Beats: 93.52% */
-/* Space Beats: 77.18% */
+/* Time  Beats: 59.57% */
+/* Space Beats: 96.86% */
 
-/* Time  Complexity: O(k^2 + rowConditions + colConditions) */
-/* Space Complexity: O(k) */
+/* Time  Complexity: O(max(k^2, N)) */
+/* Space Complexity: O(max(k^2, N)) */
 class Solution {
 public:
-    // Topological sort using BFS (Kahn's algorithm)
-    vector<int> topo_sort(int k, vector<vector<int>>& conditions)
+    vector<vector<int>> buildMatrix(int k, vector<vector<int>>& rowConditions, vector<vector<int>>& colConditions)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-        
-        vector<int> degree(k+1, 0);
-        vector<vector<int>> adj_list(k+1);
+        vector<int> order_rows = topological_sort(rowConditions, k);
+        vector<int> order_cols = topological_sort(colConditions, k);
 
-        for (auto& edge: conditions)
+        if (order_rows.empty() || order_cols.empty())
+            return {};
+
+        vector<vector<int>> matrix(k, vector<int>(k, 0));
+        for (int i = 0; i < k; i++)
         {
-            int v = edge[0];
-            int w = edge[1];
-
-            adj_list[v].push_back(w);
-            degree[w]++;
-        }
-
-        queue<int> queue;
-        for (int i = 1; i <= k; i++)
-        {
-            if (degree[i] == 0) 
-                queue.push(i);
-        }
-
-        int count = 0;
-        vector<int> result;
-        result.reserve(k);
-
-        while( ! queue.empty())
-        {
-            int j = queue.front();
-            queue.pop();
-
-            result.push_back(j);
-            count++;
-
-            for(int k : adj_list[j])
+            for (int j = 0; j < k; j++)
             {
-                degree[k]--;
-                if (degree[k] == 0)
-                    queue.push(k);
+                if (order_rows[i] == order_cols[j])
+                    matrix[i][j] = order_rows[i];
             }
         }
 
-        if (count != k)
-            return {}; // Has cycle
-        else
-            return result;
+        return matrix;
     }
 
-    vector<vector<int>> buildMatrix(int k, vector<vector<int>>& rowConditions, vector<vector<int>>& colConditions)
+private:
+    // Find topological sequence using Kahn's algorithm
+    vector<int> topological_sort(vector<vector<int>>& edges, int k)
     {
-        auto order_row = topo_sort(k, rowConditions);
-        auto order_col = topo_sort(k, colConditions);
+        vector<vector<int>> adj_list(k + 1);
+        vector<int> degree(k + 1);
+        vector<int> order;
 
-        if (order_row.empty()|| order_col.empty())
-            return {}; // Some conflict
-
-        vector<vector<int>> arr(k, vector<int>(k));
-
-        // Find pos for x where 1 <= x <= k
-        vector<int> pos_i(k+1, -1), pos_j(k+1, -1);
-
-        for (int i = 0; i < k; i++)
+        for (const auto& e : edges)
         {
-            pos_i[order_row[i]] = i;
-            pos_j[order_col[i]] = i;
+            adj_list[e[0]].push_back(e[1]);
+            degree[e[1]]++;
         }
 
-        for (int x = 1; x <= k; x++)
-            arr[pos_i[x]][pos_j[x]] = x;
+        queue<int> queue;
 
-        return arr;
+        // Push all integers with in-degree 0 in the queue.
+        for (int i = 1; i <= k; i++)
+        {
+            if (degree[i] == 0)
+                queue.push(i);
+        }
+
+        while ( ! queue.empty())
+        {
+            int front = queue.front();
+            queue.pop();
+
+            order.push_back(front);
+            k--;
+
+            for (const auto& neighbor : adj_list[front])
+            {
+                if (--degree[neighbor] == 0)
+                    queue.push(neighbor);
+            }
+        }
+
+        // If we have NOT visited all integers, return empty array.
+        if (k != 0)
+            return {};
+
+        return order;
     }
 };
