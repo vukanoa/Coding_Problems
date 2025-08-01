@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -68,12 +65,18 @@
 
 */
 
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
     TODO
+    Backtracking is natural here, however there is a more straightforward
+    Solution that is a bit less Time efficient, but more Space efficient, but
+    it's more elegant.
 
 */
 
@@ -82,7 +85,7 @@
 
 /* Time  Complexity: O(n * 2^n) */
 /* Space Complexity: O(n)       */
-class Solution {
+class Solution_Backtracking {
 public:
     int countMaxOrSubsets(vector<int> &nums)
     {
@@ -107,5 +110,51 @@ private:
 
         for (int i = index; i < nums.size(); ++i)
             backtrack(nums, i + 1, currentOR | nums[i], maxOR, count);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 30.26% */
+/* Space Beats: 82.95% */
+
+/* Time  Complexity: O(N * 2^N) */
+/* Space Complexity: O(1)       */
+class Solution_Bitmask { 
+public:
+    int countMaxOrSubsets(vector<int>& nums) 
+    {
+        const int N = nums.size();
+
+        int max_or_value = 0;
+        for (const int& num : nums)
+            max_or_value |= num;
+
+        int total_subsets = 1 << N;
+        int subsets_with_max_or = 0;
+
+        for (int subset_mask = 0; subset_mask < total_subsets; subset_mask++) 
+        {
+            int current_or_value = 0;
+
+            for (int i = 0; i < N; i++) 
+                if (((subset_mask >> i) & 1) == 1)
+                    current_or_value |= nums[i];
+
+            if (current_or_value == max_or_value)
+                subsets_with_max_or++;
+        }
+
+        return subsets_with_max_or;
     }
 };
