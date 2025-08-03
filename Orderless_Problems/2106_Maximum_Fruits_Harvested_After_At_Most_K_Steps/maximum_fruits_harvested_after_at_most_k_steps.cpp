@@ -151,3 +151,69 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Similar idea to the one above, however this one does NOT use Binary Search.
+    It is redundant.
+
+    TODO
+
+*/
+
+/* Time  Beats: 37.45% */
+/* Space Beats: 23.83% */
+
+/* Time  Complexity: O(N + k + max_position) */
+/* Space Complexity: O(max_position)         */
+class Solution_Only_Prefix_Sum {
+public:
+    int MaxTotalFruits(vector<vector<int>>& fruits, int startPos, int k)
+    {
+        const int N = fruits.size();
+        int result = 0;
+
+        int max_position = max(fruits.back()[0], startPos + k) + 2;
+
+        vector<int> prefix_sum(max_position, 0);
+        for (const vector<int>& fruit : fruits)
+        {
+            int position = fruit[0];
+            int amount   = fruit[1];
+
+            prefix_sum[position + 1] += amount;
+        }
+
+        for (int i = 1; i < max_position; ++i)
+        {
+            prefix_sum[i] += prefix_sum[i - 1];
+        }
+
+
+        // First to the left
+        for (int steps_left = 0; steps_left <= k; steps_left++)
+        {
+            int left_limit  = max(startPos - steps_left, 0);
+            int right_limit = max(startPos + (k - 2 * steps_left), 0);
+
+            result = max(result, prefix_sum[right_limit + 1] - prefix_sum[left_limit]);
+        }
+
+        // First to the right
+        for (int steps_right = 0; steps_right <= k; steps_right++)
+        {
+            int right_limit = startPos + steps_right;
+            int left_limit  = max(startPos - (k - 2 * steps_right), 0);
+
+            result = max(result, prefix_sum[right_limit + 1] - prefix_sum[left_limit]);
+        }
+
+        return result;
+    }
+};
