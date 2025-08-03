@@ -217,3 +217,58 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 73.62% */
+/* Space Beats: 84.68% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Sliding_Window {
+public:
+    int maxTotalFruits(vector<vector<int>>& fruits, int startPos, int k)
+    {
+        const int N = fruits.size();
+        int result = 0;
+
+        int window_sum = 0;
+
+        int L = 0;
+        int R = 0;
+        while (R < N)
+        {
+            window_sum += fruits[R][1];
+
+            while (L <= R && min_steps(fruits[L][0], fruits[R][0], startPos) > k)
+            {
+                window_sum -= fruits[L][1];
+                L++;
+            }
+
+            result = max(result, window_sum);
+
+            // Increment
+            R++;
+        }
+
+        return result;
+    }
+
+private:
+    int min_steps(int L, int R, int start)
+    {
+        return min(abs(start - L) + (R - L),
+                   abs(start - R) + (R - L));
+    }
+};
