@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-
 /*
     ==============
     === MEDIUM ===
@@ -69,6 +65,11 @@
     0 <= fruits[i] < fruits.length
 
 */
+
+#include <vector>
+#include <unordered_map>
+using namespace std;
+
 
 /*
     ------------
@@ -371,121 +372,34 @@ class Solution {
 public:
     int totalFruit(vector<int>& fruits)
     {
-        int result = INT_MIN;
-        std::unordered_map<int, int> umap;
+        const int N = fruits.size();
+        int result = 0;
+
+        unordered_map<int, int> fruit_count;
 
         int left  = 0;
         int right = 0;
 
-        while (right < fruits.size())
+        while (right < N)
         {
-            umap[fruits[right]]++;
+            fruit_count[fruits[right]]++;
 
-            while (umap.size() > 2)
+            while (fruit_count.size() > 2)
             {
-                umap[fruits[left]]--;
+                fruit_count[fruits[left]]--;
 
-                if (umap[fruits[left]] == 0)
-                    umap.erase(fruits[left]);
+                if (fruit_count[fruits[left]] == 0)
+                    fruit_count.erase(fruits[left]);
 
                 left++;
             }
 
-            result = std::max(result, right - left + 1);
+            result = max(result, right - left + 1);
 
+            // Increment
             right++;
         }
 
         return result;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Essentially the same Solution as the one above, but written in a much worse
-    way.
-
-    I wanted to keep both, so that you can compare and see how to optimize in
-    general. This Solution is, maybe, a bit more intuitive, but much harder to
-    read and, therefore, grasp.
-
-*/
-
-/* Time  Beats: 96.89% */
-/* Space Beats: 88.69% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution_Messy {
-public:
-    int totalFruit(vector<int>& fruits)
-    {
-        int type_1 = -1;
-        int type_2 = -1;
-
-        int basket_1 = 0;
-        int basket_2 = 0;
-
-        int left  = 0;
-        int right = 0;
-
-        int max = 0;
-
-        while (right < fruits.size())
-        {
-            while (!match_one_basket(type_1, type_2, fruits[right]))
-            {
-                if (type_1 == -1)
-                {
-                    type_1 = fruits[right];
-                    continue;
-                }
-                else if (type_2 == -1)
-                {
-                    type_2 = fruits[right];
-                    continue;
-                }
-
-                if (fruits[left] == type_1)
-                {
-                    basket_1--;
-
-                    if (basket_1 == 0)
-                        type_1 = fruits[right];
-                }
-                else if (fruits[left] == type_2)
-                {
-                    basket_2--;
-
-                    if (basket_2 == 0)
-                        type_2 = fruits[right];
-                }
-
-                left++;
-            }
-
-            if (fruits[right] == type_1)
-                basket_1++;
-            else
-                basket_2++;
-
-            max = std::max(max, right - left + 1);
-
-            right++;
-        }
-
-        return max;
-    }
-
-private:
-    bool match_one_basket(int& type_1, int& type_2, int current_type)
-    {
-        return type_1 == current_type || type_2 == current_type;
     }
 };
