@@ -68,6 +68,7 @@
 
 */
 
+#include <numeric>
 #include <set>
 #include <string>
 #include <vector>
@@ -200,5 +201,119 @@ private:
     long long subarray_count_of_range_len(int range_len)
     {
         return 1LL * range_len * (range_len + 1) / 2;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+
+/* Time  Beats: 97.80% */
+/* Space Beats: 84.80% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class DSU {
+public:
+    vector<int> parent;
+    vector<int> rank; // group_size
+
+    DSU(int n)
+    {
+        rank.assign(n, 1);
+        parent.resize(n);
+        iota(parent.begin(), parent.end(), 0);
+    }
+
+    int find_root_node(int node)
+    {
+        while (node != parent[node])
+        {
+            parent[node] = parent[parent[node]];
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    // Unusual part of DSU
+    int get_component_size(int node)
+    {
+        return rank[find_root_node(node)];
+    }
+
+    void merge_components(int node1, int node2)
+    {
+        int root1 = find_root_node(node1);
+        int root2 = find_root_node(node2);
+
+        if (root1 == root2)
+            return;
+
+        if (rank[root1] < rank[root2])
+            swap(root1, root2);
+
+        parent[root2] = root1;
+        rank[root1] += rank[root2];
+    }
+};
+
+class Solution_DSU {
+public:
+    int minTime(string s, vector<int>& order, int k)
+    {
+        const int N = order.size();
+
+        long long total_possible_substrings = 1LL * N * (N + 1) / 2;
+        long long non_active = total_possible_substrings;
+
+        if (total_possible_substrings < k)
+            return -1;
+
+
+        DSU dsu(N);
+
+        for (int t = N-1; t >= 0; t--)
+        {
+            int idx = order[t];
+            s[idx] = '*';
+
+            long long left_component_size  = 0;
+            long long right_component_size = 0;
+
+            if (idx > 0 && s[idx - 1] == '*')
+            {
+                left_component_size = dsu.get_component_size(idx - 1);
+                dsu.merge_components(idx, idx - 1);
+            }
+
+            if (idx + 1 < N && s[idx + 1] == '*')
+            {
+                right_component_size = dsu.get_component_size(idx + 1);
+                dsu.merge_components(idx, idx + 1);
+            }
+
+            long long curr_component_size = dsu.get_component_size(idx);
+
+            long long delta = (curr_component_size  * (curr_component_size  + 1LL)) / 2
+                            - (left_component_size  * (left_component_size  + 1LL)) / 2
+                            - (right_component_size * (right_component_size + 1LL)) / 2;
+
+            non_active -= delta;
+
+            if (non_active < k)
+                return t;
+        }
+
+        return -1;
     }
 };
