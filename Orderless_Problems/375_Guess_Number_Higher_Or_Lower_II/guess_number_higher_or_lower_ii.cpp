@@ -128,3 +128,48 @@ private:
         return memo[start][end] = min_cost;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Bottom-up implementation, same idea.
+
+*/
+
+/* Time  Beats: 94.75% */
+/* Space Beats: 80.27% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_Bottom_Up {
+public:
+    int getMoneyAmount(int n)
+    {
+        vector<vector<int>> cost_table(n + 1, vector<int>(n + 1, 0));
+
+        for (int end = 2; end <= n; end++)
+        {
+            for (int start = end - 1; start > 0; start--)
+            {
+                int minimum_cost = INT_MAX;
+
+                for (int guess = start + 1; guess < end; ++guess)
+                {
+                    int curr_cost = guess + max(cost_table[start    ][guess - 1],
+                                                cost_table[guess + 1][end      ]);
+
+                    minimum_cost = min(minimum_cost, curr_cost);
+                }
+
+                cost_table[start][end] = (start + 1 == end) ? start : minimum_cost;
+            }
+        }
+
+        return cost_table[1][n];
+    }
+};
