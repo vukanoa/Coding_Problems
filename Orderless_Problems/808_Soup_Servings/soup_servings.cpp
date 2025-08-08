@@ -98,15 +98,15 @@ public:
     double soupServings(int n)
     {
         int servings_unit_count = ceil(n / 25.0);
-        unordered_map<int, unordered_map<int, double>> dp;
+        unordered_map<int, unordered_map<int, double>> memo;
 
         for (int k = 1; k <= servings_unit_count; k++)
         {
-            if (solve(k, k, dp) > 1 - 1e-5)
+            if (solve(k, k, memo) > 1 - 1e-5)
                 return 1;
         }
 
-        return solve(servings_unit_count, servings_unit_count, dp);
+        return solve(servings_unit_count, servings_unit_count, memo);
     }
 
 private:
@@ -132,5 +132,57 @@ private:
         dp[i][j] /= 4;
 
         return dp[i][j];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats:  5.33% */
+/* Space Beats: 38.83% */
+
+/* Time  Complexity: O((N / 25)^2) */ // But practically O(1)
+/* Space Complexity: O((N / 25)^2) */ // But practically O(1)
+class Solution_Bottom_Up {
+public:
+    double soupServings(int n)
+    {
+        int servings_unit_count = ceil(n / 25.0);
+        unordered_map<int, unordered_map<int, double>> dp;
+
+        dp[0][0] = 0.5;
+        for (int k = 1; k <= servings_unit_count; k++)
+        {
+            dp[0][k] = 1;
+            dp[k][0] = 0;
+
+            for (int j = 1; j <= k; j++)
+            {
+                dp[j][k] = solve(j, k, dp);
+                dp[k][j] = solve(k, j, dp);
+            }
+
+            if (dp[k][k] > 1 - 1e-5)
+                return 1;
+        }
+
+        return dp[servings_unit_count][servings_unit_count];
+    }
+
+    double solve(int i, int j, unordered_map<int, unordered_map<int, double>>& dp)
+    {
+        return (dp[max(0, i - 4)][max(0, j    )] +
+                dp[max(0, i - 3)][max(0, j - 1)] +
+                dp[max(0, i - 2)][max(0, j - 2)] +
+                dp[max(0, i - 1)][max(0, j - 3)]) / 4;
     }
 };
