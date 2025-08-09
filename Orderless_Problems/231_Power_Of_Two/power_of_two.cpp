@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ============
     === EASY ===
@@ -48,6 +46,9 @@
     -2^31 <= n <= 2^31 - 1
 
 */
+
+#include <cmath>
+using namespace std;
 
 /*
 
@@ -99,7 +100,7 @@
 
     First important thing just in case you didn't know:
 
-        NEGATIVE NUMBER ARE NOT(!!!) CONSIDERED POWER OF TWO.
+        NEGATIVE NUMBERS ARE NOT(!!!) CONSIDERED POWER OF TWO.
 
         -4 or -2 or -8 are NOT considered powers of two.
 
@@ -118,8 +119,8 @@
 /* Time  Beats: 100.00% */
 /* Space Beats:  36.73% */
 
-/* Time  Complexity: O(1) */
-/* Space Complexity: O(1) */
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(1)    */
 class Solution_Loop_1 {
 public:
     bool isPowerOfTwo(int n)
@@ -191,7 +192,7 @@ public:
     {
         for(int i = 0; i < 31 ; i++)
         {
-            int ith_pow_of_two = (1 << i); // (1 << i) <==> pow(2,i)
+            int ith_pow_of_two = (1 << i); // (1 << i) <==> pow(2, i)
 
             if (ith_pow_of_two == n)
                 return true;
@@ -201,6 +202,9 @@ public:
     }
 };
 
+
+
+
 /*
     ------------
     --- IDEA ---
@@ -208,8 +212,8 @@ public:
 
     This one is not easy to come up with, but it's not too difficult.
 
-    First, as we've concluded above: NEGATIVE NUMBER ARE NOT CONSIDERED A POWER
-    OF TWO.
+    First, as we've concluded above: NEGATIVE NUMBERS ARE NOT CONSIDERED A
+                                     POWER OF TWO.
 
     Therefore we only need to check if n > 0.
 
@@ -334,7 +338,7 @@ class Solution_Follow_Up_2 {
 public:
     bool isPowerOfTwo(int n)
     {
-        return n > 0 && std::floor(std::log2(n)) == std::ceil(std::log2(n));
+        return n > 0 && floor(log2(n)) == ceil(log2(n));
     }
 };
 
@@ -352,7 +356,12 @@ public:
     Why?
 
     Because in a signed integer 2^31 is Overflow.
-    32-bit integers are in the range [-2^31, 2^31-1]
+    32-bit integers are in the range [-2^31, 2^31 - 1]
+                                                  ~~~~
+                                                    ^
+                                             _______|
+                                             |
+                                    This is important
 
 */
 
@@ -366,5 +375,63 @@ public:
     bool isPowerOfTwo(int n)
     {
         return n > 0 && (1 << 30) % n == 0;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    __builtin_pop_count counts number of SET bits in a number, 'n' in this case
+
+    Therefore if there is ONLY ONE SET bit, then that means it's 100% power of
+    two.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  83.20% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Compiler_help { 
+public:
+    bool isPowerOfTwo(int n) {
+        // __builtin_pop_count() is supported by compilers:
+        // GCC and Clang(and Apple Clang)
+        //
+        // But it's NOT supported by: MSVC
+        return n > 0 && __builtin_popcount(n) == 1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, though this one uses "portable code", but it's C++20.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  52.81% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+#include <bit>
+class Solution_Portable { // Portable "pop_count", though only C++20 and later
+public:
+    bool isPowerOfTwo(int number)
+    {
+        // C++20
+        return number > 0 && std::popcount(static_cast<unsigned int>(number)) == 1;
     }
 };
