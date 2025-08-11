@@ -59,6 +59,7 @@
 
 #include <algorithm>
 #include <queue>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -127,5 +128,48 @@ public:
         }
 
         return total_sum;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Turns out, we can actually implement it this way as well. It's NOT
+    intuitive at all and the Description is very vague.
+
+*/
+
+/* Time  Beats: 28.59% */
+/* Space Beats: 14.29% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_2 {
+public:
+    long long maxTotal(vector<int>& value, vector<int>& limit)
+    {
+        const int N = value.size();
+        long long result = 0;
+
+        unordered_map<int, priority_queue<int>> umap;
+
+        for (int i = 0; i < N; i++)
+            umap[limit[i]].push(value[i]);
+
+        for (auto& [curr_limit, max_heap] : umap)
+        {
+            for (int i = 0; i < curr_limit && !max_heap.empty(); i++)
+            {
+                result += max_heap.top();
+                max_heap.pop();
+            }
+        }
+
+        return result;
     }
 };
