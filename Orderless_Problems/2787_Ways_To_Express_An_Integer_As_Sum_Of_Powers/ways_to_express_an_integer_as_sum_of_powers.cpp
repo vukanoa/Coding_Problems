@@ -66,9 +66,9 @@ using namespace std;
 /* Time  Beats: 59.48% */
 /* Space Beats: 58.60% */
 
-/* Time  Complexity: O(powers.size() * N) */ // powers.size() <= N
-/* Space Complexity: O(powers.size() * N) */
-class Solution {
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_Memoization {
 private:
     int const MOD = 1e9 + 7;
     vector<vector<int>> memo;
@@ -108,5 +108,47 @@ private:
         int skip = solve(idx + 1, sum +    0      , n, x);
 
         return memo[idx][sum] = (take + skip) % MOD;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Bottom-Up way of implementing.
+
+*/
+
+/* Time  Beats: 25.71% */
+/* Space Beats:  5.23% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_Bottom_Up {
+public:
+    int numberOfWays(int n, int x)
+    {
+        const int MOD = 1e9 + 7;
+
+        vector<vector<long long>> dp(n + 1, vector<long long>(n + 1));
+        dp[0][0] = 1;
+
+        for (int i = 1; i <= n; i++)
+        {
+            long long val = pow(i, x);
+            for (int j = 0; j <= n; j++)
+            {
+                dp[i][j] = dp[i - 1][j];
+
+                if (j >= val)
+                    dp[i][j] = (dp[i][j] + dp[i - 1][j - val]) % MOD;
+            }
+        }
+
+        return dp[n][n];
     }
 };
