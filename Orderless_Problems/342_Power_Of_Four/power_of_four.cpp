@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ============
     === EASY ===
@@ -53,6 +51,9 @@
 
 */
 
+#include <cmath>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -67,7 +68,7 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_Without_Builtin_functions {
+class Solution_Loop {
 public:
     bool isPowerOfFour(int n)
     {
@@ -107,20 +108,80 @@ class Solution_Follow_Up {
 public:
     bool isPowerOfFour(int n)
     {
-        if (n == 0)
+        if (n <= 0) return false;
+
+        double base = 4.0;
+        double x = std::log(static_cast<double>(n)) / std::log(base);
+
+        const double EPS = 1e-10;
+        return std::fabs(x - std::round(x)) < EPS; // 2.0000000001 is INT
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Similar Math as above.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  52.41% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Follow_Up_2 {
+public:
+    bool isPowerOfFour(int n)
+    {
+        if (n <= 0)
             return false;
 
-        return is_integer(log_base_b(n, 4));
-    }
+        double base = 4.0;
+        double x = std::log2(static_cast<double>(n)) / 2.0;
 
-private:
-    double log_base_b(int num, int b)
-    {
-        return std::log2(num) / std::log2(b);
-    }
+        const double EPS = 1e-10;
 
-    bool is_integer(double number)
+        // Nearest integer exponent
+        int exponent = static_cast<int>(std::round(x));
+
+        // Verify by recomputing 4^exponent and comparing to n with tolerance
+        double candidate = std::pow(base, exponent);
+
+        // std::fabs <==> floating-point absolute
+        return std::fabs(candidate - static_cast<double>(n)) < EPS;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Explained in the comments.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  52.41% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Pure_Binary_Math {
+public:
+    bool isPowerOfFour(int n)
     {
-        return std::floor(number) == number;
+        // 1. Must be positive
+        // 2. Must be power of two (only one bit set)
+        // 3. That bit must be at an odd position (power of four property)
+        return n > 0 && (n & (n - 1)) == 0 && (n & 0x55555555);
     }
 };
