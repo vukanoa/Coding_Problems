@@ -55,6 +55,7 @@
 
 #include <algorithm>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 using namespace std;
@@ -104,6 +105,61 @@ public:
             }
             else
                 result_str += chr;
+        }
+
+        return result_str;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats:  8.85% */
+/* Space Beats: 14.79% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Counting_Sort {
+public:
+    string sortVowels(string s)
+    {
+        string result_str;
+
+        unordered_set<char> uset_vowels = {'A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u'};
+        unordered_map<char, int> vowel_freq;
+
+        // Store the frequencies for each vowel
+        for (const char& chr : s)
+        {
+            if (uset_vowels.count(chr))
+                vowel_freq[chr]++;
+        }
+
+        string sorted_vowels = "AEIOUaeiou";
+
+        int vowel_idx = 0;
+        for (int i = 0; i < static_cast<int>(s.length()); i++)
+        {
+            if (uset_vowels.count(s[i])) // Vowel
+            {
+                // Skip to the leftmost available vowel
+                while (vowel_freq[sorted_vowels[vowel_idx]] == 0)
+                    vowel_idx++;
+
+                result_str += sorted_vowels[vowel_idx];
+                vowel_freq[sorted_vowels[vowel_idx]]--;
+            }
+            else // Consonant
+                result_str += s[i];
         }
 
         return result_str;
