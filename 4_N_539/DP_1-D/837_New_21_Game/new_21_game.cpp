@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -59,6 +56,10 @@
 
 */
 
+#include <unordered_map>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -74,35 +75,31 @@
 /* Time  Complexity: O(k^2) */
 /* Space Complexity: O(k)   */
 class Solution_TLE {
+private:
+    unordered_map<int, double> memo;
 public:
     double new21Game(int n, int k, int maxPts)
     {
-        std::unordered_map<int, double> cache;
-
-        return dfs(n, k, maxPts, 0, cache);
+        return dfs(n, k, maxPts, 0);
     }
 
 private:
-    double dfs(int n,
-               int k,
-               int maxPts,
-               int score,
-               std::unordered_map<int, double>& cache)
+    double dfs(int n, int k, int maxPts, int score)
     {
         if (score >= k)
             return score <= n ? 1.0 : 0.0;
 
-        if (cache.find(score) != cache.end())
-            return cache[score];
+        if (memo.find(score) != memo.end())
+            return memo[score];
 
-        double probability = 0;
+        double probability = 0.0;
 
         for (int i = 1; i <= maxPts; i++)
-            probability += dfs(n, k, maxPts, score + i, cache);
+            probability += dfs(n, k, maxPts, score + i);
 
-        cache[score] = 1.0 * probability / maxPts;
+        memo[score] = 1.0 * probability / maxPts;
 
-        return cache[score];
+        return memo[score];
     }
 };
 
@@ -127,27 +124,74 @@ class Solution {
 public:
     double new21Game(int n, int k, int maxPts)
     {
-        if(k == 0 || n >= k + maxPts)
+        if (k == 0 || n >= k + maxPts)
             return 1.0;
 
-        std::vector<double> dp(n+1);
+        double result = 0.0;
+
+        vector<double> dp(n+1);
         dp[0] = 1.0;
 
         double curr_sum = 1.0;
-        double result = 0.0;
         for(int i = 1; i < n+1; i++)
         {
             dp[i] = curr_sum / maxPts;
 
-             if(i < k)
+             if (i < k)
                  curr_sum += dp[i];
              else
                 result += dp[i];
 
-             if(i >= maxPts)
-                 curr_sum -= dp[i-maxPts];
+             if (i >= maxPts)
+                 curr_sum -= dp[i - maxPts];
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 6.59% */
+/* Space Beats: 5.41% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_2 {
+public:
+    double new21Game(int n, int k, int maxPts)
+    {
+        if (k == 0)
+            return 1.0;
+
+        double window_sum = 0.0;
+        for (int i = k; i < k + maxPts; i++)
+            window_sum += (i <= n) ? 1 : 0;
+
+        unordered_map<int, double> dp; // Start at score -> probability
+
+        for (int i = k-1; i >= 0; i--)
+        {
+            dp[i] = window_sum / maxPts;
+
+            double remove = 0;
+
+            if (i + maxPts <= n)
+                remove = (dp.find(i + maxPts) != dp.end()) ? dp[i + maxPts] : 1;
+
+            window_sum += dp[i] - remove;
+        }
+
+        return dp[0];
     }
 };
