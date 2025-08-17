@@ -56,6 +56,7 @@
 
 */
 
+#include <numeric>
 #include <unordered_map>
 #include <vector>
 using namespace std;
@@ -193,5 +194,76 @@ public:
         }
 
         return dp[0];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is here for didactic purposes. Only to better explain how we've
+    incrementally arrive a the below Solution.
+
+*/
+
+class Solution_TLE_2 {
+public:
+    double new21Game(int n, int k, int maxPts)
+    {
+        vector<double> dp(n + 1);
+        dp[0] = 1;
+
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = 1; j <= maxPts; j++)
+            {
+                if (i - j >= 0 && i - j < k)
+                    dp[i] += dp[i - j] / maxPts;
+            }
+        }
+
+        return accumulate(dp.begin() + k, dp.end(), 0.0);
+    }
+};
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats:  6.59% */
+/* Space Beats: 26.82% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Optimized {
+public:
+    double new21Game(int n, int k, int maxPts)
+    {
+        vector<double> dp(n + 1);
+        dp[0] = 1; // dp <==> probability_at_score
+
+        double window_sum_probability = k > 0 ? 1 : 0;
+        for (int i = 1; i <= n; i++)
+        {
+            dp[i] = window_sum_probability / maxPts;
+
+            if (i < k)
+                window_sum_probability += dp[i];
+
+            if (i - maxPts >= 0 && i - maxPts < k)
+                window_sum_probability -= dp[i - maxPts];
+
+        }
+
+        return accumulate(dp.begin() + k, dp.end(), 0.0);
     }
 };
