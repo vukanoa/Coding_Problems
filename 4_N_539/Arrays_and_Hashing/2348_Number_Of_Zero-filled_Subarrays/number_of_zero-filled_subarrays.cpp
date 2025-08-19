@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -58,31 +55,41 @@
 
 */
 
-/* Time  Beats: 97.22% */
-/* Space Beats: 45.11% */
+#include <vector>
+using namespace std;
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The most fundamental Sliding-Window problem.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  40.61% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution {
 public:
     long long zeroFilledSubarray(std::vector<int>& nums)
     {
+        const int N = nums.size();
         long long result = 0;
 
-        int i = 0;
-        while (i < nums.size())
+        int L = 0;
+        int R = 0;
+        while (R < N)
         {
-            int count = 0;
+            if (nums[R] == 0)
+                result += R - L + 1;
+            else
+                L = R + 1;
 
-            while (i < nums.size() && nums[i] == 0)
-            {
-                count++;
-                i++;
-
-                result += count;
-            }
-
-            i++;
+            // Increment
+            R++;
         }
 
         return result;
