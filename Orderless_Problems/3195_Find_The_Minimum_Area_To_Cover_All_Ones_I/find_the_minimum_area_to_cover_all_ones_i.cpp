@@ -41,6 +41,7 @@
 
 */
 
+#include <climits>
 #include <vector>
 using namespace std;
 
@@ -53,8 +54,8 @@ using namespace std;
 
 */
 
-/* Time  Beats: 44.41% */
-/* Space Beats: 86.58% */
+/* Time  Beats: 92.97% */
+/* Space Beats: 86.80% */
 
 /* Time  Complexity: O(ROWS * COLS) */
 /* Space Complexity: O(1)           */
@@ -65,11 +66,11 @@ public:
         const int ROWS = grid.size();
         const int COLS = grid[0].size();
 
-        int leftmost  = COLS;
-        int rightmost = -1;
+        int left  = INT_MAX;
+        int right = -1;
 
-        int highest = ROWS;
-        int lowest  = -1;
+        int top    = INT_MAX;
+        int bottom = -1;
 
         for (int row = 0; row < ROWS; row++)
         {
@@ -77,27 +78,15 @@ public:
             {
                 if (grid[row][col] == 1)
                 {
-                    leftmost  = min(leftmost,  col);
-                    rightmost = max(rightmost, col);
+                    left  = min(left, col);
+                    right = max(right, col);
+
+                    top    = min(top, row);
+                    bottom = max(bottom, row);
                 }
             }
         }
 
-        for (int col = 0; col < COLS; col++)
-        {
-            for (int row = 0; row < ROWS; row++)
-            {
-                if (grid[row][col] == 1)
-                {
-                    highest = min(highest, row);
-                    lowest  = max(lowest,  row);
-                }
-            }
-        }
-
-        int A = rightmost - leftmost + 1;
-        int B = lowest - highest + 1;
-
-        return A * B;
+        return (bottom - top + 1) * (right - left + 1);
     }
 };
