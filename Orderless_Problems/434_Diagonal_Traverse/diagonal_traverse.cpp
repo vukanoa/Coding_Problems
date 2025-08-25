@@ -55,8 +55,8 @@ using namespace std;
 /* Time  Beats: 100.00% */
 /* Space Beats:  86.06% */
 
-/* Time  Complexity: O() */
-/* Space Complexity: O(`) */
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
 class Solution {
 public:
     vector<int> findDiagonalOrder(vector<vector<int>>& matrix)
@@ -93,6 +93,78 @@ public:
 
             for (int val : intermediate)
                 result[k++] = val;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Also pointless to do.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  91.64% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
+class Solution_Using_Directions {
+public:
+    vector<int> findDiagonalOrder(vector<vector<int>>& matrix)
+    {
+        if (matrix.empty() || matrix[0].empty())
+            return {};
+
+        int ROWS = matrix.size();
+        int COLS = matrix[0].size();
+
+        int row = 0;
+        int col = 0;
+
+        int direction = 1;
+
+        vector<int> result(ROWS * COLS);
+        int idx = 0;
+
+        while (row < ROWS && col < COLS)
+        {
+            result[idx++] = matrix[row][col];
+
+            int new_row = row + (direction == 1 ? -1 :  1);
+            int new_col = col + (direction == 1 ?  1 : -1);
+
+            if (new_row < 0 || new_row == ROWS || new_col < 0 || new_col == COLS)
+            {
+                if (direction == 1)
+                {
+                    if (col == COLS - 1)
+                        row++;
+                    else
+                        col++;
+                }
+                else
+                {
+                    if (row == ROWS - 1)
+                        col++;
+                    else
+                        row++;
+                }
+
+                direction = 1 - direction;
+            }
+            else
+            {
+                row = new_row;
+                col = new_col;
+            }
         }
 
         return result;
