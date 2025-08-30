@@ -73,6 +73,7 @@
 
 #include <vector>
 #include <bitset>
+#include <unordered_set>
 using namespace std;
 
 /*
@@ -125,5 +126,53 @@ public:
         }
 
         return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats:  16.01% */
+/* Space Beats:   5.39% */
+
+/* Time  Complexity: O(81) */
+/* Space Complexity: O(81) */
+class Solution_Unordered_Set {
+public:
+    bool isValidSudoku(vector<vector<char>>& board)
+    {
+        unordered_set<string> uset;
+
+        int n = 0;
+        for (int i = 0; i < 9; i++)
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                char chr = board[i][j];
+                if (chr != '.') {
+                    n++;
+                    string row = "row" + to_string(i) + chr;
+                    string col = "col" + to_string(j) + chr;
+
+                    int block_idx = (i / 3) * 3 + j / 3;
+                    string block = "block" + to_string(block_idx) + chr;
+
+                    uset.insert(row);
+                    uset.insert(col);
+                    uset.insert(block);
+                }
+            }
+        }
+
+        return uset.size() == 3*n;
     }
 };
