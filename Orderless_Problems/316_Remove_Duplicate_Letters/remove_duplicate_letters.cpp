@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -46,6 +43,11 @@
 
 */
 
+#include <vector>
+#include <string>
+using namespace std;
+
+
 /*
     ------------
     --- IDEA ---
@@ -58,46 +60,39 @@
 /* Time  Beats: 100.00% */
 /* Space Beats:  86.76% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    std::string removeDuplicateLetters(std::string s)
+    string removeDuplicateLetters(string s)
     {
-        int n = s.size();
+        int N = s.size();
 
-        std::vector<bool> used(26);         // Avoids the letter duplications
-        std::vector<int> last_seen_idx(26);
-        std::string output = "";            // Stores the result string
+        vector<bool> used(26);
+        vector<int> last_seen_idx(26);
+        string monotonic_stack_str = "";
 
-        // Map the letters with their index at which they're seen at last
-        for(int i = 0; i < n; i++)
+        for (int i = 0; i < N; i++)
             last_seen_idx[s[i] - 'a'] = i;
 
-        for(int i = 0; i < n; i++)
+        for(int i = 0; i < N; i++)
         {
-            // If its possible to take the current letter (ith letter)
-            if( ! used[s[i] - 'a'])
+            if ( ! used[s[i] - 'a'])
             {
-                // Pop all the letters smaller than the ith letter
-                while( ! output.empty()                       &&
-                       last_seen_idx[output.back() - 'a'] > i &&
-                       output.back() > s[i])
+                while( ! monotonic_stack_str.empty()                       &&
+                       last_seen_idx[monotonic_stack_str.back() - 'a'] > i &&
+                       monotonic_stack_str.back() > s[i])
                 {
-                    used[output.back() - 'a'] = false;
-                    output.pop_back();
+                    used[monotonic_stack_str.back() - 'a'] = false;
+                    monotonic_stack_str.pop_back();
                 }
 
-                // Push the ith letter to the "output".
-                output.push_back(s[i]);
+                monotonic_stack_str.push_back(s[i]);
 
-                // Mark the ith letter untakable for the next time, as we are
-                // aiming for the distinct letters
                 used[s[i] - 'a'] = true;
             }
         }
 
-        // Return the result string
-        return output;
+        return monotonic_stack_str;
     }
 };
