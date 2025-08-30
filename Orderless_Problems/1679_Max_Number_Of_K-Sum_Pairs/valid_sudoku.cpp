@@ -85,7 +85,7 @@ using namespace std;
 
 */
 
-/* Time  Beats:  66.71% */
+/* Time  Beats: 100.00% */
 /* Space Beats:  83.40% */
 
 /* Time  Complexity: O(81) */
@@ -107,15 +107,15 @@ public:
                 if (chr == '.')
                     continue;
 
-                int x = (chr - '0') % 9; 
+                int digit_idx = (chr - '0') % 9; 
 
-                if (row[i][x])
+                if (row[i][digit_idx])
                     return false;
-                row[i][x] = 1;
+                row[i][digit_idx] = 1;
 
-                if (col[j][x])
+                if (col[j][digit_idx])
                     return false;
-                col[j][x] = 1;
+                col[j][digit_idx] = 1;
                 
                 int block_idx = (i / 3) * 3 + j / 3;
                 if (block[block_idx][x])
@@ -174,5 +174,60 @@ public:
         }
 
         return uset.size() == 3*n;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  83.40% */
+
+/* Time  Complexity: O(81) */
+/* Space Complexity: O(81) */
+class Solution_Bitmask {
+public:
+    bool isValidSudoku(vector<vector<char>>& board)
+    {
+        short col[9] = {0};
+        short row[9] = {0};
+        short block[9] = {0};
+
+        for (int i = 0; i < 9; i++)
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                char chr = board[i][j];
+                if (chr == '.')
+                    continue;
+
+                int digit_idx  = (chr - '0') % 9;
+                int digit_mask = 1 << digit_idx;
+                
+                int block_idx = (i/3)*3 + j/3; 
+
+                if ((row[i] >> digit_idx) & 1 ||
+                    (col[j] >> digit_idx) & 1 ||
+                    (block[block_idx] >> digit_idx) & 1)
+                {
+                    return 0;
+                }
+
+                row[i] |= digit_mask;
+                col[j] |= digit_mask;
+                block[block_idx] |= digit_mask;
+            }
+        }
+
+        return 1;
     }
 };
