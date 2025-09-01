@@ -60,8 +60,8 @@
 
 */
 
-#include <queue>
 #include <vector>
+#include <queue>
 using namespace std;
 
 /*
@@ -70,53 +70,59 @@ using namespace std;
     ------------
 
     Greedy + Heap. Nothing "tricky" here. Maybe the only unintuitive part is
-    using the difference between previous and current avg, instead of just new
-    average.
+    using the difference between previous and current average, instead of just
+    new average.
 
 */
 
-/* Time  Beats: 88.03% */
-/* Space Beats: 56.39% */
+/* Time  Beats: 91.80% */
+/* Space Beats: 81.29% */
 
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(n)        */
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
 class Solution {
 public:
     double maxAverageRatio(vector<vector<int>>& classes, int extraStudents)
     {
-        auto gain = [](double pass, double total) {
-            return (pass + 1) / (total + 1) - pass / total;
-        };
+        const int N = classes.size();
+        double result = 0.0;
 
-        const int n = classes.size();
-        priority_queue<pair<double,int>> max_heap;
-        double sum = 0.0;
+        priority_queue<pair<double,int>> max_heap; // {ratio_gain, idx};
 
-        for (int i = 0; i < n; i++)
+        for (int idx = 0; idx < N; idx++)
         {
-            const double& pass  = classes[i][0];
-            const double& total = classes[i][1];
+            const double& pass  = classes[idx][0];
+            const double& total = classes[idx][1];
 
-            sum += 1.0 * pass / total;
+            result += 1.0 * pass / total;
 
-            max_heap.push( {gain(pass, total), i} );
+            max_heap.push( {gain(pass, total), idx} );
         }
 
-        for (int i = 0; i < extraStudents; i++)
+        while (extraStudents > 0)
         {
             auto [avg, idx] = max_heap.top();
             max_heap.pop();
 
-            sum -= 1.0 * classes[idx][0] / classes[idx][1];
+            result -= 1.0 * classes[idx][0] / classes[idx][1];
 
             classes[idx][0]++;
             classes[idx][1]++;
 
-            sum += 1.0 * classes[idx][0] / classes[idx][1];
+            result += 1.0 * classes[idx][0] / classes[idx][1];
 
             max_heap.push( {gain(classes[idx][0], classes[idx][1]), idx} );
+
+            // Decrement
+            extraStudents--;
         }
 
-        return sum / n;
+        return result / N;
+    }
+
+private:
+    double gain(double pass, double total)
+    {
+        return (pass + 1) / (total + 1) - pass / total;
     }
 };
