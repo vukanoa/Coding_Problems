@@ -126,3 +126,64 @@ private:
         return (pass + 1) / (total + 1) - pass / total;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, but using different Heap in C++.
+
+*/
+
+/* Time  Beats: 97.39% */
+/* Space Beats: 97.97% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Different_Heap {
+private:
+    using class_info = tuple<double, int, int>;
+    class_info heap_data[100000];
+
+public:
+    double maxAverageRatio(vector<vector<int>>& classes, int extraStudents)
+    {
+        const int N = classes.size();
+        double result = 0.0;
+        int idx = 0;
+
+        for (auto& c : classes)
+        {
+            int passed_students  = c[0];
+            int total_students = c[1];
+
+            result += 1.0 * passed_students / total_students;
+
+            double delta = 1.0 * (total_students - passed_students) / (total_students * (total_students + 1.0));
+            heap_data[idx++] = {delta, passed_students, total_students};
+        }
+
+        make_heap(heap_data, heap_data + N);
+
+        for (int i = 0; i < extraStudents; i++)
+        {
+            pop_heap(heap_data, heap_data + N);
+            auto [delta, passed_students, total_students] = heap_data[N - 1];
+
+            if (delta == 0) break; // early stop
+
+            result += delta;
+
+            double next_delta = 1.0 * (total_students - passed_students) / ((total_students + 1.0) * (total_students + 2.0));
+            heap_data[N - 1] = {next_delta, passed_students + 1, total_students + 1};
+
+            push_heap(heap_data, heap_data + N);
+        }
+
+        return result / N;
+    }
+};
