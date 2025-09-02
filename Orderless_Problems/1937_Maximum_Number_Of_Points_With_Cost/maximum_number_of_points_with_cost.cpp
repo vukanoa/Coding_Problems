@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -71,6 +68,12 @@
 
 */
 
+#include <vector>
+#include <algorithm>
+#include <climits>
+using namespace std;
+
+
 /*
     ------------
     --- IDEA ---
@@ -85,12 +88,10 @@
 
 /* Time  Complexity: O(ROWS * COLS) */
 /* Space Complexity: O(COLS)        */
-class Solution {
+class Solution_Tabulation {
 public:
     long long maxPoints(vector<vector<int>>& points)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-
         const int ROWS = points.size();
         const int COLS = points[0].size();
 
@@ -119,5 +120,74 @@ public:
         }
 
         return *std::max_element(dp_row.begin(), dp_row.end());
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 74.30% */
+/* Space Beats: 63.26% */
+
+/* Time  Complexity: O(ROWS * COLS)        */
+/* Space Complexity: O(ROWS * COLS + COLS) */
+class Solution_Memoization {
+private:
+    vector<vector<long long>> memo_table; 
+    vector<long long> max_left;
+    vector<long long> max_right;
+
+public:
+    long long maxPoints(vector<vector<int>>& points)
+    {
+        const int ROWS = points.size();
+        const int COLS = points[0].size();
+
+        memo_table = vector<vector<long long>>(ROWS, vector<long long>(COLS, -1));
+
+        max_left = max_right = vector<long long>(COLS, INT_MIN);
+        long long result = 0;
+
+        for (int col = 0; col < COLS; col++)
+            result = max(result, compute_points(col, ROWS - 1, points));
+
+        return result;
+    }
+
+private:
+    long long compute_points(int col, int row, vector<vector<int>>& points)
+    {
+        if (row == 0)
+            return memo_table[row][col] = points[row][col];
+
+        if (memo_table[row][col] != -1)
+            return memo_table[row][col];
+
+        if (col == 0)
+            preprocess_row(row, points);
+
+        return memo_table[row][col] = max(max_left[col], max_right[col]) + points[row][col];
+    }
+
+    void preprocess_row(int row, vector<vector<int>>& points)
+    {
+        const int COLS = points[0].size();
+
+        max_left[0] = compute_points(0, row - 1, points);
+        for (int col = 1; col < COLS; col++)
+            max_left[col] = max(max_left[col - 1] - 1, compute_points(col, row - 1, points));
+
+        max_right[COLS - 1] = compute_points(COLS - 1, row - 1, points);
+        for (int col = COLS - 2; col >= 0; col--)
+            max_right[col] = max(max_right[col + 1] - 1, compute_points(col, row - 1, points));
     }
 };
