@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === HARD ===
@@ -74,6 +71,11 @@
 
 */
 
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -131,25 +133,23 @@
 /* Space Beats: 57.09% */
 
 /*
-    Time  Complexity: O(m * 2^n)
+    Time  Complexity: O(2^W * W * L)
 
-    where n is the number of words and m is the average length of words.
+    where W is the number of words and m is the average length of words.
 */
 /*
-    Space Complexity: O()
+    Space Complexity: O(W)
 
-    where n is the number of words and k is the number of unique characters
+    where W is the number of words and k is the number of unique characters
     which is 26 for lowercase words
 */
 class Solution {
 public:
-    int maxScoreWords(std::vector<std::string>& words,
-                      std::vector<char>& letters,
-                      std::vector<int>& score)
+    int maxScoreWords(vector<string>& words, vector<char>& letters, vector<int>& score)
     {
         int max_score = 0;
 
-        std::vector<int> letter_count(26, 0);
+        vector<int> letter_count(26, 0);
         for (const char& chr : letters)
             letter_count[chr - 'a']++;
 
@@ -159,9 +159,7 @@ public:
     }
 
 private:
-    int calculate_score(std::string &word,
-                       std::vector<int>& letter_count,
-                       std::vector<int>& score)
+    int calculate_score(string& word, vector<int>& letter_count, vector<int>& score)
     {
         int current_score = 0;
 
@@ -180,15 +178,15 @@ private:
     }
 
     void find_max_score(int index,
-                      std::vector<std::string>& words,
-                      std::vector<int>& score,
-                      std::vector<int>  letter_count,
+                      vector<string>& words,
+                      vector<int>& score,
+                      vector<int>  letter_count,
                       int  current_val,
                       int& max_score)
     {
         if (index == words.size())
         {
-            max_score = std::max(max_score, current_val);
+            max_score = max(max_score, current_val);
             return;
         }
 
@@ -198,5 +196,79 @@ private:
 
         if (word_score > 0)
             find_max_score(index + 1, words, score, letter_count, current_val + word_score, max_score);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 43.39% */
+/* Space Beats: 89.24% */
+
+/*
+    Time  Complexity: O(2^W * W * L)
+
+    where W is the number of words and m is the average length of words.
+*/
+/*
+    Space Complexity: O(1)
+*/
+class Solution_Bitmask {
+public:
+    int maxScoreWords(vector<string>& words, vector<char>& letters, vector<int>& score)
+    {
+        int word_count = words.size();
+
+        vector<int> letter_count(26, 0);
+        for (const char& chr : letters)
+            letter_count[chr - 'a']++;
+
+        int max_score = 0;
+        vector<int> subset_count(26, 0);
+
+        for (int mask = 0; mask < (1 << word_count); mask++)
+        {
+            fill(subset_count.begin(), subset_count.end(), 0);
+
+            for (int i = 0; i < word_count; i++)
+            {
+                if (mask & (1 << i))
+                {
+                    for (const char& chr : words[i])
+                        subset_count[chr - 'a']++;
+                }
+            }
+
+            max_score = max(max_score, calculate_subset_score(subset_count, score, letter_count));
+        }
+
+        return max_score;
+    }
+
+private:
+    int calculate_subset_score(vector<int>& subset_count,
+                               vector<int>& score,
+                               vector<int>& letter_count)
+    {
+        int total_score = 0;
+
+        for (int i = 0; i < 26; i++)
+        {
+            if (subset_count[i] > letter_count[i])
+                return 0;
+
+            total_score += subset_count[i] * score[i];
+        }
+
+        return total_score;
     }
 };
