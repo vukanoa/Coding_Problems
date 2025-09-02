@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <climits>
-
 /*
     ============
     === HARD ===
@@ -57,12 +53,15 @@
 
 */
 
+#include <iostream>
+#include <vector>
+#include <climits>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
-
-    DP Using Memoization.
 
     TODO
 
@@ -73,158 +72,122 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_Tabulation {
 public:
-    int minSwap(std::vector<int>& nums1, std::vector<int>& nums2)
+    int minSwap(vector<int>& nums1, vector<int>& nums2)
     {
-        int n = nums1.size();
-        int dp[n][2];
+        int N = nums1.size();
+        int dp[N][2];
 
-        for(int i = 0; i < n; i++)
+        for(int i = 0; i < N; i++)
         {
-            dp[i][0]=INT_MAX;
-            dp[i][1]=INT_MAX;
+            dp[i][0] = INT_MAX;
+            dp[i][1] = INT_MAX;
         }
 
         dp[0][0] = 0;
         dp[0][1] = 1;
-        int prenums1;
-        int prenums2;
+        int prev_nums1;
+        int prev_nums2;
 
-        for(int i = 1; i < n; i++)
+        for(int i = 1; i < N; i++)
         {
             // Prev position swapped
-            prenums1 = nums2[i-1];
-            prenums2 = nums1[i-1];
+            prev_nums1 = nums2[i-1];
+            prev_nums2 = nums1[i-1];
 
-            if(dp[i-1][1] != INT_MAX)
+            if (dp[i-1][1] != INT_MAX)
             {
                 // Swap at current position
-                if(nums2[i] > prenums1 && nums1[i] > prenums2)
+                if (nums2[i] > prev_nums1 && nums1[i] > prev_nums2)
                     dp[i][1] = 1 + dp[i-1][1];
 
                 // No swap at current position
-                if(nums1[i] > prenums1 && nums2[i] > prenums2)
+                if (nums1[i] > prev_nums1 && nums2[i] > prev_nums2)
                     dp[i][0] = dp[i-1][1];
             }
 
             // Prev position no swap
-            prenums1 = nums1[i-1];
-            prenums2 = nums2[i-1];
-            if(dp[i-1][0] != INT_MAX)
+            prev_nums1 = nums1[i-1];
+            prev_nums2 = nums2[i-1];
+            if (dp[i-1][0] != INT_MAX)
             {
                 // Swap at current position
-                if(nums2[i] > prenums1 && nums1[i] > prenums2)
-                    dp[i][1] = std::min(dp[i][1], 1 + dp[i-1][0]);
+                if (nums2[i] > prev_nums1 && nums1[i] > prev_nums2)
+                    dp[i][1] = min(dp[i][1], 1 + dp[i-1][0]);
 
                 // No swap at current position
-                if(nums1[i] > prenums1 && nums2[i] > prenums2)
-                    dp[i][0] = std::min(dp[i][0], dp[i-1][0]);
+                if (nums1[i] > prev_nums1 && nums2[i] > prev_nums2)
+                    dp[i][0] = min(dp[i][0], dp[i-1][0]);
             }
         }
 
-        return std::min(dp[n-1][0], dp[n-1][1]);
+        return min(dp[N-1][0], dp[N-1][1]);
     }
 };
 
 
-int
-main()
-{
-    Solution sol;
-
-    /* Example 1 */
-    // std::vector<int> nums1 = {1, 4, 4, 9};
-    // std::vector<int> nums2 = {2, 3, 5, 10};
-
-    /* Example 2 */
-    // std::vector<int> nums1 = {1, 2, 3, 8};
-    // std::vector<int> nums2 = {5, 6, 7, 4};
-
-    /* Example 3 */
-    // std::vector<int> nums1 = {2, 3, 4, 5};
-    // std::vector<int> nums2 = {1, 2, 3, 6};
-
-    /* Example 4 */
-    // std::vector<int> nums1 = {1, 4, 6, 9};
-    // std::vector<int> nums2 = {2, 2, 5, 10};
-
-    /* Example 5 */
-    // std::vector<int> nums1 = {4, 1, 9};
-    // std::vector<int> nums2 = {0, 5, 10};
-
-    /* Example 6 */
-    // std::vector<int> nums1 = {4, 4, 9};
-    // std::vector<int> nums2 = {3, 5, 10};
-
-    /* Example 7 */
-    // std::vector<int> nums1 = {1, 3, 3};
-    // std::vector<int> nums2 = {1, 2, 4};
-
-    /* Example 8 */
-    // std::vector<int> nums1 = {0, 7, 8};
-    // std::vector<int> nums2 = {1, 2, 3};
-
-    /* Example 9 */
-    // std::vector<int> nums1 = {2};
-    // std::vector<int> nums2 = {0};
-
-    /* Example 10 */
-    // std::vector<int> nums1 = {};
-    // std::vector<int> nums2 = {};
-
-    /* Example 11 */
-    // std::vector<int> nums1 = {3, 3};
-    // std::vector<int> nums2 = {4, 4};
-
-    /* Example 12 */
-    // std::vector<int> nums1 = {3, 3};
-    // std::vector<int> nums2 = {0, 4};
-
-    /* Example 13 */
-    std::vector<int> nums1 = {0, 7, 8, 10, 10, 11, 12, 13, 19, 18};
-    std::vector<int> nums2 = {4, 4, 5,  7, 11, 14, 15, 16, 17, 20};
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
 
-    std::cout << "\n\t==================================================";
-    std::cout << "\n\t=== MINIMUM SWAPS TO MAKE SEQUENCES INCREASING ===";
-    std::cout << "\n\t==================================================\n";
+    TODO
 
+*/
+/* Time  Beats: 17.92% */
+/* Space Beats: 40.80% */
 
-    /* Write Input */
-    bool first = true;
-    std::cout << "\n\tNums1: [";
-    for (auto x: nums1)
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Memoization {
+private:
+    vector<vector<int>> memo;
+
+public:
+    int minSwap(vector<int>& nums1, vector<int>& nums2)
     {
-        if (!first)
-            std::cout << ", ";
+        const int N = nums1.size();
+        nums1.insert(nums1.begin(), -1);
+        nums2.insert(nums2.begin(), -1);
+        int swapped = 0; // 0 <==> false
 
-        std::cout << x;
-        first = false;
+        /* Allocate memo with the new size */
+        memo.assign(N + 1, vector<int>(2, -1));
+
+        return solve(1, swapped, nums1, nums2);
     }
-    std::cout << "]";
 
-    first = true;
-    std::cout << "\n\tNums2: [";
-    for (auto x: nums2)
+private:
+    int solve(int idx, int swapped, vector<int>& nums1, vector<int>& nums2)
     {
-        if (!first)
-            std::cout << ", ";
+        const int N = nums1.size();
 
-        std::cout << x;
-        first = false;
+        if (idx == nums1.size())
+           return 0;
+
+        if (memo[idx][swapped] != -1)
+            return memo[idx][swapped];
+
+        int no_swap = INT_MAX;
+        int do_swap = INT_MAX;
+
+        int prev1 = nums1[idx - 1];
+        int prev2 = nums2[idx - 1];
+
+        if (swapped)
+            swap(prev1, prev2);
+
+        // NO swap
+        if (nums1[idx] > prev1 && nums2[idx] > prev2)
+            no_swap = 0 + solve(idx+1, 0, nums1, nums2);
+        
+        // INDEED swap
+        if (nums1[idx] > prev2 && nums2[idx] > prev1)
+            do_swap = 1 + solve(idx+1, 1, nums1, nums2);
+
+        return memo[idx][swapped] = min(no_swap, do_swap);
     }
-    std::cout << "]\n";
-
-
-    /* Solution */
-    int  result = sol.minSwap(nums1, nums2);
-
-
-    /* Write Output */
-    std::cout << "\n\tResult: " << result;
-
-    std::cout << "\n\n";
-    return 0;
-}
+};
