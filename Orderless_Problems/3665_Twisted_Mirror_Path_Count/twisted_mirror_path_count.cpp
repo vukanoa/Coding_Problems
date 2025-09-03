@@ -116,7 +116,7 @@ using namespace std;
 
 /* Time  Complexity: O(ROWS * COLS * 2) --> (ROWS * COLS) */
 /* Space Complexity: O(ROWS * COLS * 2) --> (ROWS * COLS) */
-class Solution {
+class Solution_Memoization {
 private:
     const int MOD = 1e9 + 7;
     int memo[501][501][2];
@@ -169,5 +169,98 @@ private:
         }
 
         return memo[row][col][came_from] = (go_down + go_right) % MOD;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same idea, but implemented using "Tabulation", i.e. "Bottom-Up" approach.
+
+*/
+
+/* Time  Complexity: O(ROWS * COLS * 2) --> (ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS * 2) --> (ROWS * COLS) */
+class Solution_Tabulation__Bottom_Up {
+private:
+    const int MOD = 1e9 + 7;
+
+public:
+    int uniquePaths(vector<vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        const int ZERO_ROW = 0;
+        const int ZERO_COL = 0;
+
+        const int CAME_FROM_ABOVE = 0;
+        const int CAME_FROM_LEFT  = 1;
+
+
+        vector<vector<vector<long long>>> dp(ROWS, vector<vector<long long>>(COLS, vector<long long>(2, 0LL)));
+        dp[ZERO_ROW][ZERO_COL] = {1LL, 1LL};
+
+        // Do Zeroeth row
+        for (int row = 1; row < ROWS; row++)
+        {
+            if (grid[row-1][ZERO_COL] == 1) // Mirror
+                dp[row][ZERO_COL][CAME_FROM_ABOVE] = dp[row-1][ZERO_COL][CAME_FROM_LEFT];
+            else
+                dp[row][ZERO_COL][CAME_FROM_ABOVE] = dp[row-1][ZERO_COL][CAME_FROM_ABOVE];
+        }
+
+
+        // Do Zeroeth col
+        for (int col = 1; col < COLS; col++)
+        {
+            if (grid[ZERO_ROW][col-1] == 1) // Mirror
+                dp[ZERO_ROW][col][CAME_FROM_LEFT] = dp[ZERO_ROW][col-1][CAME_FROM_ABOVE];
+            else
+                dp[ZERO_ROW][col][CAME_FROM_LEFT] = dp[ZERO_ROW][col-1][CAME_FROM_LEFT];
+        }
+
+
+        // Do a Bottom-Up Dynamic Programming
+        for (int row = 1; row < ROWS; row++)
+        {
+            for (int col = 1; col < COLS; col++)
+            {
+                // Above
+                if (grid[row-1][col] == 1) // Mirror
+                {
+                    dp[row][col][CAME_FROM_ABOVE] = dp[row-1][col][CAME_FROM_LEFT];
+                }
+                else
+                {
+                    dp[row][col][CAME_FROM_ABOVE] = dp[row-1][col][CAME_FROM_LEFT] +
+                                                    dp[row-1][col][CAME_FROM_ABOVE];
+
+                    dp[row][col][CAME_FROM_ABOVE] %= MOD;
+                }
+
+
+                // Left
+                if (grid[row][col-1] == 1) // Mirror
+                {
+                    dp[row][col][CAME_FROM_LEFT] = dp[row-1][col][CAME_FROM_ABOVE];
+                }
+                else
+                {
+                    dp[row][col][CAME_FROM_LEFT] = dp[row][col-1][CAME_FROM_LEFT] +
+                                                   dp[row][col-1][CAME_FROM_ABOVE];
+
+                    dp[row][col][CAME_FROM_LEFT] %= MOD;
+                }
+            }
+        }
+
+        return (dp[ROWS-1][COLS-1][CAME_FROM_ABOVE] +
+                dp[ROWS-1][COLS-1][CAME_FROM_LEFT]) % MOD;
     }
 };
