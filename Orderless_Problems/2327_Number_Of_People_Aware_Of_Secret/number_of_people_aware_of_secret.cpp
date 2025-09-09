@@ -61,6 +61,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <vector>
 using namespace std;
 
 /*
@@ -151,5 +152,94 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 32.43% */
+/* Space Beats: 91.58% */
+
+/* Time  Complexity: O(N^2) */ // Acceptable for Constraints where N=1000
+/* Space Complexity: O(N)   */
+class Solution_Memoization {
+private:
+    const int MOD = 1e9 + 7;
+    int memo[1001];
+
+public:
+    int peopleAwareOfSecret(int n, int delay, int forget)
+    {
+        /* Memset */
+        memset(memo, -1, sizeof(memo));
+
+        return solve(n, delay, forget);
+    }
+
+private:
+    int solve(int limit, int& delay, int& forget)
+    {
+        if (memo[limit] != -1)
+            return memo[limit];
+
+        long long count = (forget >= limit) ? 1 : 0;
+
+        for (int days_since_learned = delay; days_since_learned < min(forget, limit); days_since_learned++)
+        {
+            count += solve(limit - days_since_learned, delay, forget);
+            count %= MOD;
+        }
+
+        return memo[limit] = static_cast<int>(count);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 30.69% */
+/* Space Beats: 68.56% */
+
+/* Time  Complexity: O(N^2) */ // Acceptable for Constraints where N=1000
+/* Space Complexity: O(N)   */
+class Solution_Bottom_Up {
+public:
+    int peopleAwareOfSecret(int n, int delay, int forget)
+    {
+        const int MOD = 1e9 + 7;
+        vector<int> dp(n + 1, 0);
+
+        for (int curr_day = 0; curr_day <= n; curr_day++)
+            dp[curr_day] = (forget >= curr_day) ? 1 : 0;
+
+        for (int curr_day = 0; curr_day <= n; curr_day++)
+        {
+            for (int days_since_learned = delay; days_since_learned < min(forget, curr_day); days_since_learned++)
+            {
+                dp[curr_day] += dp[curr_day - days_since_learned];
+                dp[curr_day] %= MOD;
+            }
+        }
+
+        return dp[n];
     }
 };
