@@ -1,7 +1,3 @@
-#include <iostream>
-#include <queue>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -64,17 +60,22 @@
 
 */
 
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
- *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- * };
- */
+/*
+    Definition for a binary tree node.
+*/
+#include <queue>
+#include <unordered_map>
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
+
+
+using namespace std;
 
 /*
     ------------
@@ -92,7 +93,7 @@
     Maybe not even BFS is going to help us, but we'll see.
 
 
-    Now, everytime you're dealing with "brothers", "cousins" kind of Tree
+    Now, every time you're dealing with "brothers", "cousins" kind of Tree
     problems, especially where you're asked to change the values of the
     nodes(or pointers or something similar), it's usually easiest to do so
     while you're ON the parent node.
@@ -110,14 +111,14 @@
         3. Two  levels Tree(2 or 3 nodes)
         4. Five levels Tree
 
-    First 3 are kind of an edge case, ususally, but you should take care of
+    First 3 are kind of an edge case, usually, but you should take care of
     those immediately since you shouldn't be constrained by those by any means.
 
-    Even if you general solution works for every other case besides these first
-    three, then you should cover them separately, in if-elseif at the
+    Even if your general solution works for every other case besides these
+    first three, then you should cover them separately, in an if-else_if at the
     beginning.
 
-    Now, let's focus on the "Five levels" tree.
+    Now, let's focus on the "Five levels" tree. (Depth 3+ Tree)
 
     It's usually the best to go with 5 levels because that's enough nodes and
     levels and branches to cover all possibles scenarios. I'm not sure I
@@ -137,7 +138,7 @@
 
     We're at node: D
 
-    What are counsins of D's children, i.e. cousins of H and I?
+    What are cousins of D's children, i.e. cousins of H and I?
     Nodes at the same level as H and I, but with different parents. They are:
 
         J, K, L, M, N and O
@@ -153,16 +154,17 @@
     children.
 
     Solutions - After we "iterate" through those nodes, each time we pop them
-    and add their children's values, we are going to push this nodes back.
+    and add their children's values, we are going to push this node back.
 
     Aren't we going to have an infinite loop? No, because we'll pop and
-    push(pop and push we'll be done in ONE iteration) exactly size-1 times.
+    push(pop and push will be done in ONE iteration) exactly (size - 1) times.
 
-    "size" is the number of nodes in the current level. At level 2, at the
-    beginning it's 4(D, E, F and G). However, we do NOT want to count current
-    node's children as cousins and besides that we've ALREADY popped current
-    node(D, the first one), therefore we have to pop it 4-1 times, i.e. 3 more
-    times.
+    "size" is the number of nodes in the current level. Intial level is Level 0.
+
+    At level 2, at the beginning it's 4(D, E, F and G). However, we do NOT want
+    to count current node's children as cousins and besides that we've ALREADY
+    popped current node(D, the first one), therefore we have to pop it 4-1
+    times, i.e. 3 more times.
 
     Therefore we'll pop E, add it's children's sum and push it back at the end.
     Then,     we'll pop F, add it's children's sum and push it back at the end.
@@ -295,6 +297,116 @@ public:
     --- IDEA ---
     ------------
 
+    The Solution's IDEA above is a nice introduction to Tree Problems, however
+    the implementation is waaaay too complicated that it needs to be.
+
+    This one accomplishes the same thing, however it is MUCH more easy to grasp
+    and MUCH more elegant.
+
+    Also, once you understand this one, the DFS(at the end of this file) will
+    make even more sense.
+
+
+    The key thing you need to notice here is the following:
+
+    What is the actual value that should be at some node X?
+    It's:
+
+        TOTAL_SUM_OF_ALL_NODES_IN_THAT_LEVEL - SUM_OF_IT_AND_ITS_BROTHER
+
+    Once you notice that it becomes trivial.
+
+    This way, we'll use BFS to calculate total_sum of entire level and we'll
+    push that into our HashMap named "depth_to_sum".
+
+
+    Then we'll do a simple DFS where at each node, we'll update the values of
+    its children.
+
+    And the desired value is, as we've said:
+
+        TOTAL_SUM_OF_ALL_NODES_IN_THAT_LEVEL - SUM_OF_IT_AND_ITS_BROTHER
+
+
+    Pretty simple, elegant and straightforward.
+*/
+
+/* Time  Beats: 41.52% */
+/* Space Beats: 32.58% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Elegant_BFS {
+public:
+    TreeNode* replaceValueInTree(TreeNode* root)
+    {
+        queue<TreeNode*> queue;
+        queue.push(root);
+
+        unordered_map<int, long long> depth_to_sum;
+
+        // BFS(i.e. level-order), to find total sum of each depth(i.e. level)
+        int depth = 0;
+        while ( ! queue.empty())
+        {
+            int size = queue.size();
+            long long sum = 0LL;
+
+            while (size > 0)
+            {
+                TreeNode* node = queue.front();
+                queue.pop();
+
+                sum += node->val;
+
+                if (node->left)
+                    queue.push(node->left);
+
+                if (node->right)
+                    queue.push(node->right);
+
+                // Decrement
+                size--;
+            }
+
+            depth_to_sum.insert( {depth, sum} );
+            depth++;
+        }
+
+        root->val = 0;
+        dfs(root,  root, 0, depth_to_sum); // Update values of your children
+
+        return root;
+    }
+
+private:
+    void dfs(TreeNode* root, TreeNode* parent, int curr_depth, unordered_map<int, long long>& depth_to_sum)
+    {
+        if ( ! root)
+            return;
+
+        long long sum_of_children = (root->left  ? root->left->val  : 0LL) +
+                                    (root->right ? root->right->val : 0LL);
+
+        if (root->left)
+            root->left->val = depth_to_sum[curr_depth + 1] - sum_of_children;
+
+        if (root->right)
+            root->right->val = depth_to_sum[curr_depth + 1] - sum_of_children;
+
+        dfs(root->left,  root, curr_depth + 1, depth_to_sum);
+        dfs(root->right, root, curr_depth + 1, depth_to_sum);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     TODO
 
     This one is implemented using DFS. I wanted to show that it CAN be
@@ -306,58 +418,60 @@ public:
 /* Time  Beats: 90.87% */
 /* Space Beats: 15.59% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution {
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_DFS {
 public:
     TreeNode* replaceValueInTree(TreeNode* root)
     {
         root->val = 0;
+        vector<TreeNode*> nodes_of_curr_level = {root};
 
-        dfs(std::vector<TreeNode*>{root});
+        dfs(nodes_of_curr_level);
+
         return root;
     }
 
 private:
-    void dfs(std::vector<TreeNode*>vec)
+    void dfs(vector<TreeNode*> nodes_of_curr_level)
     {
-        if (vec.empty())
+        if (nodes_of_curr_level.empty())
             return;
 
-        int sum = 0;
-        for (auto node :vec)
+        int total_sum_of_curr_level = 0;
+        for (const auto& node : nodes_of_curr_level)
         {
             if ( ! node)
                 continue;
 
             if (node->left)
-                sum += node->left->val;
+                total_sum_of_curr_level += node->left->val;
 
             if (node->right)
-                sum += node->right->val;
+                total_sum_of_curr_level += node->right->val;
         }
 
-        std::vector<TreeNode*> child_vec;
-        for (auto node : vec)
+        vector<TreeNode*> nodes_of_next_level;
+        for (auto node : nodes_of_curr_level)
         {
-            int curr_sum = 0;
+            long long sum_of_curr_two_children = 0;
 
-            curr_sum += node->left  ? node->left->val  : 0;
-            curr_sum += node->right ? node->right->val : 0;
+            sum_of_curr_two_children = (node->left  ? node->left->val  : 0) +
+                                       (node->right ? node->right->val : 0);
 
             if (node->left)
             {
-                node->left->val = sum - curr_sum;
-                child_vec.push_back(node->left);
+                node->left->val = total_sum_of_curr_level - sum_of_curr_two_children;
+                nodes_of_next_level.push_back(node->left);
             }
 
             if (node->right)
             {
-                node->right->val = sum - curr_sum;
-                child_vec.push_back(node->right);
+                node->right->val = total_sum_of_curr_level - sum_of_curr_two_children;
+                nodes_of_next_level.push_back(node->right);
             }
         }
 
-        dfs(child_vec);
+        dfs(nodes_of_next_level);
     }
 };
