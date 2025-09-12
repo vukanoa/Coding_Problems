@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -63,42 +60,102 @@
 
 */
 
+#include <unordered_map>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    TODO
+    Self-explanatory.
 
 */
 
 /* Time  Beats: 74.04% */
 /* Space Beats: 55.03% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution {
 public:
     vector<vector<int>> findMatrix(vector<int>& nums)
     {
-        const int n = nums.size();
+        const int N = nums.size();
 
-        vector<int> cnt(201, 0);
-        int s = 0;
+        int max_freq = 0;
+        vector<int> freq(201, 0);
 
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < N; i++)
         {
-            cnt[nums[i]]++;
-            s = max(s, cnt[nums[i]]);
+            freq[nums[i]]++;
+            max_freq = max(max_freq, freq[nums[i]]);
         }
 
-        vector<vector<int>> result(s);
-        for (int i = 0; i < n; i++)
+        vector<vector<int>> result(max_freq);
+        for (int i = 0; i < N; i++)
         {
-            while (cnt[nums[i]] > 0)
+            while (freq[nums[i]] > 0)
             {
-                result[cnt[nums[i]] - 1].push_back(nums[i]);
-                cnt[nums[i]]--;
+                result[freq[nums[i]] - 1].push_back(nums[i]);
+                freq[nums[i]]--;
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This Solution is Safer if we're NOT dealing with these small Constraints.
+    Essentially they're the same, it's good to be able to see both
+    implementations.
+
+*/
+
+/* Time  Beats: 59.32% */
+/* Space Beats:  7.27% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Safer {
+public:
+    vector<vector<int>> findMatrix(vector<int>& nums)
+    {
+        int max_freq = 0;
+
+        unordered_map<int, int> freq;
+        for (const auto& num : nums)
+        {
+            freq[num]++;
+            max_freq = max(max_freq, freq[num]);
+        }
+
+        unordered_map<int, vector<int>> bucket;
+        for (const auto& entry : freq)
+            bucket[entry.second].push_back(entry.first);
+
+        vector<vector<int>> result(max_freq);
+
+        for (const auto& entry : bucket)
+        {
+            int         curr_freq = entry.first;
+            vector<int> curr_nums = entry.second;
+
+            while (curr_freq > 0)
+            {
+                result[curr_freq - 1].insert(result[curr_freq - 1].end(), curr_nums.begin(), curr_nums.end());
+
+                // Decrement
+                curr_freq--;
             }
         }
 
