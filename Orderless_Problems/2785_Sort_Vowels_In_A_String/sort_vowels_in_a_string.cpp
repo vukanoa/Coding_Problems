@@ -54,6 +54,7 @@
 */
 
 #include <algorithm>
+#include <queue>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -119,6 +120,68 @@ public:
     --- IDEA ---
     ------------
 
+    Self-explanatory.
+
+*/
+
+/* Time  Beats: 5.22% */
+/* Space Beats: 5.44% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Heap {
+public:
+    string sortVowels(string s)
+    {
+        const int N = s.length();
+
+        string t(N, 'x');
+        priority_queue<char, vector<char>, greater<char>> chr_min_heap;
+        priority_queue<int, vector<int>, greater<int>>    idx_min_heap;
+
+        for (int i = 0; i < N; i++)
+        {
+            if ( ! is_vowel(s[i]))
+            {
+                t[i] = s[i];
+            }
+            else
+            {
+                chr_min_heap.push(s[i]);
+                idx_min_heap.push(i);
+            }
+        }
+
+        while ( ! chr_min_heap.empty())
+        {
+            int idx = idx_min_heap.top();
+            idx_min_heap.pop();
+
+            char chr = chr_min_heap.top();
+            chr_min_heap.pop();
+
+            t[idx] = chr;
+        }
+
+        return t;
+    }
+
+private:
+    bool is_vowel(char& chr)
+    {
+        return chr == 'a' || chr == 'e' || chr == 'i' || chr == 'o' || chr == 'u' ||
+               chr == 'A' || chr == 'E' || chr == 'I' || chr == 'O' || chr == 'U';
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     TODO
 
 */
@@ -132,6 +195,7 @@ class Solution_Counting_Sort {
 public:
     string sortVowels(string s)
     {
+        const int N = s.length();
         string result_str;
 
         unordered_set<char> uset_vowels = {'A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u'};
@@ -147,7 +211,7 @@ public:
         string sorted_vowels = "AEIOUaeiou";
 
         int vowel_idx = 0;
-        for (int i = 0; i < static_cast<int>(s.length()); i++)
+        for (int i = 0; i < N; i++)
         {
             if (uset_vowels.count(s[i])) // Vowel
             {
