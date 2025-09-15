@@ -71,7 +71,7 @@ using namespace std;
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution {
+class Solution_Memoizaiton {
 private:
     const int MOD = 1e9 + 7;
     long long memo[3][3][100001];
@@ -122,5 +122,90 @@ private:
         skip = solve(L_parity, R_parity, idx+1, nums);
 
         return memo[L_parity][R_parity][idx] = (skip + take) % MOD;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    Tabulation, i.e. "Bottom-Up" Solutions are a little less intuitive to me
+    than "Memoization" ones, but it's not too bad.
+
+    You need to have base cases done before you start "solving" and you also
+    need to have the index as the outer most loop.
+
+    Those are the general rules, you do more of them you'll notice some unique
+    patterns and it'll become more and more easy to implement them.
+
+    Especially if you've already solved it using Memoization. It becomes almost
+    trivial to convert one to the other and vice-versa.
+
+*/
+
+/* Time  Beats:  8.33% */
+/* Space Beats: 32.75% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Tabulation {
+private:
+    const int MOD = 1e9 + 7;
+
+public:
+    int countStableSubsequences(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        if (N == 1)
+            return 1;
+
+        if (N == 2)
+            return 3;
+
+        vector<vector<vector<int>>> dp(3, vector<vector<int>>(3, vector<int>(100002, 0LL)));
+
+        // Base case
+        for (int L_parity = 0; L_parity < 3; L_parity++)
+        {
+            for (int R_parity = 0; R_parity < 3; R_parity++)
+            {
+                if (L_parity != 0 || R_parity != 0)
+                    dp[L_parity][R_parity][N] = 1;
+                else
+                    dp[L_parity][R_parity][N] = 0;
+            }
+        }
+
+
+        // Fill table BACKWARDS!
+        for (int idx = N-1; idx >= 0; idx--)
+        {
+            int curr_num_parity = (nums[idx] & 1) ? 1 : 2;
+
+            for (int L_parity = 0; L_parity < 3; L_parity++)
+            {
+                for (int R_parity = 0; R_parity < 3; R_parity++)
+                {
+                    long long skip = dp[L_parity][R_parity][idx + 1];
+                    long long take = 0LL;
+
+                    if ((L_parity != R_parity) || 
+                        (L_parity == R_parity && R_parity != curr_num_parity))
+                    {
+                        take = dp[R_parity][curr_num_parity][idx + 1];
+                    }
+
+                    dp[L_parity][R_parity][idx] = (skip + take) % MOD;
+                }
+            }
+        }
+
+        return dp[0][0][0];
     }
 };
