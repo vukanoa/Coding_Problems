@@ -64,6 +64,7 @@
 */
 
 #include <algorithm>
+#include <bitset>
 #include <vector>
 using namespace std;
 
@@ -81,7 +82,7 @@ using namespace std;
 /* Space Beats: 93.60% */
 
 /* Time  Complexity: O(N * logN + N * k) */
-/* Space Complexity: O(logN + )          */ // logN is TC for C++'s Sort
+/* Space Complexity: O(logN + N + k)     */ // logN is TC for C++'s Sort
 class Solution {
 public:
     vector<bool> subsequenceSumAfterCapping(vector<int>& nums, int k)
@@ -113,20 +114,85 @@ public:
             }
 
             int num_of_capped_elements = N - idx;
-
-            int capped_elements_used = 0;
-            while (capped_elements_used <= num_of_capped_elements && capped_elements_used * curr_cap_val <= k)
+            int used_capped_elements = 0;
+            while (used_capped_elements <= num_of_capped_elements && used_capped_elements * curr_cap_val <= k)
             {
                 // Can we form the remainder using elements STRICTLY LESS THAN curr_cap_value
                 // (that's what possible_sum represents)
-                if (possible_sum[k - capped_elements_used * curr_cap_val])
+                if (possible_sum[k - used_capped_elements * curr_cap_val])
                 {
                     answer[curr_cap_val - 1] = true;
                     break;
                 }
 
                 // Increment
-                capped_elements_used++;
+                used_capped_elements++;
+            }
+        }
+
+        return answer;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 98.97% */
+/* Space Beats: 73.13% */
+
+/* Time  Complexity: O(N * k / W) */ // 'W' = the number of bits in bitset word
+/* Space Complexity: O(k / W)     */
+class Solution_Bitset {
+public:
+    vector<bool> subsequenceSumAfterCapping(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+        vector<bool> answer(N, false);
+
+        /* Sort */
+        sort(nums.begin(), nums.end());
+
+        // dp[i] = can we can form sum i using elements STRICTLY LESS THAN curr_cap_value
+        bitset<4001> possible_sum;
+        possible_sum[0] = 1;
+
+        // answer[i] = can we can form sum k with all elements capped at (i + 1)
+        int idx = 0;
+        for (int curr_cap_val = 1; curr_cap_val <= N; curr_cap_val++)
+        {
+            while (idx < N && nums[idx] < curr_cap_val)
+            {
+                // Update possible sums (classic knapsack with bitset shift)
+                possible_sum |= (possible_sum << nums[idx]);
+                idx++;
+            }
+
+            int num_of_capped_elements = N - idx;
+            int used_capped_elements = 0;
+
+            // Try using 0, 1, 2, ..., capped elements
+            while (used_capped_elements <= num_of_capped_elements &&
+                   used_capped_elements * curr_cap_val <= k)
+            {
+                int remaining_sum = k - used_capped_elements * curr_cap_val;
+
+                // Check if the remainder is possible using smaller elements
+                if (possible_sum[remaining_sum])
+                {
+                    answer[curr_cap_val - 1] = true;
+                    break;
+                }
+
+                used_capped_elements++;
             }
         }
 
