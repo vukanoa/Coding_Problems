@@ -212,3 +212,78 @@ public:
         return final_schedule;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Much less straightforward, but more optimal. I definitely recommend the
+    above approach.
+
+*/
+
+/* Time  Beats: 92.91% */
+/* Space Beats: 81.00% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_Squared {
+public:
+    vector<vector<int>> generateSchedule(int n)
+    {
+        vector<int> team_ids;
+        for (int team_id = 0; team_id < n; team_id++)
+            team_ids.push_back(team_id);
+
+        vector<vector<int>> schedule;
+
+        if (n <= 4)
+            return schedule;
+
+        // Adjacent pairs (0-gap), different handling for odd/even
+        if (n % 2 == 1)
+        {
+            for (int idx = 0; idx < 2 * n; idx += 2)
+                schedule.push_back( {team_ids[idx % n], team_ids[(idx + 1) % n]} );
+        }
+        else
+        {
+            for (int idx = 0; idx < n; idx += 2)
+                schedule.push_back( {team_ids[idx % n], team_ids[(idx + 1) % n]} );
+
+            for (int idx = 1; idx < n + 1; idx += 2)
+                schedule.push_back( {team_ids[idx % n], team_ids[(idx + 1) % n]} );
+
+            // Fix ordering issue for even n
+            swap(schedule[schedule.size() - 1], schedule[schedule.size() - 2]);
+        }
+
+        // Pairs with gaps from 2 to n - 2
+        for (int gap = 2; gap < n - 1; gap++)
+        {
+            for (int idx = 0; idx < n; idx++)
+                schedule.push_back( {team_ids[idx], team_ids[(idx + gap) % n]} );
+        }
+
+        // Pairs with n - 1 gap (mirror of 0-gap)
+        if (n % 2 == 1)
+        {
+            for (int idx = 1; idx < 2 * n; idx += 2)
+                schedule.push_back( {team_ids[idx % n], team_ids[(idx - 1 + n) % n]} );
+        }
+        else
+        {
+            for (int idx = 1; idx < n; idx += 2)
+                schedule.push_back( {team_ids[idx % n], team_ids[(idx - 1 + n) % n]} );
+
+            for (int idx = 2; idx < n + 2; idx += 2)
+                schedule.push_back( {team_ids[idx % n], team_ids[(idx - 1 + n) % n]} );
+        }
+
+        return schedule;
+    }
+};
