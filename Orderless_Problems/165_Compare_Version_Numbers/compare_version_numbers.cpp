@@ -63,6 +63,7 @@
 */
 
 #include <string>
+#include <sstream>
 using namespace std;
 
 /*
@@ -180,6 +181,46 @@ public:
 
             if (revision_1 > revision_2)
                 return 1;
+        }
+
+        return 0;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_String_Stream {
+public:
+    int compareVersion(string version1, string version2)
+    {
+        stringstream ss1(version1);
+        stringstream ss2(version2);
+
+        string token1;
+        string token2;
+
+        while (ss1.good() || ss2.good()) // .good() means not EOF yet
+        {
+            if ( ! getline(ss1, token1, '.')) token1 = "0";
+            if ( ! getline(ss2, token2, '.')) token2 = "0";
+
+            int num1 = stoi(token1);
+            int num2 = stoi(token2);
+
+            if (num1 < num2) return -1;
+            if (num1 > num2) return 1;
         }
 
         return 0;
