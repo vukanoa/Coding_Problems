@@ -77,34 +77,109 @@ using namespace std;
 /* Time  Beats: 100.00% */
 /* Space Beats:  99.96% */
 
-/* Time  Complexity: O(max(N1, N2)) */
-/* Space Complexity: O(1)           */
+/* Time  Complexity: O(max(N, M)) */
+/* Space Complexity: O(1)         */
 class Solution {
 public:
-    static int compareVersion(string& v1, string& v2)
+    int compareVersion(string& version1, string& version2)
     {
-        const int N1 = v1.size();
-        const int N2 = v2.size();
+        const int N = version1.size();
+        const int M = version2.size();
 
-        int x1 = 0;
-        int x2 = 0;
+        int revision_1 = 0;
+        int revision_2 = 0;
 
-        for (int i = 0, j = 0; i < N1 || j < N2; i++, j++)
+        int i = 0;
+        int j = 0;
+        while (i < N || j < M)
         {
-            while (i < N1 && v1[i] != '.')
-                x1 = 10*x1 + (v1[i++] - '0');
+            while (i < N && version1[i] != '.')
+            {
+                revision_1 = 10*revision_1 + (version1[i] - '0');
+                i++;
+            }
 
-            while (j < N2 && v2[j] != '.')
-                x2 = 10*x2 + (v2[j++] - '0');
+            while (j < M && version2[j] != '.')
+            {
+                revision_2 = 10*revision_2 + (version2[j] - '0');
+                j++;
+            }
 
-            if (x1 < x2)
+            if (revision_1 < revision_2)
                 return -1;
 
-            if (x1 > x2)
+            if (revision_1 > revision_2)
                 return 1;
 
-            x1 = 0;
-            x2 = 0;
+            revision_1 = 0;
+            revision_2 = 0;
+
+            // Increment
+            i++;
+            j++;
+        }
+
+        return 0;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  48.40% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(N + M) */
+class Solution_String_Functions {
+public:
+    int compareVersion(string& version1, string& version2)
+    {
+        const int N = version1.length();
+        const int M = version2.length();
+
+        int i = 0;
+        int j = 0;
+        while (i < N || j < M)
+        {
+            auto dot_idx_1 = version1.find('.', i);
+            auto dot_idx_2 = version2.find('.', j);
+
+            int revision_1;
+            int revision_2;
+
+
+            // Revision 1
+            string str1 = version1.substr(i, dot_idx_1 - i);   // Get substring of revision
+            str1.erase(0, str1.find_first_not_of('0'));        // Remove leading 0s
+
+            revision_1 = str1.empty() ? 0 : stoi(str1);        // Assign
+            i = dot_idx_1 == string::npos ? N : dot_idx_1 + 1; // Update i
+
+
+            // Revision 2
+            string str2 = version2.substr(j, dot_idx_2 - j);   // Get substring of revision
+            str2.erase(0, str2.find_first_not_of('0'));        // Remove leading 0s
+
+            revision_2 = str2.empty() ? 0 : stoi(str2);        // Assign
+            j = dot_idx_2 == string::npos ? M : dot_idx_2 + 1; // Update j
+
+
+            // Compare
+            if (revision_1 < revision_2)
+                return -1;
+
+            if (revision_1 > revision_2)
+                return 1;
         }
 
         return 0;
