@@ -199,9 +199,12 @@ public:
 
 */
 
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
-class Solution_String_Stream {
+/* Time  Beats: 100.00% */
+/* Space Beats:  16.14% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(N + M) */
+class Solution_Stringstream {
 public:
     int compareVersion(string version1, string version2)
     {
@@ -221,6 +224,50 @@ public:
 
             if (num1 < num2) return -1;
             if (num1 > num2) return 1;
+        }
+
+        return 0;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  69.84% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(N + M) */
+class Solution_Input_Stringstream {
+public:
+    int compareVersion(string &version1, string &version2)
+    {
+        istringstream iss1(version1);
+        istringstream iss2(version2);
+
+        int revision_1 = 0;
+        int revision_2 = 0;
+        char dot;
+
+        while (iss1.good() || iss2.good())
+        {
+            if ( ! (iss1 >> revision_1)) revision_1 = 0;
+            if ( ! (iss2 >> revision_2)) revision_2 = 0;
+
+            if (iss1.peek() == '.') iss1 >> dot; // .peek() return -1 on EOF
+            if (iss2.peek() == '.') iss2 >> dot; // .peek() return -1 on EOF
+
+            if (revision_1 < revision_2) return -1;
+            if (revision_1 > revision_2) return  1;
         }
 
         return 0;
