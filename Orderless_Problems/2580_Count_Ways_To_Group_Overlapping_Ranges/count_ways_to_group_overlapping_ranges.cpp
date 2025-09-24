@@ -83,7 +83,7 @@ using namespace std;
 /* Space Beats: 79.78% */
 
 /* Time  Complexity: O(N) */
-/* Space Complexity: O(1) */
+/* Space Complexity: O(logN)     */ // LogN is the TC for C++'s Sort
 class Solution {
 private:
     const int MOD = 1e9 + 7;
@@ -127,6 +127,52 @@ private:
 
             // Right Shift
             exponent >>= 1;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    Equivalen to the above Solution, however instead of doing
+    "modular_exponentiation" at the end, we can just double the "result" at
+    each new group.
+
+    Thus, not only making it concise, but a bit more efficient since we've cut
+    down the need to call another fucntion at the end.
+
+*/
+
+/* Time  Beats: 43.68% */
+/* Space Beats: 79.78% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(logN)     */ // LogN is the TC for C++'s Sort
+class Solution_Concise {
+public:
+    int countWays(vector<vector<int>>& ranges)
+    {
+        const int MOD = 1e9 + 7;
+        long long result = 1LL;
+
+        /* Sort */
+        sort(ranges.begin(), ranges.end());
+
+        int end = -1;
+        for (const auto& range : ranges)
+        {   
+            if (end < range[0]) // New group
+                result = (1LL * result * 2) % MOD;
+
+            end = max(end, range[1]);
         }
 
         return result;
