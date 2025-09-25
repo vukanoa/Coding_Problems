@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-
 /*
     ============
     === HARD ===
@@ -68,6 +64,9 @@
 
 */
 
+#include <vector>
+#include <queue>
+
 using namespace std;
 
 /*
@@ -79,67 +78,83 @@ using namespace std;
 
 */
 
-/* Time  Beats: 48.53% */
-/* Space Beats: 43.40% */
+/* Time  Beats: 14.63% */
+/* Space Beats: 14.18% */
 
-/* Time  Complexity: O(M * N * log(M * N)) */
-/* Space Complexity: O(M * N)              */
+/* Time  Complexity: O(ROWS * COLS * log(ROWS * COLS)) */
+/* Space Complexity: O(ROWS * COLS)                    */
 class Solution {
 public:
     int minimumTime(vector<vector<int>>& grid)
     {
+        /* Edge Case */
         if (grid[0][1] > 1 && grid[1][0] > 1)
             return -1;
 
         const int ROWS = grid.size();
         const int COLS = grid[0].size();
 
+        auto comparator = [](const vector<int>& a, const vector<int>& b) {
+            if (a[0] == b[0])
+            {
+                if (a[1] == b[1])
+                    return a[2] < b[2];
 
-        // Min Heap of VECTOR<INT>
-        std::priority_queue<vector<int>,
-                            std::vector<vector<int>>,
-                            std::greater<vector<int>>> min_heap; // {time, row, col}
+                return a[1] < b[1]; // Decreasing by the second
+            }
 
-        // Add the starting position
-        min_heap.push({0, 0, 0}); // {time, row, col}
+            return a[0] > b[0]; // Increasing by the first
+        };
+
+        priority_queue<vector<int>,
+                       vector<vector<int>>,
+                       decltype(comparator)> min_heap(comparator);
+
+        min_heap.push( {0, 0, 0} );
 
         /* Signing Cross */
-        std::vector<std::pair<int, int>> directions = {{-1,0}, {1,0}, {0,-1}, {0,1}};
+        vector<pair<int, int>> directions = {{-1,0}, {1,0}, {0,-1}, {0,1}};
         vector<vector<bool>> visited(ROWS, vector<bool>(COLS, false));
 
         while ( ! min_heap.empty())
         {
-            int curr_time = min_heap.top()[0];
-            int curr_row  = min_heap.top()[1];
-            int curr_col  = min_heap.top()[2];
+            auto top = min_heap.top();
             min_heap.pop();
 
-            if (curr_row == ROWS-1 && curr_col == COLS-1)
-                return curr_time;
+            int time = top[0];
+            int row  = top[1];
+            int col  = top[2];
+
+            if (visited[row][col])
+                continue;
+
+            visited[row][col] = true;
+
+            if (row == ROWS-1 && col == COLS-1)
+                return time;
 
             for (const auto& dir : directions)
             {
-                // Neighbor <==> nei
-                int nei_row = curr_row + dir.first;
-                int nei_col = curr_col + dir.second;
+                int new_row = row + dir.first;
+                int new_col = col + dir.second;
 
-                if (nei_row < 0 || nei_col < 0 || nei_row == ROWS || nei_col == COLS)
+                if (new_row < 0 || new_col < 0 || new_row >= ROWS || new_col >= COLS)
                     continue;
 
-                if (visited[nei_row][nei_col])
+                if (visited[new_row][new_col])
                     continue;
 
                 /* Crux of this Solution */
-                int wait = 0;
-                if (abs(grid[nei_row][nei_col] - curr_time) % 2 == 0)
-                    wait = 1;
+                int min_cell_time = grid[new_row][new_col];
+                if ((min_cell_time - (time + 1)) % 2 != 0) 
+                    min_cell_time++;
 
-                int next_time = max(grid[nei_row][nei_col] + wait, curr_time + 1);
-                min_heap.push({next_time, nei_row, nei_col});
-                visited[nei_row][nei_col] = true;
+                int arrival_time = max(time + 1, min_cell_time);
+
+                min_heap.push( {arrival_time, new_row, new_col} );
             }
         }
 
-        return -1; // We won't ever get to here
+        return -1; // If we can't get to bottom-right cell, return -1
     }
 };
