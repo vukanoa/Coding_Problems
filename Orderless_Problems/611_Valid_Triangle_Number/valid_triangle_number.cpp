@@ -41,9 +41,10 @@
 
 */
 
-#include <algorithm>
 #include <vector>
+#include <algorithm>
 using namespace std;
+
 
 /*
     ------------
@@ -58,7 +59,7 @@ using namespace std;
 /* Space Beats: 42.88% */
 
 /* Time  Complexity: O(N^2 * logN) */
-/* Space Complexity: O(logN) */
+/* Space Complexity: O(logN)       */ // O(logN) is TC for C++'s Sort
 class Solution {
 public:
     int triangleNumber(vector<int>& nums)
@@ -110,6 +111,51 @@ public:
                 auto iter = upper_bound(nums.begin() + j + 1, nums.end(), nums[i] + nums[j] - 1);
                 
                 result += iter - (nums.begin() + j + 1);
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is more natural, but a bit more difficult to write than the above
+    Solution.
+
+*/
+
+/* Time  Beats: 31.24% */
+/* Space Beats: 74.70% */
+
+/* Time  Complexity: O(N^2)  */
+/* Space Complexity: O(logN)       */ // O(logN) is TC for C++'s Sort
+class Solution_Two_Pointers {
+public:
+    int triangleNumber(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        /* Sort */
+        sort(nums.begin(), nums.end());
+        
+        for (int i = 0; i < N-2; i++)
+        {
+            int k = i + 2;
+
+            for (int j = i + 1; j < N-1 && nums[i] != 0; j++)
+            {
+                while (k < N && nums[i] + nums[j] > nums[k])
+                    k++;
+
+                result += k - j - 1;
             }
         }
 
