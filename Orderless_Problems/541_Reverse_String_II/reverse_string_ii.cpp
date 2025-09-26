@@ -103,7 +103,43 @@ public:
 
             result += one + two;
         }
-        
+
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We can write the above logic in a much much more clean and concise way.
+
+    Also, this way we're modifying the string s and thus are not using any
+    extra Space, making its TC: O(1).
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  97.92% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Concise {
+public:
+    string reverseStr(string s, int k)
+    {
+        const int N = s.length();
+
+        for (int i = 0; i < N; i += 2 * k)
+        {
+            int j = min(i + k, N);
+            reverse(s.begin() + i, s.begin() + j);
+        }
+
+        return s;
     }
 };
