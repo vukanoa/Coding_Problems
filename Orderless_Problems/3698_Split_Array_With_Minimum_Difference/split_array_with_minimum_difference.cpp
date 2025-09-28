@@ -124,3 +124,61 @@ public:
         return min(abs((left_sum - nums[last_left_idx]) - (right_sum + nums[last_left_idx])), abs(left_sum - right_sum));
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    More efficient since we don't have to sort it.
+
+    It is also much more clean and concise and more robust.
+    However, it's good to be able to take a look at both and figure why this
+    one is so superior.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  93.17% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Linear {
+public:
+    long long splitArray(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int L = 0;
+        int R = N - 1;
+
+        long long L_sum = 0;
+        long long R_sum = 0;
+
+        // Strictly increasing from left
+        while (L < N - 1 && nums[L] < nums[L + 1])
+            L_sum += nums[L++];
+
+        // Strictly decreasing from right
+        while (R > 0 && nums[R - 1] > nums[R])
+            R_sum += nums[R--];
+
+        // Single peak element
+        if (L == R)
+        {
+            long long one = abs((L_sum + nums[L]) - R_sum);
+            long long two = abs(L_sum - (R_sum + nums[L]));
+
+            return min(one, two);
+        }
+        else if (R - L == 1 && nums[L] == nums[R]) // Peak <==> 2 equal elems
+        {
+            return abs(L_sum - R_sum);
+        }
+
+        // Invalid mountain
+        return -1;
+    }
+};
