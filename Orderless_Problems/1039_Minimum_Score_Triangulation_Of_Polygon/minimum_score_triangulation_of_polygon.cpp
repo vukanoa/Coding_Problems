@@ -83,7 +83,7 @@ using namespace std;
 
 /* Time  Complexity: O(N^3) */
 /* Space Complexity: O(N^2) */
-class Solution {
+class Solution_Memoization {
 public:
     int memo[50][50] = {};
 
@@ -92,7 +92,7 @@ public:
         memset(memo, -1, sizeof(memo));
         return solve(values, 0, 0, 0);
     }
-    
+
     int solve(vector<int>& values, int i, int j, int result)
     {
         const int N = values.size();
@@ -118,5 +118,54 @@ public:
         }
 
         return memo[i][j] = result;
+    }
+};
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    (Tabulation)
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  70.70% */
+
+/* Time  Complexity: O(N^3) */
+/* Space Complexity: O(N^2) */
+class Solution_Bottom_Up_Tabulation {
+public:
+    int minScoreTriangulation(vector<int>& values)
+    {
+        const int N = values.size();
+        vector<vector<int>> dp(N, vector<int>(N, 0));
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            for (int j = i+1; j < N; j++)
+            {
+                int best_score = INT_MAX;
+
+                for (int k = i+1; k < j; k++)
+                {
+                    long long left_subpolygon_score  = dp[i][k];
+                    long long right_subpolygon_score = dp[k][j];
+                    long long triangle_score         = 1LL * values[i] * values[k] * values[j];
+
+                    long long total_score = left_subpolygon_score + triangle_score + right_subpolygon_score;
+
+                    best_score = min(best_score, static_cast<int>(total_score));
+                }
+
+                if (best_score != INT_MAX)
+                    dp[i][j] = best_score;
+            }
+        }
+
+        return dp[0][N - 1];
     }
 };
