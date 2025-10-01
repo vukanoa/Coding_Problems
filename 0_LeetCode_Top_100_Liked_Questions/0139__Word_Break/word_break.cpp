@@ -61,7 +61,7 @@ using namespace std;
 
 /* Time  Complexity: O(2^n) */
 /* Space Complexity: O(n) */
-class Solution_Brute{
+class Solution_Brute {
 private:
     bool backtracking(string& s, unordered_set<string>& dict_uset, int start)
     {
@@ -90,6 +90,9 @@ public:
         return backtracking(s, dict_uset, 0);
     }
 };
+
+
+
 
 /*
     ------------
@@ -261,19 +264,22 @@ class Solution_DP {
 public:
     bool wordBreak(string s, vector<string>& wordDict)
     {
-        unordered_set<string> dict(wordDict.begin(), wordDict.end());
-        vector<bool> dp(s.length() + 1, false);
+        const int N = s.length();
 
-        dp[s.length()] = true;
+        unordered_set<string> uset(wordDict.begin(), wordDict.end());
+        vector<bool> dp(N + 1, false);
 
-        for (int start = s.length() - 1; start >= 0; start--)
+        dp[N] = true;
+
+        for (int start = N-1; start >= 0; start--)
         {
-            for (int i = start; i < s.length(); i++)
+            for (int i = start; i < N; i++)
             {
-                string current_substr = s.substr(start, i - start + 1);
+                string curr_substr     = s.substr(start, i - start + 1);
+                int    curr_substr_len = curr_substr.length();
 
-                // if (dict.find(current_substr) != dict.end() && dp[start + current_substr.length()])
-                if (dict.find(current_substr) != dict.end() && dp[i + 1])
+                // if (uset.find(curr_substr) != uset.end() && dp[start + curr_substr_len])
+                if (uset.find(curr_substr) != uset.end() && dp[i + 1])
                 {
                     dp[start] = true;
                     break;
@@ -321,19 +327,19 @@ class Solution_DP_Neat {
 public:
     bool wordBreak(string& s, vector<string> wordDict)
     {
-        int n = s.length();
-        int m = wordDict.size();
+        const int N = s.length();
+        const int M = wordDict.size();
 
-        vector<bool> dp(n + 1, false);
-        dp[n] = true; // Empty String is always possible to make
+        vector<bool> dp(N + 1, false);
+        dp[N] = true; // Empty String is always possible to make
 
-        for (int i = n-1; i >= 0; i--)
+        for (int i = N-1; i >= 0; i--)
         {
-            for (int j = 0; j < m; j++)
+            for (int j = 0; j < M; j++)
             {
                 int substr_len = wordDict[j].length();
 
-                if (i + substr_len <= n
+                if (i + substr_len <= N
                     &&
                     s.substr(i, substr_len) == wordDict[j] // O(n)
                     &&
@@ -364,11 +370,12 @@ public:
 /* Time  Beats: 48.93% */
 /* Space Beats: 36.66% */
 
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
-class Solution_Memoization {
+/* Time  Complexity: O(N^2)   */
+/* Space Complexity: O(N + M) */
+class Solution_Unusual_Memoization {
 private:
     bool memo[301];
+
 public:
     bool wordBreak(string s, vector<string>& wordDict)
     {
@@ -404,5 +411,80 @@ private:
                 return;
             }
         }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a much more usual version of Memoizaiton.
+
+    The key point is this -- If you've calculated whether it's possible from
+    index "idx", return that!
+
+    That's why with "memoset" we're setting every byte to -1, i.e 0x7f.
+
+    Then if we've tried to go deep down the rabbit hole from say index 8 and
+    we've concluded that it's NOT possible to match it until the end, then
+    we assign 0 to that index in memo[8], indicating that:
+
+        1. We've already calculated it(i.e. it's different than 0x7f)
+        2. It's NOT possible, so return immediately
+
+
+    This now becomes a classic Memoization Solution.
+
+*/
+
+/* Time  Beats: 33.56% */
+/* Space Beats: 34.39% */
+
+/* Time  Complexity: O(N^2)   */
+/* Space Complexity: O(N + M) */
+class Solution_Real_Memo {
+    int memo[301];
+
+public:
+    bool wordBreak(string s, vector<string>& wordDict)
+    {
+        /* Memset */
+        memset(memo, -1, sizeof(memo));
+        unordered_set<string> uset(wordDict.begin(), wordDict.end());
+
+        return solve(0, s, uset);
+    }
+
+private:
+    bool solve(int idx, string& s, unordered_set<string>& uset)
+    {
+        const int N = s.length();
+
+        if (idx == N)
+            return 1; // True
+
+        if (memo[idx] != -1)
+            return memo[idx];
+
+        int result = 0;
+        for (int i = idx; i < N; i++)
+        {
+            string substr  = s.substr(idx, i - idx + 1);
+            int substr_len = substr.length();
+
+            if (uset.count(substr))
+            {
+                result = solve(idx + substr_len, s, uset);;
+
+                if (result == 1)
+                    break;
+            }
+        }
+
+        return memo[idx] = max(memo[idx], result); // If it was EVER true, keep
     }
 };
