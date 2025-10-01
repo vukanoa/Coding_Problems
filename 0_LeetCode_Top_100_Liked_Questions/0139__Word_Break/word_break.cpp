@@ -299,6 +299,55 @@ public:
     --- IDEA ---
     ------------
 
+    Virtually the same as above, but implemented in conceptually a different
+    way.
+
+    It's always beneficial to look at multiple solutions in these fundamental
+    problems. Especially if you're a beginner.
+
+*/
+
+/* Time  Beats: 50.18% */
+/* Space Beats: 24.30% */
+
+/* Time  Complexity: O(N^2)   */
+/* Space Complexity: O(N + M) */
+class Solution_Another_Bottom_Up {
+public:
+    bool wordBreak(string s, vector<string>& wordDict)
+    {
+        const int N = s.length();
+
+        vector<bool> dp(N + 1, false);
+        dp[N] = true;
+
+        unordered_set<string> words(wordDict.begin(), wordDict.end());
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            for (int x = i; x < N; x++)
+            {
+                string substring  = s.substr(i, x - i + 1);
+                int substring_len = substring.length();
+
+                if (words.find(substring) != words.end()) // It DOES exist
+                {
+                    dp[i] = dp[i] | dp[i + substring_len];
+                }
+            }
+        }
+
+        return dp[0];
+    }
+};
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     Almost equivalent IDEA to the the one above. The only difference is that
     we're iterating through wordDict instead of every possible substring.
 
