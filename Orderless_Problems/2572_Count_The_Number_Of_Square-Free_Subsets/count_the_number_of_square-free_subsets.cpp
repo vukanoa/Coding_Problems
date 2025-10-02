@@ -75,7 +75,7 @@ using namespace std;
 
 /* Time  Complexity: O(N * 2^P) -->  O(N * 1024) */
 /* Space Complexity: O(N * 2^P) -->  O(N * 1024) */
-class Solution {
+class Solution_Memoization {
 private:
     long long memo[1111][1 << 11];
     const int MOD = 1e9 + 7;
@@ -133,5 +133,78 @@ private:
             result = (result + solve(idx + 1, product_mask | mask, nums)) % MOD;
 
         return memo[idx][product_mask] = result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 70.78% */
+/* Space Beats:  9.13% */
+
+/* Time  Complexity: O(N * 2^P) -->  O(N * 1024) */
+/* Space Complexity: O(N * 2^P) -->  O(N * 1024) */
+class Solution_Bottom_Up {
+public:
+    int squareFreeSubsets(vector<int>& nums)
+    {
+        const int N = nums.size(); 
+        const int MOD = 1e9 + 7; 
+
+        vector<int> mask(31, -1);
+        vector<int> primes = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29}; 
+
+        // Precompute mask for each number up to 30
+        for (int number = 1; number <= 30; number++)
+        {
+            int prime_mask = 0;
+            int prime_product = 1; 
+
+            for (int prime_index = 0; prime_index < 10; ++prime_index) 
+            {
+                if (number % primes[prime_index] == 0)
+                {
+                    prime_product *= primes[prime_index];
+                    prime_mask ^= 1 << prime_index; 
+                }
+            }
+
+            if (prime_product == number) 
+                mask[number] = prime_mask; 
+        }
+
+        vector<vector<long long>> dp(N + 1, vector<long long>(1 << 10)); 
+
+        // Base case: empty subset
+        for (int mask = 0; mask < (1 << 10); mask++)
+            dp[N][mask] = 1; 
+
+        for (int index = N-1; index >= 0; index--)
+        {
+            int current_number_mask = mask[nums[index]]; 
+
+            for (int mask = 0; mask < (1 << 10); mask++)
+            {
+                // Skip
+                dp[index][mask] = dp[index + 1][mask]; 
+
+                // Take, if square-free and no conflict
+                if (current_number_mask >= 0 && (mask & current_number_mask) == 0)
+                {
+                    dp[index][mask] = (dp[index][mask] + dp[index + 1][mask ^ current_number_mask]) % MOD; 
+                }
+            }
+        }
+
+        return (dp[0][0] - 1 + MOD) % MOD; 
     }
 };
