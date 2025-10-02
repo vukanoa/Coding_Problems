@@ -54,6 +54,7 @@
 */
 
 #include <algorithm>
+#include <unordered_map>
 using namespace std;
 
 /*
@@ -121,5 +122,58 @@ private:
 
         solve(curr_number + (1 << ending_zeroes_count), operations_count + 1, result);
         solve(curr_number - (1 << ending_zeroes_count), operations_count + 1, result);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats: 10.78% */
+
+/* Time  Complexity: O(log^2(N)) */
+/* Space Complexity: O(logN)     */
+class Solution_Memoization {
+private:
+    unordered_map<int, int> memo;
+
+public:
+    int minOperations(int n)
+    {
+        return solve(n);
+    }
+
+private:
+    int solve(int n)
+    {
+        if (n == 0)
+            return 0;
+
+        if (memo.count(n))
+            return memo[n];
+
+        // If n is already a power of 2
+        if ((n & (n - 1)) == 0)
+            return memo[n] = 1;
+
+        // Find nearest power of 2
+        int nearest_pow_of_two = 1;
+        while (nearest_pow_of_two < n)
+            nearest_pow_of_two <<= 1;
+
+        // Try both: add or subtract power of 2
+        int add = 1 + solve(nearest_pow_of_two - n);         // Add      (to reach nearest higher power)
+        int sub = 1 + solve(n - (nearest_pow_of_two >> 1));  // Subtract (to reach nearest lower  power)
+
+        return memo[n] = min(add, sub);
     }
 };
