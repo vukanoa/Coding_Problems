@@ -107,3 +107,49 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    A much more concise Solutoin.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  98.13% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */ // This one can be O(1) since result is not extra
+class Solution_Concise {
+public:
+    vector<int> shortestToChar(string s, char c)
+    {
+        const int N = s.size();
+
+        int distance_to_nearest_c = -N;
+        vector<int> result(N, N);
+
+        for (int i = 0; i < N; i++)
+        {
+            if (s[i] == c)
+                distance_to_nearest_c = i;
+
+            result[i] = i - distance_to_nearest_c;
+        }
+
+        for (int i = distance_to_nearest_c - 1; i >= 0; --i)
+        {
+            if (s[i] == c)
+                distance_to_nearest_c = i;
+
+            result[i] = min(result[i], distance_to_nearest_c - i);
+        }
+
+        return result;
+    }
+};
