@@ -305,3 +305,67 @@ public:
         return pairs;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 91.29% */
+/* Space Beats: 57.84% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(N)     */
+class Solution_Counting_Sort {
+public:
+    static vector<int> SuccessfulPairs(vector<int>& spells, vector<int>& potions, long long success)
+    {
+        const int N = spells.size();
+        const int M = potions.size();
+
+        int potion_frequency[100001] = {0};
+        int potion_max_value = 0;
+        int potion_min_value = 100001;
+
+        for (const int& potion_strength : potions)
+        {
+            potion_frequency[potion_strength]++;
+            potion_min_value = min(potion_min_value, potion_strength);
+            potion_max_value = max(potion_max_value, potion_strength);
+        }
+
+        // Reconstruct sorted potions using counting sort
+        for (int strength = potion_min_value, index = 0; strength <= potion_max_value; strength++)
+        {
+            const int frequency = potion_frequency[strength];
+            if (frequency == 0) continue;
+            fill(potions.begin() + index, potions.begin() + (index + frequency), strength);
+            index += frequency;
+        }
+
+        const int strongest_potion = potions[M - 1];
+
+        vector<int> successful_pairs(N, 0);
+
+        for (int i = 0; i < N; i++)
+        {
+            int spell_strength = spells[i];
+            long long required_potion_strength = (success + spell_strength - 1) / spell_strength;
+
+            if (required_potion_strength <= strongest_potion)
+            {
+                int valid_index = lower_bound(potions.begin(), potions.end(), required_potion_strength) - potions.begin();
+                successful_pairs[i] = M - valid_index;
+            }
+        }
+
+        return successful_pairs;
+    }
+};
