@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
 /*
     ==============
     === MEDIUM ===
@@ -63,6 +59,11 @@
     1 <= success <= 10^10
 
 */
+
+#include <cmath>
+#include <vector>
+#include <algorithm>
+using namespace std;
 
 /*
     ------------
@@ -168,19 +169,17 @@
 /* Space Beats: 17.37% */
 
 /* Time  Complexity: O(N * logM + M * logM) */
-/* Space Complexity: O(max(N, M)) */
+/* Space Complexity: O(max(N, M))           */
 class Solution {
 public:
-    std::vector<int> successfulPairs(std::vector<int>& spells,
-                                     std::vector<int>& potions,
-                                     long long success)
+    vector<int> successfulPairs(vector<int>& spells, vector<int>& potions, long long success)
     {
         int N = spells.size();
         int M = potions.size();
-        std::vector<int> pairs(N);
+        vector<int> pairs(N);
 
         // O(M * logM)
-        std::sort(potions.begin(), potions.end());
+        sort(potions.begin(), potions.end());
 
         // O(N * logM)
         for (int i = 0; i < N; i++)
@@ -196,7 +195,7 @@ public:
 
                 if ((long long)spells[i] * (long long)potions[mid] >= success)
                 {
-                    max_potions = std::max(max_potions, M - mid);
+                    max_potions = max(max_potions, M - mid);
                     right = mid - 1;
                 }
                 else
@@ -226,19 +225,17 @@ public:
 /* Space Beats: 12.42% */
 
 /* Time  Complexity: O(N * logM + M * logM) */
-/* Space Complexity: O(max(N, M)) */
+/* Space Complexity: O(max(N, M))           */
 class Solution_2 {
 public:
-    std::vector<int> successfulPairs(std::vector<int>& spells,
-                                     std::vector<int>& potions,
-                                     long long success)
+    vector<int> successfulPairs(vector<int>& spells, vector<int>& potions, long long success)
     {
         const int N = spells.size();
         const int M = potions.size();
-        std::vector<int> pairs;
+        vector<int> pairs;
 
         // O(M * logM)
-        std::sort(potions.begin(), potions.end());
+        sort(potions.begin(), potions.end());
 
         // O(N * logM)
         for (int& spell : spells)
@@ -250,13 +247,59 @@ public:
             {
                 int mid = left + (right - left) / 2;
 
-                if ((long long)spell * (long long)potions[mid] >= success)
+                if (static_cast<long long>(spell) * static_cast<long long>(potions[mid]) >= success)
                     right = mid - 1;
                 else
                     left  = mid + 1;
             }
 
             pairs.push_back(M - left);
+        }
+
+        return pairs;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+
+/* Time  Complexity: O(N * logM + M * logM) */
+/* Space Complexity: O(max(N, M))           */
+class Solution_Lower_Bound {
+public:
+    vector<int> successfulPairs(vector<int>& spells, vector<int>& potions, long long success)
+    {
+        const int N = spells.size();
+        const int M = potions.size();
+        vector<int> pairs;
+
+        // O(M * logM)
+        sort(potions.begin(), potions.end());
+
+        // O(N * logM)
+        for (int& spell : spells)
+        {
+            long long target = static_cast<long long>(ceil(1.0 * success / spell));
+
+            auto iter = lower_bound(potions.begin(), potions.end(), target);
+            int idx = iter - potions.begin();
+
+            if (iter != potions.end())
+                pairs.push_back(M - idx);
+            else
+                pairs.push_back(0);
         }
 
         return pairs;
