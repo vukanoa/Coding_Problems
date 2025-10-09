@@ -56,6 +56,7 @@
 
 */
 
+#include <numeric>
 #include <vector>
 using namespace std;
 
@@ -99,5 +100,54 @@ public:
         }
 
         return times[N - 1];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 98.46% */
+/* Space Beats: 97.44% */
+
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(N)     */
+class Solution_Prefix_Sum {
+public:
+    static long long minTime(vector<int>& skill, vector<int>& mana)
+    {
+        const int N = skill.size();
+        const int M = mana.size();
+
+        partial_sum(skill.begin(), skill.end(), skill.begin());
+        const int initial_skill_sum = skill[0];
+        long long total_time = 0;
+
+        for (int mana_index = 1; mana_index < M; mana_index++)
+        {
+            const long long prev_mana = mana[mana_index - 1];
+            const long long curr_mana = mana[mana_index];
+
+            long long max_time_contribution = 1LL * initial_skill_sum * prev_mana;
+
+            for (int skill_index = 1; skill_index < N; skill_index++)
+            {
+                max_time_contribution = max(max_time_contribution,
+                                            1LL * skill[skill_index] * prev_mana - 1LL * skill[skill_index - 1] * curr_mana
+                                            );
+            }
+
+            total_time += max_time_contribution;
+        }
+
+        return total_time + 1LL * skill.back() * mana.back();
     }
 };
