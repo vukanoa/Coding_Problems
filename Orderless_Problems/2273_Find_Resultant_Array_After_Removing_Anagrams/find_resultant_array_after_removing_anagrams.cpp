@@ -112,3 +112,59 @@ private:
         return str;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This looks like a small improvement, but it's crucial. Instead of
+    calculating the frequency map for the previous anagram EACH TIME, we count
+    it once.
+
+    For these Constraints it's not a problem, however were the Constraints
+    worse, we'd have a problem and this would make a difference.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  19.31% */
+
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(1)     */
+class Solution_2 {
+public:
+    vector<string> removeAnagrams(vector<string>& words)
+    {
+        const int N = words.size();
+
+        vector<string> result;
+
+        string prev_string = words[0];
+        vector<int> prev_anagram(26, 0); // Frequency map
+        for (const char& chr : words[0])
+            prev_anagram[chr - 'a']++;
+
+        for (int i = 1; i < N; i++)
+        {
+            string curr_string = words[i];
+            vector<int> curr_anagram(26, 0);
+            for (const char& chr : words[i])
+                curr_anagram[chr - 'a']++;
+            
+            if (prev_anagram != curr_anagram)
+            {
+                result.push_back(prev_string);
+
+                prev_string  = curr_string;
+                prev_anagram = curr_anagram;
+            }
+        }
+        result.push_back(prev_string);
+
+        return result;
+    }
+};
