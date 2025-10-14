@@ -23,7 +23,7 @@
     otherwise.
 
     ===========================================================================
-    FUNCTION: bool hasIncreasingSubarrays(const std::vector<int>& nums, int k); 
+    FUNCTION: bool hasIncreasingSubarrays(const std::vector<int>& nums, int k);
     ===========================================================================
 
     ==========================================================================
@@ -114,7 +114,7 @@ public:
 /* Space Complexity: O(1) */
 class Solution_2 {
 public:
-    bool hasIncreasingSubarrays(const std::vector<int>& nums, int k)
+    bool hasIncreasingSubarrays(vector<int>& nums, int k)
     {
         const int N = nums.size();
 
@@ -126,7 +126,7 @@ public:
         {
             if ((R - L) == 2 * k)
                 break;
-            
+
             if ((R - L) == k)
             {
                 if (nums[R-1] < nums[R])
@@ -151,5 +151,61 @@ public:
         }
 
         return (R - L) == 2 * k;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 54.09% */
+/* Space Beats: 23.64% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_3 {
+public:
+    bool hasIncreasingSubarrays(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+
+        vector<int> increasing_lengths;
+        int L = 0;
+        int R = 1;
+
+        while (R < N)
+        {
+            if (nums[R-1] >= nums[R])
+            {
+                increasing_lengths.push_back(R - L);
+                L = R;
+            }
+
+            // Increment
+            R++;
+        }
+        increasing_lengths.push_back(R - L);
+
+        if (increasing_lengths[0] >= 2 * k)
+            return true;
+
+        for (unsigned i = 1; i < increasing_lengths.size(); i++)
+        {
+            if (increasing_lengths[i] >= 2 * k)
+                return true;
+
+            if (min(increasing_lengths[i-1], increasing_lengths[i]) >= k)
+                return true;
+        }
+
+        return false;
     }
 };
