@@ -94,3 +94,62 @@ public:
         return false;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 70.00% */
+/* Space Beats: 54.55% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    bool hasIncreasingSubarrays(const std::vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+
+        int L = 0;
+        int R = 1;
+
+        bool can_reuse = false;
+        while (R < N)
+        {
+            if ((R - L) == 2 * k)
+                break;
+            
+            if ((R - L) == k)
+            {
+                if (nums[R-1] < nums[R])
+                    can_reuse = true;
+            }
+            else if (nums[R-1] >= nums[R])
+            {
+                if (can_reuse)
+                {
+                    can_reuse = false;
+                    L = R - k; // Reuse part of the left and part of the right subarray
+                }
+                else
+                {
+                    L = R; // Start all over again
+                }
+            }
+
+
+            // Increment
+            R++;
+        }
+
+        return (R - L) == 2 * k;
+    }
+};
