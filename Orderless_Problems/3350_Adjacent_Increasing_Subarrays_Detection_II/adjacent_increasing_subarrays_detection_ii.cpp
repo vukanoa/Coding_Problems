@@ -133,3 +133,56 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 80.51% */
+/* Space Beats: 42.47% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_2 {
+public:
+    int maxIncreasingSubarrays(vector<int>& nums)
+    {
+        const int N = nums.size();
+        vector<int> increasing_lengths;
+
+        int L = 0;
+        int R = 1;
+        while (R < N)
+        {
+            if (nums[R-1] >= nums[R])
+            {
+                increasing_lengths.push_back(R - L);
+                L = R;
+            }
+
+            // Increment
+            R++;
+        }
+        increasing_lengths.push_back(R - L);
+
+        int result = increasing_lengths.empty() ? 0 : increasing_lengths[0] / 2;
+
+        for (unsigned i = 1; i < increasing_lengths.size(); i++)
+        {
+            int prev = increasing_lengths[i-1];
+            int curr = increasing_lengths[i];
+
+            result = max( {result, curr / 2, min(prev, curr)} );
+        }
+
+        return result;
+    }
+};
