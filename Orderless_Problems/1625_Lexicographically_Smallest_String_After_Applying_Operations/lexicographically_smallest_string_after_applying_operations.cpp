@@ -84,6 +84,7 @@
 */
 
 #include <string>
+#include <unordered_set>
 using namespace std;
 
 /*
@@ -156,5 +157,81 @@ private:
         {
             s[i] = '0' + ((s[i] - '0') + min_times * a) % 10;
         }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    It can also be done as a "Graph Problem".
+    TODO
+
+*/
+
+/* Time  Beats: 16.80% */
+/* Space Beats: 56.64% */
+
+/* Time  Complexity: O(N^2 * d^2) */
+/* Space Complexity: O(N)         */
+class Solution_DFS {
+private:
+    int N;
+    int a_val;
+    int b_val;
+    unordered_set<string> seen;
+
+public:
+    string findLexSmallestString(string s, int a, int b)
+    {
+        N = s.size();
+        a_val = a;
+        b_val = b;
+        seen.clear();
+
+        dfs(s);
+
+        string result = *seen.begin();
+        for (const auto& candidate : seen)
+        {
+            if (candidate < result)
+            {
+                result = candidate;
+            }
+        }
+        return result;
+    }
+
+private:
+    string add_operation(const string& s)
+    {
+        string result = s;
+        for (int i = 1; i < N; i += 2)
+        {
+            int digit = (s[i] - '0' + a_val) % 10;
+            result[i] = '0' + digit;
+        }
+
+        return result;
+    }
+
+    string rotate_operation(const string& s)
+    {
+        string result = s.substr(N - b_val) + s.substr(0, N - b_val);
+        return result;
+    }
+
+    void dfs(const string& s)
+    {
+        if (seen.count(s))
+            return;
+
+        seen.insert(s);
+        dfs(add_operation(s));
+        dfs(rotate_operation(s));
     }
 };
