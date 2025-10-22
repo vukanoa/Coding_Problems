@@ -130,7 +130,75 @@ public:
         return result;
     }
 };
+class Solution_2 {
+public:
+    int maxFrequency(vector<int>& nums, int k, int numOperations)
+    {
+        const int N = nums.size();
 
+        /* Sort */
+        sort(nums.begin(), nums.end());
+
+        int result = 0;
+        unordered_map<int, int> num_count;
+
+        int last_num_idx = 0;
+        for (int i = 0; i < nums.size(); i++)
+        {
+            if (nums[i] != nums[last_num_idx])
+            {
+                num_count[nums[last_num_idx]] = i - last_num_idx;
+                result = max(result, i - last_num_idx);
+                last_num_idx = i;
+            }
+        }
+
+        num_count[nums[last_num_idx]] = N - last_num_idx;
+        result = max(result, N - last_num_idx);
+
+        auto left_bound = [&](int value) {
+            int left = 0, right = nums.size() - 1;
+            while (left < right) {
+                int mid = (left + right) / 2;
+                if (nums[mid] < value) {
+                    left = mid + 1;
+                } else {
+                    right = mid;
+                }
+            }
+            return left;
+        };
+
+        auto right_bound = [&](int value) {
+            int left = 0, right = nums.size() - 1;
+            while (left < right) {
+                int mid = (left + right + 1) / 2;
+                if (nums[mid] > value) {
+                    right = mid - 1;
+                } else {
+                    left = mid;
+                }
+            }
+            return left;
+        };
+
+        for (int i = nums.front(); i <= nums.back(); i++)
+        {
+            int L = left_bound(i - k);
+            int R = right_bound(i + k);
+
+            int tmp_result;
+            if (num_count.count(i))
+                tmp_result = min(R - L + 1, num_count[i] + numOperations);
+            else
+                tmp_result = min(R - L + 1, numOperations);
+
+            result = max(result, tmp_result);
+        }
+
+        return result;
+    }
+};
 
 
 
