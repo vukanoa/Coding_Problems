@@ -107,3 +107,83 @@ public:
         return s[0] == s[1];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 13.24% */
+/* Space Beats: 33.11% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Reserve_Space {
+public:
+    bool hasSameDigits(string s)
+    {
+        while (s.length() > 2)
+        {
+            const int N = s.length();
+            string str;
+            str.reserve(N-1);
+
+            for (int i = 0; i < N-1; i++)
+            {
+                int one = s[i]   - '0';
+                int two = s[i+1] - '0';
+
+                str += to_string((one + two) % 10);
+            }
+
+            s.clear();
+            s = str;
+        }
+
+        return s[0] == s[1];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  95.53% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Constant_Space {
+public:
+    bool hasSameDigits(string s)
+    {
+        int n = s.length();
+
+        int8_t i;
+        while (n != 2)
+        {
+            for (i = 0; i < n-1; i++)
+                s[i] = ((s[i] - '0') + (s[i+1] - '0')) % 10 + '0';
+
+            n--;
+        }
+
+        return s[0] == s[1];
+    }
+};
