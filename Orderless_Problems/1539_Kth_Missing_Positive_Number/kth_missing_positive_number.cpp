@@ -89,3 +89,42 @@ public:
         return number;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  99.63% */
+
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(1)    */
+class Solution_2 {
+public:
+    int findKthPositive(vector<int>& arr, int k)
+    {
+        const int N = arr.size();
+
+        int L = 0;
+        int R = N;
+        while (L < R)
+        {
+            int mid = L + (R - L) / 2; // Left-Leaning
+
+            if (arr[mid] - 1 - mid < k)
+                L = mid + 1;
+            else
+                R = mid;
+        }
+
+        return L + k;
+    }
+};
