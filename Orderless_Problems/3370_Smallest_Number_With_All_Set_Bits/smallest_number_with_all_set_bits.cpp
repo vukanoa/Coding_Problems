@@ -118,3 +118,59 @@ public:
         return (1 << (idx_of_farthest_set_bit + 1)) - 1;
     }
 };
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  89.59% */
+
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(1)    */
+class Solution_2 {
+public:
+    int smallestNumber(int n)
+    {
+        int x = 1;
+        while (x <= n)
+            x <<= 1;
+
+        return x-1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(1)    */
+class Solution_3 {
+public:
+    int smallestNumber(int n)
+    {
+        int x = 0;
+        while (n > 0)
+        {
+            n >>= 1;
+            x++;
+        }
+
+        return (1 << x) - 1;
+    }
+};
