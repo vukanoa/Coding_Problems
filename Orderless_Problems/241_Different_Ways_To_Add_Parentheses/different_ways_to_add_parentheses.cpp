@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -53,6 +50,10 @@
     All the integer values in the input expression are in the range [0, 99].
 
 */
+
+#include <string>
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -220,34 +221,36 @@
 /* Time  Beats: 100.00% */
 /* Space Beats:  46.44% */
 
-/* Time  Complexity: O(n^3) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(2^N) */
+/* Space Complexity: O(2^N) */
 class Solution {
 public:
-    std::vector<int> diffWaysToCompute(std::string exp)
+    vector<int> diffWaysToCompute(string exp)
     {
-        std::vector<int> results;
+        const int N = exp.length();
+
+        vector<int> results;
         bool is_number = 1;
 
-        for(int i = 0; i < exp.length(); i++)
+        for (int i = 0; i < N; i++)
         {
             // Check if current character is an operator
-            if( ! std::isdigit(exp[i]))
+            if( ! isdigit(exp[i]))
             {
                 // If current character is not a digit then exp is not purely a
                 // number
                 is_number = 0;
 
                 // List of first operands
-                std::vector<int> left = diffWaysToCompute(exp.substr(0, i));
+                vector<int> left = diffWaysToCompute(exp.substr(0, i));
 
                 // List of second operands
-                std::vector<int> right = diffWaysToCompute(exp.substr(i + 1));
+                vector<int> right = diffWaysToCompute(exp.substr(i + 1));
 
                 // Performing operations
-                for(int num1 : left)
+                for (int num1 : left)
                 {
-                    for(int num2 : right)
+                    for (int num2 : right)
                     {
                         int val = perform(num1, num2, exp[i]);
                         results.push_back(val);
@@ -257,7 +260,7 @@ public:
             }
         }
 
-        if(is_number == 1)
+        if (is_number == 1)
             results.push_back(stoi(exp));
 
         return results;
@@ -266,12 +269,109 @@ public:
 private:
 
     // Function to get the result of the operation
-    int perform(int& num1, int& num2, char& op)
+    int perform(int& left_num, int& right_num, char& operation)
     {
-        if(op == '+') return num1 + num2;
-        if(op == '-') return num1 - num2;
-        if(op == '*') return num1 * num2;
+        if (operation == '+') return left_num + right_num;
+        if (operation == '-') return left_num - right_num;
+        if (operation == '*') return left_num * right_num;
 
         return 0;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 64.11% */
+/* Space Beats: 95.38% */
+
+/* Time  Complexity: O(  N * 2^N) */
+/* Space Complexity: O(N^2 * 2^N) */
+class Solution_2 {
+public:
+    vector<int> diffWaysToCompute(string exp)
+    {
+        const int N = exp.length();
+
+        // Initialize memoization vector to store results of subproblems
+        vector<vector<vector<int>>> memo(N, vector<vector<int>>(N));
+
+        // Solve for the entire expression
+        return computeResults(0, N-1, exp, memo);
+    }
+
+private:
+    vector<int> computeResults(int start,
+                               int end,
+                               string& exp,
+                               vector<vector<vector<int>>>& memo)
+    {
+        if ( ! memo[start][end].empty())
+            return memo[start][end];
+
+        vector<int> results;
+
+        // Base case: Single digit
+        if ((end - start + 1) == 1)
+        {
+            results.push_back(exp[start] - '0');
+            return results;
+        }
+
+        // Base case: Two-digit number
+        if ((end - start + 1) == 2 && isdigit(exp[start]))
+        {
+            int tens = exp[start] - '0';
+            int ones = exp[end]   - '0';
+
+            results.push_back(10 * tens + ones);
+
+            return results;
+        }
+
+        // Recursive case: split the expression at each operator
+        for (int i = start; i <= end; i++)
+        {
+            char curr_chr = exp[i];
+
+            if (isdigit(curr_chr))
+                continue;
+
+            vector<int> left_portion  = computeResults(start, i - 1, exp, memo);
+            vector<int> right_portion = computeResults(i + 1,   end, exp, memo); 
+
+            // Combine results from left and right subexpressions
+            for (int left_value : left_portion)
+            {
+                for (int right_value : right_portion)
+                {
+                    switch (curr_chr)
+                    {
+                        case '+':
+                            results.push_back(left_value + right_value);
+                            break;
+
+                        case '-':
+                            results.push_back(left_value - right_value);
+                            break;
+
+                        case '*':
+                            results.push_back(left_value * right_value);
+                            break;
+                    }
+                }
+            }
+        }
+
+        return memo[start][end] = results;
     }
 };
