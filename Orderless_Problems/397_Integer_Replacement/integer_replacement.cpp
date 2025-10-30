@@ -47,12 +47,15 @@
 
 */
 
+#include <unordered_map>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Classic Recursive problem.
+    TODO
 
 */
 
@@ -62,48 +65,30 @@
 /* Time  Complexity: O(logN) */
 /* Space Complexity: O(logN) */
 class Solution {
+private:
+    unordered_map<int, int> memo;
+
 public:
     int integerReplacement(int n)
     {
-        return count_steps_to_reach_one(static_cast<long long>(n), 0);
+        return solve(n);
     }
 
 private:
-    int count_steps_to_reach_one(long long curr_val, int step_count)
+    int solve(long long n)
     {
-        if (curr_val == 1)
-            return step_count;
+        if (memo.count(n))
+            return memo[n];
 
-        if (is_even(curr_val))
-        {
-            return count_steps_to_reach_one(divide_by_two(curr_val), step_count + 1);
-        }
+        if (n == 1)
+            return 0;
+
+        if (n % 2 == 0)
+            memo[n] = 1 + solve(n / 2);
         else
-        {
-            if (should_decrement(curr_val))
-            {
-                return count_steps_to_reach_one(curr_val - 1, step_count + 1);
-            }
-            else
-            {
-                return count_steps_to_reach_one(curr_val + 1, step_count + 1);
-            }
-        }
-    }
+            memo[n] = 1 + min(solve(n + 1),
+                              solve(n - 1));
 
-    bool is_even(long long value)
-    {
-        return value % 2 == 0;
-    }
-
-    long long divide_by_two(long long value)
-    {
-        return value >> 1;
-    }
-
-    bool should_decrement(long long odd_value)
-    {
-        // If value is 3 or if (value / 2) is even, prefer decrement
-        return odd_value == 3 || !((odd_value >> 1) & 1);
+        return memo[n];
     }
 };
