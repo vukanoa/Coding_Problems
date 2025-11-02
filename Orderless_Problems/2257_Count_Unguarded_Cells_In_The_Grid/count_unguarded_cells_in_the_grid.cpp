@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -60,6 +57,9 @@
     All the positions in guards and walls are unique.
 
 */
+
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -121,39 +121,47 @@
 
 */
 
-/* Time  Beats: 81.44% */
-/* Space Beats: 88.24% */
+/* Time  Beats: 53.67% */
+/* Space Beats: 48.17% */
 
-/* Time  Complexity: O(guards.size() * (m + n)) */
-/* Space Complexity: O(m + n)                   */
+/* Time  Complexity: O(M * N) */
+/* Space Complexity: O(M * N) */
 class Solution {
 public:
     int countUnguarded(int m, int n, vector<vector<int>>& guards, vector<vector<int>>& walls)
     {
-        if ( (guards.size() + walls.size()) == m * n )
-            return 0;
+        const int GUARDS_SIZE = guards.size();
+        const int WALLS_SIZE  = walls.size();
 
-        vector<vector<int>> table(m, vector(n, 0)); // size, initial value
+        vector<vector<int>> grid(m, vector<int>(n, 0));
 
-        for (int i = 0; i < guards.size(); i++)
-            table[guards[i][0]][guards[i][1]] = 1;
+        for (int i = 0; i < GUARDS_SIZE; i++)
+            grid[guards[i][0]][guards[i][1]] = 1;
 
-        for (int j = 0; j < walls.size(); j++)
-            table[walls[j][0]][walls[j][1]] = 2;
+        for (int i = 0; i < WALLS_SIZE; i++)
+            grid[walls[i][0]][walls[i][1]] = 2;
 
-        int result = m * n - guards.size() - walls.size();
-        for (int i = 0; i < m; i++)
+        for (int row = 0; row < m; row++)
         {
-            for (int j = 0; j < n; j++)
+            for (int col = 0; col < n; col++)
             {
-                if (table[i][j] == 1)
+                if (grid[row][col] == 1) // If it's a guard
                 {
-                    // Signing cross
-                    direction('u', table, m, n, result, i-1, j  );
-                    direction('d', table, m, n, result, i+1, j  );
-                    direction('l', table, m, n, result, i  , j-1);
-                    direction('r', table, m, n, result, i  , j+1);
+                    dfs(0, row-1, col  , grid); // Up
+                    dfs(1, row+1, col  , grid); // Down
+                    dfs(2, row  , col-1, grid); // Left
+                    dfs(3, row  , col+1, grid); // Right
                 }
+            }
+        }
+
+        int result = 0;
+        for (int row = 0; row < m; row++)
+        {
+            for (int col = 0; col < n; col++)
+            {
+                if (grid[row][col] == 0)
+                    result++;
             }
         }
 
@@ -161,33 +169,35 @@ public:
     }
 
 private:
-    void direction(char dir, vector<vector<int>>& table, int& m, int &n, int& result, int i, int j)
+    void dfs(int dir, int row, int col, vector<vector<int>>& grid)
     {
-        if (i < 0 || j < 0 || i == m || j == n || table[i][j] == 1 || table[i][j] == 2)
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        if (row < 0 || col < 0 || row >= ROWS || col >= COLS)
             return;
 
-        if (table[i][j] == 0)
-        {
-            table[i][j] = 3; // Guarded-cell
-            result--;
-        }
+        if (grid[row][col] == 1 || grid[row][col] == 2)
+            return;
+
+        grid[row][col] = 3; // Now it's a GUARDED cell
 
         switch (dir)
         {
-            case 'u':
-                direction('u', table, m, n, result, i-1, j  );
+            case 0: // Up
+                dfs(0, row-1, col  , grid);
                 break;
 
-            case 'd':
-                direction('d', table, m, n, result, i+1, j  );
+            case 1: // Down
+                dfs(1, row+1, col  , grid);
                 break;
 
-            case 'l':
-                direction('l', table, m, n, result, i  , j-1);
+            case 2: // Left
+                dfs(2, row  , col-1, grid);
                 break;
 
-            case 'r':
-                direction('r', table, m, n, result, i  , j+1);
+            case 3: // Right
+                dfs(3, row  , col+1, grid);
                 break;
         }
     }
