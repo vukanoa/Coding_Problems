@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -64,6 +61,11 @@
     colors contains only lowercase English letters.
 
 */
+
+#include <numeric>
+#include <string>
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -150,40 +152,38 @@
 /* Time  Beats: 99.52% */
 /* Space Beats: 15.97% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
     int minCost(string colors, vector<int>& neededTime)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        const int N = colors.length();
 
-        const int n = colors.length();
-
-        int left  = 0;
-        int right = 1;
+        int L  = 0;
+        int R = 1;
 
         int result = 0;
 
         int move_left = 0;
-        while (right < n)
+        while (R < N)
         {
-            if (colors[left] == colors[right])
-                result += min(neededTime[left], neededTime[right]);
+            if (colors[L] == colors[R])
+                result += min(neededTime[L], neededTime[R]);
 
-            if (colors[left] == colors[right] && neededTime[left] > neededTime[right])
+            if (colors[L] == colors[R] && neededTime[L] > neededTime[R])
             {
                 move_left++;
             }
             else
             {
-                left++;
-                left += move_left;
+                L++;
+                L += move_left;
 
                 move_left = 0; // Reset
             }
 
-            right++;
+            R++;
         }
 
         return result;
@@ -198,50 +198,63 @@ public:
     --- IDEA ---
     ------------
 
-    Upon further revising of the above Solution we can see that we don't really
-    need "move_left" variable since once the balloons above 'L' and 'R'
-    pointers are NOT the same, we ALWAYS have to move the 'L' pointer to the
-    index of the current 'R' pointer and then increment the 'R' by one as we're
-    used to.
+    Instead of moving "left" and counting, all we have to do is simply find
+    out which out of the CONSECUTIVE balloons should remain on the rope.
 
-    That way we're "jumping over the gap" with the left pointer without having
-    to worry about the amount of balloons we've evicted.
+    In other words -- if there are CONSECUTIVE balloons on the rope, we'll
+    leave the one that has the highest neededTime.
+
+    Why?
+    Because we want MINIMUM time to remove redundant balloons, therefore leave
+    those with HIGHEST neededTime to remove as they are.
+
+    This way we'll calculate the total_sum of neededTime, and then we'll
+    subtract the ones that we left on the rope.
+
+
+    This way the approach is much more simple and straight forward.
+    "In every CONSECUTIVE group of balloons of same color, add only the one
+     with the HIGHEST neededTime".
+
+    At the end we simply subtract those from total_sum.
 
 */
 
-/* Time  Beats: 97.75% */
-/* Space Beats: 17.26% */
+/* Time  Beats: 59.28% */
+/* Space Beats: 65.69% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution_2 {
+class Solution_Concise {
 public:
     int minCost(string colors, vector<int>& neededTime)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        const int N = colors.size();
+        int total_sum = accumulate(neededTime.begin(), neededTime.end(), 0);
 
-        int result = 0;
+        int sum_of_remaining = 0;
+        int max_time = neededTime[0];
 
-        int left  = 0;
-        int right = 1;
-        while (right < colors.length())
+        int L = 0;
+        int R = 1;
+        while (R < N)
         {
-            if (colors[left] == colors[right])
+            if (colors[L] == colors[R])
             {
-                if (neededTime[left] < neededTime[right])
-                {
-                    result += neededTime[left];
-                    left = right;
-                }
-                else
-                    result += neededTime[right];
+                max_time = max(max_time, neededTime[R]);
             }
             else
-                left = right;
+            {
+                sum_of_remaining += max_time;
+                L = R;
+                max_time = neededTime[R];
+            }
 
-            right++;
+            // Increment
+            R++;
         }
+        sum_of_remaining += max_time;
 
-        return result;
+        return total_sum - sum_of_remaining;
     }
 };
