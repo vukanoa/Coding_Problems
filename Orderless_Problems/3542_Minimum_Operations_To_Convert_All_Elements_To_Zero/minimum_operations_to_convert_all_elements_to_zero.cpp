@@ -93,7 +93,7 @@ using namespace std;
 
 /* Time  Complexity: O(N)       */
 /* Space Complexity: O(MAX_NUM) */
-class Solution {
+class Solution_Monotonic_Stack {
 public:
     inline int minOperations(vector<int>& nums)
     {
@@ -134,5 +134,136 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 20.79% */
+/* Space Beats: 17.86% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class FenwickTree {
+    vector<int> BIT;
+    int len;
+
+public:
+    FenwickTree(int size)
+    {
+        len = size;
+        BIT.assign(size + 2, 0);
+    }
+
+    void mark(int idx, int val)
+    {
+        idx++;
+
+        while (idx <= len)
+        {
+            BIT[idx] += val;
+            idx += (idx & -idx);
+        }
+    }
+
+    int sum(int idx)
+    {
+        idx++;
+        int result = 0;
+
+        while (idx > 0)
+        {
+            result += BIT[idx];
+            idx -= (idx & -idx);
+        }
+
+        return result;
+    }
+
+    int range_count(int left, int right)
+    {
+        if (left > right)
+            return 0;
+
+        return sum(right) - sum(left - 1);
+    }
+};
+
+
+class Solution {
+public:
+    int minOperations(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int peak = 0;
+
+        for (const int& num : nums)
+        {
+            if (num > peak)
+                peak = num;
+        }
+
+        vector<vector<int>> groups(peak + 6);
+        group_idx(groups, nums);
+
+        FenwickTree zero_tracker(N);
+        for (int i = 0; i < N; i++)
+        {
+            if (nums[i] == 0)
+                zero_tracker.mark(i, 1);
+        }
+
+        int result = 0;
+        for (int val = 1; val <= peak; val++)
+        {
+            if ( ! groups[val].empty())
+                result += count_operations(groups[val], zero_tracker);
+        }
+
+        return result;
+    }
+
+private:
+    void group_idx(vector<vector<int>>& groups, const vector<int>& vals)
+    {
+        const int N = vals.size();
+
+        for (int idx = 0; idx < N; idx++)
+        {
+            if (vals[idx] > 0)
+                groups[vals[idx]].push_back(idx);
+        }
+    }
+
+    int count_operations(const vector<int>& positions, FenwickTree& tracker)
+    {
+        const int M = positions.size();
+
+        int operations = 0;
+        int last_idx = -2;
+
+        for (int it = 0; it < M; it++)
+        {
+            int curr = positions[it];
+            if (last_idx == -2 || tracker.range_count(last_idx + 1, curr - 1) > 0)
+                operations++;
+
+            last_idx = curr;
+        }
+
+        for (int j = 0; j < M; j++)
+            tracker.mark(positions[j], 1);
+
+        return operations;
     }
 };
