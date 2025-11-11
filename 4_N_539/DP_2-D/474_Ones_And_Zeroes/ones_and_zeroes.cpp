@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -61,6 +58,12 @@
 
 */
 
+#include <algorithm>
+#include <cstring>
+#include <string>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -79,19 +82,21 @@
 /* Space Complexity: O(m * n)        */ //More Space efficient than memoization
 class Solution_Bottom_Up {
 public:
-    int findMaxForm(std::vector<std::string>& strs, int m, int n)
+    int findMaxForm(vector<string>& strs, int m, int n)
     {
-        std::vector<std::vector<int>> dp(m + 1, std::vector<int>(n + 1));
+        vector<vector<int>> dp(m + 1, vector<int>(n + 1));
 
-        for(auto& s : strs)
+        for (const auto& bin_str : strs)
         {
-            int zeros = std::count(s.begin(), s.end(), '0');
-            int ones  = s.size() - zeros;
+            int curr_zeroes = count(bin_str.begin(), bin_str.end(), '0');
+            int curr_ones   = bin_str.size() - curr_zeroes;
 
-            for(int i = m; i >= zeros; i--)
+            for (int i = m; i >= curr_zeroes; i--)
             {
-                for(int j = n; j >= (ones); j--)
-                    dp[i][j] = std::max(dp[i][j], 1 + dp[i - zeros][j - ones]);
+                for (int j = n; j >= (curr_ones); j--)
+                {
+                    dp[i][j] = max(dp[i][j], 1 + dp[i - curr_zeroes][j - curr_ones]);
+                }
             }
         }
 
@@ -102,6 +107,9 @@ public:
 
 
 
+/*****************************************************************************/
+/******************************** Memoization ********************************/
+/*****************************************************************************/
 /*
     ------------
     --- IDEA ---
@@ -109,79 +117,58 @@ public:
 
     Clasical 1-0 Knapsack Dynamic Programming technique.
 
-    This one is implemented using memoization.
+    Clean implementation of Memoization.
 
 */
 
-/*****************************************************************************/
-/******************************** Memoization ********************************/
-/*****************************************************************************/
+/* Time  Beats: 56.29% */
+/* Space Beats: 59.39% */
 
-/* Time  Beats: 58.21% */
-/* Space Beats: 20.08% */
+/* Time  Complexity: O(SIZE * M * N) */
+/* Space Complexity: O(SIZE * M * N) */
+class Solution_memo {
+private:
+    int memo[601][101][101];
 
-/* Time  Complexity: O(SIZE * m * n) */
-/* Space Complexity: O(SIZE * m * n) */
-class Solution_Memoization {
 public:
-    int findMaxForm(std::vector<std::string>& strs, int m, int n)
+    int findMaxForm(vector<string>& strs, int m, int n)
     {
         const int SIZE = strs.size();
 
-        std::vector<std::vector<std::vector<int>>> cache(SIZE + 1, std::vector<std::vector<int>>(m + 1, std::vector(n + 1, -1)));
+        memset(memo, -1, sizeof(memo));
 
-        std::vector<std::pair<int, int>> zeroes_ones;
-        for (std::string& str : strs)
-            zeroes_ones.push_back(count_0s_and_1s(str));
-
-        return dfs(zeroes_ones, 0, m, n, cache);
+        return solve(0, m, n, strs);
     }
 
 private:
-    int dfs(std::vector<std::pair<int, int>>& zeroes_ones, int idx, int m, int n,
-            std::vector<std::vector<std::vector<int>>>& cache)
+    int solve(int idx, int zeroes, int ones, vector<string>& strs)
     {
-        // Base
-        if(idx == zeroes_ones.size())
+        const int SIZE = strs.size();
+
+        if (idx >= SIZE)
             return 0;
 
-        if(cache[idx][m][n] != -1) // If already computed
-            return cache[idx][m][n];
-
-        int curr_zeroes = zeroes_ones[idx].first;
-        int curr_ones  = zeroes_ones[idx].second;
-
-        int take = 0;
-        int skip = 0;
-
-        // Take
-        if(m - curr_zeroes >=0 && n - curr_ones >= 0)
-            take = 1 + dfs(zeroes_ones, idx+1, m-curr_zeroes, n-curr_ones, cache);
+        if (memo[idx][zeroes][ones] != -1)
+            return memo[idx][zeroes][ones];
 
         // Skip
-        skip = 0 + dfs(zeroes_ones, idx+1, m, n, cache);
+        int skip = solve(idx + 1, zeroes, ones, strs);
 
-        cache[idx][m][n] = std::max(take, skip);
+        // Take
+        int take = 0;
 
-        return cache[idx][m][n];
-    }
+        int curr_zeroes = count(strs[idx].begin(), strs[idx].end(), '0');
+        int curr_ones   = count(strs[idx].begin(), strs[idx].end(), '1');
 
-    std::pair<int,int> count_0s_and_1s(std::string str)
-    {
-        int zero = 0;
-        int one  = 0;
+        // More efficient, but it's the above is easier to read
+        // int curr_ones = strs[idx].size() - curr_zeroes;
 
-        while (!str.empty())
-        {
-            char c = str[str.size()-1];
-            str.pop_back();
+        int remaining_zeroes = zeroes - curr_zeroes;
+        int remaining_ones   = ones   - curr_ones;
 
-            if (c == '1')
-                one++;
-            else
-                zero++;
-        }
+        if (remaining_zeroes >= 0 && remaining_ones >= 0)
+            take = 1 + solve(idx + 1, remaining_zeroes, remaining_ones, strs);
 
-        return {zero, one};
+        return memo[idx][zeroes][ones] = max(skip, take);
     }
 };
