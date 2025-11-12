@@ -57,13 +57,125 @@
 #include <vector>
 using namespace std;
 
-
 /*
     ------------
     --- IDEA ---
     ------------
 
-    TODO
+    This requires a small explanation.
+
+    First, my thoughts went in something like this:
+
+        What if we just check the number of intial ones in "nums".
+        That way we'll only need to convert the (N - ones) that are not 1s.
+
+        But is it that easy?
+
+        What if initial we did not have ANY 1, as in Example 1?
+
+            Input: nums = [2,6,3,4]
+            Output: 4
+
+        Hmm, what if we go through first N-1 elements and try do GCD of
+        nums[i] and nums[i+1] for all N-1 elements and then we count ones.
+
+        In this example it would be:
+
+                         0  1  2  3
+            nums      = [2, 6, 3, 4]
+            processed = [2, 3, 1]
+
+        Then we can count the number of 1s in this new "processed" vector of
+        N-1 elements.
+
+        Then, we simply return (N - ones) again, however "ones" are made-up
+        therefore we need to return he number of made-up 1s as well.
+
+        In this case: 1 + (N - ones).
+
+
+    Will that work?
+    Not quite. Almost, but no.
+
+
+    Consider this example:
+
+        Input:  nums = [6, 10, 15]
+        Output: 4
+
+    Had we used my above approach, we'd return -1, because we're NOT able
+    make-up any 1s.
+
+
+    But is that correct?
+    No!
+
+    We would be able to create 1s in this example, but it would require
+    more than 2 operations.
+
+    We used to do this:
+        nums      = [6, 10, 15]
+        processed = [2,  5]
+
+    And there are no 1s, however, had we done one more GCD, then we'd get:
+
+        processed = [1, 5]
+
+    And then we'd spread out that 1 to the rest, giving us the correct
+    result of 4.
+
+    Therefore, what we need to do instead is find the:
+
+        "shortest subarray that has a gcd == 1"
+
+
+    What I'm about to say is CRUCIAL! Listen to this:
+
+    The number of operations needed to get a 1 from subarray is:
+
+        (subarray_len - 1) operations
+
+
+    Of course, assuming IF the GCD of ENTIRE SUBARRAY is equal to 1.
+
+
+    Therefore, IF we find that subarray, then the total number of operations
+    needed to convert the ENTIRE array to 1s is:
+
+        (min_subarray_len - 1) + (N - 1)
+
+
+    min_subarray_len is the MINIMUM LENGTH subarray that CAN INDEED be
+    converted to 1s using gcd function.
+
+    Why do we need to "minimum one", because we want to get the 1 with AS
+    LITTLE operations as possible. Remember that the number of operations
+    needed to convert to get 1 from a subarray is:
+
+        (subarray_len - 1)
+
+    Therefore, since the number of operations is dependent on the LENGTH of
+    the subarray, we want to REDUCE its length as much as possible.
+
+    However, once we have that one 1, we need to spread it to all the other
+    elements.
+
+    The remaining amount of elements that are NOT 1s, are (N-1).
+
+    Therefore, the total number of operations needed is:
+
+        (min_subarray_len - 1) + (N - 1).
+
+
+    Also, if INITIALLY, we DO have at least one 1 in "nums", then all we have
+    to do is count those 1s and return (N - ones).
+
+    We don't have to grapple with min_subarray_len or anything else because we
+    already have 1s initially.
+
+    Also, if there is NO subarray in the entire "nums", including the subarray
+    "nums" itself, then we must return -1 since there is no possible way to
+    converting all the elements to 1s.
 
 */
 
@@ -124,7 +236,12 @@ private:
     --- IDEA ---
     ------------
 
-    TODO
+    Same idea as above, however it's written in a much more compact way.
+    Still, I'd prefer the above Solution.
+
+    I feel it's easier to follow and grasp.
+
+    This is more in a Competitive-Programming spirit.
 
 */
 
