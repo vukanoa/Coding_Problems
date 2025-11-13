@@ -147,3 +147,119 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is, at least to me, the solution that makes the most sense.
+    Let's consider Example 1:
+
+
+        Input: s = "1001101"
+        Output: 4
+
+        Explanation:
+        We can perform the following operations:
+
+            Choose index i = 0. The resulting string is s = "0011101".
+            Choose index i = 4. The resulting string is s = "0011011".
+            Choose index i = 3. The resulting string is s = "0010111".
+            Choose index i = 2. The resulting string is s = "0001111".
+
+    I'm not sure if you see the pattern, but let me clarify it.
+
+    If we're going from left-to-right, we're going to need and move each
+    consecutive 1s to next group of 1s that is separated by one or more 0s from
+    this current group.
+
+    Then, we'd need to move that new group of consecutive 1s to the next
+    group of consecutive 1s that is separated by one or more 0s from this
+    current group.
+
+    And so on and so on.
+
+
+    But let me be very precise:
+
+
+        1 0 0 1 1 0 1
+        0 1 2 3 4 5 6
+
+    To move 1 from index 0 to join the next group at indices 3 and 4, we need
+    to perform one operation.
+
+    Now, once those 1s are join at indices 2,3,4, we need to move THOSE 1s to
+    join the next group, etc.
+
+    Do you see the pattern?
+
+    Essentially every 1 in the binary string, in order to join the last group
+    of consecutive 1s, it needs to jump over exactly X number of 0 segments.
+
+        1 0 0 1 1 0 1
+        0 1 2 3 4 5 6
+          ^^^     ^
+           |      |
+       1st Seg   2nd Seg
+
+    Therefore, 1 at index 2, need to jump over TWO segments of 0s and 1s at
+    indices 3 and 4 need to jump only over ONE segment of 0s.
+
+    Therefore, the result is: (1 * 2)                 + (2 * 1) = 4
+                               ^   ^                     ^   ^           
+                             __|   |__                 __|   |__         
+                             |        |                |        |
+                          cons 1s   0-segments      cons 1s   0-segments
+
+
+
+    Now read the code and it'll make sense.
+
+
+*/
+
+/* Time  Beats: 86.23% */
+/* Space Beats: 53.99% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_3 {
+public:
+    int maxOperations(string s)
+    {
+        const int N = s.length();
+        int result = 0;
+
+        int i = N-1;
+        while (i >= 0 && s[i] == '1') // Skip over rightmost 1s at the end
+            i--;
+
+        if (i == -1)
+            return 0;
+
+        int zero_segments = 0;
+        while (i >= 0)
+        {
+            while (i >= 0 && s[i] == '0') // Iterate over 0-segments
+                i--;
+
+            zero_segments++;
+
+            int consecutive_ones = 0;
+            while (i >= 0 && s[i] == '1') // Iterate and count consecutive 1s
+            {
+                consecutive_ones++;
+                i--;
+            }
+
+            result += consecutive_ones * zero_segments;
+        }
+
+        return result;
+    }
+};
