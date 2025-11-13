@@ -157,3 +157,54 @@ public:
         return words[0];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  97.39% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Constant_Space {
+public:
+    string oddString(vector<string>& words)
+    {
+        const int SIZE = words.size();
+        int matching_first = 0;
+        int mismatch_idx   = 0;
+
+        for (int i = 1; i < SIZE; i++)
+        {
+            if (matches_diff(words[0], words[i]))
+                matching_first++;
+            else
+                mismatch_idx = i;
+        }
+
+        return matching_first > 0 ? words[mismatch_idx] : words[0];
+    }
+
+private:
+    bool matches_diff(string& a, string& b)
+    {
+        const int N = a.length();
+
+        for (size_t i = 0; i < N - 1; i++)
+        {
+            if (a[i + 1] - a[i] != b[i + 1] - b[i])
+                return false;
+        }
+
+        return true;
+    }
+};
