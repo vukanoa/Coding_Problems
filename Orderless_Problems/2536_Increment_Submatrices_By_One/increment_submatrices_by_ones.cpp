@@ -101,3 +101,64 @@ public:
         return mat;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    2D Line-Sweep technique.
+
+*/
+
+/* Time  Beats: 82.76% */
+/* Space Beats: 75.24% */
+
+/* Time  Complexity: O(N^2 + QUERIES_SIZE) */
+/* Space Complexity: O(N)                  */ // For extra row and columns
+class Solution_2D_Line_Sweep {
+public:
+    vector<vector<int>> rangeAddQueries(int n, vector<vector<int>>& queries)
+    {
+        const int QUERIES_SIZE = queries.size();
+
+        vector<vector<int>> mat(n + 1, vector<int>(n + 1, 0));
+
+        for (int i = 0; i < QUERIES_SIZE; i++)
+        {
+            int top_row = queries[i][0];
+            int top_col = queries[i][1];
+
+            int bot_row = queries[i][2];
+            int bot_col = queries[i][3];
+
+            mat[top_row    ][top_col    ]++;
+            mat[top_row    ][bot_col + 1]--;
+            mat[bot_row + 1][top_col    ]--;
+            mat[bot_row + 1][bot_col + 1]++; // Diagonal correction
+        }
+
+        for (int row = 0; row < n; row++)
+        {
+            for (int col = 0; col < n; col++)
+            {
+                if (row-1 >= 0) mat[row][col] += mat[row-1][col  ];
+                if (col-1 >= 0) mat[row][col] += mat[row  ][col-1];
+
+                if (row-1 >= 0 && col-1 >= 0) // Diagonal(upper-left)
+                    mat[row][col] -= mat[row-1][col-1];
+            }
+
+            // Remove extra column used for difference array
+            mat[row].pop_back();
+        }
+
+        // Remove extra row used for difference array
+        mat.pop_back();
+
+        return mat;
+    }
+};
