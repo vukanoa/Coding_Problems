@@ -157,3 +157,63 @@ public:
         return max(0, dp[N][0]);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Greedy Approach.
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats: 84.90% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Greedy {
+public:
+    int maxSumDivThree(vector<int>& nums)
+    {
+        int total = 0;
+        int smallest_one = INT_MAX;
+        int smallest_two = INT_MAX;
+
+        for (const int& num : nums)
+        {
+            total += num;
+            int remainder = num % 3;
+
+            if (remainder == 1)
+            {
+                if (smallest_one != INT_MAX)
+                    smallest_two = min(smallest_two, num + smallest_one);
+
+                smallest_one = min(smallest_one, num);
+            }
+            else if (remainder == 2)
+            {
+                if (smallest_two != INT_MAX)
+                    smallest_one = min(smallest_one, num + smallest_two);
+
+                smallest_two = min(smallest_two, num);
+            }
+        }
+
+        int remainder = total % 3;
+
+        if (remainder == 0)
+            return total;
+
+        if (remainder == 1)
+            return total - smallest_one;
+
+        // remainder == 2
+        return total - smallest_two;
+    }
+};
