@@ -45,6 +45,7 @@
 
 */
 
+#include <climits>
 #include <cstring>
 #include <vector>
 using namespace std;
@@ -68,7 +69,7 @@ using namespace std;
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution {
+class Solution_Memoization {
 private:
     int memo[40000][3];
 
@@ -102,5 +103,57 @@ private:
         const int skip =  0  + solve(i - 1, target_mod, nums);
 
         return memo[i][target_mod] = max(take, skip);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Iterative, Bottom-Up, way of implementing it. Memoization is usually eaiser
+    to write, but Bottom-Up is usually preffereable since it doesn't have the
+    overhead of the Call-Stack.
+
+*/
+
+/* Time  Beats: 38.95% */
+/* Space Beats: 33.55% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Bottom_Up {
+public:
+    int maxSumDivThree(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        // dp[i][m] = best sum with first i elements and modulo m
+        vector<vector<int>> dp(N + 1, vector<int>(3, INT_MIN));
+        dp[0][0] = 0; // Base case: zero elements, i.e. sum = 0 which has mod 0
+
+        for (int i = 1; i <= N; i++)
+        {
+            int num     = nums[i - 1];
+            int num_mod = num % 3;
+
+            for (int curr_mod = 0; curr_mod < 3; curr_mod++)
+            {
+                // Skip
+                int skip = dp[i - 1][curr_mod];
+
+                // Take
+                // previous_mod + x_mod == curr_mod (mod 3)
+                int prev_mod = (curr_mod - num_mod + 3) % 3;
+                int take = dp[i - 1][prev_mod] + num;
+
+                dp[i][curr_mod] = max(skip, take);
+            }
+        }
+
+        return max(0, dp[N][0]);
     }
 };
