@@ -145,3 +145,93 @@ public:
         return static_cast<int>(result);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Memoization version of the above code. It's a bit less straightforward in
+    my opinion.
+
+*/
+
+/* Time  Beats: 5.17% */
+/* Space Beats: 5.18% */
+
+/* Time  Complexity: O(ROWS * COLS * K) */
+/* Space Complexity: O(ROWS * COLS * K) */
+class Solution_Memoization {
+private:
+    const int MOD = 1e9 + 7;
+
+public:
+    int numberOfPaths(vector<vector<int>>& grid, int k)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        vector<vector<vector<unsigned long long>>> memo(ROWS+1, vector<vector<unsigned long long>>(COLS+1, vector<unsigned long long>(51, 0)));
+
+        /* Solve */
+        memo[0][0] = solve(0, 0, grid, k, memo);
+
+        unsigned long long result = 0;
+        for (int i = 0; i <= 50; i++)
+        {
+            if (i % k == 0)
+            {
+                result += memo[0][0][i];
+                result %= MOD;
+            }
+        }
+
+        return static_cast<int>(result);
+    }
+
+private:
+    vector<unsigned long long> solve(int row, int col, vector<vector<int>>& grid, int& k, vector<vector<vector<unsigned long long >>>& memo)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        // Target, Finish, cell
+        if (row == ROWS-1 && col == COLS-1)
+        {
+            vector<unsigned long long> vec(51, 0ULL);
+            vec[grid[row][col] % k] = 1;
+
+            return vec;
+        }
+
+        // Out-of-Bounds
+        if (row >= ROWS || col >= COLS)
+            return vector<unsigned long long>(51, 0ULL);
+
+
+        if (memo[row][col] != vector<unsigned long long>(51, 0))
+            return memo[row][col];
+
+        vector<unsigned long long> right = solve(row  , col+1, grid, k, memo);
+        vector<unsigned long long> down  = solve(row+1, col  , grid, k, memo);
+
+        vector<unsigned long long> curr_vec(51, 0);
+        int curr_val = grid[row][col];
+
+        for (int i = 0; i <= 50; i++)
+        {
+            // Right
+            curr_vec[(i + curr_val) % k] += right[i];
+            curr_vec[(i + curr_val) % k] %= MOD;
+
+            // Down
+            curr_vec[(i + curr_val) % k] += down[i];
+            curr_vec[(i + curr_val) % k] %= MOD;
+        }
+
+        return memo[row][col] = curr_vec;
+    }
+};
