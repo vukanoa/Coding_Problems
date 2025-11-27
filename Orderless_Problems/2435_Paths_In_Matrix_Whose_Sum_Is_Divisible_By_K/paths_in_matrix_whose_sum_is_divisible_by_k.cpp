@@ -235,3 +235,65 @@ private:
         return memo[row][col] = curr_vec;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    However, implementing Memoization this way is much much easier.
+
+    But, it's a bit more difficult to think about it like this if you're not
+    very well versed with Memoization.
+
+    If you were, then this is the most straightforward Solution.
+
+*/
+
+/* Time  Beats: 17.65% */
+/* Space Beats:  9.88% */
+
+/* Time  Complexity: O(ROWS * COLS * K) */
+/* Space Complexity: O(ROWS * COLS * K) */
+class Solution_Memoization_Optimized {
+private:
+    const int MOD = 1e9 + 7;
+
+public:
+    int numberOfPaths(vector<vector<int>>& grid, int k)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        auto memo = vector(ROWS, vector(COLS, vector<long long>(k, -1)));
+
+        return solve(0, 0, 0, grid, k, memo);
+    }
+
+private:
+    long long solve(int row, int col, int curr_rem, vector<vector<int>>& grid, int& k, vector<vector<vector<long long>>>& memo)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        if (row >= ROWS || col >= COLS)
+            return 0LL;
+
+        if (row == ROWS-1 && col == COLS-1)
+            return (grid[row][col] % k == curr_rem ? 1LL : 0LL);
+
+        if (memo[row][col][curr_rem] != -1)
+            return memo[row][col][curr_rem];
+
+        int val_rem  = grid[row][col] % k;
+        int prev_rem = (curr_rem - val_rem + k) % k;
+
+        long long down  = solve(row+1, col  , prev_rem, grid, k, memo);
+        long long right = solve(row  , col+1, prev_rem, grid, k, memo);
+
+        return memo[row][col][curr_rem] = (down + right) % MOD;
+    }
+};
