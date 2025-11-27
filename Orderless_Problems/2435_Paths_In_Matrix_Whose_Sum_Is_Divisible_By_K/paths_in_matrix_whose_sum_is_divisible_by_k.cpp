@@ -59,6 +59,13 @@
 
 */
 
+/*
+
+    It's really beneficial to look at all 4 Solutions if you're not comfortable
+    with 3D DPs.
+
+*/
+
 #include <vector>
 using namespace std;
 
@@ -295,5 +302,63 @@ private:
         long long right = solve(row  , col+1, prev_rem, grid, k, memo);
 
         return memo[row][col][curr_rem] = (down + right) % MOD;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is the Bottom-Up translation of the above "Optimized" Memoization
+    Solution.
+
+    It's really beneficial to look at all 4 Solutions if you're not comfortable
+    with 3D DPs.
+
+*/
+
+/* Time  Beats: 60.23% */
+/* Space Beats:  5.18% */
+
+/* Time  Complexity: O(ROWS * COLS * K) */
+/* Space Complexity: O(ROWS * COLS * K) */
+class Solution_Bottom_Up_Optimized {
+public:
+    int numberOfPaths(vector<vector<int>>& grid, int k )
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        const int MOD = 1e9 + 7;
+
+        auto dp = vector(ROWS+1, vector(COLS+1, vector<long long>(k, 0LL)));
+        dp[ROWS-1][COLS-1][grid[ROWS - 1][COLS - 1] % k] = 1; // Base case
+
+        for (int row = ROWS-1; row >= 0; row--)
+        {
+            for (int col = COLS-1; col >= 0; col--)
+            {
+                if (row == ROWS-1 && col == COLS-1)
+                    continue;
+
+                int curr_rem = grid[row][col] % k;
+
+                for (int rem = 0; rem < k; rem++)
+                {
+                    int prev_rem = (rem - curr_rem + k) % k;
+
+                    long long down  = (row + 1 >= ROWS ? 0 : dp[row + 1][col    ][prev_rem]);
+                    long long right = (col + 1 >= COLS ? 0 : dp[row    ][col + 1][prev_rem]);
+
+                    dp[row][col][rem] = (down + right) % MOD;
+                }
+            }
+        }
+
+        return dp[0][0][0];
     }
 };
