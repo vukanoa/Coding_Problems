@@ -82,9 +82,12 @@
 
 */
 
+#include <algorithm>
 #include <climits>
+#include <queue>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 using namespace std;
 
@@ -99,7 +102,7 @@ using namespace std;
 
 /* Time  Beats: 65.71% */
 /* Space Beats: 76.67% */
-class Solution {
+class Solution_DFS {
 public:
     int findMinStep( string board, string hand )
     {
@@ -218,5 +221,134 @@ private:
         }
 
         return key;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 86.19% */
+/* Space Beats: 81.43% */
+class Solution_BFS {
+public:
+    int findMinStep(string board, string hand)
+    {
+        sort(hand.begin(), hand.end());
+
+        queue<string> board_queue;
+        queue<string> hand_queue;
+        queue<int> step_queue;
+
+        unordered_set<string> visited;
+
+        visited.insert(board + "#" + hand);
+        board_queue.push(board);
+        hand_queue.push(hand);
+        step_queue.push(0);
+
+        while ( ! hand_queue.empty())
+        {
+            string curr_board = board_queue.front();
+            board_queue.pop();
+
+            string curr_hand = hand_queue.front();
+            hand_queue.pop();
+
+            int curr_step = step_queue.front();
+            step_queue.pop();
+
+            const int BN = curr_board.length();
+            const int HN = curr_hand.length();
+
+            for (int i = 0; i < BN; i++)
+            {
+                for (int j = 0; j < HN; j++)
+                {
+                    // Avoid duplicate test of identical colors in hand
+                    if (0 < j && curr_hand[j] == curr_hand[j - 1])
+                        continue;
+
+                    // Avoid placing same color right after an identical board char
+                    if (0 < i && curr_board[i - 1] == curr_hand[j])
+                        continue;
+
+                    bool worth_trying = false;
+
+                    if (curr_board[i] == curr_hand[j])
+                    {
+                        worth_trying = true;
+                    }
+                    else if (0 < i && curr_board[i] == curr_board[i - 1] && curr_board[i] != curr_hand[j])
+                    {
+                        worth_trying = true;
+                    }
+
+                    if (worth_trying)
+                    {
+                        string merged_board = curr_board.substr(0, i)
+                                              + curr_hand[j]
+                                              + curr_board.substr(i);
+
+                        string new_board = update_board(merged_board, i);
+
+                        if (new_board == "")
+                            return curr_step + 1;
+
+                        string new_hand = curr_hand.substr(0, j)
+                                          + curr_hand.substr(j + 1);
+
+                        string key = new_board + "#" + new_hand;
+
+                        if (visited.find(key) == visited.end())
+                        {
+                            visited.insert(key);
+                            board_queue.push(new_board);
+                            hand_queue.push(new_hand);
+                            step_queue.push(curr_step + 1);
+                        }
+                    }
+                }
+            }
+        }
+
+        return -1;
+    }
+
+private:
+    string update_board(const string& board, int index)
+    {
+        if (index < 0)
+            return board;
+
+        const int N = board.length();
+
+        int left  = index;
+        int right = index;
+
+        while (0 < left && board[left] == board[left - 1])
+            left--;
+
+        while (right + 1 < N && board[right] == board[right + 1])
+            right++;
+
+        int run_length = right - left + 1;
+
+        if (run_length >= 3)
+        {
+            string new_board = board.substr(0, left) + board.substr(right + 1);
+
+            return update_board(new_board, left - 1);
+        }
+
+        return board;
     }
 };
