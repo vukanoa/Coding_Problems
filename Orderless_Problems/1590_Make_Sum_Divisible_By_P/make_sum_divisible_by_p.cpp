@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-
 /*
     ==============
     === MEDIUM ===
@@ -62,6 +58,10 @@
 
 */
 
+#include <numeric>
+#include <vector>
+#include <unordered_map>
+
 using namespace std;
 
 /*
@@ -76,34 +76,34 @@ using namespace std;
 /* Time  Beats: 88.43% */
 /* Space Beats: 73.78% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution {
 public:
     int minSubarray(vector<int>& nums, int p)
     {
-        // Use long long to avoid overflow
-        long long totalSum = std::accumulate(nums.begin(), nums.end(), 0L);
-
-        int remainder = totalSum % p;
+        long long total_sum = accumulate(nums.begin(), nums.end(), 0L);
+        int remainder = total_sum % p;
 
         // If the total sum is already divisible by p, return 0
         if (remainder == 0)
             return 0;
 
-        return findSmallestSubarray(nums, p, remainder);
+        return find_smallest_subarray(nums, p, remainder);
     }
 
 private:
-    int findSmallestSubarray(vector<int>& nums, int p, int remainder)
+    int find_smallest_subarray(vector<int>& nums, int p, int remainder)
     {
-        long long prefix_sum = 0; // Use long long to avoid overflow
-        int min_length = nums.size();
+        const int N = nums.size();
+
+        long long prefix_sum = 0;
+        int min_length = N;
 
         unordered_map<int, int> prefix_map;
-        prefix_map[0] = -1; // Initial condition for no subarray
+        prefix_map[0] = -1;
 
-        for (int i = 0; i < nums.size(); i++)
+        for (int i = 0; i < N; i++)
         {
             prefix_sum += nums[i];
             int target_remainder = (prefix_sum % p - remainder + p) % p;
@@ -114,6 +114,6 @@ private:
             prefix_map[prefix_sum % p] = i;
         }
 
-        return min_length < nums.size() ? min_length : -1;
+        return min_length < N ? min_length : -1;
     }
 };
