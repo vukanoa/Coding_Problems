@@ -68,6 +68,7 @@
 */
 
 #include <algorithm>
+#include <numeric>
 #include <vector>
 using namespace std;
 
@@ -114,5 +115,50 @@ public:
         }
 
         return 0LL; // Unreachable code
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 73.89% */
+/* Space Beats: 58.92% */
+
+
+/* Time  Complexity: O(SIZE * log(TOTAL_SUM / n)) */
+/* Space Complexity: O(1)                         */
+class Solution_Binary_Search {
+public:
+    long long maxRunTime(int n, std::vector<int>& batteries)
+    {
+        const long long TOTAL_SUM = accumulate(batteries.begin(), batteries.end(), 0LL);
+
+        long long low  = 0;
+        long long high = TOTAL_SUM / n + 1; // Make high exclusive
+
+        while (low < high)
+        {
+            long long mid = low + (high - low) / 2; // Left-leaning mid
+
+            long long reserve = 0;
+            for (const int& power : batteries)
+                reserve += min(static_cast<long long>(power), mid);
+
+            if (reserve >= mid * n)
+                low = mid + 1; // mid works, try higher
+            else
+                high = mid;    // mid fails, go lower
+        }
+
+        return low - 1; // Highest valid time
     }
 };
