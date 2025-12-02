@@ -81,7 +81,7 @@ public:
         unordered_map<string, int> freq;
 
         for (const string& word : words)
-            freq[word] += 1;
+            freq[word]++;
 
         vector<pair<string, int>> entries;
         entries.reserve(freq.size());
@@ -106,6 +106,60 @@ public:
 
         for (int i = 0; i < k; i++)
             result.push_back(entries[i].first);
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Max_Heap {
+public:
+    vector<string> topKFrequent(vector<string>& words, int k)
+    {
+        vector<string> result;
+        result.reserve(k);
+
+        unordered_map<string, int> freq;
+        for (const string& word : words)
+            freq[word]++;
+
+        vector<pair<string, int>> max_heap;
+
+        // custom comparator for heap
+        auto cmp = [](const pair<string, int>& a, const pair<string, int>& b)
+        {
+            if (a.second != b.second)
+                return a.second < b.second; // Larger freq should be "greater"
+
+            return a.first > b.first; // Lexicographically smaller should be "greater"
+        };
+
+        // Build heap
+        for (const auto& entry : freq)
+            max_heap.push_back(entry);
+
+        make_heap(max_heap.begin(), max_heap.end(), cmp);
+
+
+        for (int i = 0; i < k; i++)
+        {
+            pop_heap(max_heap.begin(), max_heap.end(), cmp);
+            result.push_back(max_heap.back().first);
+            max_heap.pop_back();
+        }
 
         return result;
     }
