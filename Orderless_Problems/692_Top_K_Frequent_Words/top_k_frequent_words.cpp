@@ -164,3 +164,127 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    Trie + BucketSort
+
+*/
+
+/* Time  Beats: 44.60% */
+/* Space Beats:  5.53% */
+
+/* Time  Complexity: O(N * L) */ // 'L' is the maximum len of any single word
+/* Space Complexity: O(N * L) */ // 'L' is the maximum len of any single word
+class TrieNode {
+public:
+    TrieNode* children[26];
+    string word;
+
+    TrieNode()
+    {
+        for (int i = 0; i < 26; i++)
+            children[i] = nullptr;
+
+        word = "";
+    }
+};
+
+class Trie {
+public:
+    TrieNode* root;
+
+    Trie()
+    {
+        root = new TrieNode();
+    }
+
+    void add_word(const string& word)
+    {
+        TrieNode* curr = root;
+
+        for (const char& chr : word)
+        {
+            int idx = chr - 'a';
+
+            if (curr->children[idx] == nullptr)
+                curr->children[idx] = new TrieNode();
+
+            curr = curr->children[idx];
+        }
+
+        curr->word = word;
+    }
+
+    void get_words(TrieNode* node, vector<string>& result)
+    {
+        if(node == nullptr)
+            return;
+
+        if ( ! node->word.empty())
+            result.push_back(node->word);
+
+        for (int i = 0; i < 26; i++)
+        {
+            if (node->children[i] != nullptr)
+                get_words(node->children[i], result);
+        }
+    }
+};
+
+class Solution_Trie_plus_Bucket_Sort {
+public:
+    vector<string> topKFrequent(vector<string>& words, int k)
+    {
+        const int N = words.size();
+        vector<string> result;
+
+        unordered_map<string,int> freq;
+        for (const string& word : words)
+            freq[word]++;
+
+        vector<Trie*> buckets(N + 1, nullptr);
+
+        for (const auto& entry : freq)
+        {
+            const string& word = entry.first;
+            int freq = entry.second;
+
+            if (buckets[freq] == nullptr)
+                buckets[freq] = new Trie();
+
+            buckets[freq]->add_word(word);
+        }
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            if (buckets[i] != nullptr)
+            {
+                vector<string> tmp;
+                buckets[i]->get_words(buckets[i]->root, tmp);
+
+                if (static_cast<int>(tmp.size()) < k)
+                {
+                    result.insert(result.end(), tmp.begin(), tmp.end());
+                    k -= tmp.size();
+                }
+                else
+                {
+                    for (int j = 0; j < k; j++)
+                        result.push_back(tmp[j]);
+
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+};
