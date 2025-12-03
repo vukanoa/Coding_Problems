@@ -55,6 +55,7 @@
 */
 
 #include <algorithm>
+#include <map>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -279,6 +280,81 @@ public:
                 {
                     for (int j = 0; j < k; j++)
                         result.push_back(tmp[j]);
+
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 77.01% */
+/* Space Beats: 54.15% */
+
+/* Time  Complexity: O(N * L + N * logN) */
+/* Space Complexity: O(N * L)            */
+class Solution3 {
+public:
+    vector<string> topKFrequent(vector<string>& words, int k)
+    {
+        const int N = words.size();
+        vector<string> result;
+
+        unordered_map<string,int> freq;
+        for (const string& word : words)
+            freq[word]++;
+
+        vector<map<string,int>> buckets(N + 1);
+
+        for (const auto& entry : freq)
+        {
+            const string& word = entry.first;
+            int freq = entry.second;
+
+            buckets[freq].insert({word, freq});
+        }
+
+
+        for (int i = N; i >= 0; i--)
+        {
+            if ( ! buckets[i].empty())
+            {
+                auto& curr_bucket = buckets[i];
+
+                if (static_cast<int>(curr_bucket.size()) < k)
+                {
+                    k -= curr_bucket.size();
+
+                    while ( ! curr_bucket.empty())
+                    {
+                        auto it = curr_bucket.begin();
+                        result.push_back(it->first);
+                        curr_bucket.erase(it);
+                    }
+                }
+                else
+                {
+                    while (k > 0)
+                    {
+                        auto it = curr_bucket.begin();
+                        result.push_back(it->first);
+                        curr_bucket.erase(it);
+                        k--;
+                    }
 
                     break;
                 }
