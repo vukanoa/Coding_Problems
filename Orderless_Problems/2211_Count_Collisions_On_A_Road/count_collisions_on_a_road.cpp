@@ -112,3 +112,39 @@ public:
         return collisions;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 93.04% */
+/* Space Beats: 50.72% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Two_Pointers {
+public:
+    int countCollisions(string directions)
+    {
+        const int N = directions.size();
+        int left  = 0;
+        int right = N - 1;
+
+        while (left  < N  && directions[left]  == 'L') left++;
+        while (right >= 0 && directions[right] == 'R') right--;
+
+        int result = 0;
+        while (left <= right)
+            result += directions[left++] != 'S';
+
+        return result;
+    }
+};
