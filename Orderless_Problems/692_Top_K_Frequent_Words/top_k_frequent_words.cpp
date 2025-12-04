@@ -364,3 +364,52 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 44.62% */
+/* Space Beats: 93.28% */
+
+/* Time  Complexity: O(N + N * logK) */
+/* Space Complexity: O(N)            */
+class Solution_Quick_Select {
+public:
+    vector<string> topKFrequent(vector<string>& words, int k)
+    {
+        vector<string> result;
+        result.reserve(k);
+
+        unordered_map<string, int> freq;
+        for (const string& word : words)
+            freq[word]++;
+        
+        vector<pair<string, int>> entries(freq.begin(), freq.end());
+        
+        auto comparator = [](const pair<string, int>& a, const pair<string, int>& b) {
+            if (a.second != b.second)
+                return a.second > b.second;
+
+            return a.first < b.first;
+        };
+        
+        nth_element(entries.begin(), entries.begin() + k - 1, entries.end(), comparator);
+        
+        /* Sort */
+        sort(entries.begin(), entries.begin() + k, comparator);
+        
+        for (int i = 0; i < k; i++)
+            result.push_back(entries[i].first);
+        
+        return result;
+    }
+};
