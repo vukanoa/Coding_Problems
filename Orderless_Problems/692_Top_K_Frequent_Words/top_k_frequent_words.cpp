@@ -392,24 +392,133 @@ public:
         unordered_map<string, int> freq;
         for (const string& word : words)
             freq[word]++;
-        
+
         vector<pair<string, int>> entries(freq.begin(), freq.end());
-        
+
         auto comparator = [](const pair<string, int>& a, const pair<string, int>& b) {
             if (a.second != b.second)
                 return a.second > b.second;
 
             return a.first < b.first;
         };
-        
+
         nth_element(entries.begin(), entries.begin() + k - 1, entries.end(), comparator);
-        
+
         /* Sort */
         sort(entries.begin(), entries.begin() + k, comparator);
-        
+
         for (int i = 0; i < k; i++)
             result.push_back(entries[i].first);
-        
+
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, but uses my own partition instead of "nth_element".
+
+*/
+
+/* Time  Beats: 77.09% */
+/* Space Beats: 90.92% */
+
+/* Time  Complexity: O(N + N * logK) */
+/* Space Complexity: O(N)            */
+class Solution_Quick_Select_Manual_Partition {
+private:
+    // Comparator: first by frequency (desc), then by word (asc)
+    struct Comparator {
+        bool operator()(const pair<string, int>& a, const pair<string, int>& b) {
+            if (a.second != b.second)
+                return a.second > b.second;
+            return a.first < b.first;
+        }
+    };
+
+public:
+    vector<string> topKFrequent(vector<string>& words, int k)
+    {
+        vector<string> result;
+        result.reserve(k);
+
+        unordered_map<string, int> freq;
+        for (const string& word : words)
+            freq[word]++;
+
+        vector<pair<string, int>> entries;
+        entries.reserve(freq.size());
+
+        for (const auto& entry : freq)
+            entries.emplace_back(entry.first, entry.second);
+
+        // Quickselect to find top k elements
+        int start = 0;
+        int end   = entries.size() - 1;
+
+        while (start <= end)
+        {
+            int mid = partition(entries, start, end);
+            if (mid == k - 1)
+                break;
+
+            if (mid < k - 1)
+                start = mid + 1;
+            else
+                end   = mid - 1;
+        }
+
+        // Sort the first k elements
+        Comparator comp;
+        sort(entries.begin(), entries.begin() + k, comp);
+
+        for (int i = 0; i < k; i++)
+            result.push_back(entries[i].first);
+
+        return result;
+    }
+
+private:
+    int partition(vector<pair<string, int>>& entries, int start, int end)
+    {
+        Comparator comp;
+
+        int pivot = start;
+
+        int left  = start + 1;
+        int right = end;
+
+        while (true)
+        {
+            while (left <= end)
+            {
+                if ( ! comp(entries[left], entries[pivot]))
+                    break;
+
+                left++;
+            }
+
+            while (right >= start + 1)
+            {
+                if (comp(entries[right], entries[pivot]))
+                    break;
+
+                right--;
+            }
+
+            if (left > right)
+                break;
+
+            swap(entries[left], entries[right]);
+        }
+
+        swap(entries[pivot], entries[right]);
+        return right;
     }
 };
