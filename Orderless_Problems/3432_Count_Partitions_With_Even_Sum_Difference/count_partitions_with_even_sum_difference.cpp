@@ -139,3 +139,42 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats: 53.79%  */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Parity_Check {
+public:
+    int countPartitions(vector<int>& nums)
+    {
+        const int N = nums.size();
+        if (N == 0)
+            return 0;
+
+        int last_value = nums.back();
+        nums.pop_back();
+
+        int parity = last_value & 1;
+
+        for (const int& value : nums)
+            parity ^= (value & 1);
+
+        int result = (N - 1) * (parity ^ 1);
+
+        return result;
+    }
+};
