@@ -75,6 +75,7 @@
 
 */
 
+#include <queue>
 #include <utility>
 #include <vector>
 using namespace std;
@@ -141,6 +142,114 @@ private:
 
         for (const auto& dir : directions)
             dfs(board, row + dir.first, col + dir.second);
+    }
+
+    int count_mines(vector<vector<char>>& board, int row, int col)
+    {
+        int mines = 0;
+        const int ROWS = board.size();
+        const int COLS = board[0].size();
+
+        for (const auto& dir : directions)
+        {
+            int x = row + dir.first;
+            int y = col + dir.second;
+
+            if (x >= 0 && y >= 0 && x < ROWS && y < COLS && board[x][y] == 'M')
+                mines++;
+        }
+
+        return mines;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    BFS way of doing the same.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  51.23% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_BFS {
+private:
+    /* Clockwise */
+    vector<pair<int, int>> directions =
+    {
+        {-1, -1}, {-1, 0}, {-1, 1},
+        { 0, -1},           { 0, 1},
+        { 1, -1}, { 1, 0}, { 1, 1}
+    };
+
+
+public:
+    vector<vector<char>> updateBoard(vector<vector<char>>& board, vector<int>& click)
+    {
+        int row = click[0];
+        int col = click[1];
+
+        if (board[row][col] == 'M')
+            board[row][col] = 'X';
+        else
+            BFS(board, row, col);
+
+        return board;
+    }
+
+private:
+    void BFS(vector<vector<char>>& board, int start_row, int start_col)
+    {
+        const int ROWS = board.size();
+        const int COLS = board[0].size();
+
+        queue<pair<int, int>> queue;
+
+        if (board[start_row][start_col] != 'E')
+            return;
+
+        queue.push({start_row, start_col});
+        board[start_row][start_col] = 'B';
+
+        while ( ! queue.empty())
+        {
+            auto curr = queue.front();
+            queue.pop();
+
+            int row = curr.first;
+            int col = curr.second;
+
+            int adjacent_mines = count_mines(board, row, col);
+
+            if (adjacent_mines > 0)
+            {
+                board[row][col] = char('0' + adjacent_mines);
+                continue;
+            }
+
+            for (const auto& dir : directions)
+            {
+                int next_row = row + dir.first;
+                int next_col = col + dir.second;
+
+                if (next_row < 0 || next_col < 0 || next_row >= ROWS || next_col >= COLS)
+                    continue;;
+
+                if (board[next_row][next_col] != 'E')
+                    continue;
+
+                board[next_row][next_col] = 'B';
+                queue.push( {next_row, next_col} );
+            }
+        }
     }
 
     int count_mines(vector<vector<char>>& board, int row, int col)
