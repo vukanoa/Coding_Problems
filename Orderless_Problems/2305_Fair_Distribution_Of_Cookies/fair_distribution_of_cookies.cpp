@@ -107,3 +107,56 @@ private:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 73.73% */
+/* Space Beats: 13.32% */
+
+/* Time  Complexity: O(k^N) */
+/* Space Complexity: O(k^N) */
+class Solution_DP_Masking {
+public:
+    int distributeCookies(vector<int>& cookies, int k)
+    {
+        const int N = cookies.size();
+        vector<vector<int>> dp(k + 1, vector<int>(1LL << N, INT_MAX));
+
+        vector<int> sum(1LL << N);
+        for (int mask = 0; mask < (1LL << N); mask++)
+        {
+            int total = 0;
+
+            for (int i = 0; i < N; i++)
+            {
+                if (mask & (1ll << i))
+                    total += cookies[i];
+            }
+            sum[mask] = total;
+        }
+
+        dp[0][0] = 0;
+        for (int person = 1; person <= k; person++)
+        {
+            for (int mask = 0; mask < (1LL << N); mask++)
+            {
+                for (int submask = mask; submask; submask = (submask - 1) & mask)
+                {
+                    dp[person][mask] = min(dp[person][mask], max(sum[submask], dp[person - 1][mask ^ submask]));
+                }
+            }
+        }
+
+        return dp[k][(1LL << N) - 1];
+    }
+};
