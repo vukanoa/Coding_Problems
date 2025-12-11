@@ -63,6 +63,7 @@
 
 */
 
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 using namespace std;
@@ -115,5 +116,99 @@ public:
         }
 
         return total;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 78.67% */
+/* Space Beats: 75.36% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Trie  {
+public:
+    struct TrieNode 
+    {
+        unordered_map<int, TrieNode*> children;
+        bool is_end; // Marks end of a valid subarray
+    };
+
+    TrieNode* root;
+
+    Trie() 
+    {
+        root = nullptr;
+    }
+
+    TrieNode* get_trie_node() 
+    {
+        TrieNode* node = new TrieNode();
+        node->is_end = false;
+        return node;
+    }
+
+    // Recursively insert valid subarrays starting at <index>
+    int insert_subarray(vector<int>& nums, TrieNode* node, int index, int k, int p) 
+    {
+        if (index == nums.size() || k < 0)
+            return 0;
+
+        int curr_num = nums[index];
+
+        // Decrease k if current number is divisible by p
+        int remaining_k = k - (curr_num % p == 0);
+
+        if (remaining_k < 0)
+            return 0; // cannot include this number, stop
+
+        if ( ! node->children.count(curr_num))
+            node->children[curr_num] = get_trie_node();
+
+        TrieNode* next_node = node->children[curr_num];
+
+        // Only count this subarray as new if it wasn't marked before
+        int is_new = 0;
+        if ( ! next_node->is_end)
+        {
+            is_new = 1;
+            next_node->is_end = true;
+        }
+
+        // Recurse to extend the subarray
+        int next_new = insert_subarray(nums, next_node, index + 1, remaining_k, p);
+
+        return is_new + next_new;
+    }
+};
+
+class Solution_Trie {
+public:
+
+    int countDistinct(vector<int>& nums, int k, int p) 
+    {
+        const int N = nums.size();
+        Trie trie;
+        int total_distinct = 0;
+
+        for (int start = 0; start < N; start++)
+        {
+            if ( ! trie.root)
+                trie.root = trie.get_trie_node();
+
+            total_distinct += trie.insert_subarray(nums, trie.root, start, k, p);
+        }
+
+        return total_distinct;
     }
 };
