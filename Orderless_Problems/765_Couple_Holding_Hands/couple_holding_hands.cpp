@@ -111,28 +111,55 @@ public:
     }
 };
 
-class Solution {
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  96.64% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Greedy {
 public:
     int minSwapsCouples(vector<int>& row)
     {
-        int N = row.size() / 2;
-        DSU dsu(N);
+        int N = row.size();
+        int result = 0;
 
+        vector<int> idx_of_person(N);
         for (int i = 0; i < N; i++)
-        {
-            int a = row[2 * i];
-            int b = row[2 * i + 1];
+            idx_of_person[row[i]] = i;
 
-            dsu.union_components(a / 2, b / 2);
+        for (int i = 0; i < N; i += 2)
+        {
+            int partner = row[i] ^ 1;
+
+            if (row[i + 1] == partner)
+                continue;
+
+            int partner_idx = idx_of_person[partner];
+
+            // Swap partner into seat i+1
+            int other = row[i + 1];
+
+            // Put partner in its correct place
+            swap(row[i + 1], row[partner_idx]);
+
+            idx_of_person[partner] = i + 1;
+            idx_of_person[other]   = partner_idx;
+
+            result++;
         }
 
-        int components = 0;
-        for (int i = 0; i < N; i++)
-        {
-            if (dsu.find_root_node(i) == i)
-                components++;
-        }
-
-        return N - components;
+        return result;
     }
 };
