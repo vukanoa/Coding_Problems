@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ============
     === HARD ===
@@ -70,6 +68,56 @@
 
 */
 
+#include <string>
+#include <vector>
+using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 47.00% */
+/* Space Beats: 51.50% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution {
+public:
+    int numberOfWays(string corridor)
+    {
+        const int N = corridor.size();
+        const int MOD = 1e9 + 7;
+        vector<int> position;
+
+        for (int i = 0; i < corridor.size(); i++)
+        {
+            if (corridor[i] == 'S')
+                position.push_back(i);
+        }
+        
+        if (position.empty() || position.size() & 1)
+            return 0;
+        
+        long long result = 1;
+        for (int i = 2; i < position.size(); i += 2)
+        {
+            int len_of_gap = position[i] - position[i - 1];
+
+            result = (result * len_of_gap) % MOD;
+        }
+
+        return result;
+    }
+};
+
+
+
+
 /*
     ------------
     --- IDEA ---
@@ -82,20 +130,18 @@
 /* Time  Beats: 63.69% */
 /* Space Beats: 64.25% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Space_Optimized {
 public:
     int numberOfWays(string corridor)
     {
-        // Store 1000000007 in a variable for convenience
         const int MOD = 1e9 + 7;
 
         int zero = 0;
         int one  = 0;
         int two  = 1;
 
-        // Compute using derived equations
         for (char thing : corridor)
         {
             if (thing == 'S')
@@ -109,7 +155,6 @@ public:
             }
         }
 
-        // Return the result
         return zero;
     }
 };
