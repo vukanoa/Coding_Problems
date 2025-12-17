@@ -98,3 +98,44 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    Small "trick" to reduce the Time Complexity by an order of 'N'.
+
+*/
+
+/* Time  Beats: 59.51% */
+/* Space Beats: 13.86% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N)   */
+class Solution_N_Squared {
+public:
+    int countQuadruplets(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+        
+        unordered_map<int, int> freq;
+        freq[nums[N-1] - nums[N-2]] = 1;
+        
+        for (int i = N-3; i >= 1; i--)
+        {
+            for (int j = i-1; j >= 0; j--)
+                result += freq[nums[j] + nums[i]];
+            
+            for (int x = N-1; x > i; x--)
+                freq[nums[x] - nums[i]]++;
+        }
+
+        return result;
+    }
+};
