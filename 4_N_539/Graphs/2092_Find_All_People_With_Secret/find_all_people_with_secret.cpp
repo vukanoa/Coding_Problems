@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === HARD ===
@@ -84,6 +81,10 @@
     1 <= firstPerson <= n - 1
 
 */
+
+#include <climits>
+#include <queue>
+#include <vector>
 
 using namespace std;
 
@@ -208,5 +209,68 @@ private:
                 dfs(v, w, adj_list, min_shared_time);
             }
         }
+    }
+};
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    (Dijkstra)
+
+*/
+
+/* Time  Beats: 77.24% */
+/* Space Beats: 32.79% */
+
+/* Time  Complexity: O((N + M) * log(N + M)) */
+/* Space Complexity: O(N + M)                */
+class Solution_Dijkstra {
+public:
+    vector<int> findAllPeople(int n, vector<vector<int>>& meetings, int firstPerson) 
+    {
+        // Person to Meetings
+        vector<vector<pair<int,int>>> adj_list(n);
+
+        for (auto& meeting : meetings) 
+        {
+            int person_a     = meeting[0];
+            int person_b     = meeting[1];
+            int meeting_time = meeting[2];
+
+            adj_list[person_a].emplace_back(meeting_time, person_b);
+            adj_list[person_b].emplace_back(meeting_time, person_a);
+        }
+
+        vector<int> known_time(n, INT_MAX);
+        vector<int> people_who_know_secret;
+        priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> min_heap;
+
+        min_heap.emplace(0, 0);
+        min_heap.emplace(0, firstPerson);
+
+        while ( ! min_heap.empty()) 
+        {
+            auto [current_time, current_person] = min_heap.top();
+            min_heap.pop();
+
+            if (known_time[current_person] != INT_MAX) 
+                continue;
+
+            known_time[current_person] = current_time;
+            people_who_know_secret.push_back(current_person);
+
+            for (auto& [meeting_time, other_person] : adj_list[current_person]) 
+            {
+                if (known_time[other_person] != INT_MAX || meeting_time < current_time) 
+                    continue;
+
+                min_heap.emplace(meeting_time, other_person);
+            }
+        }
+
+        return people_who_know_secret;
     }
 };
