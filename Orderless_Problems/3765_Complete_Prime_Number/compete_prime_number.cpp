@@ -63,6 +63,9 @@
 
 */
 
+#include <string>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -98,6 +101,67 @@ public:
             remaining_number /= 10; 
             multiplier       *= 10;
         }   
+
+        return true;
+    }
+
+private:
+    bool is_prime(int num)
+    {
+        if (num <= 1)
+            return false;
+
+        for (int factor = 2; factor * factor <= num; factor++)
+        {
+            if (num % factor == 0)
+                return false;
+        }
+
+        return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    A little easier to grasp.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  46.60% */
+
+/* Time  Complexity: O(D^2) */
+/* Space Complexity: O(D)   */
+class Solution_2 {
+public:
+    bool completePrime(int num)
+    {
+        string s = to_string(num);
+        const int N = s.size();
+
+        // Check all prefixes
+        int current_prefix = 0;
+        for (int i = 0; i < N; i++)
+        {
+            current_prefix = current_prefix * 10 + (s[i] - '0');
+            if (!is_prime(current_prefix))
+                return false;
+        }
+
+        // Check all suffixes
+        for (int i = 0; i < N; i++)
+        {
+            int current_suffix = stoi(s.substr(i));
+            if (!is_prime(current_suffix))
+                return false;
+        }
 
         return true;
     }
