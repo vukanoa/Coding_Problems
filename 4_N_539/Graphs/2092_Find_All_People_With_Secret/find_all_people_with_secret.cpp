@@ -83,6 +83,7 @@
 */
 
 #include <climits>
+#include <numeric>
 #include <queue>
 #include <vector>
 
@@ -234,7 +235,7 @@ public:
         // Person to Meetings
         vector<vector<pair<int,int>>> adj_list(n);
 
-        for (auto& meeting : meetings) 
+        for (const auto& meeting : meetings) 
         {
             int person_a     = meeting[0];
             int person_b     = meeting[1];
@@ -269,6 +270,126 @@ public:
 
                 min_heap.emplace(meeting_time, other_person);
             }
+        }
+
+        return people_who_know_secret;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    DSU
+
+*/
+
+/* Time  Beats: 91.87% */
+/* Space Beats: 44.99% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(N + M) */
+class DSU {
+public:
+    vector<int> rank;
+    vector<int> parent;
+
+    DSU(int n)
+    {
+        rank.assign(n, 1);
+
+        parent.resize(n);
+        iota(parent.begin(), parent.end(), 0);
+        // iota(parent.begin(), parent.end(), 1);
+    }
+
+    int find_root_node(int node)
+    {
+        // Get root parent
+        while (node != parent[node])
+        {
+            // Huge Optimization (From O(n) to Amortized O(1) Time Complexity)
+            // If there is no grandparent, nothing will happen
+            parent[node] = parent[parent[node]];
+
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    bool union_components(int node1, int node2)
+    {
+        int root1 = find_root_node(node1);
+        int root2 = find_root_node(node2);
+
+        if (root1 == root2)
+            return false;
+
+        if (rank[root1] < rank[root2])
+            swap(root1, root2);
+
+        // Make sure that to merge TOWARDS the smaller node, i.e. root1
+        parent[root2] = root1;
+        rank[root1] += rank[root2];
+
+        return true;
+    }
+};
+
+class Solution_DSU {
+public:
+    using PersonPair = pair<int, int>;
+
+    vector<int> findAllPeople(int n, vector<vector<int>>& meetings, int firstPerson) 
+    {
+        // Maximum meeting time is 10^5, so we can use counting sort
+        vector<PersonPair> meetings_by_time[100001]; // meetings_by_time[t] = {(x, y) have meeting at t}
+        int max_meeting_time = -1;
+
+        for (const auto& meeting : meetings) 
+        {
+            int person_a     = meeting[0];
+            int person_b     = meeting[1];
+            int meeting_time = meeting[2];
+
+            meetings_by_time[meeting_time].emplace_back(person_a, person_b);
+            max_meeting_time = max(max_meeting_time, meeting_time);
+        }
+
+
+        DSU dsu(n);
+
+        dsu.union_components(0, firstPerson);
+
+        for (int current_time = 0; current_time <= max_meeting_time; current_time++) 
+        {
+            for (auto& [person_a, person_b] : meetings_by_time[current_time]) 
+                dsu.union_components(person_a, person_b);
+
+            for (auto& [person_a, person_b] : meetings_by_time[current_time]) 
+            {
+                if (dsu.find_root_node(person_a) != dsu.find_root_node(0)) 
+                {
+                    dsu.parent[person_a] = person_a;
+                    dsu.rank[person_a]   = 1;
+
+                    dsu.parent[person_b] = person_b;
+                    dsu.rank[person_b]   = 1;
+                }
+            }
+        }
+
+        vector<int> people_who_know_secret = {0};
+        for (int person_id = 1; person_id < n; person_id++) 
+        {
+            if (dsu.find_root_node(person_id) == dsu.find_root_node(0)) 
+                people_who_know_secret.push_back(person_id);
         }
 
         return people_who_know_secret;
