@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === EASY ===
@@ -79,6 +76,10 @@
 
 */
 
+#include <string>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -88,29 +89,32 @@
 
 */
 
-/* Time  Beats: 65.98% */
-/* Space Beats: 11.68% */
+/* Time  Beats: 100.00% */
+/* Space Beats: 77.57% */
 
-/* Time  Complexity: O(max_length_string * n) */
-/* Space Complexity: O(1)                               */
+/* Time  Complexity: O(str_len * N) */
+/* Space Complexity: O(1)           */
 class Solution {
 public:
-    int minDeletionSize(std::vector<std::string>& strs)
+    int minDeletionSize(vector<string>& strs)
     {
-        int count = 0;
+        const int N          = strs.size();
+        const int STRING_LEN = strs[0].length();
 
-        for (int i = 0; i < strs[0].length(); i++)
+        int result = 0;
+
+        for (int letter_idx = 0; letter_idx < STRING_LEN; letter_idx++)
         {
-            for (int j = 0; j < strs.size(); j++)
+            for (int i = 1; i < N; i++) // Starting from 1
             {
-                if (j+1 < strs.size() && strs[j][i] > strs[j+1][i])
+                if (strs[i - 1][letter_idx] > strs[i][letter_idx])
                 {
-                    count++;
+                    result++;
                     break;
                 }
             }
         }
 
-        return count;
+        return result;
     }
 };
