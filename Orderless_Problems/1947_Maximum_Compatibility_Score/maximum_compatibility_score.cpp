@@ -136,3 +136,101 @@ private:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  74.57% */
+
+/* Time  Complexity: O(2^N * N^2) */
+/* Space Complexity: O(2^N)       */
+class Solution_DP_Mask {
+private:
+    int dp[300]; // dp array
+
+public:
+    int maxCompatibilitySum(vector<vector<int>>& students,
+                            vector<vector<int>>& mentors)
+    {
+        int total_students  = students.size();
+        int total_questions = students[0].size();
+
+        vector<int> student_bits;
+        vector<int> mentor_bits;
+
+        // Convert student answers to integers (bit representation)
+        for (auto& student : students)
+        {
+            int bits = 0;
+            for (int i = 0; i < total_questions; i++)
+                bits += (student[i] << ((total_questions - i) - 1));
+
+            student_bits.push_back(bits);
+        }
+
+        // Convert mentor answers to integers (bit representation)
+        for (auto& mentor : mentors)
+        {
+            int bits = 0;
+            for (int i = 0; i < total_questions; i++)
+                bits += (mentor[i] << ((total_questions - i) - 1));
+
+            mentor_bits.push_back(bits);
+        }
+
+        // All bits set mean that mentor is "NOT assigned"
+        int full_mask = (1 << total_students) - 1;
+
+        for (int mask_idx = 0; mask_idx <= full_mask; mask_idx++)
+            dp[mask_idx] = -1;
+
+        return calc_max_compatibility(student_bits, mentor_bits, 0, full_mask, total_students, total_questions);
+    }
+
+private:
+    int calc_max_compatibility(vector<int>& student_bits,
+                                  vector<int>& mentor_bits,
+                                  int student_idx,
+                                  int mentor_mask,
+                                  int total_students,
+                                  int total_questions)
+    {
+        if (student_idx >= total_students)
+            return 0;
+
+        if (dp[mentor_mask] != -1)
+            return dp[mentor_mask];
+
+        int max_score = 0;
+
+        for (int mentor_idx = 0; mentor_idx < total_students; mentor_idx++)
+        {
+            // Check if this mentor has not been assigned yet
+            if ((mentor_mask & (1 << mentor_idx)))
+            {
+                int new_mask = mentor_mask ^ (1 << mentor_idx);
+
+                int curr_score = 0;
+                for (int question_idx = 0; question_idx < total_questions; question_idx++)
+                {
+                    if ((student_bits[student_idx] & (1 << question_idx)) == (mentor_bits[mentor_idx] & (1 << question_idx)))
+                        curr_score++;
+                }
+
+                max_score = max(max_score, curr_score + calc_max_compatibility(student_bits, mentor_bits, student_idx + 1, new_mask,  total_students, total_questions));
+            }
+        }
+
+        return dp[mentor_mask] = max_score;
+    }
+};
