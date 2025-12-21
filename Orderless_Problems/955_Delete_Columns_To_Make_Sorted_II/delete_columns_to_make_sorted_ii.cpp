@@ -64,6 +64,7 @@
 
 */
 
+#include <climits>
 #include <string>
 #include <vector>
 
@@ -132,5 +133,64 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  62.92% */
+
+/* Time  Complexity: O(N * LEN) */
+/* Space Complexity: O(N)       */
+class Solution_2 {
+public:
+    using uint128_t = unsigned __int128;
+
+    int minDeletionSize(vector<string>& strs)
+    {
+        const int N   = strs.size();
+        const int LEN = strs[0].size();
+
+        uint128_t is_sorted = 0;
+        uint128_t remove = 0;
+
+        for (int chr_idx = 0; chr_idx < LEN; chr_idx++)
+        {
+            bool need_remove = false;
+
+            for (int i = 0; i < N-1; i++)
+            {
+                if (((is_sorted >> i) & 1) == 0 && strs[i][chr_idx] > strs[i+1][chr_idx])
+                {
+                    remove |= ((uint128_t)1 << chr_idx);
+                    need_remove = true;
+                    break;
+                }
+            }
+
+            if (need_remove)
+                continue;
+
+            for (int i = 0; i < N-1; i++)
+            {
+                if (((is_sorted >> i) & 1) == 0 && strs[i][chr_idx] < strs[i+1][chr_idx])
+                    is_sorted |= ((uint128_t)1 << i);
+            }
+        }
+
+        // Count set bits in remove (low 64 + high 64)
+        return __builtin_popcountll((unsigned long long)(remove & ULLONG_MAX))
+             + __builtin_popcountll((unsigned long long)(remove >> 64));
     }
 };
