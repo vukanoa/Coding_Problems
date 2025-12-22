@@ -135,3 +135,55 @@ private:
         return memo[curr_col_idx][last_kept_col_idx] = max(skip, take);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 78.46% */
+/* Space Beats: 34.36% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N)   */
+class Solution_Iterative {
+public:
+    int minDeletionSize(vector<string>& strs)
+    {
+        const int N          = strs.size();
+        const int STRING_LEN = strs[0].size();
+
+        vector<int> dp(STRING_LEN, 1);
+
+        int longest_non_decreasing_sequence = 1;
+        for (int curr_col_idx = 0; curr_col_idx < STRING_LEN; curr_col_idx++)
+        {
+            for (int prev_col_idx = 0; prev_col_idx < curr_col_idx; prev_col_idx++)
+            {
+                bool can_extend = true;
+                for (int i = 0; i < N; i++)
+                {
+                    if (strs[i][prev_col_idx] > strs[i][curr_col_idx])
+                    {
+                        can_extend = false;
+                        break;
+                    }
+                }
+
+                if (can_extend)
+                    dp[curr_col_idx] = max(dp[curr_col_idx], dp[prev_col_idx] + 1);
+            }
+
+            longest_non_decreasing_sequence = max(longest_non_decreasing_sequence, dp[curr_col_idx]);
+        }
+
+        return STRING_LEN - longest_non_decreasing_sequence;
+    }
+};
