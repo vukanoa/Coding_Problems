@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
 /*
     ==============
     === MEDIUM ===
@@ -63,6 +59,9 @@
 
 */
 
+#include <vector>
+#include <algorithm>
+
 using namespace std;
 
 /*
@@ -114,22 +113,17 @@ class Solution {
 public:
     int maxTwoEvents(vector<vector<int>>& events)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-        
-        const int n = events.size();
+        const int N = events.size();
         int result = 0;
 
-        // std::sort(events.begin(), events.begin());
-        sort(events.begin(), events.end(), [](const vector<int>& a, const vector<int>& b) {
-            return a[0] < b[0];
-        });
+        /* Sort in ASCENDING order */
+        sort(events.begin(), events.end());
 
-        vector<int> dp(n, 0); 
-        dp[n-1] = events[n-1][2]; // Biggest value from this starting time, onwards
+        vector<int> dp(N, 0); 
+        dp[N-1] = events[N-1][2];
 
-        for (int i = n-2; i >= 0; i--)
+        for (int i = N-2; i >= 0; i--)
             dp[i] = max(events[i][2], dp[i+1]);
-
 
         for (int i = 0; i < events.size(); i++)
         {
@@ -143,6 +137,69 @@ public:
                 result = max(result, events[i][2] + dp[idx]);
             else
                 result = max(result, events[i][2]);
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 8.49% */
+/* Space Beats: 7.72% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Greedy_Sweep_Line {
+public:
+    int maxTwoEvents(vector<vector<int>>& events) 
+    {
+        // Sort events by end time
+        vector<vector<int>> end_sorted = events;
+        sort(end_sorted.begin(), end_sorted.end(), [](const vector<int>& a, const vector<int>& b) 
+        {
+            return a[1] < b[1];
+        });
+
+        // Sort events by start time
+        vector<vector<int>> start_sorted = events;
+        sort(start_sorted.begin(), start_sorted.end(), [](const vector<int>& a, const vector<int>& b) 
+        {
+            return a[0] < b[0];
+        });
+
+        // Initial answer is the max value among all events
+        int result = 0;
+        for (const auto& ev : events) 
+            result = max(result, ev[2]);
+
+        int end_max = 0;
+        int idx = 0;
+
+        for (auto& event : start_sorted) 
+        {
+            int start = event[0];
+            int end   = event[1];
+            int value = event[2];
+
+            // Update end_max for events that end before current start
+            while (idx < (int)end_sorted.size() && end_sorted[idx][1] < start) 
+            {
+                end_max = max(end_max, end_sorted[idx][2]);
+                idx++;
+            }
+
+            result = max(result, value + end_max);
         }
 
         return result;
