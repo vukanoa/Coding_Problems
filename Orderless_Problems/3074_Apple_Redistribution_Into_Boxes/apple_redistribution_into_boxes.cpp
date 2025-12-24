@@ -54,6 +54,7 @@
 */
 
 #include <algorithm>
+#include <cstdint>
 #include <numeric>
 #include <vector>
 using namespace std;
@@ -81,22 +82,83 @@ public:
 
         int result = 0;
 
-        /* Sort */
+        /* Sort in DECREASING order */
         sort(capacity.begin(), capacity.end(), greater<int>());
 
         int apples = accumulate(apple.begin(), apple.end(), 0);
-        int cap = 0;
+        int curr_capacity = 0;
 
-        if (cap >= apples)
+        if (curr_capacity >= apples)
             return result;
 
         for (int i = 0; i < M; i++)
         {
-            cap += capacity[i];
+            curr_capacity += capacity[i];
             result++;
 
-            if (cap >= apples)
+            if (curr_capacity >= apples)
                 return result;
+        }
+
+        return -1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Counting Sort.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  77.48% */
+
+/* Time  Complexity: O(N + C) */ // Where 'C' is 50
+/* Space Complexity: O(C)     */
+class Solution_Counting_Sort {
+public:
+    int minimumBoxes(vector<int>& apple, vector<int>& capacity)
+    {
+        int N = capacity.size();
+
+        int remaining_apples = accumulate(apple.begin(), apple.end(), 0);
+
+        // Frequency table for capacities (constraints guarantee max <= 50)
+        uint8_t capacity_freq[51] = {0};
+
+        int max_capacity_value = 0;
+        for (const int& curr_capacity : capacity)
+        {
+            capacity_freq[curr_capacity]++;
+            max_capacity_value = max(max_capacity_value, curr_capacity);
+        }
+
+        int used_box_count = 0;
+
+        for (int curr_capacity = max_capacity_value; curr_capacity > 0; curr_capacity--)
+        {
+            int available_boxes = capacity_freq[curr_capacity];
+            if (available_boxes == 0)
+                continue;
+
+            int total_capacity_here = curr_capacity * available_boxes;
+
+            if (total_capacity_here < remaining_apples)
+            {
+                remaining_apples -= total_capacity_here;
+                used_box_count += available_boxes;
+            }
+            else
+            {
+                int required_boxes = (remaining_apples + curr_capacity - 1) / curr_capacity;
+                return used_box_count + required_boxes;
+            }
         }
 
         return -1;
