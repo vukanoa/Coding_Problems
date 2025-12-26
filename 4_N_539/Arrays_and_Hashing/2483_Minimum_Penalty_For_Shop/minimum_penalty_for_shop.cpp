@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -132,48 +130,9 @@
 
 */
 
-/* Time  Beats: 94.90% */
-/* Space Beats: 90.65% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution {
-public:
-    int bestClosingTime(string customers)
-    {
-        int left_N  = 0;
-        int right_Y = 0;
-
-        // Count Y's
-        for (char& c : customers)
-        {
-            if (c == 'Y')
-                right_Y++;
-        }
-
-        int hour = 0;
-        int min = left_N + right_Y;
-
-        for (int i = 1; i <= customers.length(); i++)
-        {
-            if (customers[i-1] == 'Y')
-                right_Y--;
-            else
-                left_N++;
-
-            if ((left_N + right_Y) < min)
-            {
-                min = left_N + right_Y;
-                hour = i;
-            }
-        }
-
-        return hour;
-    }
-};
-
-
-
+#include <algorithm>
+#include <string>
+using namespace std;
 
 /*
     ------------
@@ -184,33 +143,34 @@ public:
 
 */
 
-/* Time  Beats: 84.74% */
-/* Space Beats: 88.11% */
+/* Time  Beats: 89.07% */
+/* Space Beats: 91.48% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_3 {
 public:
     int bestClosingTime(string customers)
     {
-        int res  = -1;
-        int maxi = 0;
-        int pen  = 0;
+        const int N = customers.length();
 
-        for (int i = 0 ; i < customers.size(); ++i)
+        int Ns_left_of_here = 0;
+        int Ys_from_here    = count(customers.begin(), customers.end(), 'Y');
+
+        int result = -1;
+        int minimum_penalty = N;
+        for (int i = 0; i <= N; i++)
         {
-            if (customers[i] == 'Y')
-                pen++;
-            else
-                pen--;
-
-            if(pen > maxi)
+            if ((Ns_left_of_here + Ys_from_here) < minimum_penalty)
             {
-                maxi = pen;
-                res = i;
+                minimum_penalty = Ns_left_of_here + Ys_from_here;
+                result = i;
             }
+
+            Ns_left_of_here += customers[i] == 'N' ? 1 : 0;
+            Ys_from_here    -= customers[i] == 'Y' ? 1 : 0;
         }
 
-        return ++res;
+        return result;
     }
 };
