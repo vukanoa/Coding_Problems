@@ -50,8 +50,11 @@ struct TreeNode {
     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
+/* Time  Beats: 100.00% */
+/* Space Beats:  98.41% */
+
 /* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
+/* Space Complexity: O(N) */ // Call stack
 class Solution_Recursive {
 public:
     TreeNode* root = nullptr;
@@ -91,5 +94,93 @@ private:
         }
 
         return false;
+    }
+};
+
+
+
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  99.49% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Iterative {
+public:
+    bool findTarget(TreeNode* root, int k)
+    {
+        if ( ! root)
+            return false;
+
+        TreeNode* start = root;
+        TreeNode* end   = root;
+
+        while (start->left)
+            start = start->left;
+
+        while (end->right)
+            end = end->right;
+
+        while (start != end)
+        {
+            int sum = start->val + end->val;
+
+            if (sum == k)
+                return true;
+
+            if (sum > k)
+            {
+                end = find_predecessor(root, end);
+            }
+            else // if (sum < k)
+            {
+                start = find_successor(root, start);
+            }
+        }
+
+        return false;
+    }
+
+private:
+    TreeNode* find_predecessor(TreeNode* root, TreeNode* node)
+    {
+        TreeNode* predecessor = nullptr;
+        TreeNode* curr = root;
+
+        while (curr)
+        {
+            if (curr->val < node->val)
+            {
+                predecessor = curr;
+                curr = curr->right;
+            }
+            else
+            {
+                curr = curr->left;
+            }
+        }
+
+        return predecessor;
+    }
+
+    TreeNode* find_successor(TreeNode* root, TreeNode* node)
+    {
+        TreeNode* successor = nullptr;
+        TreeNode* curr = root;
+
+        while (curr)
+        {
+            if (curr->val > node->val)
+            {
+                successor = curr;
+                curr = curr->left;
+            }
+            else
+            {
+                curr = curr->right;
+            }
+        }
+
+        return successor;
     }
 };
