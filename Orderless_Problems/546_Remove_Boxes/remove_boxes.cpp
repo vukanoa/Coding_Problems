@@ -71,17 +71,18 @@ using namespace std;
 
 /* Time  Complexity: O(N^4) */
 /* Space Complexity: O(N^3) */
-class Solution {
+class Solution_Memoization {
 private:
     int memo[101][101][101];
 
 public:
     int removeBoxes(vector<int> & boxes)
     {
+        /* Memset */
         memset(memo, -1, sizeof(memo));
 
-        int total_boxes = static_cast<int>(boxes.size());
-        return solve(0, total_boxes - 1, boxes, 0);
+        int N = static_cast<int>(boxes.size());
+        return solve(0, N - 1, boxes, 0);
     }
 
 private:
@@ -127,5 +128,74 @@ private:
         }
 
         return memo[original_left_idx][right_idx][original_same_color] = best_score;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 11.71% */
+/* Space Beats: 24.34% */
+
+/* Time  Complexity: O(N^4) */
+/* Space Complexity: O(N^3) */
+class Solution {
+public:
+    int removeBoxes(vector<int> & boxes)
+    {
+        int N = static_cast<int>(boxes.size());
+        if (N == 0)
+            return 0;
+
+        // 3D DP: dp[left_idx][right_idx][same_color_on_left]
+        vector<vector<vector<int>>> dp(N, vector<vector<int>>(N, vector<int>(N, 0)));
+
+        // Base case: single-box segments
+        for (int right_idx = 0; right_idx < N; right_idx++)
+        {
+            for (int same_color_on_left = 0; same_color_on_left <= right_idx; same_color_on_left++)
+            {
+                dp[right_idx][right_idx][same_color_on_left] = (same_color_on_left + 1) * (same_color_on_left + 1);
+            }
+        }
+
+        // Segment lengths
+        for (int segment_len = 1; segment_len < N; segment_len++)
+        {
+            for (int right_idx = segment_len; right_idx < N; right_idx++)
+            {
+                int left_idx = right_idx - segment_len;
+
+                for (int same_color_on_left = 0; same_color_on_left <= left_idx; same_color_on_left++)
+                {
+                    // TAKE case: remove boxes[left_idx] + same_color_on_left immediately
+                    int best_score = (same_color_on_left + 1) * (same_color_on_left + 1) +
+                                     dp[left_idx + 1][right_idx][0];
+
+                    // SKIP case: merge boxes[left_idx] with a same-colored box later
+                    for (int merge_idx = left_idx + 1; merge_idx <= right_idx; ++merge_idx)
+                    {
+                        if (boxes[merge_idx] == boxes[left_idx])
+                        {
+                            best_score = max(best_score, dp[left_idx + 1][merge_idx - 1][       0             ] +
+                                                         dp[merge_idx   ][right_idx   ][same_color_on_left + 1]);
+                        }
+                    }
+
+                    dp[left_idx][right_idx][same_color_on_left] = best_score;
+                }
+            }
+        }
+
+        return dp[0][N - 1][0];
     }
 };
