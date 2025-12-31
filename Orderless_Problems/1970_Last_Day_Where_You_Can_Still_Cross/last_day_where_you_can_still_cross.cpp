@@ -67,6 +67,7 @@
 */
 
 #include <numeric>
+#include <queue>
 #include <vector>
 using namespace std;
 
@@ -132,7 +133,7 @@ public:
     }
 };
 
-class Solution {
+class Solution_DSU {
 public:
     int latestDayToCross(int row, int col, vector<vector<int>>& cells)
     {
@@ -186,5 +187,113 @@ public:
         }
 
         return -1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Less efficient, but good to practice both BFS and Binary Search from
+    different angles.
+
+    TODO
+
+*/
+
+/* Time  Beats: 20.42% */
+/* Space Beats: 25.13% */
+
+/* Time  Complexity: O(row * col * log(row * col)) */
+/* Space Complexity: O(row * col)                  */
+class Solution {
+private:
+    int total_rows;
+    int total_cols;
+    vector<vector<int>> directions = {{-1,0}, {1,0}, {0,-1}, {0,1}};
+
+public:
+
+    int latestDayToCross(int row, int col, vector<vector<int>>& cells)
+    {
+        int CELLS = cells.size();
+        total_rows = row;
+        total_cols = col;
+
+        return my_lower_bound(1, CELLS, cells);
+    }
+
+private:
+
+    int my_lower_bound(int low, int high, vector<vector<int>>& cells)
+    {
+        // LEFT-leaning binary search for the last day we can cross
+        while (low < high)
+        {
+            int mid = low + (high - low) / 2;
+
+            if (can_cross_on_day(mid, cells))
+                low = mid + 1;
+            else
+                high = mid;
+        }
+
+        return low - 1; // Last day we can cross
+    }
+
+    bool can_cross_on_day(int day, vector<vector<int>>& cells)
+    {
+        vector<vector<int>> grid(total_rows, vector<int>(total_cols, 0));
+
+        for (int i = 0; i < day; i++)
+        {
+            int curr_row = cells[i][0] - 1;
+            int curr_col = cells[i][1] - 1;
+
+            grid[curr_row][curr_col] = 1;
+        }
+
+        queue<pair<int,int>> queue;
+        vector<vector<bool>> visited(total_rows, vector<bool>(total_cols, false));
+
+        for (int curr_col = 0; curr_col < total_cols; curr_col++)
+        {
+            if (grid[0][curr_col] == 0)
+            {
+                queue.push({0, curr_col});
+                visited[0][curr_col] = true;
+            }
+        }
+
+        /* BFS */
+        while ( ! queue.empty())
+        {
+            auto [curr_row, curr_col] = queue.front();
+            queue.pop();
+
+            if (curr_row == total_rows - 1)
+                return true;
+
+            for (auto& dir : directions)
+            {
+                int new_row = curr_row + dir[0];
+                int new_col = curr_col + dir[1];
+
+                if (new_row >= 0 && new_row < total_rows &&
+                    new_col >= 0 && new_col < total_cols &&
+                    ! visited[new_row][new_col]          &&
+                    grid[new_row][new_col] == 0)
+                {
+                    visited[new_row][new_col] = true;
+                    queue.push({new_row, new_col});
+                }
+            }
+        }
+
+        return false;
     }
 };
