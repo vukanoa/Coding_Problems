@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === EASY ===
@@ -64,128 +61,136 @@
 
 */
 
+#include <numeric>
+#include <vector>
+using namespace std;
 
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Try to increment the least significant digit in the vector and if it's less
-    than 10 after incrementing(basically if it's NOT 9) then just increment
-    that digits in the vector and return the entire vector as a result.
+    The only "difficult" part in this problem is the figuring out WHEN do we
+    actually need to add an additional digit in the front(most significant
+    digit).
 
-    On the other hand, if the digit we tried to increment was 9 indeed, then
-    put 0 in its place and try to increment the digit before(left of it).
+    That happens EXCLUSIVELY if ALL of the digits in "digits" are 9s.
 
-    Do this until:
-        either you find that you weren't incrementing number 9 or
-            In that case just return the whole "digits" vector.
+    Think about it, if we have [1, 9, 9, 9], we'll end up with [2, 0, 0, 0]
+    Or if we have [8, 9, 9], we 'll end up with [9, 0, 0].
 
-        or
-        i becomes less than 0(meaning that even the very first digit, i.e. the
-        most significant one) was 9 before incrementing.
-            In that case we have to make a new vector, push 1 in it(because
-            that is the carry after we have incremented the most significant
-            digits) and then push all the other elements from digits to that
-            new vector.
+    However, if we had: [9, 9, 9], then we'll have N+1 digits in result.
+    We'd end up with:
 
-            At the end, just return that new vector.
+        [1, 0, 0, 0]
+
+    Therefore, an easy way to check for that is to simply calculate the total
+    sum of digits in "digits".
+
+    If it's eqaul to: 9 * size_of_digits, then that means "digits" is populated
+    with all 9s.
+
+    If that's the case, simply return a vector of size N+1, that has all 0s,
+    except for the digit at, now, index 0 which should be equal to 1.
+
+        digits = [9, 9, 9]
+                  0  1  2
+
+        result = [1, 0, 0, 0]
+                  0  1  2  3
+
+    Otherwise, simply assign result to be equal to "digits" and then iterate
+    from the last digit(from the back) and as soon as you increment a non-9
+    digit, break and return result.
 
 */
 
-/* Time  Beats: 100% */
-/* Space Beats: 78.88% */
+/* Time  Beats: 100.00% */
+/* Space Beats: 50.17% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution{
+/* Time  Complexity: O(N)                                       */
+/* Space Complexity: O(N) total Space, but O(1) Auxiliary Space */
+class Solution {
 public:
-    std::vector<int> plusOne(std::vector<int>& digits)
+    vector<int> plusOne(vector<int>& digits)
     {
-        for (int i = digits.size() - 1; i >= 0; i--)
+        const int N = digits.size();
+
+        int total_sum = accumulate(digits.begin(), digits.end(), 0); // O(N)
+
+        // O(N) (entire block)
+        if (9 * N == total_sum) // If it's all 9s
         {
-            if (digits[i] + 1 < 10)
-            {
-                digits[i]++;
+            vector<int> result(N+1, 0); // O(N)
+            result[0] = 1;
 
-                return  digits;
-            }
-            else
-                digits[i] = 0;
-
+            return result;
         }
 
-        // If we need to increment the most significant digit.
-        std::vector<int> result;
-        result.push_back(1);
+        // O(N) (entire block)
+        vector<int> result = digits;
+        for (int i = N-1; i >= 0; i--) // O(N)
+        {
+            if (result[i] < 9)
+            {
+                result[i]++;
+                break;
+            }
 
-        for (auto& d : digits)
-            result.push_back(d);
+            result[i] = 0;
+        }
 
         return result;
     }
 };
 
 
-int
-main()
-{
-    Solution sol;
 
 
-    /* Example 1 */
-    // std::vector<int> digits = {1, 2, 3};
+/*
+    ------------
+    --- IDEA ---
+    ------------
 
-    /* Example 2 */
-    // std::vector<int> digits = {4, 3, 2, 1};
+    Instead of checking if all elements are 9s, we try to be greedy.
+    Keep incrementing and if we stumble upon a non-9 digit, then return
+    immediately.
 
-    /* Example 3 */
-    // std::vector<int> digits = {9};
+    If we do finish the loop, then that means we shall return a vector of size
+    N+1 that has 0th element 1 and everything else 0.
 
-    /* Example 4 */
-    std::vector<int> digits = {9, 9, 9, 9};
+    However, since we've already incremented all of the digits in "digits" to
+    be, we only need to PREprend a 1.
 
-    /* Example 5 */
-    // std::vector<int> digits = {9, 9, 4, 9, 9, 9, 9};
+    Unfortunately, we need to shift every element to the right, which takes
+    O(N) time, however this way we do NOT use an additional vector "result".
 
+    But one could argue that this extension is a new vector.
 
-    std::cout << "\n\t================";
-    std::cout << "\n\t=== PLUS ONE ===";
-    std::cout << "\n\t================\n";
+*/
 
-
-    /* Write Input */
-    bool first = true;
-    std::cout << "\n\tDigits: [";
-    for (auto x: digits)
+/* Time  Complexity: O(2 * N) --> O(N) */
+/* Space Complexity: O(1)              */
+class Solution_In_Place_Almost {
+public:
+    vector<int> plusOne(vector<int>& digits)
     {
-        if (!first)
-            std::cout << ", ";
+        const int N = digits.size();
 
-        std::cout << x;
-        first = false;
+        // O(N) (entire block)
+        for (int i = N-1; i >= 0; i--) // O(N)
+        {
+            if (digits[i] < 9)
+            {
+                digits[i]++;
+                return digits;
+            }
+
+            digits[i] = 0;
+        }
+
+        digits.insert(digits.begin(), 1); // O(N)
+
+        return digits;
     }
-    std::cout << "]\n";
-
-
-    /* Solution */
-    std::vector<int> result = sol.plusOne(digits);
-
-
-    /* Write Input */
-    first = true;
-    std::cout << "\n\t\t*** After incrementing ***\n";
-    std::cout << "\n\tResult: [";
-    for (auto x: result)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        std::cout << x;
-        first = false;
-    }
-    std::cout << "]\n\n";
-
-
-    return 0;
-}
+};
