@@ -1,7 +1,3 @@
-#include <iostream>
-#include <sstream>
-#include <string>
-
 /*
     ***************
     *** PREMIUM ***
@@ -57,6 +53,11 @@
     Any ASCII character can be found in string!  // (Difficulty lies there)
 
 */
+
+#include <sstream>
+#include <string>
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -180,31 +181,31 @@
 /* Space Complexity: O(1) */
 class Codec {
 public:
-    std::string encode(std::vector<std::string>& strs)
+    string encode(vector<string>& strs)
     {
-        std::ostringstream out;
+        ostringstream out;
 
-        for (const std::string& str : strs)
+        for (const string& str : strs)
             out << str.size() << '#' << str;
 
         return out.str();
     }
 
-    std::vector<std::string> decode(std::string s)
+    vector<string> decode(string s)
     {
-        std::vector<std::string> decoded_str;
+        vector<string> decoded_str;
 
         for (int i = 0; i < s.length(); i++)
         {
-            std::ostringstream str_len;
+            ostringstream str_len;
 
             while(s[i] != '#')
                 str_len << s[i++];
             i++; // Get rid of the '#' sign
 
-            int len = std::stoi(str_len.str());
+            int len = stoi(str_len.str());
 
-            std::ostringstream out;
+            ostringstream out;
             for (int x = 0; x < len; x++)
                 out << s[i++];
 
@@ -229,11 +230,11 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Codec {
+class Codec_2 {
 public:
     string encode(vector<string>& strs)
     {
-        std::ostringstream out;
+        ostringstream out;
 
         for (int i = 0; i < strs.size(); i++)
             out << strs[i].size() << '#' << strs[i];
@@ -243,20 +244,20 @@ public:
 
     // 4#lint4#code4#love3#you
 
-    std::vector<std::string> decode(std::string s)
+    vector<string> decode(string s)
     {
-        std::vector<std::string> strs;
+        vector<string> strs;
 
         int i = 0;
         while (i < s.length())
         {
-            std::ostringstream out;
+            ostringstream out;
 
             while (s[i] != '#')
                 out << s[i++];
             i++; // skip '#'
 
-            int characters = std::stoi(out.str());
+            int characters = stoi(out.str());
             strs.push_back(s.substr(i, characters));
 
             i += characters;

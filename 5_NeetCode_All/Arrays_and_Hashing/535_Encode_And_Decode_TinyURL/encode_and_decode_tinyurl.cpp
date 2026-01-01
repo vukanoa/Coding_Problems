@@ -1,7 +1,3 @@
-#include <iostream>
-#include <unordered_map>
-#include <sstream>
-
 /*
     ==============
     === MEDIUM ===
@@ -65,6 +61,10 @@
     url is guranteed to be a valid URL.
 
 */
+
+#include <unordered_map>
+#include <sstream>
+using namespace std;
 
 /* Time  Beats:  100% */
 /* Space Beats: 5.15% */

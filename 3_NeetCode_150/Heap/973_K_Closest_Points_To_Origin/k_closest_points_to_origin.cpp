@@ -1,8 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <queue>
-
 /*
     ==============
     === MEDIUM ===
@@ -57,6 +52,13 @@
 
 */
 
+#include <cmath>
+#include <vector>
+#include <algorithm>
+#include <queue>
+using namespace std;
+
+
 /*
     ------------
     --- IDEA ---
@@ -89,16 +91,16 @@
 /* Space Complexity: O(n) */
 class Solution {
 public:
-    std::vector<std::vector<int>> kClosest(std::vector<std::vector<int>>& points, int k)
+    vector<vector<int>> kClosest(vector<vector<int>>& points, int k)
     {
-        std::vector<std::pair<double, std::vector<int>>> distances;
+        vector<pair<double, vector<int>>> distances;
 
         for (auto& point : points)
             distances.push_back({euclidean_distance(point[0], point[1]), point});
 
-        std::sort(distances.begin(), distances.end());
+        sort(distances.begin(), distances.end());
 
-        std::vector<std::vector<int>> results;
+        vector<vector<int>> results;
         int i = 0;
         while (i < k)
             results.push_back(distances[i++].second);
@@ -158,9 +160,9 @@ private:
 */
 class Solution_2 {
 public:
-    std::vector<std::vector<int>> kClosest(std::vector<std::vector<int>>& points, int k)
+    vector<vector<int>> kClosest(vector<vector<int>>& points, int k)
     {
-        std::priority_queue<std::pair<int, std::vector<int>>> max_heap;
+        priority_queue<pair<int, vector<int>>> max_heap;
 
         for (auto& point : points)
         {
@@ -177,7 +179,7 @@ public:
                 max_heap.pop();
         }
 
-        std::vector<std::vector<int>> result;
+        vector<vector<int>> result;
         for (int i = 0; i < k; i++)
         {
             result.push_back(max_heap.top().second);
@@ -219,11 +221,11 @@ public:
 /* Space Complexity: O(n) */
 class Solution_3 {
 public:
-    std::vector<std::vector<int>> kClosest(std::vector<std::vector<int>>& points, int k)
+    vector<vector<int>> kClosest(vector<vector<int>>& points, int k)
     {
-        std::priority_queue<std::pair<int, std::vector<int>>,
-                            std::vector<std::pair<int, std::vector<int>>>,
-                            std::greater<std::pair<int, std::vector<int>>>> min_heap;
+        priority_queue<pair<int, vector<int>>,
+                            vector<pair<int, vector<int>>>,
+                            greater<pair<int, vector<int>>>> min_heap;
 
         for (auto& point : points)
         {
@@ -231,7 +233,7 @@ public:
             min_heap.push({distance, point});
         }
 
-        std::vector<std::vector<int>> result;
+        vector<vector<int>> result;
         while (k--)
         {
             auto top = min_heap.top();
@@ -248,18 +250,18 @@ public:
 
 
 /* Quick select */
-class Solution {
+class Solution_Quick_Select {
 public:
-    std::vector<std::vector<int>> kClosest(std::vector<std::vector<int>>& points, int k)
+    vector<vector<int>> kClosest(vector<vector<int>>& points, int k)
     {
-        int n = points.size();
+        int N = points.size();
 
         int left  = 0;
-        int right = n - 1;
+        int right = N - 1;
 
         while (left <= right)
         {
-            int mid = helper(points, left, right);
+            int mid = quick_select_algo(points, left, right);
 
             if (mid == k)
                 break;
@@ -270,13 +272,13 @@ public:
                 right = mid - 1;
         }
 
-        return std::vector<std::vector<int>>(points.begin(), points.begin() + k);
+        return vector<vector<int>>(points.begin(), points.begin() + k);
     }
 
 private:
-    int helper(std::vector<std::vector<int>>& points, int left, int right)
+    int quick_select_algo(vector<vector<int>>& points, int left, int right)
     {
-        std::vector<int> pivot_point = points[left];
+        vector<int> pivot_point = points[left];
 
         while (left < right)
         {
@@ -296,7 +298,7 @@ private:
         return left;
     }
 
-    int compare(std::vector<int>& first, std::vector<int>& second)
+    int compare(vector<int>& first, vector<int>& second)
     {
         return  first[0] *  first[0] +  first[1] *  first[1] -
                second[0] * second[0] - second[1] * second[1];
