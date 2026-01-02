@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_set>
-
 /*
     ============
     === EASY ===
@@ -44,75 +40,40 @@
 
 */
 
+#include <vector>
+#include <unordered_set>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Iterate through the array and check if that number was already visited.
-    How are we going to do that?
-
-    By putting the number in a Hash Set if it doesn't exist already.
-
-    If it does exist, then we're done - return true.
+    Simply check if the current element has already been seen. We're achieving
+    that by using a HashSet(unordered).
 
 */
 
-/* Time  Beats: 79.53% */
-/* Space Beats: 45.93% */
+/* Time  Beats: 73.85% */
+/* Space Beats: 73.85% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution {
 public:
     bool containsDuplicate(vector<int>& nums)
     {
-        std::unordered_set<int> uset;
+        const int N = nums.size();
 
-        for (int& num : nums)
+        unordered_set<int> seen;
+
+        // O(N) (entire-block)
+        for (const int& num : nums) // O(N)
         {
-            if (uset.find(num) != uset.end())
+            if (seen.count(num)) // O(1) Average-case
                 return true;
 
-            uset.insert(num);
-        }
-
-        return false;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Usually, for some reason, LeetCode Solutions that use "uset.count" instead
-    of uset.find() are faster.
-
-    That's something to keep in mind, but it's not too important.
-
-*/
-
-/* Time  Beats: 99.28% */
-/* Space Beats: 71.44% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_Faster {
-public:
-    bool containsDuplicate(vector<int>& nums)
-    {
-        std::unordered_set<int> uset;
-
-        for (int& num : nums)
-        {
-            if (uset.count(num) == 0)
-                uset.insert(num);
-            else
-                return true;
+            seen.insert(num); // O(1) Amortized due to rehashing
         }
 
         return false;
