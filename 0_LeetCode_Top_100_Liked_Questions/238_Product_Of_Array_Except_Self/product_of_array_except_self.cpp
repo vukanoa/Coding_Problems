@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -51,6 +48,8 @@
 
 */
 
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -81,25 +80,26 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution{
+class Solution {
 public:
-    std::vector<int> productExceptSelf(std::vector<int>& nums)
+    vector<int> productExceptSelf(vector<int>& nums)
     {
-        int n = nums.size();
-        std::vector<int> prefix(n, 1);
-        std::vector<int> suffix(n, 1);
+        const int N = nums.size();
+        vector<int> prefix(N, 1);
+        vector<int> suffix(N, 1);
 
-        for (int i = 1; i < n; i++)
-            prefix[i] = prefix[i - 1] * nums[i - 1];
+        for (int i = 1; i < N; i++)
+            prefix[i] = prefix[i-1] * nums[i-1];
 
-        for (int i = n - 2; i >= 0; i--)
-            suffix[i] = suffix[i + 1] * nums[i + 1];
+        for (int i = N - 2; i >= 0; i--)
+            suffix[i] = suffix[i+1] * nums[i+1];
 
-        std::vector<int> results(n, 1);
-        for (int i = 0; i < n; i++)
-            results[i] = prefix[i] * suffix[i];
+        // Populate result
+        vector<int> result(N, 1);
+        for (int i = 0; i < N; i++)
+            result[i] = prefix[i] * suffix[i];
 
-        return results;
+        return result;
     }
 };
 
@@ -127,7 +127,7 @@ public:
 
     Regarding the third number '4' the product of array except '4' is 2 * 3 * 5
     which consists of two parts:
-        Prefix:  2 * 3
+        Prefix: 2 * 3
         Suffix: 5
 
     The product is left * right. We can get lefts and rights:
@@ -144,18 +144,6 @@ public:
     To make it O(1), we just need to store it in a variable which is "suffix"
     and multiply with the "results" array.
 
-
-    The *Suffix* part could be written like this as well:
-    (It's maaybe easier to read, I dont know)
-
-    // Suffix
-    int suffix = 1;
-    for (int i = n - 2; i >= 0; i--)
-    {
-        results[i] *= nums[i + 1] * suffix;
-        suffix     *= nums[i + 1];
-    }
-
 */
 
 /* Time  Beats: 92.10% */
@@ -163,83 +151,25 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_Follow_Up{
+class Solution_Follow_Up {
 public:
-    std::vector<int> productExceptSelf(std::vector<int>& nums)
+    vector<int> productExceptSelf(vector<int>& nums)
     {
-        int n = nums.size();
-        std::vector<int> results(n, 1);
+        const int N = nums.size();
+        vector<int> result(N, 1);
 
         /* Prefix */
-        for (int i = 1; i < n; i++)
-            results[i] = results[i - 1] * nums[i - 1];
+        for (int i = 1; i < N; i++)
+            result[i] = result[i-1] * nums[i-1];
 
         /* Suffix */
         int suffix = 1;
-        for (int i = n - 1; i >= 0; i--)
+        for (int i = N-1; i >= 0; i--)
         {
-            results[i] *= suffix;
-            suffix    *= nums[i];
+            result[i] *= suffix;
+            suffix     *= nums[i];
         }
 
-        return results;
+        return result;
     }
 };
-
-
-int
-main()
-{
-    Solution sol;
-    Solution_Follow_Up sol_followup;
-
-    /* Example 1 */
-    std::vector<int> nums {1, 2, 3, 4};
-
-    /* Example 2 */
-    // std::vector<int> nums {-1, 1, 0, -3, 3};
-
-    /* Example 3 */
-    // std::vector<int> nums {5, 4, -1, 2, 3};
-
-    std::cout << "\n\t====================================";
-    std::cout << "\n\t=== PRODUCT OF ARRAY EXCEPT SELF ===";
-    std::cout << "\n\t====================================\n";
-
-
-    /* Write Input */
-    bool first = true;
-    std::cout << "\n\tnums: [";
-    for (auto x: nums)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        std::cout << x;
-        first = false;
-    }
-    std::cout << "]\n";
-
-
-    /* Solution */
-    // std::vector<int> results = sol.productExceptSelf(nums);
-    std::vector<int> results = sol_followup.productExceptSelf(nums);
-
-    /* Write Output */
-
-    first = true;
-    std::cout << "\n\tresults: [";
-    for (auto x: results)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        std::cout << x;
-        first = false;
-    }
-    std::cout << "]\n\n";
-
-
-
-    return 0;
-}
