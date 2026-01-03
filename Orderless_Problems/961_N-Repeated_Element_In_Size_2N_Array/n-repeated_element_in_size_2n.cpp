@@ -49,6 +49,7 @@
 
 */
 
+#include <bitset>
 #include <unordered_set>
 #include <vector>
 using namespace std;
@@ -145,5 +146,40 @@ public:
 
         // In case N == 2 and both repeating elements are at the end
         return nums.back();
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Use std::bitset from C++.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  53.81% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */ // Practically, Asymptotically O(1)
+class Solution_Bitset {
+public:
+    int repeatedNTimes(vector<int>& nums)
+    {
+        bitset<10001> seen = 0;
+
+        for (const int& num : nums)
+        {
+            if (seen[num])
+                return num;
+
+            seen[num] = 1;
+        }
+
+        return -1; // Unreachable code
     }
 };
