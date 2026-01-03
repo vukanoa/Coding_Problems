@@ -40,6 +40,7 @@
 
 */
 
+#include <unordered_map>
 #include <vector>
 #include <unordered_set>
 using namespace std;
@@ -114,7 +115,7 @@ using namespace std;
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution {
+class Solution_HashSet {
 public:
     int longestConsecutive(vector<int>& nums)
     {
@@ -138,6 +139,61 @@ public:
             }
 
             result = max(result, sequence_length); // O(1)
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Each time we place a new number into the HashMap
+    "len_of_sequence_starting_at", it may connect TWO EXISTING consecutive
+    sequences, or it may extend one of them.
+
+    Instead of scanning forward or backward, we only look at the sequence
+    lengths stored at the neighbors:
+
+        len_of_sequence_starting_at[num - 1]
+        len_of_sequence_starting_at[num + 1]
+
+    By adding these together and including the current number, we know the
+    total length of the new marged sequence.
+
+    We then MUST update the left and right boundary of this sequence because
+    we've merged them together.
+
+*/
+
+/* Time  Beats: 14.67% */
+/* Space Beats:  9.01% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_HashMap {
+public:
+    int longestConsecutive(vector<int>& nums)
+    {
+        int result = 0;
+        unordered_map<int, int> len_of_sequence_starting_at;
+
+        for (const int& num : nums)
+        {
+            if (len_of_sequence_starting_at[num] != 0)
+                continue;
+
+            len_of_sequence_starting_at[num  ] = len_of_sequence_starting_at[num - 1] +  len_of_sequence_starting_at[num + 1] + 1;
+
+            len_of_sequence_starting_at[num - len_of_sequence_starting_at[num - 1]] = len_of_sequence_starting_at[num];
+            len_of_sequence_starting_at[num + len_of_sequence_starting_at[num + 1]] = len_of_sequence_starting_at[num];
+
+            result = max(result, len_of_sequence_starting_at[num]);
         }
 
         return result;
