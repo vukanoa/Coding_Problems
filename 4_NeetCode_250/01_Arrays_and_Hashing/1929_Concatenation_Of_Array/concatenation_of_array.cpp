@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ============
     === EASY ===
@@ -52,31 +50,31 @@
 
 */
 
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Basic use of "std::vector" in C++.
+    Most straightfoward Solution.
 
 */
 
-/* Time  Beats: 39.26% */
-/* Space Beats: 43.51% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */ // result is usually not counted as EXTRA Space
 class Solution {
 public:
-    vector<int> getConcatenation(std::vector<int>& nums)
+    vector<int> getConcatenation(vector<int>& nums)
     {
-        int n = nums.size();
+        const int N = nums.size();
+        vector<int> ans(2 * N);
 
-        std::vector<int> ans(n);
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < N; i++)
         {
-            ans[i] = nums[i];
-            ans.push_back(nums[i]);
+            ans[i]     = nums[i];
+            ans[i + N] = nums[i];
         }
 
         return ans;
@@ -91,53 +89,26 @@ public:
     --- IDEA ---
     ------------
 
-    General Approach. This one is also faster.
+    If we're not allowed to modify input, but wish to solve it in a similar
+    way, then:
 
-*/
-
-/* Time  Beats: 94.18% */
-/* Space Beats: 60.53% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution {
-public:
-    vector<int> getConcatenation(std::vector<int>& nums)
-    {
-        int n = nums.size();
-
-        std::vector<int> ans(2 * n);
-        for (int i = 0; i < n; i++)
-            ans[i] = ans[i+n] = nums[i];
-
-        return ans;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    This one uses a "concatenation" feature of vectors.
-
-*/
-
-/* Time  Beats: 93.66% */
-/* Space Beats: 24.92% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution_Using_Vectors {
-public:
-    std::vector<int> getConcatenation(std::vector<int>& nums)
-    {
-        std::vector<int> ans = nums;
+        vector<int> ans;
         ans.insert(ans.end(), nums.begin(), nums.end());
 
         return ans;
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  41.90% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */ // result is usually not counted as EXTRA Space
+class Solution_If_Allowed_To_Modify_Input {
+public:
+    vector<int> getConcatenation(vector<int>& nums)
+    {
+        nums.insert(nums.end(), nums.begin(), nums.end());
+        return nums;
     }
 };
