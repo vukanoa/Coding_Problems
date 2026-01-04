@@ -183,3 +183,113 @@ public:
         return -1; // Unreachable code
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  96.55% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Boyer_Moore_Majority_Voting {
+public:
+    int repeatedNTimes(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        // Handle early candidates among first three elements
+        if (nums[0] == nums[1])
+            return nums[0];
+
+        if (nums[0] == nums[2] || nums[1] == nums[2])
+            return nums[2];
+
+        int majority_element = 0;
+        int count = 0;
+
+        for (int i = 3; i < N; i++)
+        {
+            int curr_value = nums[i];
+
+            if (count == 0)
+                majority_element = curr_value;
+
+            if (curr_value == majority_element)
+                count++;
+            else
+                count--;
+
+            if (count >= 2)
+                return curr_value;
+        }
+
+        return majority_element;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  64.54% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Boyer_Moore_Majority_Voting_2 {
+public:
+    int repeatedNTimes(vector<int>& nums)
+    {
+        const int TWO_N = nums.size();
+        const int N     = TWO_N / 2;
+
+        int previous_majority_element = -1;
+        int majority_element = nums[0];
+        int count = 1;
+
+        for (int i = 1; i < TWO_N; i++)
+        {
+            if (nums[i] == majority_element)
+            {
+                count++;
+            }
+            else
+            {
+                count--;
+                if (count == 0)
+                {
+                    previous_majority_element = majority_element;
+                    majority_element = nums[i];
+                    count = 1; // Reset
+                }
+            }
+        }
+
+        count = 0;
+        for (int i = 0; i < TWO_N; i++)
+        {
+            if (nums[i] == majority_element)
+              count++;
+        }
+
+        return count == N ? majority_element : previous_majority_element;
+    }
+};
