@@ -54,12 +54,15 @@ using namespace std;
     --- IDEA ---
     ------------
 
-   Fundamental Quick-Sort algorithm.
+    Fundamental Quick-Sort algorithm.
 
     TLE - Time Limit Exceeded, because QuickSort with "Lomuto-Partitioning
     gives an O(N^2) in the worst case.
 
 */
+
+/* Time  Complexity: O(N^2) */ // On average, it's O(N * log)
+/* Space Complexity: O(N)   */
 class Solution_Quick_Sort_using_Lomuto_Partitioning {
 public:
     vector<int> sortArray(vector<int>& nums)
@@ -162,6 +165,76 @@ private:
             result.insert(result.end(), a.begin() + i, a.end());
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Implementation of real Heap-Sort, without using built-in Heap data
+    structure from C++(i.e. "priority_queue").
+
+*/
+
+/* Time  Beats: 75.83% */
+/* Space Beats: 92.76% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(logN)     */ // due to recursion of the "heapify"
+class Solution_Real_Heap_Sort {
+public:
+    vector<int> sortArray(vector<int>& nums)
+    {
+        heap_sort(nums);
+        return nums;
+    }
+
+private:
+    void heapify(vector<int>& nums, int heap_size, int parent_idx)
+    {
+        int left_child_idx  = (parent_idx * 2) + 1;
+        int right_child_idx = (parent_idx * 2) + 2;
+
+        int largest_idx = parent_idx;
+
+        if (left_child_idx < heap_size && nums[left_child_idx] > nums[largest_idx])
+        {
+            largest_idx = left_child_idx;
+        }
+
+        if (right_child_idx < heap_size && nums[right_child_idx] > nums[largest_idx])
+        {
+            largest_idx = right_child_idx;
+        }
+
+        if (largest_idx != parent_idx)
+        {
+            swap(nums[parent_idx], nums[largest_idx]);
+            heapify(nums, heap_size, largest_idx);
+        }
+    }
+
+    void heap_sort(vector<int>& nums)
+    {
+        const int heap_size = nums.size();
+
+        // Build max-heap
+        for (int parent_idx = (heap_size / 2) - 1; parent_idx >= 0; parent_idx--)
+        {
+            heapify(nums, heap_size, parent_idx);
+        }
+
+        // Extract elements one by one
+        for (int last_idx = heap_size - 1; last_idx > 0; last_idx--)
+        {
+            swap(nums[0], nums[last_idx]);
+            heapify(nums, last_idx, 0);
+        }
     }
 };
 
