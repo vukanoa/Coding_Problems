@@ -45,6 +45,8 @@
 
 */
 
+#include <algorithm>
+#include <unordered_map>
 #include <vector>
 #include <queue>
 using namespace std;
@@ -293,7 +295,7 @@ public:
 
 /* Time  Complexity: O(N^2) */ // O(N * logN) in average
 /* Space Complexity: O(1)   */
-class Solution {
+class Solution_Shell_Sort { // Variation of Insertion-Sort.
 public:
     vector<int> sortArray(vector<int>& nums)
     {
@@ -324,6 +326,53 @@ private:
                 }
 
                 nums[prev_idx + gap] = tmp;
+            }
+        }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Fundamental Counting-Sort.
+
+*/
+
+// O(N^2) worst, but very rare. But it's possible
+/* Time  Complexity: O(N * K) */ // K == difference between min_val and max_val
+/* Space Complexity: O(N)     */
+class Solution_Counting_Sort {
+public:
+    vector<int> sortArray(vector<int>& nums)
+    {
+        counting_sort(nums);
+        return nums;
+    }
+
+private:
+    void counting_sort(vector<int>& nums)
+    {
+        unordered_map<int, int> value_to_count;
+
+        int min_value = *min_element(nums.begin(), nums.end());
+        int max_value = *max_element(nums.begin(), nums.end());
+
+        for (const int& value : nums)
+            value_to_count[value]++;
+
+        int write_idx = 0;
+        for (int value = min_value; value <= max_value; value++)
+        {
+            while (value_to_count[value] > 0)
+            {
+                nums[write_idx] = value;
+                write_idx++;
+                value_to_count[value]--;
             }
         }
     }
