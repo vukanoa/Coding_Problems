@@ -274,3 +274,57 @@ public:
         return nums;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    I'm not sure why this one PASSES, but Quick-Sort does NOT.
+    But it's good to see various different Solutions.
+
+*/
+
+/* Time  Beats: 72.50% */
+/* Space Beats: 92.76% */
+
+/* Time  Complexity: O(N^2) */ // O(N * logN) in average
+/* Space Complexity: O(1)   */
+class Solution {
+public:
+    vector<int> sortArray(vector<int>& nums)
+    {
+        const int N = nums.size();
+        if (N <= 1)
+            return nums;
+
+        shell_sort(nums);
+        return nums;
+    }
+
+private:
+    void shell_sort(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        for (int gap = N / 2; gap >= 1; gap /= 2)
+        {
+            for (int curr_idx = gap; curr_idx < N; curr_idx++)
+            {
+                int tmp = nums[curr_idx];
+                int prev_idx = curr_idx - gap;
+
+                while (prev_idx >= 0 && nums[prev_idx] > tmp)
+                {
+                    nums[prev_idx + gap] = nums[prev_idx];
+                    prev_idx -= gap;
+                }
+
+                nums[prev_idx + gap] = tmp;
+            }
+        }
+    }
+};
