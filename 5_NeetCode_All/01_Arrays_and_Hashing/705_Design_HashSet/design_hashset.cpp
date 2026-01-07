@@ -75,6 +75,7 @@
 
 */
 
+#include <cstring>
 #include <vector>
 using namespace std;
 
@@ -152,6 +153,105 @@ public:
 };
 
 
+// Open Addressing, Linear Probing
+class MyHashSet {
+private:
+    static constexpr int EMPTY   = -1;
+    static constexpr int DELETED = -2;
+
+    int m_size;
+    int capacity;
+    double load_factor;
+    vector<int> table;
+
+    int hash_key(int key)
+    {
+        return key % capacity;
+    }
+
+    void rehash(int new_capacity)
+    {
+        vector<int> old_table = table;
+
+        capacity = new_capacity;
+        table.assign(capacity, EMPTY);
+        m_size = 0;
+
+        for (int key : old_table)
+        {
+            if (key >= 0)
+                add(key);
+        }
+    }
+
+public:
+    MyHashSet()
+        : m_size(0),
+          capacity(8),
+          load_factor(0.7),
+          table(capacity, EMPTY)
+    {
+    }
+
+    void add(int key)
+    {
+        if (contains(key))
+            return;
+
+        if (m_size + 1 > load_factor * capacity)
+            rehash(capacity * 2);
+
+        int idx = hash_key(key);
+
+        while (table[idx] >= 0)
+            idx = (idx + 1) % capacity;
+
+        table[idx] = key;
+        m_size++;
+    }
+
+    void remove(int key)
+    {
+        int idx = hash_key(key);
+        int start_idx = idx;
+
+        while (table[idx] != EMPTY)
+        {
+            if (table[idx] == key)
+            {
+                table[idx] = DELETED;
+                m_size--;
+                return;
+            }
+
+            idx = (idx + 1) % capacity;
+
+            if (idx == start_idx)
+                return;
+        }
+    }
+
+    bool contains(int key)
+    {
+        int idx = hash_key(key);
+        int start_idx = idx;
+
+        while (table[idx] != EMPTY)
+        {
+            if (table[idx] == key)
+                return true;
+
+            idx = (idx + 1) % capacity;
+
+            if (idx == start_idx)
+                return false;
+        }
+
+        return false;
+    }
+};
+
+
 
 
 /* Time  Beats: 88.05% */
@@ -159,36 +259,94 @@ public:
 
 /* Time  Complexity: O(1) */
 /* Space Complexity: O(n) */
-class MyHashSet_3 {
+
+class MyHashSet_Array_On_The_Stack {
 public:
-    MyHashSet_3()
+    MyHashSet_Array_On_The_Stack()
     {
-        hash_set = vector<bool>(1e6 + 1, false);
     }
 
     void add(int key)
     {
-        hash_set[key] = true;
+        array[key] = true;
     }
 
     void remove(int key)
     {
-        hash_set[key] = false;
+        array[key] = false;
     }
 
     bool contains(int key)
     {
-        return hash_set[key] == true;
+        return array[key];
     }
 
 private:
-    vector<bool> hash_set;
+    static constexpr int SIZE = 1e6 + 1;
+    bool array[SIZE] = {false};
 };
 
-/**
- * Your MyHashSet object will be instantiated and called as such:
- * MyHashSet* obj = new MyHashSet();
- * obj->add(key);
- * obj->remove(key);
- * bool param_3 = obj->contains(key);
- */
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The most natural Solution given the Constraints.
+
+*/
+
+/* Time  Beats: 90.12% */
+/* Space Beats: 54.96% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */ // Relative to Input size
+class MyHashSet_Bitset {
+private:
+    /*
+        Our "key" is in the range [1, 1000000] because:
+        
+            31251 * 32bits = 1000032 bits
+
+        I.e., a single bit for each key.
+    */
+    int set[31251];
+
+public:
+    MyHashSet_Bitset()
+    {
+        // O(1), relative to Input size N, where N is the key range.
+        memset(set, 0, sizeof(set));
+    }
+
+    // O(1)
+    void add(int key)
+    {
+        set[key / 32] |= mask_of(key);
+    }
+
+    // O(1)
+    void remove(int key)
+    {
+        if (contains(key))
+            set[key / 32] ^= mask_of(key);
+
+        // Or we could've just:
+        // set[key / 32] &= ~mask_of(key);
+    }
+
+    // O(1)
+    bool contains(int key)
+    {
+        return set[key / 32] & mask_of(key);
+    }
+
+private:
+    // O(1)
+    int mask_of(int key)
+    {
+        return 1 << (key % 32); // 2^(key % 32)
+    }
+};
