@@ -78,6 +78,7 @@
 */
 
 #include <cstring>
+#include <vector>
 using namespace std;
 
 /*
@@ -121,5 +122,111 @@ public:
     void remove(int key)
     {
         hash_map[key] = -1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    "Separate Chaining" implementation.
+
+*/
+
+/* Time  Beats: 95.34% */
+/* Space Beats: 70.32% */
+
+/* Time  Complexity: O(1) Avg and O(N) worst */
+/* Space Complexity: O(N)                    */
+class MyHashMap_Separate_Chaining {
+private:
+    struct ListNode
+    {
+        int key;
+        int value;
+        ListNode* next;
+
+        ListNode(int key = -1, int value = -1, ListNode* next = nullptr)
+            : key(key), value(value), next(next)
+        {
+        }
+    };
+
+    vector<ListNode*> buckets;
+
+public:
+    MyHashMap_Separate_Chaining()
+    {
+        buckets.resize(1000);
+
+        for (ListNode*& bucket : buckets)
+        {
+            // Dummy head to simplify insert/remove logic
+            bucket = new ListNode();
+        }
+    }
+
+    // O(1) Average, O(N) worst
+    void put(int key, int value)
+    {
+        ListNode* curr_node = buckets[hash_of(key)];
+
+        while (curr_node->next)
+        {
+            if (curr_node->next->key == key)
+            {
+                curr_node->next->value = value;
+                return;
+            }
+
+            curr_node = curr_node->next;
+        }
+
+        curr_node->next = new ListNode(key, value);
+    }
+
+    // O(1) Average, O(N) worst
+    int get(int key)
+    {
+        ListNode* curr_node = buckets[hash_of(key)]->next;
+
+        while (curr_node)
+        {
+            if (curr_node->key == key)
+                return curr_node->value;
+
+            curr_node = curr_node->next;
+        }
+
+        return -1;
+    }
+
+    // O(1) Average, O(N) worst
+    void remove(int key)
+    {
+        ListNode* curr_node = buckets[hash_of(key)];
+
+        while (curr_node->next)
+        {
+            if (curr_node->next->key == key)
+            {
+                ListNode* node_to_delete = curr_node->next;
+                curr_node->next = curr_node->next->next;
+                delete node_to_delete;
+                return;
+            }
+
+            curr_node = curr_node->next;
+        }
+    }
+
+private:
+    int hash_of(int key)
+    {
+        return key % buckets.size();
     }
 };
