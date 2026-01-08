@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <std::unordered_map>
-
 /*
     ============
     === EASY ===
@@ -49,6 +45,10 @@
 
 */
 
+#include <string>
+#include <unordered_map>
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -81,21 +81,23 @@
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    bool isAnagram(std::string s, std::string t)
+    bool isAnagram(string s, string t)
     {
         if (s.length() != t.length())
             return false;
 
-        std::vector<int> vec_s (26, 0);
-        std::vector<int> vec_t (26, 0);
+        const int N = s.length();
 
-        for (int i = 0; i < s.length(); i++)
+        vector<int> freq_s (26, 0);
+        vector<int> freq_t (26, 0);
+
+        for (int i = 0; i < N; i++)
         {
-            vec_s[s[i] - 'a']++;
-            vec_t[t[i] - 'a']++;
+            freq_s[s[i] - 'a']++;
+            freq_t[t[i] - 'a']++;
         }
 
-        return vec_s == vec_t;
+        return freq_s == freq_t;
     }
 };
 
@@ -139,13 +141,13 @@ public:
 /* Time  Beats: 41.97% */
 /* Space Beats:  5.00% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /*
     Space Complexity: O(1)
 
     Even though Unicode character set is much much larger than ASCII character
     set, it's still considered O(1) since the Space we need wouldn't grow if
-    we increase the length of string s and string t.
+    we were to increase the length of string s and string t.
 */
 class Solution_Unicode {
 public:
@@ -154,10 +156,12 @@ public:
         if (s.length() != t.length())
             return false;
 
-        std::unordered_map<int, int> umap_s;
-        std::unordered_map<int, int> umap_t;
+        const int N = s.length();
 
-        for (int i = 0; i < s.length(); i++)
+        unordered_map<int, int> umap_s;
+        unordered_map<int, int> umap_t;
+
+        for (int i = 0; i < N; i++)
         {
             umap_s[s[i]]++;
             umap_t[t[i]]++;
