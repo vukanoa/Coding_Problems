@@ -89,3 +89,48 @@ public:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  77.19% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_One_Pass {
+public:
+    void sortColors(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        int L = 0;
+        int R = N-1;
+
+        int i = 0;
+        while (i <= R)
+        {
+            if (nums[i] == 0)
+            {
+                swap(nums[L++], nums[i]);
+            }
+            else if (nums[i] == 2)
+            {
+                swap(nums[i], nums[R--]);
+                i--; // To cancel out the increment of 'i'
+            }
+
+            // Increment
+            i++;
+        }
+    }
+};
