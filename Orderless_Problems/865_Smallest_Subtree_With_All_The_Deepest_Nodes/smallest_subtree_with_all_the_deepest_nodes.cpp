@@ -60,6 +60,7 @@
 
 */
 
+#include <queue>
 #include <unordered_map>
 #include <utility>
 using namespace std;
@@ -169,6 +170,176 @@ private:
 
         TreeNode* left  = solve(node->left, depth, max_depth);
         TreeNode* right = solve(node->right, depth, max_depth);
+
+        if (left && right)
+            return node;
+
+        return left ? left : right;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The idea is pretty simple. First, we perform a BFS to find the leftmost and
+    rightmost nodes on the DEEPEST level.
+
+    For example:
+
+                                    3 
+                                  /   \
+                                 /     \
+                                /       \
+                               /         \
+                              /           \
+                             /             \
+                            /               \
+                           /                 \
+                          /                   \
+                         /                     \
+                        /                       \
+                       5                         1
+                     /   \                     /   \
+                    /     \                   /     \
+                   /       \                 /       \
+                  /         \               /         \
+                 /           \             /           \
+                6             2           0             8
+                             / \
+                            /   \
+                           /     \
+                          7       4                          
+                          ^       ^
+                          |       |
+                          |       |
+                      leftmost   rightmost
+
+
+    (Or if it's easier to look at this):
+
+        _______________________
+        ___________3___________
+        _____5___________1_____
+        __6_____2_____0_____8__
+        ______7___4____________
+              ^   ^
+              |   |
+            __|   |__
+            |        |
+         leftmost   rightmost
+
+
+    Then, we simply try to find the LCA(i.e. Lowest Common Ancestor) of those
+    two nodes.
+
+    In this example, it is trivial, but imagine if we had this:
+
+                                    3 
+                                  /   \
+                                 /     \
+                                /       \
+                               /         \
+                              /           \
+                             /             \
+                            /               \
+                           /                 \
+                          /                   \
+                         /                     \
+                        /                       \
+                       5                         1
+                     /   \                     /   \
+                    /     \                   /     \
+                   /       \                 /       \
+                  /         \               /         \
+                 /           \             /           \
+                6             2           0             8
+                             / \                      /
+                            /   \                    /
+                           /     \                  /
+                          7       4                9         
+                          ^                        ^
+                          |                        |
+                          |                        |
+                      leftmost                    rightmost
+
+
+    (Or if it's easier to look at this):
+
+        _______________________
+        ___________3___________
+        _____5___________1_____
+        __6_____2_____0_____8__
+        ______7___4________9___
+              ^            ^
+              |            |
+            __|            |__
+            |                 |
+         leftmost            rightmost
+
+
+    Now it's much more clear. The LCA of node_7 and node_9 is the root node 3.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  27.77% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_LCA {
+public:
+    TreeNode* subtreeWithAllDeepest(TreeNode* root)
+    {
+        if (root == nullptr)
+            return nullptr;
+
+        TreeNode* leftmost  = nullptr;
+        TreeNode* rightmost = nullptr;
+
+        queue<TreeNode*> queue;
+        queue.push(root);
+
+        /* BFS */
+        while ( ! queue.empty())
+        {
+            int level_size = queue.size();
+            leftmost = queue.front();
+
+            for (int i = 0; i < level_size; ++i)
+            {
+                TreeNode* curr = queue.front();
+                queue.pop();
+
+                rightmost = curr;
+
+                if (curr->left)
+                    queue.push(curr->left);
+
+                if (curr->right)
+                    queue.push(curr->right);
+            }
+        }
+
+        /*
+           "leftmost" and "rightmost" are the leftmost and rightmost nodes of
+           the DEEPEST level in the entire tree. That's why this works!
+        */
+        return lca(root, leftmost, rightmost); // Lowest Common Ancestor
+    }
+
+private:
+    TreeNode* lca(TreeNode* node, TreeNode* p, TreeNode* q)
+    {
+        if (node == nullptr || node == p || node == q)
+            return node;
+
+        TreeNode* left  = lca(node->left, p, q);
+        TreeNode* right = lca(node->right, p, q);
 
         if (left && right)
             return node;
