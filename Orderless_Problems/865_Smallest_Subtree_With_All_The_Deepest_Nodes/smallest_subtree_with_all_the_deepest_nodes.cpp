@@ -60,6 +60,7 @@
 
 */
 
+#include <unordered_map>
 #include <utility>
 using namespace std;
 
@@ -100,19 +101,78 @@ private:
     pair<TreeNode*, int> dfs(TreeNode* root)
     {
         if ( ! root)
-            return {nullptr, 0};
+            return {nullptr, 0}; // {left_subtree_root, left_subtree_depth}
 
-        // left.first  <==> left_subtree_root
-        // left.second <==> left_subtree_depth
-        auto left_pair  = dfs(root->left);
-        auto right_pair = dfs(root->right);
+        auto left  = dfs(root->left);
+        auto right = dfs(root->right);
 
-        if (left_pair.second > right_pair.second)
-            return {left_pair.first, left_pair.second + 1};
+        if (left.second > right.second)
+            return {left.first, left.second + 1};
 
-        if (left_pair.second < right_pair.second)
-            return {right_pair.first, right_pair.second + 1};
+        if (left.second < right.second)
+            return {right.first, right.second + 1};
 
-        return {root, left_pair.second + 1};
+        return {root, left.second + 1};
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   7.32% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Depth_plus_LCA {
+public:
+    TreeNode* subtreeWithAllDeepest(TreeNode* root)
+    {
+        unordered_map<TreeNode*, int> depth;
+        depth.clear();
+        depth[nullptr] = -1;
+
+        dfs(root, nullptr, depth);
+
+        int max_depth = -1;
+        for (const auto& entry : depth)
+            max_depth = max(max_depth, entry.second);
+
+        return solve(root, depth, max_depth);
+    }
+
+private:
+    void dfs(TreeNode* node, TreeNode* parent, unordered_map<TreeNode*, int>& depth)
+    {
+        if (node == nullptr)
+            return;
+
+        depth[node] = depth[parent] + 1;
+
+        dfs(node->left, node, depth);
+        dfs(node->right, node, depth);
+    }
+
+    TreeNode* solve(TreeNode* node, unordered_map<TreeNode*, int>& depth, int& max_depth)
+    {
+        if (node == nullptr || depth[node] == max_depth)
+            return node;
+
+        TreeNode* left  = solve(node->left, depth, max_depth);
+        TreeNode* right = solve(node->right, depth, max_depth);
+
+        if (left && right)
+            return node;
+
+        return left ? left : right;
     }
 };
