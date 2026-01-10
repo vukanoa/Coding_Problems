@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -49,6 +47,11 @@
 
 */
 
+#include <climits>
+#include <string>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -59,44 +62,39 @@
 
 */
 
-/* Time  Beats: 83.22% */
-/* Space Beats: 22.98% */
+/* Time  Beats: 30.73% */
+/* Space Beats: 49.34% */
 
-/* Time  Complexity: O(M * N) */
-/* Space Complexity: O(M * N) */
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(N * M) */
 class Solution {
 public:
-    int minimumDeleteSum(std::string s1, std::string s2)
+    int minimumDeleteSum(string s1, string s2)
     {
-        int M = s2.length();
-        int N = s1.length();
+        const int ROWS = s1.size();
+        const int COLS = s2.size();
 
-        std::vector<std::vector<int>> dp(M+1, std::vector<int>(N+1, 0));
+        vector<vector<int>> dp(ROWS+1, vector<int>(COLS+1, INT_MAX));
+        dp[ROWS][COLS] = 0; // Base case
 
-        // As if: s1=""    s2="eat"
-        for (int i = M-1; i >= 0; i--)
-            dp[i][N] = s2[i] + dp[i+1][N];
+        // Initialize Last Row
+        for (int row = ROWS-1; row >= 0; row--)
+            dp[row][COLS] = s1[row] + dp[row + 1][COLS];
 
-        // As if: s1="sea" s2=""
-        for (int j = N-1; j >= 0; j--)
-            dp[M][j] = s1[j] + dp[M][j+1];
+        // Initialize Last Col
+        for (int col = COLS-1; col >= 0; col--)
+            dp[ROWS][col] = s2[col] + dp[ROWS][col + 1];
 
-        for (int i = M-1; i >= 0; i--)
+        for (int row = ROWS-1; row >= 0; row--)
         {
-            for (int j = N-1; j >= 0; j--)
+            for (int col = COLS-1; col >= 0; col--)
             {
-                if (s1[j] == s2[i])
-                    dp[i][j] = dp[i+1][j+1]; // Diagonal
+                if (s1[row] == s2[col])
+                    dp[row][col] = dp[row+1][col+1];
                 else
-                {
-                    int right = dp[i  ][j+1];
-                    int down  = dp[i+1][j  ];
-
-                    if ((s1[j] + right) < (s2[i] + down))
-                        dp[i][j] = s1[j] + right;
-                    else
-                        dp[i][j] = s2[i] + down;
-                }
+                    dp[row][col] = min( {s1[row]           + dp[row+1][col  ],
+                                         s2[col]           + dp[row  ][col+1],
+                                         s1[row] + s2[col] + dp[row+1][col+1]} );
             }
         }
 
