@@ -48,6 +48,7 @@
 */
 
 #include <climits>
+#include <cstring>
 #include <string>
 #include <vector>
 using namespace std;
@@ -99,5 +100,67 @@ public:
         }
 
         return dp[0][0];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats:   5.17% */
+/* Space Beats: 78.29% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
+class Solution_Memoization {
+private:
+    int memo[1001][1001];
+
+public:
+    int minimumDeleteSum(string s1, string s2)
+    {
+        const int ROWS = s1.size();
+        const int COLS = s2.size();
+
+        /* Memset */
+        memset(memo, 0x7f, sizeof(memo));
+        memo[ROWS][COLS] = 0;
+
+        for (int row = ROWS-1; row >= 0; row--)
+            memo[row][COLS] = s1[row] + memo[row+1][COLS];
+
+        for (int col = COLS-1; col >= 0; col--)
+            memo[ROWS][col] = s2[col] + memo[ROWS][col+1];
+
+        return solve(0, 0, s1, s2);
+    }
+
+private:
+    int solve(int row, int col, string& s1, string& s2)
+    {
+        const int ROWS = s1.size();
+        const int COLS = s2.size();
+
+        if (memo[row][col] != 0x7f7f7f7f || row >= ROWS || col >= COLS)
+            return memo[row][col];
+
+        /* Skip */
+        if (s1[row] == s2[col])
+            return memo[row][col] = solve(row+1, col+1, s1, s2);
+
+        /* Take */
+        int take_s1   = s1[row] +    0    + solve(row+1, col  , s1, s2);
+        int take_s2   =    0    + s2[col] + solve(row  , col+1, s1, s2);
+        int take_both = s1[row] + s2[col] + solve(row+1, col+1, s1, s2);
+
+        return memo[row][col] = min( {take_s1, take_s2, take_both} );
     }
 };
