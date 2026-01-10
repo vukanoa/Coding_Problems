@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -64,77 +61,52 @@
     0 <= prices[i] <= 104
 
 */
+
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Similar to the first version of this problem.
-
-    Don't buy today if tomorrow if cheaper.
-    But here we buy on the first day and then we're just asking if tomorrow's
-    price is decreasing, then immediately sell today, and if it's not the end
-    of the array(given period) then buy it again on that day when it's cheaper.
-
-
-    Input: prices = [7, 1, 5, 3, 6, 4]
-                     0  1  2  3  4  5
-
-    But on day 0.
-
-    Tomorrow is cheaper, immediately sell and buy tomorrow.
-
-    Now we bought at price 1(on day 1).
-
-    Tomorrow(Day 2) is not cheaper - Do nothing.
-
-    Tomorrow(Day 3) is cheaper than yesterday(Day 2) - Immediately sell:
-        max_profit += (5 - 1) => max_profit += 4
-
-    Buy on Day 3 again since that is not the last day.
-
-    Tomorrow(Day 4) is not cheaper than today(Day 3) - Do nothing.
-
-    Tomorrow(Day 5) is indeed cheaper than today(Day 4) - Immediately sell.
-
-    However, since Day 5 is the last Day(Starting from Day 0), we don't want to
-    buy it since we would just lose money because we can't sell it afterwards.
-
-    Since we're not subtracting our profit when we're buying, we don't even
-    have to worry about that.
-
-    That's the whole idea.
+    TODO
 
 */
 
-/* Time  Beats: 74.56% */
-/* Space Beats: 79.41% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  83.95% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Two_Pointers {
 public:
-    int maxProfit(std::vector<int>& prices) {
-        int start = 0;
-        int end = 1;
+    int maxProfit(vector<int>& prices)
+    {
+        const int N = prices.size();
+        int result = 0;
 
-        int max_profit = 0;
+        // Start from a valley
+        int L = 0;
+        while (L < N-1 && prices[L] > prices[L+1])
+            L++;
 
-        while (end < prices.size())
+        // Calculate profit at every local peak
+        int R = L+1;
+        while (R < N)
         {
-            if (prices[end - 1] > prices[end])
-            {
-                max_profit += prices[end - 1] - prices[start];
-                start = end;
-            }
+            // Keep searching for the local peak
+            while (R < N-1 && prices[R] <= prices[R+1])
+                R++;
+            
+            result += prices[R] - prices[L];
 
-            end++;
+            L = R+1;
+            // Increment
+            R++;
         }
 
-        if (start != prices.size() - 1)
-            max_profit += prices[prices.size() - 1] - prices[start];
-
-        return max_profit;
+        return result;
     }
 };
 
@@ -155,18 +127,19 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution_2 {
+class Solution_Intuitive {
 public:
-    int maxProfit(std::vector<int>& prices)
+    int maxProfit(vector<int>& prices)
     {
+        const int N = prices.size();
         int profit = 0;
-        bool buying = true;
 
-        for (int i = 0; i < prices.size(); i++)
+        bool buying = true; // State
+        for (int i = 0; i < N; i++)
         {
             if (buying)
             {
-                if (i+1 < prices.size() && prices[i] < prices[i+1])
+                if (i+1 < N && prices[i] < prices[i+1])
                 {
                     profit -= prices[i];
                     buying = false;
@@ -174,7 +147,7 @@ public:
             }
             else // Selling
             {
-                if (i+1 == prices.size() || prices[i] > prices[i+1])
+                if (i+1 == N || prices[i] > prices[i+1])
                 {
                     profit += prices[i];
                     buying = true;
@@ -196,8 +169,10 @@ public:
 
     Same Idea, though, much more neatly written.
 
-    Though, now we don't count "end day - start day", but "today - yesterday"
-    if today is larger than yesterday(i.e. we're going to make a profit).
+    Though, now we don't count "end day - start day", but "today - yesterday".
+
+    If today is larger than yesterday(i.e. we're going to make a profit), then
+    take that profit into account.
 
 */
 
@@ -208,13 +183,14 @@ public:
 /* Space Complexity: O(1) */
 class Solution_Neat {
 public:
-    int maxProfit(std::vector<int>& prices)
+    int maxProfit(vector<int>& prices)
     {
+        const int N = prices.size();
         int profit = 0;
 
-        for (int i = 1; i < prices.size(); i++)
+        for (int i = 1; i < N; i++)
         {
-            if (prices[i] > prices[i - 1])
+            if (prices[i-1] < prices[i])
                 profit += prices[i] - prices[i - 1];
         }
 
