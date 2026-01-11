@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-
 /*
     ==============
     === MEDIUM ===
@@ -43,6 +39,9 @@
 
 */
 
+#include <vector>
+#include <unordered_map>
+using namespace std;
 
 /*
     ------------
@@ -496,82 +495,31 @@
     At the very end we return "total" as the final answer.
 */
 
-/* Time  Beats: 89.97% */
-/* Space Beats: 95.60% */
+/* Time  Beats: 95.81% */
+/* Space Beats: 69.69% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution {
 public:
-    int subarraySum(std::vector<int>& nums, int k)
+    int subarraySum(vector<int>& nums, int k)
     {
         int result = 0;
 
-        std::unordered_map<int, int> prefix_sum;
-        prefix_sum.insert({0, 1});
+        unordered_map<int, int> prefix_sum;
+        prefix_sum.insert( {0, 1} );
 
-        int sum = 0;
+        int curr_sum = 0;
         for (int i = 0; i < nums.size(); i++)
         {
-            sum += nums[i];
+            curr_sum += nums[i];
 
-            if (prefix_sum.find(sum - k) != prefix_sum.end())
-                result += prefix_sum[sum - k];
+            if (prefix_sum.find(curr_sum - k) != prefix_sum.end())
+                result += prefix_sum[curr_sum - k];
 
-            prefix_sum[sum]++;
+            prefix_sum[curr_sum]++;
         }
 
         return result;
     }
 };
-
-
-int
-main()
-{
-    Solution sol;
-
-
-    /* Example 1 */
-    // std::vector<int> nums = {1, 1, 1};
-    // int k = 2;
-
-    /* Example 2 */
-    // std::vector<int> nums = {1, 2, 3};
-    // int k = 3;
-
-    /* Example 3 */
-    std::vector<int> nums = {-1, 1, 0, 1, -1};
-    int k = 0;
-
-
-    std::cout << "\n\t=============================";
-    std::cout << "\n\t=== SUBARRAY SUM EQUALS K ===";
-    std::cout << "\n\t=============================\n";
-
-
-    /* Write Input */
-    bool first = true;
-    std::cout << "\n\tArray: [";
-    for (auto x: nums)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        std::cout << x;
-        first = false;
-    }
-    std::cout << "]";
-    std::cout << "\n\tK = " << k << "\n";
-
-
-    /* Solution */
-    int count = sol.subarraySum(nums, k);
-
-
-    /* Write Output */
-    std::cout << "\n\tOutput: " << count << "\n\n";
-
-
-    return 0;
-}
