@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ============
     === HARD ===
@@ -61,6 +59,11 @@
 
 */
 
+#include <climits>
+#include <stack>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -77,41 +80,45 @@
 /* Space Complexity: O(n^2) */
 class Solution_Brute_Force {
 public:
-    int maximalRectangle(std::vector<std::vector<char>>& matrix)
+    int maximalRectangle(vector<vector<char>>& matrix)
     {
         if (matrix.empty() || matrix[0].empty())
             return 0;
 
         const int ROWS = matrix.size();
         const int COLS = matrix[0].size();
+        int result = 0;
 
-        // Include an extra element for easier calculation
-        std::vector<int> heights(COLS + 1, 0);
-        int max_area = 0;
-
-        for (const auto& row : matrix)
+        vector<int> heights(COLS + 1, 0);
+        for (int row = 0; row < ROWS; row++)
         {
-            for (int i = 0; i < COLS; i++)
-                heights[i] = (row[i] == '1') ? heights[i] + 1 : 0;
-
-            // Calculate max area using histogram method
-            int n = heights.size(); // Number of bars in the histogram
-
-            for (int i = 0; i < n; i++)
+            // Build histogram heights for current row
+            for (int col = 0; col < COLS; col++)
             {
-                int min_height = INT_MAX;
+                if (matrix[row][col] == '1')
+                    heights[col]++;
+                else
+                    heights[col] = 0;
+            }
 
-                for (int j = i; j < n; j++)
+            // Brute-force largest rectangle in histogram
+            for(int left_col = 0; left_col < COLS; left_col++)
+            {
+                int min_height_in_range = INT_MAX;
+
+                for (int right_col = left_col; right_col < COLS; right_col++)
                 {
-                    min_height = std::min(min_height, heights[j]);
+                    min_height_in_range = min(min_height_in_range, heights[right_col]);
 
-                    int area = min_height * (j - i + 1);
-                    max_area = std::max(max_area, area);
+                    int width = right_col - left_col + 1;
+                    int area  = min_height_in_range * width;
+
+                    result = max(result, area);
                 }
             }
         }
 
-        return max_area;
+        return result;
     }
 };
 
@@ -132,108 +139,61 @@ public:
 
 */
 
-/* Time  Beats: 84.87% */
-/* Space Beats: 81.27% */
-
-/* Time  Complexity: O(N * M) */
-/* Space Complexity: O(M)     */
-class Solution_Optimization {
-public:
-    int maximalRectangle(std::vector<std::vector<char>>& matrix)
-    {
-        if (matrix.empty() || matrix[0].empty())
-            return 0;
-
-        int ROWS = matrix.size();
-        int COLS = matrix[0].size();
-        std::vector<int> heights(COLS + 1, 0); // Include an extra element for easier calculation
-        int max_area = 0;
-
-        for (const auto& row : matrix)
-        {
-            for (int i = 0; i < COLS; i++)
-            {
-                heights[i] = (row[i] == '1') ? heights[i] + 1 : 0;
-            }
-
-            // Calculate max area using stack-based method
-            stack<int> stack;
-            for (int i = 0; i < heights.size(); i++)
-            {
-                while (!stack.empty() && heights[i] < heights[stack.top()])
-                {
-                    int h = heights[stack.top()];
-                    stack.pop();
-                    int w = stack.empty() ? i : i - stack.top() - 1;
-                    max_area = max(max_area, h * w);
-                }
-
-                stack.push(i);
-            }
-        }
-
-        return max_area;
-    }
-};
-
-
-
-
 /* Time  Beats: 93.51% */
 /* Space Beats: 66.81% */
 
-/* Time  Complexity: O(n^2 * m) */
-/* Space Complexity: O(m)       */
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(COLS)        */
 class Solution {
 public:
-    int maximalRectangle(std::vector<std::vector<char>>& matrix)
+    int maximalRectangle(vector<vector<char>>& matrix)
     {
         const int ROWS = matrix.size();
         const int COLS = matrix[0].size();
+        int result = 0;
 
-        std::vector<int>heights(COLS, 0);
+        vector<int>heights(COLS, 0);
 
-        int result=0;
-        for(int i = 0; i < ROWS; i++)
+        for (int row = 0; row < ROWS; row++)
         {
-            for(int j = 0; j < COLS; j++)
+            for (int col = 0; col < COLS; col++)
             {
-                if (matrix[i][j] == '1')
-                    heights[j]++;
+                if (matrix[row][col] == '1')
+                    heights[col]++;
                 else
-                    heights[j] = 0;
+                    heights[col] = 0;
             }
 
-            result = std::max(result, area(heights));
+            result = max(result, area(heights));
         }
 
         return result;
     }
 
 private:
-    int area(std::vector<int>&heights)
+    int area(vector<int>& heights)
     {
-        int n = heights.size();
+        const int COLS = heights.size();
         int result = 0;
 
-        std::stack<int> stack;
-        for(int i = 0; i <= n; i++)
+        stack<int> stack;
+        for (int col = 0; col <= COLS; col++)
         {
-            while(!stack.empty() && (i==n || heights[stack.top()] >= heights[i]))
+            while ( ! stack.empty() && (col == COLS || heights[stack.top()] >= heights[col]))
             {
-                int height = heights[stack.top()];
+                int curr_h = heights[stack.top()];
                 stack.pop();
-                int width;
 
+                int curr_w;
                 if (stack.empty())
-                    width = i;
+                    curr_w = col;
                 else
-                    width = i - stack.top() - 1;
+                    curr_w = col - stack.top() - 1;
 
-                result = std::max(result, width * height);
+                result = max(result, curr_w * curr_h);
             }
 
-            stack.push(i);
+            stack.push(col);
         }
 
         return result;
