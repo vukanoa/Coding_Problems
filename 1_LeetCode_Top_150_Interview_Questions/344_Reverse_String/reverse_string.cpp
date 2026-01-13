@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ============
     === EASY ===
@@ -42,6 +40,9 @@
 
 */
 
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -51,19 +52,24 @@
 
 */
 
-/* Time  Beats: 87.20% */
-/* Space Beats: 94.89% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  50.20% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution{
+class Solution {
 public:
-    void reverseString(std::vector<char>& s)
+    void reverseString(vector<char>& s)
     {
-        int left  = 0;
-        int right = s.size() - 1;
+        int L = 0;
+        int R = s.size() - 1;
 
-        while (left < right)
-            std::swap(s[left++], s[right--]);
+        while (L < R)
+        {
+            swap(s[L], s[R]);
+
+            L++; // Increment
+            R--; // Decrement
+        }
     }
 };
