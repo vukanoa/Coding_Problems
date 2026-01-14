@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ============
     === EASY ===
@@ -43,183 +41,66 @@
 
 */
 
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Once left and right pointer point to different characters, check:
-        1. Substring [left, right] without the char "left"  pointers points to.
-        2. Substring [left, right] without the char "right" pointers points to.
-
-    Note that we are not checking the entire remaining of the string, only the
-    substring between "left" and "right" pointer, inclusive.
-
-    Example:
-        a b x d e d t b a
-
-    Since prefix "ab" and suffix "ba" are the same, we do NOT consider them.
-
-*******************************************************************************
-********************************** SIMULATION *********************************
-*******************************************************************************
-
-                                s = "a b x d e d t b a"
-
--------------------------------------------------------------------------------
-
-    1) s = "a b x d e d t b a"  // S[L] == S[R] --> L++; R--;
-            L               R
-
--------------------------------------------------------------------------------
-
-    2) s = "a b x d e d t b a"  // S[L] == S[R] --> L++; R--;
-              L           R
-
--------------------------------------------------------------------------------
-
-    3) s = "a b x d e d t b a"  // S[L] != S[R] --> Check w/o s[L] and w/o s[R]
-                L       R
-
-            without_left  = "dedt" // s.substr(L+1, R - L);
-            without_right = "xded" // s.substr(L  , R - L);
-
-        If either of these two substrings IS INDEED a palindrome - return true.
-        Else, return false;
-
--------------------------------------------------------------------------------
-
-*/
-
-/* Time  Beats: 84.72% */
-/* Space Beats: 79.03% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution_Neat {
-public:
-    bool validPalindrome(std::string s)
-    {
-        if (palindrome(s))
-            return true;
-
-        int left  = 0;
-        int right = s.length() - 1;
-
-        while(left < right)
-        {
-            if (s[left] != s[right])
-            {
-                std::string without_left  = s.substr(left+1, right - left);
-                std::string without_right = s.substr(left  , right - left);
-
-                return palindrome(without_left) || palindrome(without_right);
-            }
-
-            left++;
-            right--;
-        }
-
-        return false;
-    }
-
-private:
-    bool palindrome(std::string s)
-    {
-        int left  = 0;
-        int right = s.length() - 1;
-
-        while (left < right)
-        {
-            if (s[left] != s[right])
-                return false;
-
-            left++;
-            right--;
-        }
-
-        return true;
-    }
-};
-
-
+#include <string>
+using namespace std;
 
 /*
     ------------
     --- IDEA ---
     ------------
 
-    This implementation got better results on LeetCode. I have no idea why.
-    Maaaybe because we do not call a function, however compiler should optimize
-    for that.
+    Keep two pointers at two opposing sides. If at any point we see that two
+    characters are NOT equals, then check to see if the remaining INNER part
+    of the string without s[L] OR without s[R] is a palindrome.
 
-    Anyway, this one is faster on LeetCode even if both Time and Space
-    Complexities are the same.
+    We're allowed to remove at most ONE character, therefore if a remaining
+    INNER string(i.e. the one without s[L] or the one without s[R]) is NOT
+    a palindorme, we return false.
+
+    Otherwise we return true.
 
 */
 
-/* Time  Beats: 93.93% */
-/* Space Beats: 90.63% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  31.11% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
     bool validPalindrome(string s)
     {
-        int left  = 0;
-        int right = s.length() - 1;
+        const int N = s.size();
 
-        while (left < right)
+        int L = 0;
+        int R = N-1;
+
+        // O(N) (entire block)
+        while (L < R)
         {
-            if (s[left] != s[right])
+            if (s[L] != s[R])
             {
-                // Skip left
-                int l = left + 1;
-                int r = right;
-
-                bool palindrome = true;
-                while (l < r)
-                {
-                    if (s[l] != s[r])
-                    {
-                        palindrome = false;
-                        break;
-                    }
-
-                    l++;
-                    r--;
-                }
-
-                if (palindrome)
-                    return true;
-
-                palindrome = true;
-
-                // Skip Right
-                l = left;
-                r = right - 1;
-
-                while (l < r)
-                {
-                    if (s[l] != s[r])
-                    {
-                        palindrome = false;
-                        break;
-                    }
-
-                    l++;
-                    r--;
-                }
-
-                if (palindrome)
-                    return true;
-
-                return false;
+                return is_palindrome(s, L+1, R  ) || // Remove chr s[L]
+                       is_palindrome(s, L  , R-1);   // Remove chr s[R]
             }
 
-            left++;
-            right--;
+            L++; // Increment
+            R--; // Decrement
+        }
+
+        return true;
+    }
+
+private:
+    bool is_palindrome(string s, int L, int R)
+    {
+        while (L < R)
+        {
+            if (s[L] != s[R])
+                return false;
+
+            L++; // Increment
+            R--; // Decrement
         }
 
         return true;
