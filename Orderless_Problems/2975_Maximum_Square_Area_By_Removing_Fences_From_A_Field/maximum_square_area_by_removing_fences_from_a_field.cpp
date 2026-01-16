@@ -62,6 +62,7 @@
 */
 
 #include <algorithm>
+#include <unordered_set>
 #include <vector>
 using namespace std;
 
@@ -156,6 +157,83 @@ private:
                 else
                 {
                     seen_lengths.push_back(len);
+                }
+            }
+        }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 99.03% */
+/* Space Beats: 36.89% */
+
+/* Time  Complexity: O(H^2 * logH + V^2 * logV) */
+/* Space Complexity: O(H^2)                     */
+class Solution_Set {
+public:
+    const int MOD = 1e9 + 7;
+
+    int maximizeSquareArea(int m, int n, vector<int>& hFences, vector<int>& vFences)
+    {
+        const int H_SIZE = hFences.size() + 2;
+        const int V_SIZE = vFences.size() + 2;
+
+        if (H_SIZE > V_SIZE)
+            return maximizeSquareArea(n, m, vFences, hFences);
+
+        hFences.push_back(1);
+        hFences.push_back(m);
+
+        vFences.push_back(1);
+        vFences.push_back(n);
+
+        seen.reserve(H_SIZE * (V_SIZE - 1));
+
+        collect_or_match_lengths(hFences, H_SIZE, false);
+        collect_or_match_lengths(vFences, V_SIZE, true);
+
+        if (max_len == 0)
+            return -1;
+
+        return 1LL * max_len * max_len % MOD;
+    }
+
+private:
+    unordered_set<int> seen;
+    int max_len = 0;
+
+    void collect_or_match_lengths(vector<int>& fences, int SIZE, bool should_match)
+    {
+        /* Sort */
+        sort(fences.begin(), fences.end());
+
+        for (int L = 0; L < SIZE - 1; L++)
+        {
+            int base = fences[L];
+
+            for (int R = L + 1; R < SIZE; R++)
+            {
+                int len = fences[R] - base;
+
+                if (should_match)
+                {
+                    if (len > max_len && seen.count(len))
+                        max_len = len;
+                }
+                else
+                {
+                    seen.insert(len);
                 }
             }
         }
