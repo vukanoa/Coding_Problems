@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -43,12 +40,18 @@
 
 */
 
+
+#include <cstring>
+#include <string>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Idea is **Absolutely Equivalent** to:
+    Idea is Very Similar to:
         LeetCode Problem 438 "Find All Anagrams In A String"
 
     The only thing that differs is the return type.
@@ -65,39 +68,42 @@
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_Sliding_Window {
+class Solution_1 {
 public:
-    bool checkInclusion(std::string s1, std::string s2)
+    bool checkInclusion(string s1, string s2)
     {
-        if (s1.length() > s2.length())
+        const int SIZE_ONE = s1.size();
+        const int SIZE_TWO = s2.size();
+
+        if (SIZE_ONE > SIZE_TWO)
             return false;
 
-        std::vector<int> s1_map(26, 0);
-        std::vector<int> s2_map(26, 0);
+        vector<int> freq_s1(26, 0);
+        vector<int> freq_s2(26, 0);
 
         /* First window */
         for (int i = 0; i < s1.length(); i++)
         {
-            s1_map[s1[i] - 'a']++;
-            s2_map[s2[i] - 'a']++;
+            freq_s1[s1[i] - 'a']++;
+            freq_s2[s2[i] - 'a']++;
         }
 
-        if (s1_map == s2_map)
+        if (freq_s1 == freq_s2)
             return true;
 
-        int left  = 0;
-        int right = s1.length();
+        int L  = 0;
+        int R = SIZE_ONE;
 
         /* Sliding Window */
-        while (right < s2.length())
+        while (R < SIZE_TWO)
         {
-            s2_map[s2[left] - 'a']--;
-            left++;
+            freq_s2[s2[L] - 'a']--;
+            L++;
 
-            s2_map[s2[right] - 'a']++;
-            right++;
+            freq_s2[s2[R] - 'a']++;
+            R++;
 
-            if (s1_map == s2_map)
+            if (freq_s1 == freq_s2)
                 return true;
         }
 
@@ -115,85 +121,49 @@ public:
 
     Same as above, implemented in another way.
 
+    This one uses basic integer arrays on the Stack instead of utilizing
+    "vectors".
+
+    It's handy to know and see both.
+
 */
 
 /* Time  Beats: 100.00% */
-/* Space Beats:  35.38% */
+/* Space Beats:  68.34% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution_Another_Implementation {
+/* Time  Complexity: O(M + N * 128) --> O(M + N) */
+/* Space Complexity: O(1)           --> O(1)     */
+class Solution_2 {
 public:
     bool checkInclusion(string s1, string s2)
     {
-        vector<int> letters_one(26, 0);
-        vector<int> letters_two(26, 0);
+        const int M = s1.size();
+        const int N = s2.size();
 
-        for (const char& chr : s1)
-            letters_one[chr - 'a']++;
+        if (N < M)
+            return false;
 
-        int left  = 0;
-        int right = 0;
-        while (right < s2.length())
+        int freq_s1[26] = {0};
+        int freq_s2[26] = {0};
+
+        for (const char& chr : s1) // O(M)
+            freq_s1[chr - 'a']++;
+
+        int L = 0;
+        for (int R = 0; R < N; R++) // O(N)
         {
-            letters_two[s2[right] - 'a']++;
+            freq_s2[s2[R] - 'a']++;
 
-            // Increment
-            right++;
-
-            if (right < s1.length())
+            if ((R - L + 1) < M)
                 continue;
 
-            if (letters_one == letters_two)
+            if (memcmp(freq_s1, freq_s2, sizeof(freq_s1)) == 0) // O(128)
                 return true;
 
-            letters_two[s2[left] - 'a']--;
-            left++; // Shrink left-bound, i.e. "Slide Window"
+            freq_s2[s2[L] - 'a']--;
+            L++;
         }
 
         return false;
     }
 };
-
-
-int
-main()
-{
-    Solution_Sliding_Window sol_win;
-
-
-    /* Example 1 */
-    // std::string s1 = "ab";
-    // std::string s2 = "eidbaooo";
-
-    /* Example 2 */
-    // std::string s1 = "ab";
-    // std::string s2 = "eidboaoo";
-
-    /* Example 3 */
-    std::string s1 = "abc";
-    std::string s2 = "bbbca";
-
-    std::cout << "\n\t=============================";
-    std::cout << "\n\t=== PERMUTATION IN STRING ===";
-    std::cout << "\n\t=============================\n";
-
-
-    /* Write Input */
-    std::cout << "\n\ts1 = \"" << s1 << "\"";
-    std::cout << "\n\ts2 = \"" << s2 << "\"\n";
-
-
-    /* Solution */
-    bool b = sol_win.checkInclusion(s1, s2);
-
-
-    /* Write Output */
-    if (b)
-        std::cout << "\n\tOutput: True\n\n";
-    else
-        std::cout << "\n\tOutput: False\n\n";
-
-
-    return 0;
-}
