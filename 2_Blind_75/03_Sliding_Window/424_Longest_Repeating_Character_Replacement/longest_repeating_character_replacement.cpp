@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -49,6 +46,11 @@
     0 <= k <= s.length
 
 */
+
+#include <algorithm>
+#include <string>
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -379,20 +381,21 @@
 */
 class Solution {
 public:
-    int characterReplacement(std::string s, int k)
+    int characterReplacement(string s, int k)
     {
-        std::vector<int> letters(26, 0);
+        const int N = s.size();
+        int letters[26] = {0}; // Frequency counter
 
-        int left = 0;
+        int left  = 0;
         int right = 0;
 
-        int longest = 0;
-        while (right < s.length())
+        int result = 0;
+        while (right < N)
         {
             letters[s[right] - 'A']++;
 
             // O(26) -> constant -> O(1)
-            int max_freq = *std::max_element(letters.begin(), letters.end());
+            int max_freq = *max_element(begin(letters), end(letters));
 
             // current_window_length = right - left + 1
             if ((right - left + 1) - max_freq > k)
@@ -402,12 +405,13 @@ public:
             }
 
             // current_window_length = right - left + 1
-            longest = std::max(longest, right - left + 1);
+            result = max(result, right - left + 1);
 
+            // Increment
             right++;
         }
 
-        return longest;
+        return result;
     }
 };
 
@@ -589,21 +593,22 @@ public:
 /* Space Complexity: O(1) */
 class Solution_Flat_O_of_n {
 public:
-    int characterReplacement(std::string s, int k)
+    int characterReplacement(string s, int k)
     {
-        std::vector<int> letters(26, 0);
+        const int N = s.size();
+        int result = 0;
+
+        int letters[26] = {0}; // Frequency counter
 
         int left  = 0;
         int right = 0;
         int max_freq = 0;
-
-        int longest = 0;
-        while (right < s.length())
+        while (right < N)
         {
             letters[s[right] - 'A']++;
 
             // This is the optimization.
-            max_freq = std::max(max_freq, letters[s[right] - 'A']);
+            max_freq = max(max_freq, letters[s[right] - 'A']);
 
             // current_window_length = right - left + 1
             if ((right - left + 1) - max_freq > k)
@@ -613,11 +618,12 @@ public:
             }
 
             // current_window_length = right - left + 1
-            longest = std::max(longest, right - left + 1);
+            result = max(result, right - left + 1);
 
+            // Increment
             right++;
         }
 
-        return longest;
+        return result;
     }
 };
