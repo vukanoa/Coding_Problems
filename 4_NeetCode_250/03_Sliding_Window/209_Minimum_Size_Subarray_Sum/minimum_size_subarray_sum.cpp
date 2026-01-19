@@ -44,6 +44,7 @@
 
 */
 
+#include <algorithm>
 #include <climits>
 #include <vector>
 using namespace std;
@@ -132,4 +133,52 @@ public:
 
         return result == INT_MAX ? 0 : result;
     }
-};;
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    A "Follow Up" asks us to solve this in a LESS EFFICIENT way. So here it is.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  6.63% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Follow_Up {
+public:
+    int minSubArrayLen(int target, vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = INT_MAX;
+
+        vector<int> prefix_sum(N, 0);
+        prefix_sum[N-1] = nums[N-1];
+
+        // O(N) (entire block)
+        for (int i = N-2; i >= 0; i--)
+            prefix_sum[i] = nums[i] + prefix_sum[i+1];
+
+        // O(N * logN)
+        for (int left = 0; left < N; left++)
+        {
+            if (prefix_sum[left] < target)
+                break;
+
+            // O(log N)
+            auto iter = upper_bound(prefix_sum.rbegin(), prefix_sum.rend(), prefix_sum[left] - target);
+            int right = prefix_sum.rend() - iter - 1;
+
+            result = min(result, right - left + 1);
+        }
+
+        return result == INT_MAX ? 0 : result;
+    }
+};
