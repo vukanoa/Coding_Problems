@@ -106,3 +106,219 @@ public:
         return ans;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The very first thing we must take note of is that for any number X, if we
+    add 1 to it, then bitwise-speaking we're flipping the first 0 from the
+    right(i.e. the lowest 0 bit, i.e. the LSB that is NOT set) and everything
+    before it(to the right of it) becomes 0.
+
+    Let's see it practically as it's much easier to follow:
+
+                                   ---- rightmost 0
+                                   |
+                                   |
+                                   v
+        X   = 134     -->  1000 0110
+        X+1 = 135     -->  1001 0111
+
+            or
+                                ---- rightmost 0
+                                |
+                                |
+                                v
+        X   = 167      --> 1010 0111
+        X+1 = 168      --> 1010 1000
+
+    Once we flip the the rightmost 0, everything to the right of it becomes 0,
+    while the 0 itself becomes 1 since we've flipped it.
+
+    That's the first thing we need to understand.
+
+
+    Now that implies that for any set-bit(i.e. 1-bit) that appears BEFORE the
+    first 0-bit(from LEAST significant bit to MOST significant bit) in the
+    binary representation of nums[i], changing that 1-bit to 0-bit will produce
+    a valid X(i.e. ans[i]) such that:
+
+        X | (X + 1) == nums[i]
+
+            or
+
+        ans[i] | (ans[i] + 1) == nums[i]
+
+
+    Since the problem asks for the SMALLEST "ans[i]", we ONLY need to locate
+    the position "pos" of the first 0-bit from the right and set it the 1-bit
+    at position (pos - 1) to 0.
+
+
+
+    The implementation of the "while loop" is crucial in this Solution.
+
+    <Check out the detailed comment in within the code>
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  55.03% */
+
+/* Time  Complexity: O(N * log(M)) */ // Where 'M' is the value of nums[i]
+/* Space Complexity: O(1)          */ // "result" is not EXTRA space usually
+class Solution_2 {
+public:
+    vector<int> minBitwiseArray(vector<int>& nums)
+    {
+        const int N = nums.size();
+        vector<int> ans(N, -1); // Usually not considered EXTRA space
+
+        // O(N * logM) (enire block)
+        for (int i = 0; i < N; i++) // O(N)
+        {
+            int smallest_valid_ans = -1;
+
+            // O(logM) (enire block)
+            int lowest_zero_bit_position = 0;
+            // While lowest_zero_bit_position of nums[i] is SET(i.e. 1-bit)
+            while ((nums[i] & (1 << lowest_zero_bit_position)) != 0)
+            {
+                /*
+                    Flip only that bit of nums[i] and set it as a:
+
+                        smallest_valid_ans
+
+                    Why does this work?
+                    Consider nums[i] == 31      -->  0001 1111
+                                                     7654 3210
+
+                    Since our "lowest_zero_bit_position" goes from 0 upwards,
+                    flipping LOWER bits will result in BIGGER ans[i].
+
+                    However, we want to MINIMIZE ans[i].
+
+                    Therefore, since we're going from the right, if we flip the
+                    rightmost 1-bit, we'll have:
+
+                        31 & ~(1 << 0)
+
+                    i.e.:
+                        0001 1111   <-- 31
+                     &  1111 1110   <-- ~(1 << 0)
+                       ----------
+                        0001 1110   <-- 30
+
+                    But how do we know that: 30 | (30 + 1) will be nums[i]?
+                    Because we've noticed already that any number X ORed with
+                    (X+1) will set the RIGHTMOST 0 of X to 1 and all the bits
+                    to the right of it, to 0s.
+
+                    How does that guarantee that: X | (X+1) == nums[i]?
+
+                    Because X, in our case, is "smallest_valid_ans" which is
+                    gained by using nums[i] itself:
+
+                        X = nums[i] & ~(1 << lowest_zero_bit_position)
+
+                    X in our case is LITERALLY "nums[i] with 0-bit in one of
+                                                its rightmost 1-bits"
+
+                    Look at this:
+
+                        0001 1111   <-- 31 == nums[i]
+                     &  1111 1110   <-- ~(1 << 0) <==> ~(1)
+                       ----------
+                        0001 1110   <-- 30 == X == smallest_valid_ans
+
+
+                        0001 1111   <-- 31 == nums[i]
+                        0001 1110   <-- 30 == X == smallest_valid_ans
+                                ^
+                                |
+                                |
+                         Only THIS bit DIFFERS(there's only a SINGLE "hole")
+
+
+                    
+
+
+                        0001 1111   <-- 31 == nums[i]
+                     &  1111 1101   <-- ~(1 << 1)  <==> ~(2)
+                       ----------
+                        0001 1101   <-- 29
+
+
+                        0001 1111   <-- 31 == nums[i]
+                        0001 1101   <-- 29 == X
+                               ^
+                               |
+                               |
+                        Only THIS bit DIFFERS(there's only a SINGLE "hole")
+
+
+                    And how do we know that (29 | (29 + 1)) == 31?
+
+                    Remember the first thing we've noticed?
+
+                                                   ---- rightmost 0
+                                                   |
+                                                   |
+                                                   v
+                        X   = 134     -->  1000 0110
+                        X+1 = 135     -->  1001 0111
+
+                            or
+                                                ---- rightmost 0
+                                                |
+                                                |
+                                                v
+                        X   = 167      --> 1010 0111
+                        X+1 = 168      --> 1010 1000
+
+
+                    This means that EVERYTHING to the right of
+                    lowest_zero_bit_position when ORed, will "fill the hole"
+                    that now exists in smallest_valid_ans.
+
+                    Remember how:
+
+                        0001 1111   <-- 31 == nums[i]
+                        0001 1101   <-- 29 == X
+                               ^
+                               |
+                               |
+                        Only THIS bit DIFFERS(there's only a SINGLE "hole")
+
+                    There is only a SINGLE "hole"!
+                    We'll CERTAINLY fill that hole of X by doing:
+
+                        X | (X+1)
+
+                    And, thus, we'll return back to our "nums[i]".
+
+
+                    Again, don't get our of your mind that:
+
+                        X is nums[i] with a SINGLE "hole".
+                        ("hole" means a SINGLE bit of the CONSECUTIVE 1-bits
+                         glued to the right is a 0-bit)
+
+                        (read that parentheses again, until you "clock it")
+
+                */
+                smallest_valid_ans = nums[i] & ~(1 << lowest_zero_bit_position);
+                lowest_zero_bit_position++;
+            }
+
+            ans[i] = smallest_valid_ans;
+        }
+
+        return ans;
+    }
+};
