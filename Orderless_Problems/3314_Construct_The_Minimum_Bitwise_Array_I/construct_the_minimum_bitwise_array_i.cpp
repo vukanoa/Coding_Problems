@@ -65,19 +65,22 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    Since "Constraints" are small, we are allow to perform a Brute-Force.
-    Go through each pimre in "nums" and start 'x' at 1 and the first (x&(x+1))
-    that you find, put it in ans[i] and break for that nums[i].
+    Since the most optimal Solution is far from intuitive, especially for an
+    EASY problem and especially for beginners, it's always good to try and do
+    the "Brute Force" that is allowed according to the Constraints.
 
-    That's it.
+    In this case, since we're told that ans[i] needs to be MINIMIZED, we start
+    from 1 and go up until nums[i](non-inclusive) and try to do a bitwise OR
+    for every number. As soon as we find ((num | (num + 1)) == nums[i]) we stop
+    and put it in ans[i].
 
 */
 
-/* Time  Beats: 52.47% */
-/* Space Beats: 16.99% */
+/* Time  Beats: 23.67% */
+/* Space Beats: 26.63% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */ // Result is not considered extra space
+/* Time  Complexity: O(M * N) */ // Where 'M' is the value of nums[i]
+/* Space Complexity: O(1)     */ // "result" is not EXTRA space usually
 class Solution {
 public:
     vector<int> minBitwiseArray(vector<int>& nums)
@@ -87,11 +90,14 @@ public:
 
         for (int i = 0; i < N; i++)
         {
-            for (int x = 1; x < nums[i]; x++)
+            if (nums[i] == 2)
+                continue;
+
+            for (int num = 1; num < nums[i]; num++)
             {
-                if ((x | (x + 1)) == nums[i])
+                if ((num | (num + 1)) == nums[i])
                 {
-                    ans[i] = x;
+                    ans[i] = num;
                     break;
                 }
             }
