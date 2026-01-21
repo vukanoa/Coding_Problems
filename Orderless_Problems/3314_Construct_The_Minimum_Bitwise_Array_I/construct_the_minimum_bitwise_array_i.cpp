@@ -397,3 +397,193 @@ public:
         return ans;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    First, you need to know that 2 is THE ONLY even prime number.
+
+    Now let's see a cool bitwise "tricks" when the number is ODD, i.e. it
+    containts TRAILING 1-bits.
+
+    ~~~~~~~~~~~~~~~~
+    ~~~ Trick #1 ~~~
+    ~~~~~~~~~~~~~~~~
+
+        Adding 1 to some ODD number will FLIP all the bits from the RIGHTMOST
+        0-bit all the way to the right(toward LSBs, i.e. Least Significant
+        Bits)
+
+                   23    0001 0111
+                   24    0001 1000
+                              ~~~~
+                                ^
+                                |
+                                |
+                           These are flipped
+
+
+    ~~~~~~~~~~~~~~~~
+    ~~~ Trick #2 ~~~
+    ~~~~~~~~~~~~~~~~
+
+        If we do a bitwise-OR on (X | (X+1)), we'll get Y.
+
+            X      71    0100 0111
+            X+1    72    0100 1000  OR
+                   ---------------
+            Y      79    0100 1111
+
+        What is the relationship between X and Y now?
+
+            X      71    0100 0111
+            Y      79    0100 1111
+                              ^
+                              |
+                              |______________________
+                                                    |
+        They differ at EXACTLY one bit, i.e. the LEFTMOST TRAILING 1-bit in Y
+        They differ at EXACTLY one bit, i.e. the RIGHTMOST         0-bit in X.
+
+
+        Therefore, since Y is nums[i] in our case, how do we find the "leftmost
+        trailing 1-bit" in it?
+
+            Y      79    0100 1111
+                              ^
+                              |
+                              |_______
+                                     |
+        How do we find position of THIS bit efficiently?
+
+
+
+    ~~~~~~~~~~~~~~~~
+    ~~~ Trick #3 ~~~
+    ~~~~~~~~~~~~~~~~
+
+        To find the RIGHTMOST 1-bit:
+
+            -q & q
+            ^
+            |
+            |____
+                |
+               This is a NEGATIVE sign, not a tilde(bitwise-COMPLEMENT oper.)
+
+
+    ~~~~~~~~~~~~~~~~
+    ~~~ Trick #4 ~~~
+    ~~~~~~~~~~~~~~~~
+
+        To find the RIGHTMOST 0-bit:
+            
+            -(~q) & (~q)
+            ^ ^      ^
+            | |      |
+        ____| |______|
+        |         |
+      NEGATIVE   Bitwise-NOT(aka Bitwise-COMPLEMENT)
+        sign       operator
+
+
+        However, we can simplify this because:
+
+            -(~q)  <==> (q + 1)
+            ^ ^
+            | |
+        ____| |____
+        |         |
+      NEGATIVE   Bitwise-NOT(aka Bitwise-COMPLEMENT)
+        sign       operator
+
+
+        We cam simplify it to:
+
+            (q + 1) & (~q)
+                       ^
+                       |
+                       |
+                    Bitwise-NOT, aka Bitwise-COMPLEMENT operator
+
+    ~~~~~~~~~~~~~~~~
+    ~~~ Trick #5 ~~~
+    ~~~~~~~~~~~~~~~~
+
+        Leftmost trailing 1-bit
+
+        To find the LEFTMOST trailing 1-bit of nums[i](i.e. of 'q') we'll
+        have to do:
+
+            (q + 1) & (~q)
+                       ^
+                       |
+                       |
+                    Bitwise-NOT, aka Bitwise-COMPLEMENT operator
+
+        
+        Let's consider our: Y == nums[i] == q == 79
+
+           ~q     = 176    1011 0000
+            q     = 79     0100 1111
+            q + 1 = 80     0101 0000
+
+
+        Now we do:
+
+            (q + 1) & (~q)
+                       ^
+                       |
+                       |
+                    Bitwise-NOT, aka Bitwise-COMPLEMENT operator
+
+
+            q + 1 = 80     0101 0000
+           ~q     = 176    1011 0000  AND
+                          ----------
+                           0001 0000 // i.e. highest_trailing_set_bit_mask
+
+        Since we want to to set this LEFTMOST TRAILING 1-bit of nums[i](i.e. q)
+        to 0, we need to bitwise-AND it with COMPLEMENTED:
+
+            highest_trailing_set_bit_mask
+
+
+        There, we'll do:
+
+            ans[i] = nums[i] & ~highest_trailing_set_bit_mask;
+
+
+    And that's it.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  54.86% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Linear {
+public:
+    vector<int> minBitwiseArray(vector<int>& nums)
+    {
+        const int N = nums.size();
+        vector<int> ans(N, -1);
+
+        for (int i = 0; i < N; i++)
+        {
+            if (nums[i] == 2) // It's the only EVEN prime number
+                continue;
+
+            int highest_trailing_set_bit_mask = ((nums[i] + 1) & ~(nums[i])) >> 1;
+            ans[i] = nums[i] & ~highest_trailing_set_bit_mask;
+        }
+
+        return ans;
+    }
+};
