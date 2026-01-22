@@ -369,3 +369,107 @@ public:
         return vector<int>(arr.begin() + low, arr.begin() + low + k);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is another Binary-Search Solution. However, this one does NOT try to
+    find the left and right boundaries immediately, instead it tries to find
+    the x value immediately, by using "lower_bound".
+
+    However, as written in ths comment, there's a common pitfal:
+
+        Consider arr = [1, 2, 3, 10, 12, 16, 17, 18]  x = 13
+                        0  1  2   3   4   5   6   7
+                                          ^
+                                          |
+                                          |
+                                        iter
+                                        (idx)
+
+         After doing "lower_bound", our iterator will point to nums[5]==16,
+         however 12 at nums[4] is CLOSER to x than 16 at nums[5].
+
+         Therefore, we ought to move our iterator(or our "idx" which is
+         "iter - arr.begin()") back by one.
+
+    Other than that, once we find and count THE closest one, then simply assign
+    L pointer to be at idx-1 and R pointer to be at idx+1 and always move the
+    correct one.
+
+    This way we're also getting a Time Complexity of: O(log(N - K) + K).
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  63.58% */
+
+/* Time  Complexity: O(log(N - K) + K) */
+/* Space Complexity: O(1)              */ // "result" is not EXTRA space
+class Solution_Another_Binary_Search {
+public:
+    vector<int> findClosestElements(vector<int>& arr, int k, int x)
+    {
+        const int N = arr.size();
+        vector<int> result;
+        result.reserve(k);
+
+        auto iter = lower_bound(arr.begin(), arr.end(), x);
+        int idx = iter - arr.begin();
+
+        if (idx == N)
+            return vector<int>(arr.end() - k, arr.end()); // Last k
+
+        /*
+           Consider arr = [1, 2, 3, 10, 12, 16, 17, 18]  x = 13
+                           0  1  2   3   4   5   6   7
+                                             ^
+                                             |
+                                             |
+                                           iter
+                                           (idx)
+
+            After doing "lower_bound", our iterator will point to nums[5]==16,
+            however 12 at nums[4] is CLOSER to x than 16 at nums[5].
+
+            Therefore, we ought to move our iterator(or our "idx" which is
+            "iter - arr.begin()") back by one.
+        */
+        if (idx > 0)
+            idx = abs(arr[idx-1] - x) <= abs(arr[idx] - x) ? idx-1 : idx;
+
+        int L = idx-1;
+        int R = idx+1;
+
+        k--;
+        while (k > 0)
+        {
+            if (L < 0 || R == N) // If one pointer is already out-of-bounds
+            {
+                if (L < 0)
+                    R++;
+                else
+                    L--;
+            }
+            else
+            {
+                if (abs(arr[L] - x) <= abs(arr[R] - x))
+                    L--;
+                else
+                    R++;
+            }
+
+            k--;
+        }
+
+        for (int i = L+1; i < R; i++)
+            result.push_back(arr[i]);
+
+        return result;
+    }
+};
