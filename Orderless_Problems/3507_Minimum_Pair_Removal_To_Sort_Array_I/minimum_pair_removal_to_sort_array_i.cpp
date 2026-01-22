@@ -62,8 +62,6 @@
 
 */
 
-#include <algorithm>
-#include <climits>
 #include <vector>
 using namespace std;
 
@@ -72,57 +70,61 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    Brute-Force.
+    This must be done in a "Brute Force" way. There's no other way around it.
+    That's why we're given small Constraints.
 
 */
 
+/* Time  Beats: 100.00% */
+/* Space Beats:  61.14% */
+
 /* Time  Complexity: O(N^2) */
-/* Space Complexity: O(N)   */
+/* Space Complexity: O(1)   */
 class Solution {
 public:
     int minimumPairRemoval(vector<int>& nums)
     {
-        int result = 0;
+        const int N = nums.size();
+        int removed_pairs = 0;
 
-        while ( ! is_sorted(nums) && nums.size() > 1)
+        // O(N^2) (entire block)
+        while (removed_pairs < N-1) // O(N)
         {
-            int min_sum = INT_MAX;
-            for (int i = 1; i < nums.size(); i++)
-                min_sum = min(min_sum, nums[i-1] + nums[i]);
+            if (sorted_non_decreasing(nums, N-1 - removed_pairs)) // O(N)
+                break;
 
-            vector<int> tmp = {nums[0]};
+            int smallest_pair_sum_left_idx = 0; // pair = {left_idx, right_idx}
+            int smallest_sum = nums[0] + nums[1];
 
-            for (int i = 1; i < nums.size(); i++)
+            // O(N) (entire block)
+            for (int i = 1; i < N-1 - removed_pairs; i++)
             {
-                if (nums[i-1] + nums[i] == min_sum)
+                if (nums[i] + nums[i+1] < smallest_sum)
                 {
-                    tmp.pop_back();
-                    tmp.push_back(min_sum);
-
-                    if (i + 1 < nums.size())
-                        tmp.insert(tmp.end(), nums.begin() + i + 1, nums.end());
-
-                    break;
+                    smallest_sum = nums[i] + nums[i+1];
+                    smallest_pair_sum_left_idx = i;
                 }
-                else
-                    tmp.push_back(nums[i]);
             }
 
-            nums.clear();
-            nums = tmp;
+            // O(N) (entire block)
+            nums[smallest_pair_sum_left_idx] = smallest_sum;
+            for (int i = smallest_pair_sum_left_idx + 1; i < N-1 - removed_pairs; i++)
+            {
+                nums[i] = nums[i+1];
+            }
 
-            result++;
+            removed_pairs++;
         }
 
-        return result;
+        return removed_pairs;
     }
 
 private:
-    bool is_sorted(vector<int>& nums)
+    bool sorted_non_decreasing(vector<int>& nums, int last_idx)
     {
-        for (int i = 1; i < nums.size(); i++)
+        for (int i = 1; i <= last_idx; i++)
         {
-            if (nums[i - 1] > nums[i])
+            if (nums[i-1] > nums[i])
                 return false;
         }
 
