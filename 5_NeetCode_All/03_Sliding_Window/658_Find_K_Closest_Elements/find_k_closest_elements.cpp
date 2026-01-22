@@ -45,8 +45,47 @@
 
 */
 
+#include <cstdlib>
 #include <vector>
 using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Standard Sliding-Window technique.
+
+*/
+
+/* Time  Beats: 54.11% */
+/* Space Beats: 91.44% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */ // "result" is not EXTRA Space
+class Solution {
+public:
+    vector<int> findClosestElements(vector<int>& arr, int k, int x)
+    {
+        const int N = arr.size();
+
+        int L = 0;
+        int R = N-1;
+
+        while ((R - L + 1) > k) // (R - L + 1) <==> current_window_length
+        {
+            if (abs(arr[L] - x) <= abs(arr[R] - x))
+                R--;
+            else
+                L++;
+        }
+
+        return vector<int>(arr.begin() + L, arr.end() + R + 1);
+    }
+};
+
+
+
 
 /*
     ------------
