@@ -61,7 +61,7 @@ using namespace std;
 /* Space Beats: 14.40% */
 
 /* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
+/* Space Complexity: O(K) */
 class Solution_HashMap {
 public:
     bool containsNearbyDuplicate(vector<int>& nums, int k)
@@ -140,7 +140,7 @@ public:
 /* Space Beats: 81.82% */
 
 /* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
+/* Space Complexity: O(K) */
 class Solution_HashSet {
 public:
     bool containsNearbyDuplicate(vector<int>& nums, int k)
