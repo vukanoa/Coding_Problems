@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -71,96 +68,67 @@
 
 */
 
+#include <stack>
+#include <string>
+#include <unordered_set>
+#include <vector>
+using namespace std;
 
 /*
     ------------
     --- IDEA ---
     ------------
 
-    The most basic use of the Stack.
+    The most basic use of the Stack. A Simulation Problem.
+
 */
 
-/* Time  Beats: 97.20% */
-/* Space Beats: 83.98% */
+/* Time  Beats: 50.95% */
+/* Space Beats: 14.98% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution {
 public:
-    int evalRPN(std::vector<std::string>& tokens)
+    int evalRPN(vector<string>& tokens)
     {
-        std::stack<int> stack;
+        const int N = tokens.size();
 
-        for(const std::string& token : tokens)
+        unordered_set<string> operators = {"+", "-", "*", "/"};
+        stack<int> stack;
+
+        for (const string& token : tokens) // O(N)
         {
-            if (token == "+" || token == "-" || token == "*" || token == "/")
+            if (operators.count(token)) // O(1)
             {
-                int b = stack.top();
-                stack.pop();
-
-                int a = stack.top();
-                stack.pop();
+                int b = stack.top(); // O(1)
+                stack.pop();         // O(1)
+                int a = stack.top(); // O(1)
+                stack.pop();         // O(1)
 
                 if (token == "+")
-                    a = a + b;
+                {
+                    stack.push(a + b); // O(1)
+                }
                 else if (token == "-")
-                    a = a - b;
+                {
+                    stack.push(a - b); // O(1)
+                }
                 else if (token == "*")
-                    a = a * b;
-                else // if (s == "/")
-                    a = a / b;
-
-                stack.push(a);
+                {
+                    stack.push(a * b); // O(1)
+                }
+                else // str == "/"
+                {
+                    stack.push(a / b); // O(1)
+                }
             }
-            else
-                stack.push(std::stoi(token));
+            else // Number
+            {
+                stack.push(stoi(token)); // O(1)
+            }
         }
 
-        return stack.top();
+        return stack.top(); // O(1)
     }
 };
-
-
-int main()
-{
-    Solution sol;
-
-
-    /* Example 1 */
-    // std::vector<std::string> tokens = {"2","1","+","3","*"};
-
-    /* Example 2 */
-    // std::vector<std::string> tokens = {"4","13","5","/","+"};
-
-    /* Example 3 */
-    std::vector<std::string> tokens = {"10","6","9","3","+","-11","*","/","*","17","+","5","+"};
-
-    std::cout << "\n\t========================================";
-    std::cout << "\n\t=== EVALUATE REVERSE POLISH NOTATION ===";
-    std::cout << "\n\t========================================\n";
-
-
-    /* Write Input */
-    bool first = true;
-    std::cout << "\n\tTokens: [";
-    for (auto x: tokens)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        std::cout << x;
-        first = false;
-    }
-    std::cout << "]\n";
-
-
-    /* Solution */
-    int result = sol.evalRPN(tokens);
-
-
-    /* Write Output */
-    std::cout << "\n\tOutput: " << result << "\n\n";
-
-
-    return 0;
-}
