@@ -212,6 +212,7 @@
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
+#include <climits>
 class MinStack {
 public:
     MinStack()
@@ -253,4 +254,136 @@ private:
 
     int sp     = -1; // Stack     pointer
     int min_sp = -1; // Min_Stack pointer
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one uses only a SINGLE Stack.
+
+    The idea is that if the value we're about to push is the NEW MINIMUM, then
+    we push:
+
+        val - min
+
+    I.e. we push some NEGATIVE value because if (val < min), then: val - min
+    is GUARANTEED to be NEGATIVE.
+
+    Example:
+
+        min = 5, val = 3
+
+    Since val < min, i.e. 3 < 5, then 3 - 5 = -2
+
+    Otherwise, i.e. if it's GREATER THAN OR EQUALS to "min", then it will NEVER
+    be NEGATIVE(It can be 0, but it CANNOT be NEGATIVE).
+
+    Example:
+
+        min = 5, val = 7        -->     7 - 5 = 2
+
+        min = 5, val = 5        -->     5 - 5 = 0
+
+
+
+    But why are we doing that?
+    Because once it comes to "pop" operation, if the element at the TOP of the
+    Stack is NEGATIVE, then that means once this element was pushed that it is
+    THE GLOBAL MINIMUM among all of the elements on the Stack.
+
+    Therefore, by popping it we'll need to somehow "get" the new minimum.
+    How are we going to do that?
+
+    Well, since the negative value on the top of the stack is the consequence
+    of:
+
+        current_NEGATIVE_top = orig_val - min,  // min <==> MINIMUM_AT_THE_TIME
+                         min = orig_val         // orig_val becomes THE MINIMUM
+
+    i.e. current value - MINIMUM_AT_THE_TIME, then in order to restore
+    MINIMUM_AT_THE_TIME, we need to do the reverse operation:
+
+        // before this line, currently: min <==> orig_val
+        min = orig_val - current_NEGATIVE_top
+
+    Therefore, it's this:
+
+        min = min - current_NEGATIVE_top
+
+
+    Simulate one example in youre Notebook and I'm sure you'll understand. It's
+    NOT intuitive at first, but once you "see it", it becomes obvious.
+
+
+    Also, one more thing--When top() is called, you CANNOT return stack[sp] if
+    the element at the top is NEGATIVE.
+
+    So how do you get the orig_value?
+    Remember that orig_val <==> min.
+
+    However, if it's NOT negative, i.e. it's >= 0, then you ought to return:
+
+        current_top + min
+    
+    Since that is the reverse of how you got "current_top" from the orig_val
+    since "orig_val" was NOT the minimum at the time.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   5.62% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class MinStack_One_Stack {
+public:
+    MinStack_One_Stack ()
+    {
+        min = INT_MAX + 1LL; // min is LONG LONG, so it WON'T Overlfow
+    }
+    
+    void push(int val)
+    {
+        ++sp;
+        stack[sp] = val - min;
+
+        if (val < min)
+            min = static_cast<long long>(val);
+    }
+    
+    void pop()
+    {
+        if (sp == -1) // Stack is EMPTY
+            return;
+
+        long long top = stack[sp];
+        sp--;
+
+        if (top < 0) // This was THE MINIMUM when it was inserted
+            min = min - top; // Restore the previous minimum
+    }
+    
+    int top()
+    {
+        long long top = stack[sp];
+
+        return top > 0 ? static_cast<int>(top + min) : static_cast<int>(min);
+    }
+    
+    int getMin()
+    {
+        return static_cast<int>(min);
+    }
+
+private:
+    static constexpr int MAX_CALLS = 3 * 1e4;
+
+    long long stack[MAX_CALLS]; // Allocated on the STACK instead of HEAP
+    int       sp   = -1;        // Stack pointer
+    long long min;
 };
