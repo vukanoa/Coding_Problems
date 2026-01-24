@@ -61,6 +61,7 @@
 
 #include <algorithm>
 #include <climits>
+#include <cstring>
 #include <vector>
 using namespace std;
 
@@ -83,17 +84,95 @@ public:
     int minPairSum(vector<int>& nums)
     {
         const int N = nums.size();
+        int result = 0;
 
         /* Sort */
         sort(nums.begin(), nums.end());
 
         int L = 0;
         int R = N-1;
-
-        int result = INT_MIN;
         while (L < R)
         {
-            result = max(result, nums[L++] + nums[R--]);
+            result = max(result, nums[L] + nums[R]);
+
+            // Increment, Decrement
+            L++;
+            R--;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Instead of sorting and making our BigO be O(N * logN), we can use a
+    "Counting Sort" since the range is not large and thus reduce the Time
+    Complexity by an order of O(logN), which makes it: O(N + K).
+
+    Since N & K are similar values in the Constraints, it's essentially
+    Linear:
+
+        O(N + K) ~= O(N + N) ~= O(2 * N) ~= O(N)
+
+*/
+
+/* Time  Beats: 97.50% */
+/* Space Beats:  7.43% */
+
+/* Time  Complexity: O(N + K) */
+/* Space Complexity: O(K)     */ // K is the range of nums[i]
+class Solution_Linear {
+private:
+    static constexpr int MAX_SIZE = 1e5 + 1;
+    int frequency_table[MAX_SIZE];
+
+public:
+    int minPairSum(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        /* Memset */
+        memset(frequency_table, 0x00, sizeof(frequency_table)); // O(K)
+
+        int min_elem = INT_MAX;
+        int max_elem = INT_MIN;
+
+        // O(N) (entire block)
+        for (const int& num : nums)
+        {
+            frequency_table[num]++;
+
+            min_elem = min(min_elem, num); // O(1)
+            max_elem = max(max_elem, num); // O(1)
+        }
+
+        int L_val = min_elem;
+        int R_val = max_elem;
+
+        int pairs_remaining = N / 2;
+
+        // O(N + K) (entire block)
+        while (pairs_remaining > 0) // O(N / 2) --> O(N)
+        {
+            while (frequency_table[L_val] == 0) // O(K)
+                L_val++;
+
+            while (frequency_table[R_val] == 0) // O(K)
+                R_val--;
+
+            result = max(result, L_val + R_val);
+
+            frequency_table[L_val]--;
+            frequency_table[R_val]--;
+            pairs_remaining--;
         }
 
         return result;
