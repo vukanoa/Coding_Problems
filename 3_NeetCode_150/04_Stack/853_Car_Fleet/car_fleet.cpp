@@ -499,3 +499,139 @@ public:
         return stack.size();
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one can be done by thinking about it in a much simpler way.
+
+    First, it's important that it'll be beneficial for us to combine the Input
+    some third vector of pairs {position, speed} so that we could sort it in
+    ASCENDING order by the position.
+
+    That makes sense and is a logical move. If we layout cars by their
+    positions and corresponding speeds, that'll certainly help us.
+
+    Now, how do we know if some car will make a car-fleet with the one in front
+    of it?
+
+    The obvious one is if the current speed is GREATER than the speed of the
+    one in front.
+
+    But that is NOT the only way. Maybe our current speed is SLOWER than the
+    speed of the one in front, however maybe the one in front catches up to its
+    front and thus REDUCE ITS OWN speed.
+
+    Maybe at that time we'll end up having GREATER speed than it.
+
+    Example:
+        {2, 4}, {3, 9}, {7, 1}
+
+    car {2, 4}, it seems, will NOT be able to catch up car {3, 9}. However what
+    if car {3, 9} catches up its front, i.e. car {7, 1}?
+
+    Then the speed of that car fleet will be 1, i.e. the MINIMUM among all cars
+    in the car fleet.
+
+
+    But this gets too complicated, isn't it?
+
+    However, the important thing is that the car at the far right, i.e. the
+    last car in this sorted order, will CERTAINLY end up passing the "target"
+    position on its own speed because it doesn't have any car in front of it
+    to catch up.
+
+
+    That's why we MUST begin from the end of this vector and work our way back.
+
+    It's also important to emphasize this part of the Description:
+
+        If a car catches up to a car fleet right at the destination point, it
+        will still be considered as one car fleet.
+
+    This is the crux:
+    That means that all of the cars that can reach the "target" position in
+    LESS THAN OR EQUAL time to the car in front of itself, is going to create
+    a car fleet.
+
+    The TIME that is needed for some car to get to "target" position is
+    calculated by:
+
+        1.0 * (target - curr_position) / curr_speed
+
+    NOTE the "1.0". It NEEDS to be of DOUBLE type!!!!!!!!!
+
+    Example:
+
+        target = 13
+
+    timestamp to     {2,5}, {4,9}, {5,10}, {6,4}, {7,5}, {10,7}, {11,1}
+    reach "target":   2.2    1.0    0.8    1.75    1.2   0.4285   2.0
+                     ~~~~~   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                      1st                   2nd
+                    car fleet            car fleet
+
+
+    Again, read this carefully AGAIN:
+
+        That means that all of the cars that can reach the "target" position in
+        LESS THAN OR EQUAL time to the car in front of itself, is going to
+        create a car fleet.
+
+        The TIME that is needed for some car to get to "target" position is
+        calculated by:
+
+            1.0 * (target - curr_position) / curr_speed
+
+        NOTE the "1.0". It NEEDS to be of DOUBLE type!!!!!!!!!
+
+*/
+
+/* Time  Beats: 77.40% */
+/* Space Beats: 96.94% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Efficient {
+public:
+    int carFleet(int target, vector<int>& position, vector<int>& speed)
+    {
+        const int N = position.size();
+
+        vector<pair<int,int>> combined;
+        combined.reserve(N);
+        for (int i = 0; i < N; i++)
+            combined.push_back( {position[i], speed[i]} );
+
+        /* Sort in ASCENDING order by position */
+        sort(combined.begin(), combined.end());
+
+        double front_arrival_time = 1.0 * (target - combined[N-1].first) / combined[N-1].second;
+
+        int result = 1;
+        for (int i = N-2; i >= 0; i--)
+        {
+            auto& [curr_position, curr_speed] = combined[i];
+            double curr_arrival_time = 1.0 * (target - curr_position) / curr_speed;
+
+            /*
+               If this is TRUE, then that means that the current car will come
+               at position "target" BEFORE OR AT THE SAME TIME as the car in
+               front, therefore that means it will form a car-fleet with the
+               one in front of it.
+            */
+            if (curr_arrival_time <= front_arrival_time)
+                continue;
+
+            result++;
+            front_arrival_time = curr_arrival_time;
+        }
+
+        return result;
+    }
+};
