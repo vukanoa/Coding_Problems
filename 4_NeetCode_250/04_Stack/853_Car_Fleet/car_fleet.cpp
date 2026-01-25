@@ -77,8 +77,6 @@
 
 */
 
-#include <map>
-#include <stack>
 #include <vector>
 #include <algorithm>
 using namespace std;
@@ -481,63 +479,21 @@ public:
     int carFleet(int target, vector<int>& position, vector<int>& speed)
     {
         const int N = position.size();
-        vector<pair<int, int>> pairs;
+        vector<pair<int, int>> combined;
 
-        // Make a vector of pairs(position, speed)
         for (int i = 0; i < N; i++)
-            pairs.push_back({position[i], speed[i]});
+            combined.push_back( {position[i], speed[i]} );
 
-        // Sort in reversed order
-        sort(pairs.rbegin(), pairs.rend());
+        // Sort in DESCENDING order
+        sort(combined.rbegin(), combined.rend());
 
         vector<double> stack;
-        for (auto& pair : pairs)
+        for (auto& [curr_position, curr_speed] : combined)
         {
-            stack.push_back((target - pair.first) / (double)pair.second);
+            stack.push_back(1.0 * (target - curr_position) / curr_speed);
 
             if (stack.size() >= 2 && stack[stack.size() - 1] <= stack[stack.size() - 2])
                 stack.pop_back();
-        }
-
-        return stack.size();
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    TODO
-
-*/
-
-/* Time  Beats: 22.54% */
-/* Space Beats: 11.71% */
-
-/* Time  Complexity: O(N * logN) */
-/* Space Complexity: O(M)        */
-class Solution_2 {
-public:
-    int carFleet(int target, vector<int>& position, vector<int>& speed)
-    {
-        const int N = position.size();
-        map<int, pair<int, int>> map;
-
-        for (int i = 0; i < N; i++)
-            map.insert({position[i], {position[i], speed[i]}});
-
-        for (auto& entry : map)
-            entry.second.first = target - entry.second.first;
-
-        stack<double> stack;
-        for (auto iter = map.rbegin(); iter != map.rend(); ++iter)
-        {
-            if (stack.empty() || stack.top() < (1.0 * iter->second.first / iter->second.second))
-                stack.push(1.0 * iter->second.first / iter->second.second);
         }
 
         return stack.size();
