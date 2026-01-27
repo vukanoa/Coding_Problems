@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <stack>
-
 /*
     ============
     === HARD ===
@@ -40,6 +36,10 @@
     0 <= heights[i] <= 10^4
 
 */
+
+#include <vector>
+#include <stack>
+using namespace std;
 
 /*
     ------------
@@ -199,16 +199,16 @@
 /* Space Complexity: O(n) */
 class Solution {
 public:
-    int largestRectangleArea(std::vector<int>& heights)
+    int largestRectangleArea(vector<int>& heights)
     {
-        int n = heights.size();
-        std::vector<int> left(n);
-        std::vector<int> right(n);
+        int N = heights.size();
+        vector<int> left(N);
+        vector<int> right(N);
 
-        std::stack<int> stack;
+        stack<int> stack;
 
         // Fill left
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < N; i++)
         {
             if (stack.empty())
             {
@@ -217,7 +217,7 @@ public:
             }
             else
             {
-                while (!stack.empty() && heights[stack.top()] >= heights[i])
+                while ( ! stack.empty() && heights[stack.top()] >= heights[i])
                     stack.pop();
 
                 left[i] = stack.empty() ? 0 : stack.top() + 1;
@@ -226,35 +226,35 @@ public:
         }
 
         // Clear stack
-        while (!stack.empty())
+        while ( ! stack.empty())
             stack.pop();
 
         // Fill right
-        for (int i = n - 1; i >= 0; i--)
+        for (int i = N-1; i >= 0; i--)
         {
             if (stack.empty())
             {
-                right[i] = n - 1;
+                right[i] = N - 1;
                 stack.push(i);
             }
             else
             {
-                while (!stack.empty() && heights[stack.top()] >= heights[i])
+                while ( ! stack.empty() && heights[stack.top()] >= heights[i])
                     stack.pop();
 
-                right[i] = stack.empty() ? n - 1 : stack.top() - 1;
+                right[i] = stack.empty() ? N - 1 : stack.top() - 1;
                 stack.push(i);
             }
         }
 
-        int max_area = 0;
-        for (int i = 0; i < n; i++)
+        int result = 0;
+        for (int i = 0; i < N; i++)
         {
             int width = right[i] - left[i] + 1;
-            max_area = std::max(max_area, heights[i] * width);
+            result = max(result, heights[i] * width);
         }
 
-        return max_area;
+        return result;
     }
 };
 
@@ -681,100 +681,47 @@ public:
 /* Time  Beats: 89.17% */
 /* Space Beats: 63.46% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_Neat {
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_22 {
 public:
-    int largestRectangleArea(std::vector<int>& heights)
+    int largestRectangleArea(vector<int>& heights)
     {
-        int n = heights.size();
+        const int N = heights.size();
+        int result = 0;
 
-        int max_area = 0;
-        std::stack<std::pair<int , int>> stack; // pair: (index, height)
+        stack<pair<int,int>> stack; // Stack of {starting_idx, value}
 
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < N; i++)
         {
-            int start = i;
+            int leftmost_possible_idx_for_curr_height = i;
 
-            while (!stack.empty() && stack.top().second > heights[i])
+            while ( ! stack.empty() && stack.top().second > heights[i])
             {
-                std::pair<int, int> top = stack.top();
+                auto& [top_idx, top_height] = stack.top();
                 stack.pop();
 
-                max_area = std::max(max_area, top.second * (i - top.first));
-                start = top.first;
+                int h = top_height;  // Height
+                int w = i - top_idx; // Width
+                result = max(result, h * w);
+
+                leftmost_possible_idx_for_curr_height = top_idx;
             }
 
-            stack.push({start, heights[i]});
+            stack.push( {leftmost_possible_idx_for_curr_height, heights[i]} );
         }
 
-        while (!stack.empty())
+        /* Calculate areas of the ones that can be extended all the way to the end */
+        while ( ! stack.empty())
         {
-            std::pair<int, int> top = stack.top();
+            auto& [top_idx, top_height] = stack.top();
             stack.pop();
 
-            max_area = std::max(max_area, top.second * (n - top.first));
+            int h = top_height;  // Height
+            int w = N - top_idx; // Width
+            result = max(result, h * w);
         }
 
-        return max_area;
+        return result;
     }
 };
-
-
-int
-main()
-{
-    Solution sol;
-    Solution_Neat sol_neat;
-
-    /* Example 1 */
-    // std::vector<int> heights = {2, 1, 5, 6, 2, 3};
-
-    /* Example 2 */
-    // std::vector<int> heights = {2, 4};
-
-    /* Example 3 */
-    // std::vector<int> heights = {5, 2, 4, 7, 9, 3, 2, 6};
-
-    /* Example 4 */
-    // std::vector<int> heights = {5, 2, 8, 7, 9, 3, 2, 9};
-
-    /* Example 5 */
-    // std::vector<int> heights = {1, 1, 1, 1, 1, 1};
-
-    /* Example 6 */
-    // std::vector<int> heights = {1, 2, 9, 8, 1, 1};
-
-    /* Example 7 */
-    std::vector<int> heights = {3, 5, 5, 4, 0, 1, 7};
-
-    std::cout << "\n\t======================================";
-    std::cout << "\n\t=== LARGEST RECTANGLE IN HISTOGRAM ===";
-    std::cout << "\n\t======================================\n";
-
-
-    /* Write Input */
-    bool first = true;
-    std::cout << "\n\tHeights: [";
-    for (auto x: heights)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        std::cout << x;
-        first = false;
-    }
-    std::cout << "]\n";
-
-
-    /* Solution */
-    // int max_area = sol.largestRectangleArea(heights);
-    int max_area = sol_neat.largestRectangleArea(heights);
-
-
-    /* Write Output */
-    std::cout << "\n\tMax Area: " << max_area << "\n\n";
-
-
-    return 0;
-}
