@@ -54,6 +54,7 @@
 
 */
 
+#include <algorithm>
 #include <string>
 using namespace std;
 
@@ -251,6 +252,97 @@ public:
             {
                 result.push_back(s[i]);
             }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Similar implementation as the 2 above, however it uses reversal of
+    the string instead of:
+
+    instead of:
+
+        substr = stack.back() + substr;
+
+        or
+
+        substr.insert(0, 1, stack.back()) means "at offset 0,
+                                                 put 1 character,
+                                                 character is stack.back()"
+
+
+    Also, one more thing, here we are RESERVING(not allocating!) MAX_SIZE
+    space for our result string.
+
+    We're doing that to prevent unnecessary reallocations. Although maybe the
+    size is too big given the Constraints, but it's a good thing to know in
+    general, for string problems.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   5.59% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */ // result is not EXTRA Space
+class Solution_3 {
+public:
+    string decodeString(string s)
+    {
+        const int N = s.size();
+        // To prevent repeated reallocations, though maybe this is too much
+        static constexpr int MAX_SIZE = 301e5;
+
+        string result;
+        result.reserve(MAX_SIZE);
+
+        int i = 0;
+        while (i < N)
+        {
+            if (s[i] == ']')
+            {
+                string decoded_substr;
+                while (result.back() != '[')
+                {
+                    decoded_substr += result.back();
+                    result.pop_back();
+                }
+                result.pop_back();
+
+                /* Reverse */
+                reverse(decoded_substr.begin(), decoded_substr.end());
+
+                string repeat_count_str;
+                while ( ! result.empty() && isdigit(result.back()))
+                {
+                    repeat_count_str += result.back();
+                    result.pop_back();
+                }
+
+                /* Reverse */
+                reverse(repeat_count_str.begin(), repeat_count_str.end());
+
+                int repeat_count = stoi(repeat_count_str);
+
+                while (repeat_count-- > 0)
+                    result += decoded_substr;
+            }
+            else
+            {
+                result += s[i];
+            }
+
+            // Increment
+            i++;
         }
 
         return result;
