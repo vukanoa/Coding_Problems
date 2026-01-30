@@ -356,64 +356,72 @@ public:
 
     This is much simpler.
 
-    First use Binary Search to find pivot(First element BEFORE the rotation)
-    Then  use Binary Search to find target.
+    This one REQUIRES you to know how to find the SMALLEST element(i.e. pivot)
+    in SORTED and ROTATED array.
+
+    If you don't know how to do that, check out Problem: LeetCode 153 and then
+    come back.
+
+
+    It's solved in two simple steps:
+
+    1. Use Binary Search to find pivot index(ie. index of the SMALLEST element)
+
+    2. Use Binary Search(lower_bound in our case) to find the target or -1 if
+       it doesn't exist.
 
 */
 
-/* Time  Beats:   100% */
-/* Space Beats: 58.46% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  65.87% */
 
 /* Time  Complexity: O(logN) */
 /* Space Complexity: O(1)    */
-class Solution_Trick {
+class Solution {
 public:
     int search(vector<int>& nums, int target)
     {
-        int n = nums.size();
-        int left = find_pivot(nums);
+        const int N = nums.size();
 
-        // Classical Binary Search
-        if (target <= nums[n - 1])
-            return binary_search(nums, left,  n-1  , target);
+        int pivot_idx = find_pivot_idx(0, N-1, nums);
 
-        return binary_search(nums,   0 , left-1, target);
+        if (target <= nums[N-1])
+            return my_lower_bound(pivot_idx, N-1, nums, target);
+
+        return my_lower_bound(0, pivot_idx-1, nums, target);
     }
 
 private:
-    int find_pivot(const vector<int>& nums)
+    int find_pivot_idx(int low, int high, vector<int>& nums)
     {
-        int left  = 0;
-        int right = nums.size() - 1;
-
-        while (left < right)
+        while (low < high)
         {
-            int mid = left + (right - left) / 2;
+            int mid = low + (high - low) / 2;
 
-            if (nums[mid] > nums[right])
-                left = mid + 1;
+            if (nums[mid] < nums[high])
+                high = mid;
             else
-                right = mid;
+                low = mid + 1;
         }
 
-        return left;
+        return low; // Or "high", it doesn't matter
     }
 
-    int binary_search(vector<int>& nums, int left, int right, int target)
+    int my_lower_bound(int low, int high, vector<int>& nums, int target)
     {
-        while (left < right)
+        while (low < high)
         {
-            int mid = (left + right) / 2;
+            int mid = low + (high - low) / 2;
 
             if (nums[mid] == target)
                 return mid;
 
             if (target < nums[mid])
-                right = mid - 1;
+                high = mid - 1;
             else
-                left = mid + 1;
+                low = mid + 1;
         }
 
-        return nums[left] == target ? left : -1;
+        return nums[low] == target ? low : -1;
     }
 };
