@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <climits>
-
 /*
     ==============
     === MEDIUM ===
@@ -62,6 +58,9 @@
     -10^4 <= target <= 10^4
 
 */
+
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -310,37 +309,36 @@ It's here:
 
 /* Time  Complexity: O(logn) */
 /* Space Complexity: O(1) */
-class Solution_Verbose{
+class Solution_Verbose {
 public:
-    int search(std::vector<int>& nums, int target)
+    int search(vector<int>& nums, int target)
     {
-        int n = nums.size();
+        const int N = nums.size();
 
-        int left  = 0;
-        int right = n - 1;
+        int low  = 0;
+        int high = N-1;
 
-        while (left <= right)
+        while (low <= high)
         {
-            int mid = (left + right) / 2;
+            int mid = (low + high) / 2;
 
             if (target == nums[mid])
                 return mid;
 
             // Left of "mid" is LOWER part of the rotation
-            if (nums[left] <= nums[mid])
+            if (nums[low] <= nums[mid])
             {
-                if (target > nums[mid] || target < nums[left])
-                    left  = mid + 1;
+                if (target > nums[mid] || target < nums[low])
+                    low  = mid + 1;
                 else
-                    right = mid - 1;
+                    high = mid - 1;
             }
-            // Left of "mid" is UPPER part of the rotation (It's again "Left")
-            else
+            else // Right of "mid" is UPPER part of the rotation
             {
-                if (target < nums[mid] || target > nums[right])
-                    right = mid - 1;
+                if (target < nums[mid] || target > nums[high])
+                    high = mid - 1;
                 else
-                    left  = mid + 1;
+                    low  = mid + 1;
             }
         }
 
@@ -366,11 +364,11 @@ public:
 /* Time  Beats:   100% */
 /* Space Beats: 58.46% */
 
-/* Time  Complexity: O(logn) */
-/* Space Complexity: O(1) */
-class Solution_Trick{
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(1)    */
+class Solution_Trick {
 public:
-    int search(std::vector<int>& nums, int target)
+    int search(vector<int>& nums, int target)
     {
         int n = nums.size();
         int left = find_pivot(nums);
@@ -383,7 +381,7 @@ public:
     }
 
 private:
-    int find_pivot(const std::vector<int>& nums)
+    int find_pivot(const vector<int>& nums)
     {
         int left  = 0;
         int right = nums.size() - 1;
@@ -401,7 +399,7 @@ private:
         return left;
     }
 
-    int binary_search(std::vector<int>& nums, int left, int right, int target)
+    int binary_search(vector<int>& nums, int left, int right, int target)
     {
         while (left < right)
         {
@@ -419,152 +417,3 @@ private:
         return nums[left] == target ? left : -1;
     }
 };
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Equivalent as above, however, "find_pivot" is a bit different. I believe
-    this implementations is easier to read.
-
-*/
-
-/* Time  Beats: 100.00% */
-/* Space Beats:  24.15% */
-
-/* Time  Complexity: O(logn) */
-/* Space Complexity: O(1) */
-class Solution_Same_Trick_2 {
-public:
-    int search(std::vector<int>& nums, int target)
-    {
-        int n = nums.size();
-
-        int pivot_idx = -1;
-        int min = INT_MAX;
-
-        /* Finding Pivot */
-        int left  = 0;
-        int right = n - 1;
-
-        while (left <= right)
-        {
-            int mid = left + (right - left) / 2;
-
-            if (nums[mid] > nums[right])
-                left  = mid + 1;
-            else
-                right = mid - 1;
-
-            if (nums[mid] < min)
-            {
-                min = nums[mid];
-                pivot_idx = mid;
-            }
-        }
-
-        /* Now perform a classical Binary Search */
-        if (nums[pivot_idx] <= target && target <= nums[n-1])
-            return bin_search(nums, pivot_idx, n-1, target);
-
-        return bin_search(nums, 0, pivot_idx-1, target);
-    }
-
-private:
-    int bin_search(std::vector<int>& nums, int left, int right, int target)
-    {
-        while (left <= right)
-        {
-            int mid = left + (right - left) / 2;
-
-            if (nums[mid] == target)
-                return mid;
-
-            if (nums[mid] < target)
-                left  = mid + 1;
-            else
-                right = mid - 1;
-        }
-
-        return -1;
-    }
-};
-
-
-int
-main()
-{
-    Solution_Verbose        sol_ver;
-    Solution_Trick          sol_trick;
-    Solution_Same_Trick_2   sol_same_trick_2;
-
-    /* Example 1 */
-    // std::vector<int> nums = {4, 5, 6, 7, 0, 1, 2};
-    // int target = 0;
-
-    /* Example 2 */
-    // std::vector<int> nums = {4, 5, 6, 7, 0, 1, 2};
-    // int target = 3;
-
-    /* Example 3 */
-    // std::vector<int> nums = {1};
-    // int target = 0;
-
-    /* Example 4 */
-    // std::vector<int> nums =  {7, 8, 9, 10, 13, 0, 1, 2, 4, 5, 6};
-    // int target = 3;
-
-    /* Example 5 */
-    // std::vector<int> nums =  {7, 8, 9, 10, 13, 0, 1, 2, 4, 5, 6};
-    // int target = 12;
-
-    /* Example 6 */
-    // std::vector<int> nums =  {7, 8, 9, 10, 13, 0, 1, 2, 4, 5, 6};
-    // int target = 10;
-
-    /* Example 7 */
-    // std::vector<int> nums = {4, 5, 6, 7, 0, 1, 2};
-    // int target = 2;
-
-    /* Example 8 */
-    // std::vector<int> nums = {4, 5, 6, 7, 0, 1, 2};
-    // int target = 4;
-
-    /* Example 9 */
-    std::vector<int> nums = {4, 5, 6, 7, 0, 1, 2};
-    int target = 5;
-
-    std::cout << "\n\t======================================";
-    std::cout << "\n\t=== SEARCH IN ROTATED SORTED ARRAY ===";
-    std::cout << "\n\t======================================\n";
-
-    /* Write Input */
-    bool first = true;
-    std::cout << "\n\tArray: [";
-    for (auto x: nums)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        std::cout << x;
-        first = false;
-    }
-    std::cout << "]";
-    std::cout << "\n\tTarget: " << target << "\n";
-
-
-    /* Solution */
-    // int index = sol_ver.search(nums, target);
-    // int index = sol_trick.search(nums, target);
-    int index = sol_same_trick_2.search(nums, target);
-
-
-    /* Write Output */
-    std::cout << "\n\tIndex of target is: " << index << "\n\n";
-
-    return 0;
-}
