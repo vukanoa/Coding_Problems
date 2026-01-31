@@ -54,34 +54,37 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    TODO
+    This is my implmementation of lower_bound.
 
 */
 
-/* Time  Beats: 94.02% */
-/* Space Beats:  9.71% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  79.67% */
 
-/* Time  Complexity: O(logn) */
+/* Time  Complexity: O(logN) */
 /* Space Complexity: O(1)    */
-class Solution_2 {
+class Solution_My_Own_Lower_Bound {
 public:
-    int search(std::vector<int>& nums, int target)
+    int search(vector<int>& nums, int target)
     {
-        int left  = 0;
-        int right = nums.size() - 1;
+        const int N = nums.size();
 
-        while (left < right)
+        // Include entire range of answers(both 0 and N-1 CAN be answers)
+        int low  = 0;
+        int high = N-1;
+
+        /* Lower Bound */
+        while (low < high) // While loop will break ONLY once low == high
         {
-            // DON'T write it like this: mid = (l + r) / 2; It can Overflow!!!
-            int mid = left + (right - left) / 2;
+            int mid = low + (high - low) / 2; // Left-leaning
 
-            if (nums[mid] < target)
-                left  = mid + 1;
+            if (target > nums[mid])
+                low = mid + 1; // Elems from [low, mid] are CERTAINLY NOT res.
             else
-                right = mid;
+                high = mid;    // "mid" still MIGHT be the answer
         }
 
-        return nums[left] == target ? left : -1;
+        return nums[low] == target ? low : -1;
     }
 };
 
