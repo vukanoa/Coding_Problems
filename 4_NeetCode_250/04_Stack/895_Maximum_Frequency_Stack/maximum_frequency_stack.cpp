@@ -105,9 +105,9 @@ using namespace std;
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class FreqStack {
+class FreqStack_Brute_Force {
 public:
-    FreqStack() {
+    FreqStack_Brute_Force () {
         
     }
     
@@ -161,4 +161,65 @@ private:
     unordered_map<int,int> freq_count;
 
     stack<int> my_stack;
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is the Efficient Solution.
+
+    Instead of using a "helper_stack" to pour elements from "stack" to it and
+    pop the most frequent element and then pour them back from "helper_stack",
+    we can simply use:
+
+        Stack of stacks.
+
+    To be precise, we're using a HashMap of Stacks and we're using max_freq to
+    indicate which frequency is maximum right now and from which stack should
+    we start popping.
+
+*/
+
+/* Time  Beats: 82.01% */
+/* Space Beats: 51.01% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(N) */
+class FreqStack {
+public:
+    FreqStack()
+        : max_freq(0)
+    {
+        
+    }
+    
+    void push(int val)
+    {
+        max_freq = max(max_freq, ++num_to_freq[val]);
+
+        umap_stacks[num_to_freq[val]].push(val);
+    }
+
+    int pop()
+    {
+        int ret = umap_stacks[max_freq].top();
+        umap_stacks[max_freq].pop();
+
+        num_to_freq[ret]--;
+
+        if (umap_stacks[max_freq].empty())
+            max_freq--;
+
+        return ret;
+    }
+
+private:
+    unordered_map<int, stack<int>> umap_stacks;
+    unordered_map<int,int> num_to_freq;
+    int max_freq;
 };
