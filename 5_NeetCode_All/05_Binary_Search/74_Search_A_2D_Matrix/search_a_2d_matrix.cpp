@@ -109,3 +109,96 @@ public:
         return false;
     }
 };
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one uses "upper_bound" on the rows, and then once we've located a row
+    in which it COULD exist, then we do a "lower_bound".
+
+    It's important to note that:
+
+        + upper_bound searches for the first element that is STIRCTLY GREATER
+          than the target.
+
+        + lower_bound searches for the first element that is EQUAL TO OR
+          GREATER than the target.
+
+    However, it's important to note that we can use "lower_bound" to do an
+    "upper_bound". Yes, you read that right.
+
+    How do we do that?
+
+    We simply add 1 to the target and we perform a "lower_bound", that's it.
+
+
+    This is important because both of our implementations, i.e. both:
+        + find_row_upper_bound, and
+        + my_lower_bound
+
+    are actually custom implementations of "lower_bound". The only difference
+    is that one returns an index, while the other returns true/false based on
+    the presence or absence of the target, respectivelly.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  43.36% */
+
+/* Time  Complexity: O(log(ROWS * COLS)) */
+/* Space Complexity: O(1)                */
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target)
+    {
+        const int ROWS = matrix.size();
+        const int COLS = matrix[0].size();
+
+        int row = find_row_upper_bound(0, ROWS-1, matrix, target);
+
+        /* This is VERY important because we performed an UPPER_BOUND  */
+        if (row > 0 && target < matrix[row][0])
+            row--;
+
+        return my_lower_bound(row, 0, COLS-1, matrix, target);
+    }
+
+private:
+    /* Upper Bound Function */
+    int find_row_upper_bound(int low, int high, vector<vector<int>>& matrix, int& target)
+    {
+        int new_target = target + 1; // Using this new_target makes this entire
+                                     // function "upper_bound"
+
+        /* Lower Bound Implementation */
+        while (low < high)
+        {
+            int mid = low + (high - low) / 2;
+
+            if (new_target > matrix[mid][0])
+                low = mid + 1;
+            else
+                high = mid;
+        }
+
+        return high; // Or "low" it does NOT matter
+    }
+
+    int my_lower_bound(int row, int low, int high, vector<vector<int>>& matrix, int& target)
+    {
+        while (low < high)
+        {
+            int mid = low + (high - low) / 2; // Left-leaning
+
+            if (target > matrix[row][mid])
+                low = mid + 1;
+            else
+                high = mid;
+        }
+
+        return matrix[row][high] == target;
+    }
+};
