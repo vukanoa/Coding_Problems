@@ -180,20 +180,20 @@ public:
     // O(1)
     void set(string key, string value, int timestamp)
     {
-        my_map[key].insert( {timestamp, value} );
+        umap[key].insert( {timestamp, value} );
     }
     
     // O(logN)
     string get(string key, int timestamp)
     {
         /* Upper Bound */
-        auto iter = my_map[key].upper_bound(timestamp); // O(logN)
+        auto iter = umap[key].upper_bound(timestamp); // O(logN)
 
-        return iter == my_map[key].begin() ? "" : prev(iter)->second;
+        return iter == umap[key].begin() ? "" : prev(iter)->second;
     }
 
 private:
-    unordered_map<string, map<int,string>> my_map;
+    unordered_map<string, map<int,string>> umap;
 };
 
 
@@ -238,21 +238,110 @@ public:
     // O(1)
     void set(string key, string value, int timestamp)
     {
-        umap[key].push_back({ timestamp, value });
+        umap[key].push_back( {timestamp, value} );
     }
 
     // O(logN) (entire block)
     string get(string key, int timestamp)
     {
         // O(logN)
-        auto it = upper_bound(begin(umap[key]),          // Start
-                              end(umap[key]),            // End
-                              make_pair(timestamp, ""),  // Target_pair
-                              CompareByTimestamp{});     // Comparator
+        auto iter = upper_bound(begin(umap[key]),          // Start
+                                end(umap[key]),            // End
+                                make_pair(timestamp, ""),  // Target_pair
+                                CompareByTimestamp{});     // Comparator
 
-        return it == umap[key].begin() ? "" : prev(it)->second;
+        return iter == umap[key].begin() ? "" : prev(iter)->second;
     }
 
 private:
     unordered_map<string, vector<pair<int, string>>> umap;
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is EQUVALENT to the above one TimeMap_Vector, however here I am
+    implementing my own "upper_bound" instead of using the C++'s built-in one.
+
+*/
+
+/* Time  Beats: 87.26% */
+/* Space Beats: 80.45% */
+
+/* Time  Complexity: O(logN)  */ // N <==> Total number of values
+/* Space Complexity: O(M * N) */ // M <==> Total number of keys
+class TimeMap_Vector_Custom_Upper_Bound {
+public:
+
+    TimeMap_Vector_Custom_Upper_Bound() {}
+
+    // O(1)
+    void set(string key, string value, int timestamp)
+    {
+        umap[key].push_back( {timestamp, value} );
+    }
+
+    // O(logN) (entire block)
+    string get(string key, int timestamp)
+    {
+        vector<pair<int,string>>& vec_of_pairs = umap[key];
+
+        /* Upper Bound */
+        // O(logN)
+        int idx = my_upper_bound(vec_of_pairs, timestamp);
+
+        return idx <= 0 ? "" : vec_of_pairs[idx - 1].second;
+    }
+
+private:
+    unordered_map<string, vector<pair<int, string>>> umap;
+
+    int my_upper_bound(vector<pair<int,string>>& vec_of_pairs, int& target)
+    {
+        /*
+           In order to make an "upper_bound" implementation, we can use our
+           "lower_bound" implementation by simply passing "target + 1" as a 
+           target in "lower_bound".
+
+           Think about it. If we have a "lower_bound" implementation that will
+           return first GREATER THAN OR EQUALS(!!) TO "target", then why not
+           just use that to get the "FIRST STRICTLY GREATER" than some value?
+
+        */
+        return my_lower_bound(vec_of_pairs, target + 1);
+    }
+
+    int my_lower_bound(vector<pair<int,string>>& vec_of_pairs, int target)
+    {
+        if (vec_of_pairs.empty())
+            return -1;
+
+        const int N = vec_of_pairs.size();
+
+        int low  = 0;
+        int high = N; // Because idx "N" can be a VALID answer
+        while (low < high)
+        {
+            int mid = low + (high - low) / 2;
+
+            /*
+                vec_of_pairsmid]   <==> {timestamp, str_value}
+                
+                vec_of_pairs.first  <==> timestamp
+                vec_of_pairs.second <==> str_value
+            */
+            if (target > vec_of_pairs[mid].first)
+                low = mid + 1; // Indices from [low, mid], inclusive, are NOT
+                               // the answer, therefore cut them off.
+            else
+                high = mid;    // "mid" still MIGHT be the answer
+        }
+
+        return low; // Or "high" it does NOT matter
+    }
 };
