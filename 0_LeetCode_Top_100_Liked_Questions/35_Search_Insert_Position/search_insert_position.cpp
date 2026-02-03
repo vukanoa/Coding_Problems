@@ -264,7 +264,7 @@ using namespace std;
 /* Time  Beats: 100.00% */
 /* Space Beats:  11.67% */
 
-/* Time  Complexity: O(logn) */
+/* Time  Complexity: O(logN) */
 /* Space Complexity: O(1)    */
 class Solution_Lower_Bound {
 public:
@@ -272,6 +272,47 @@ public:
     {
         auto iter = lower_bound(nums.begin(), nums.end(), target);
 
-        return iter - nums.begin();
+        return iter - nums.begin(); // <==> distance(nums.begin(), iter)
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Equvalent to the above Solution, just uses my own implementation of it.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  76.30% */
+
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(1)    */
+class Solution_My_Lower_Bound {
+public:
+    int searchInsert(vector<int>& nums, int target)
+    {
+        const int N = nums.size();
+
+        /* Lower Bound */
+        int low  = 0;
+        int high = N; // Becuase 'N' is a VALID result as well
+
+        while (low < high)
+        {
+            int mid = low + (high - low) / 2;
+
+            if (target > nums[mid])
+                low  = mid + 1;
+            else
+                high = mid;
+        }
+
+        return low; // Or "high" it does NOT matter
     }
 };
