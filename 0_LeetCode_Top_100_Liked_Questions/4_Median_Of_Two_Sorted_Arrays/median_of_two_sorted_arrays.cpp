@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <climits>
-
 /*
     ============
     === HARD ===
@@ -47,6 +43,9 @@
 
 */
 
+#include <climits>
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -379,111 +378,57 @@
 
 */
 
-/* Time  Beats: 97.61% */
-/* Space Beats: 91.10% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  93.87% */
 
-/* Time  Complexity: O(log(min(m, n))) */
-/* Space Complexity: O(1) */
+/* Time  Complexity: O(log(M + N)) */
+/* Space Complexity: O(1)          */
 class Solution {
 public:
-    double findMedianSortedArrays(std::vector<int>& nums1, std::vector<int>& nums2)
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2)
     {
-        int A = nums1.size();
-        int B = nums2.size();
-
-        if(A > B)
+        if (nums1.size() > nums2.size())
             return findMedianSortedArrays(nums2, nums1);
 
-        int total = A + B;
+        const int SIZE_1 = nums1.size();
+        const int SIZE_2 = nums2.size();
+
+        const int TOTAL = SIZE_1 + SIZE_2;
+        const int HALF  = TOTAL / 2;
 
         int left  = 0;
-        int right = A; // A is the shorter one
+        int right = SIZE_1;
 
-        while(left <= right)
+        while (left <= right)
         {
-            int i = (right - left) / 2 + left;
-            int j = (total + 1) / 2 - i;
+            int part1 = left + (right - left) / 2;
+            int part2 = (TOTAL + 1) / 2 - part1;
 
-            int A_left  = (i == 0) ? INT_MIN : nums1[i - 1];
-            int A_right = (i == A) ? INT_MAX : nums1[i];
-            int B_left  = (j == 0) ? INT_MIN : nums2[j - 1];
-            int B_right = (j == B) ? INT_MAX : nums2[j];
+            int max_left_1  = (part1 == 0)      ? INT_MIN : nums1[part1 - 1];
+            int min_right_1 = (part1 == SIZE_1) ? INT_MAX : nums1[part1];
 
-            if(A_left <= B_right && B_left <= A_right)
+            int max_left_2  = (part2 == 0)      ? INT_MIN : nums2[part2 - 1];
+            int min_right_2 = (part2 == SIZE_2) ? INT_MAX : nums2[part2];
+
+            if (max_left_1 <= min_right_2 && max_left_2 <= min_right_1)
             {
-                if(total & 1) // Odd
-                    return (double) std::max(A_left, B_left);
-                else // Even
-                    return (double)(std::max(A_left,B_left) + std::min(A_right,B_right))/2;
+                // Odd
+                if (TOTAL & 1)
+                    return max(max_left_1, max_left_2);
+
+                // Even
+                return (max(max_left_1, max_left_2) + min(min_right_1, min_right_2)) / 2.0;
             }
-            else if(A_left > B_right)
-                right = i - 1;
+            else if (max_left_1 > min_right_2)
+            {
+                right = part1 - 1;
+            }
             else
-                left = i + 1;
+            {
+                left = part1 + 1;
+            }
         }
 
-        return -1.0;
+        return 0.0;        
     }
 };
-
-
-int
-main()
-{
-    Solution sol;
-
-    /* Example 1 */
-    // std::vector<int> nums1 = {1, 3};
-    // std::vector<int> nums2 = {2};
-
-    /* Example 2 */
-    // std::vector<int> nums1 = {1, 2};
-    // std::vector<int> nums2 = {3, 4};
-
-    /* Example 3 */
-    // std::vector<int> nums1 = {1, 2, 3, 4, 5, 6, 7, 8};
-    // std::vector<int> nums2 = {1, 2, 3, 4, 5};
-
-    /* Example 4 */
-    std::vector<int> nums1 = {1, 2, 3, 4, 5, 6, 7, 8};
-    std::vector<int> nums2 = {1, 2, 3, 4};
-
-    std::cout << "\n\t===================================";
-    std::cout << "\n\t=== MEDIAN OF TWO SORTED ARRAYS ===";
-    std::cout << "\n\t===================================\n";
-
-
-    /* Write Input */
-    bool first = true;
-    std::cout << "\n\tNums 1: [";
-    for (auto x: nums1)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        std::cout << x;
-        first = false;
-    }
-    std::cout << "]";
-
-    first = true;
-    std::cout << "\n\tNums 2: [";
-    for (auto x: nums2)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        std::cout << x;
-        first = false;
-    }
-    std::cout << "]\n";
-
-    /* Solution */
-    double output = sol.findMedianSortedArrays(nums1, nums2);
-
-    /* Write Output */
-    printf("\n\tOutput: %lf\n\n", output);
-    // std::cout << "\n\tOutput: " << output << "\n\n";
-
-    return 0;
-}
