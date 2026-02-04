@@ -51,82 +51,77 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    Once we find that some number squared is greater than or equal to 'x', we
-    are done.
+    We can do a basic Binary Search, however instead of "standard" use of so
+    called "Left-leaning mid", we are using "Right-Leaning mid".
 
-    If squared number is exactly equal to x, then:
-        return that number.
+    That means that if we find out that the: mid * mid, i.e. mid squared is
+    STRICTLY GREATER than 'x', we're certain that all the other, higher, values
+    than it are also out of question, therefore we need to EXCLUDE 'mid' by
+    moving our "high" pointer.
 
-    If it's greater than x, then:
-        return that number - 1;
+    Right-leaning mid means that we're doing this:
 
-    If x is 0, then:
-        return 0.
+        mid = low + (high - low + 1) / 2; // Right-Leaning
 
-    But it would be inefficient to start from 1 and try until we get a number
-    that it's square is greater or equal to x.
+    Instead of Left-leaning:
 
-    That would be O(n). That's what we've done in the Solution above.
+        mid = low + (high - low) / 2;     // Left-Leaning
 
-    However, to find that "sweet spot", we can use Binary Search.
 
-    Initialize:
-        first to 1
-        last  to x
+    What is the difference?
+    Consider any two elements.
 
-    While first is less than or equal to last, do the following:
+    With the Right-leaning mid, we're always going to pick the bigger one.
+    Conversely, with the Left-leaning mid we're always going to pick the
+    smaller one.
 
-        1) Compute mid as first + (last - first) / 2.
+    Here we're interested in the biggest one whose square is NOT bigger than
+    x, therefore we need to use the "right-leaning mid".
 
-        2) If mid * mid equals x, return mid.
 
-        3) If mid * mid is greater than x, update last to mid - 1.
+    Also, it's important to note that both "low" and "high" MUST be of type
+    "unsigned long long". Consider:
 
-        4) If mid * mid is less than x, update first to mid + 1.
+        low  = 0, and
+        high = (2^31 - 1)
 
-    Return last.
+    in that case we'd have an OVERFLOW were "low" and "high" basic integers.
+    Thta's why they ought to be "unsigned long long".
 
-    Intuition behind returning last instead of first is that we didn't found
-    any value that is perfect square which means now we have to return a value
-    which is round of sqrt(x).
+    Or we could do some intermediate conversion such as:
 
-    So, we have two options :
-        1. Start which is equal to mid+1 (in last iteration of while loop)
-        2. Last  which is equal to mid-1 (in last iteration of while loop)
+        mid = low + (1ULL * high - low + 1) / 2ULL;
 
-    Therefore, last is the largest integer value whose square is less than or
-    equal to x, which is the closest possible approximation to the integer
-    square root.
+    But I think that this way it's more emphatic.
 
 */
 
-/* Time  Beats:  100.00% */
-/* Space Beats:   93.57% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  49.43% */
 
 /* Time  Complexity: O(logN) */
-/* Space Complexity: O(1) */
+/* Space Complexity: O(1)    */
 class Solution {
 public:
-    int mySqrt(int x) {
-        if (x == 0)
-            return 0;
+    int mySqrt(int x)
+    {
+        /* Right-leaning Lower Bound */
+        unsigned long long low  = 0ULL;
+        unsigned long long high = x;
 
-        int first = 1;
-        int last  = x;
-
-        while (first <= last)
+        while (low < high)
         {
-            int mid = first + (last - first) / 2;
+            // Both "low" and "high" MUST be of type "unsigned long long".
+            // Consider: low = 0 and high = (2^31 - 1), in that case we'd have
+            // an OVERFLOW were "low" and "high" basic integers.
+            unsigned long long mid = low + (high - low + 1) / 2; // Right-Leaning
 
-            if (mid == x / mid)
-                return mid;
-
-            if (mid > x / mid)
-                last = mid - 1;
+            if (mid * mid > 1LL * x)
+                high = mid - 1;
             else
-                first = mid + 1;
+                low = mid;
         }
 
-        return last;
+        return static_cast<int>(low); // Or "high", it does NOT matter
     }
 };
