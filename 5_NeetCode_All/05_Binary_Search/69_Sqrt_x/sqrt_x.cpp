@@ -125,3 +125,35 @@ public:
         return static_cast<int>(low); // Or "high", it does NOT matter
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is Newton's Equation. You are know about this or you don't.
+    The formula is:
+
+        Xn+1 = 1/2 * (Xn + a / Xn)
+
+    We do this while: (Xn+1)^2 is greater than 'a'.
+
+*/
+
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(1)    */
+class Solution_Newthon_Equation_For_Square_Roots {
+public:
+    int mySqrt(int x)
+    {
+        unsigned long long curr_root_estimate = x;
+
+        while (curr_root_estimate * curr_root_estimate > x)
+            curr_root_estimate = (curr_root_estimate + x / curr_root_estimate) / 2;
+
+        return curr_root_estimate;
+    }
+};
