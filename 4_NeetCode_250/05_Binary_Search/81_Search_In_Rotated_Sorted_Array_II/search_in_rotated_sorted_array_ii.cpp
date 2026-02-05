@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -57,10 +54,34 @@
 
 */
 
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
+
+
+    This one is O(N) in the WORST case, however we have still minimized the
+    total number of operations by using Binary Search whenever we could.
+
+    This is the type of Input that makes the problem:
+
+        nums = [1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1]  target = 2
+                                          ^
+                                          |
+                                          |
+
+    The idea is to try and determine which side is sorted. If we CANNOT do that
+    then simply increment "low" and decrement "high" and continue.
+
+    This way we're making the Worst Time Complexity be: O(N), however we're
+    also reducing the total number of operations by using Binary Search
+    whenever we can.
+
+
+
 
     You must begin similarly to how you've approached and solved the 1st
     version of this problem - Search in Rotated Sorted Array.
@@ -284,40 +305,128 @@
 /* Time  Beats: 100.00% */
 /* Space Beats:  72.82% */
 
-/* Time  Complexity: O(n) */ // O(logn) sometimes so it's faster than just O(n)
+/* Time  Complexity: O(N) */ // O(logn) on average
 /* Space Complexity: O(1) */
 class Solution {
 public:
     bool search(vector<int>& nums, int target)
     {
-        int left  = 0;
-        int right = nums.size() - 1;
+        const int N = nums.size();
 
-        while (left <= right)
+        int low  = 0;
+        int high = N - 1;
+
+        while (low <= high)
         {
-            int mid = left + (right - left) / 2;
+            int mid = low + (high - low) / 2;
 
             if (target == nums[mid])
                 return true;
 
-            if (nums[left] < nums[mid])
+            if (nums[low] < nums[mid])
             {
-                if (nums[left] <= target && target < nums[mid])
-                    right = mid - 1;
+                if (nums[low] <= target && target < nums[mid])
+                    high = mid - 1;
                 else
-                    left  = mid + 1;
+                    low  = mid + 1;
             }
-            else if (nums[left] > nums[mid])
+            else if (nums[low] > nums[mid])
             {
-                if (nums[mid] < target && target <= nums[right])
-                    left  = mid + 1;
+                if (nums[mid] < target && target <= nums[high])
+                    low  = mid + 1;
                 else
-                    right = mid - 1;
+                    high = mid - 1;
             }
             else
-                left++;
+                low++; // This makes it O(N)
         }
 
+        return false;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is absolutely equivalent to the above Solution, however in these types
+    of problems where it's "touchy", it's always beneficial to look at the
+    problem(and implementations) from slightly different angles.
+
+    It's much better to see at least 2 Solutions than to the see only the one
+    "perfect" one from the outset, especially if you didn't know how to do it.
+
+
+    Also, both Solutions are indeed O(N), however we have still reduced the
+    total number of operations since we're doing a Binary Search whenever we
+    can.
+
+    This is the type of Input that makes the problem:
+
+        nums = [1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1]  target = 2
+                                          ^
+                                          |
+                                          |
+
+    The idea is to try and determine which side is sorted. If we CANNOT do that
+    then simply increment "low" and decrement "high" and continue.
+
+    This way we're making the Worst Time Complexity be: O(N), however we're
+    also reducing the total number of operations by using Binary Search
+    whenever we can.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  89.60% */
+
+/* Time  Complexity: O(N) */ // O(logn) on average
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    bool search(vector<int>& nums, int target)
+    {
+        const int N = nums.size();
+        
+        int low  = 0;
+        int high = N-1;
+        
+        while (low <= high)
+        {
+            int mid = low + (high - low) / 2;
+            
+            if (nums[mid] == target)
+                return true;
+            
+            // If we CANNOT determine which side is sorted
+            if (nums[low] == nums[mid] && nums[mid] == nums[high])
+            {
+                low++;  // Increment
+                high--; // Decrement
+
+                continue;
+            }
+            
+            if (nums[low] <= nums[mid]) // Left side is sorted
+            {
+                if (nums[low] <= target && target < nums[mid])
+                    high = mid - 1;  // Target is in sorted left half
+                else
+                    low  = mid + 1; // Target is in right half
+            }
+            else // Right side is sorted
+            {
+                if (nums[mid] < target && target <= nums[high])
+                    low  = mid + 1; // Target is in sorted right half
+                else
+                    high = mid - 1; // Target is in left half
+            }
+        }
+        
         return false;
     }
 };
