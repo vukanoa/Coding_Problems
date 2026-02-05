@@ -157,3 +157,49 @@ public:
         return curr_root_estimate;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  49.47% */
+
+/* Time  Complexity: O(logX) */
+/* Space Complexity: O(1)    */
+class Solution_Bit_manipulation {
+public:
+    int mySqrt(int x)
+    {
+        if (x < 2)
+            return x;
+
+        int highest_bit = 0; // Find the index(0-based) of the highest set bit
+
+        int tmp_x = x;
+        while (tmp_x > 0)
+        {
+            highest_bit++;
+            tmp_x >>= 1;
+        }
+
+        int result = 0;
+        for (int i = (highest_bit + 1) / 2; i >= 0; i--)
+        {
+            result |= (1 << i);     // Turn i-th bit ON
+
+            if (1LL * result * result > x)
+                result ^= (1 << i); // Turn i-th bit OFF
+        }
+
+        return result;       
+    }
+};
