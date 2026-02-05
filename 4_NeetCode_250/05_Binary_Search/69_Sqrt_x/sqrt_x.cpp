@@ -203,3 +203,47 @@ public:
         return result;       
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, but it's beneficial to see both implementations.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  49.47% */
+
+/* Time  Complexity: O(logX) */
+/* Space Complexity: O(1)    */
+class Solution_Bit_manipulation_2 {
+public:
+    int mySqrt(int x)
+    {
+        if (x < 2)
+            return x;
+        
+        // Function __builtin_clz() is a built-in GCC/Clang Compiler Function
+        int highest_bit = 31 - __builtin_clz(x);
+        
+        // Start from the middle of the possible bit range
+        int start_bit = (highest_bit + 1) / 2;
+        int result = 0;
+        
+        // Try setting bits from highest to lowest
+        for (int i = start_bit; i >= 0; i--)
+        {
+            int candidate = result | (1 << i); // Try turning i-th bit ON
+            
+            if (1LL * candidate * candidate <= x)
+                result = candidate; // Keep the bit ON
+        }
+        
+        return result;
+    }
+};
