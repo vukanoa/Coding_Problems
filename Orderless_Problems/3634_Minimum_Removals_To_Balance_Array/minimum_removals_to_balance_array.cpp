@@ -68,10 +68,99 @@
 #include <vector>
 using namespace std;
 
+
 /*
     ------------
     --- IDEA ---
     ------------
+
+    First, we must sort, that is absolutely obvious and clear. Especially
+    since the Constraints for N are: 10^5.
+
+    Once we sort, we can try to consider EACH element as a starting element in
+    a new VALID array.
+
+    Meaning "if we begin our VALID array HERE(at this idx), what is the total
+    number of elements we need to get rid of in order to obtain a valid array?"
+
+    We do that by starting at EACH index(except the last since by strating at
+    the very last idx, we're destined to to remove all the previous ones, so
+    we don't need to calculate that) and checking how many need to be removed
+    in order to have a VALID array.
+
+    We're moving our "L"(i.e. "left" pointer) until we're left with a valid
+    array.
+
+    We want to take the minimum of all of the removals.
+
+*/
+
+/* Time  Beats: 79.65% */
+/* Space Beats: 52.91% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(logN)     */ // Space Complexity of C++'s Intro-Sort
+class Solution_Inner_Linear {
+public:
+    int minRemoval(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+        int result = N;
+
+        /* Sort in ASCENDING order */
+        sort(nums.begin(), nums.end()); // O(N * logN)
+
+        if (1LL * nums[N-1] <= 1LL * nums[0] * k)
+            return 0;
+
+        int L = 0;
+        int R = 0;
+        while (R < N)
+        {
+            while (L < R && ! is_balanced(nums[L], k, nums[R]))
+                L++;
+
+            int valid_window_len = R - L + 1;
+            result = min(result, N - valid_window_len);
+
+            // Increment
+            R++;
+        }
+
+        return result;
+    }
+
+private:
+    bool is_balanced(int& min, int&k, int& max)
+    {
+        return 1LL * max <= 1LL * min * k;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    First, we must sort, that is absolutely obvious and clear. Especially
+    since the Constraints for N are: 10^5.
+
+    Once we sort, we can try to consider EACH element as a starting element in
+    a new VALID array.
+
+    Meaning "if we begin our VALID array HERE(at this idx), what is the total
+    number of elements we need to get rid of in order to obtain a valid array?"
+
+    We do that by starting at EACH index(except the last since by strating at
+    the very last idx, we're destined to to remove all the previous ones, so
+    we don't need to calculate that) and checking how many need to be removed
+    in order to have a VALID array.
+
+    Since we've already sorted the array, we can use Binary Search to obtain
+    this result more quickly.
 
 */
 
@@ -80,7 +169,7 @@ using namespace std;
 
 /* Time  Complexity: O(N * logN) */
 /* Space Complexity: O(N)        */
-class Solution {
+class Solution_Binary_Search {
 public:
     int minRemoval(vector<int>& nums, int k)
     {
