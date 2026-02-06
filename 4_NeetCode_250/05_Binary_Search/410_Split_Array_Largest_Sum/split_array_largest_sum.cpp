@@ -258,3 +258,113 @@ private:
         return needed_groups;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is WORSE, both asymptotically and in practice, than the one above.
+
+    That begs the question--Why have I, then, included this one as well?
+
+    Because it is REALLY beneficial to notice one thing: When you have a
+    prefix-sum of non-negative elements, that array is ALWAYS SORTED in
+    NON-DECREASING order.
+
+    Since it's sorted in NON-DECREASING order(i.e. ASCENDING with duplicates)
+    that means it's susceptible to Binary Searched.
+
+    For this specific problem, this is NOT optimal, however it is beneficial
+    to have this toolkit in your arsenal when you need it. Just know that you
+    can do a Binary Search on a "Prefix Sum" as that can improve Time
+    Complexity in some problems.
+
+    Also, the Binary Search on "Prefix Sum" is implemented in a DIFFERENT way
+    that the "outer" Binary Search that searched on the answer-space.
+
+    The answer-space Binary Search is a classic "lower_bound Left-leaning"
+    Binary Search, whereas the other one is "Right-leaning".
+
+    Also, the second one has a different kind of logic because we're dealing
+    with prefix sums.
+
+    It is really beneficial to see and truly understand both Solutions.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  10.04% */
+
+/* Time  Complexity: O(k * logN * logM) <==> O(N * logN * M) */
+/* Space Complexity: O(N)                                    */
+class Solution_Additional_Binary_Search_on_Prefix_Sum {
+public:
+    int splitArray(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+
+        /* Prefix Sum */
+        vector<int> prefix(N);
+        prefix[0] = nums[0];
+
+        for (int i = 1; i < N; ++i)
+            prefix[i] = prefix[i-1] + nums[i];
+
+        int low  = *max_element(nums.begin(), nums.end());
+        int high = accumulate(nums.begin(), nums.end(), 0);
+
+        // O(k * logN * logM) <==> O(N * logN * logM) (enire block)
+        while (low < high) // O(logM)
+        {
+            int mid = low + (high - low) / 2;
+
+            // O(k * logN) <==> O(N * logN)
+            int needed_groups = needed_groups_with_max_sum(mid, nums, prefix);
+
+            if (needed_groups > k)
+                low  = mid + 1; // "mid" CERTAINLY is NOT a valid answer
+            else
+                high = mid;     // "mid" still CAN be a valid answer
+        }
+
+        return low; // Or "high" it does NOT matter
+    }
+
+private:
+    int needed_groups_with_max_sum(int max_sum, vector<int>& nums, vector<int>& prefix)
+    {
+        const int N = nums.size();
+
+        int needed_groups = 0;
+
+        // O(k * logN), i.e. O(N * logN) (enire block)
+        int start_idx_of_new_subarray = 0;
+        while (start_idx_of_new_subarray < N) // O(k), i.e. O(N) in the worst
+        {
+            int low  = start_idx_of_new_subarray;
+            int high = N-1;
+
+            // O(logN) (entire block)
+            while (low < high)
+            {
+                int mid = low + (high - low + 1) / 2; // Right-leaning "mid"
+
+                int consecutive_sum = prefix[mid] - (start_idx_of_new_subarray == 0 ? 0 : prefix[start_idx_of_new_subarray - 1]);
+
+                if (consecutive_sum > max_sum)
+                    high = mid - 1; // "mid" CERTAINLY is NOT a valid answer
+                else
+                    low = mid;      // "mid" still CAN be a valid answer
+            }
+            needed_groups++;
+
+            start_idx_of_new_subarray = high + 1;
+        }
+
+        return needed_groups;
+    }
+};
