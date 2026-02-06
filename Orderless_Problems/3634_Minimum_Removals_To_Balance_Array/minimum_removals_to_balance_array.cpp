@@ -73,20 +73,10 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    (Igore this "other" vector, since that is needed only in C++ due to
-    overflow. We're given a vector of integers and k is an integer as well, but
-    once they are multiplied it can overflow. Therefore we use this "other",
-    but when reading assume it's "nums")
-
-    Sort the Input and then check for each element how many elements would it
-    entail to remove in order for it to be the MINIMUM value.
-
-    That's literally it.
-
 */
 
-/* Time  Beats: 11.11% */
-/* Space Beats: 00.00% */
+/* Time  Beats: 14.24% */
+/* Space Beats: 86.83% */
 
 /* Time  Complexity: O(N * logN) */
 /* Space Complexity: O(N)        */
@@ -97,27 +87,19 @@ public:
         const int N = nums.size();
         int result = N-1;
 
-        vector<long long> other; // O(N) Space
-        for (const int& num : nums)
-            other.push_back(1LL * num);
-
-        /* Sort O(N * logN) */
-        sort(other.begin(), other.end());
+        /* Sort in ASCENDING order */
+        sort(nums.begin(), nums.end()); // O(N * logN)
 
         /* O(N * logN) */
-        for (int i = 0; i < N-1; i++)
+        for (int L = 0; L < N-1; L++)
         {
-            long long target = 1LL * other[i] * k;
-            auto iter = upper_bound(other.begin() + i, other.end(), target);
+            long long max_val = 1LL * nums[L] * k;
+            auto iter = upper_bound(nums.begin() + L, nums.end(), max_val);
 
+            int first_exceeding = distance(nums.begin(), iter);
 
-            int leftmost_okay_idx;
-            if (iter == other.end())
-                leftmost_okay_idx = N;
-            else
-                leftmost_okay_idx = distance(other.begin(), iter);
-
-            result = min(result, i + (N - leftmost_okay_idx));
+            int needed_removals = (L - 0) + (N - first_exceeding);
+            result = min(result, needed_removals);
         }
 
         return result;
