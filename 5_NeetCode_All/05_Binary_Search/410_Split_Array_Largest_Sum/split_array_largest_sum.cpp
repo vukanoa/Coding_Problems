@@ -50,6 +50,8 @@
 */
 
 #include <algorithm>
+#include <climits>
+#include <cstring>
 #include <numeric>
 #include <vector>
 using namespace std;
@@ -366,5 +368,80 @@ private:
         }
 
         return needed_groups;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is BY FAR the worst Solution of all three in this file, however
+    this is one common template for doing "Memoization" Problems.
+
+    It's good to get familiar with "Memoization" as soon as possible, so even
+    if it's not the most optimal for some problems, I like to include it just
+    for the same of practice.
+
+*/
+
+/* Time  Beats: 4.52% */
+/* Space Beats: 6.81% */
+
+/* Time  Complexity: O(k * N^2) */
+/* Space Complexity: O(k * N)   */
+class Solution_Memoization {
+private:
+    static constexpr int MAX_N = 1001;
+    int memo[MAX_N][MAX_N];
+
+public:
+    int splitArray(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo)); // 0xff <==> -1 in "2's completent"
+
+
+        return solve(0, nums, k);
+    }
+
+private:
+    int solve(int idx, vector<int>& nums, int remaining_k)
+    {
+        const int N = nums.size();
+
+        if (idx == N)
+            return remaining_k == 0 ? 0 : INT_MAX;
+
+        if (remaining_k == 0)
+            return INT_MAX;
+
+        if (memo[idx][remaining_k] != -1)
+            return memo[idx][remaining_k];
+
+
+
+        int result = INT_MAX; // Smallest worst_group_sum from here
+        int left_group_sum = 0;
+
+        for (int split_end = idx; split_end <= N - remaining_k; split_end++)
+        {
+            // Take current element as the end of the current subarray
+            left_group_sum += nums[split_end];
+
+            // Smallest max_sum from any subarray until the end
+            int right_best = solve(split_end + 1, nums, remaining_k - 1);
+
+            int worst_group_sum = max(left_group_sum, right_best);
+
+            result = min(result, worst_group_sum);
+        }
+
+        return memo[idx][remaining_k] = result;
     }
 };
