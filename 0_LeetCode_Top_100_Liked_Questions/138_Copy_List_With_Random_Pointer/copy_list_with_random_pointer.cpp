@@ -141,45 +141,114 @@ public:
     Hashmap.
 */
 
-/* Time  Beats: 83.26% */
-/* Space Beats: 18.83% */
+/* Time  Beats: 91.88% */
+/* Space Beats: 69.95% */
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution_Hash_Map_plus_Two_Passes {
+class Solution_Two_Passes {
 public:
     Node* copyRandomList(Node* head)
     {
         if (head == nullptr)
             return nullptr;
 
-        unordered_map<Node*, Node*> umap;
-        umap.insert({nullptr, nullptr});
+        unordered_map<Node*, Node*> orig_to_copy;
+        orig_to_copy.insert( {nullptr, nullptr} );
 
-        Node* curr_orig_node = head;
+        Node* orig = head;
 
-        while (curr_orig_node)
+        while (orig)
         {
-            Node* curr_copy_node = new Node(curr_orig_node->val);
-            umap.insert({curr_orig_node, curr_copy_node});
+            Node* copy = new Node(orig->val);
+            orig_to_copy.insert( {orig, copy} );
 
             // Move forward
-            curr_orig_node = curr_orig_node->next;
+            orig = orig->next;
         }
 
-        curr_orig_node = head;
-        while (curr_orig_node)
+        orig = head;
+        while (orig)
         {
-            Node* curr_copy = umap[curr_orig_node];
+            Node* copy = orig_to_copy[orig];
 
-            curr_copy->next   = umap[curr_orig_node->next];
-            curr_copy->random = umap[curr_orig_node->random];
+            copy->next   = orig_to_copy[orig->next];
+            copy->random = orig_to_copy[orig->random];
 
             // Move forward
-            curr_orig_node = curr_orig_node->next;
+            orig = orig->next;
         }
 
-        return umap[head];
+        return orig_to_copy[head];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one has the same IDEA as above, however this is done in ONE-Pass as
+    opposed to Two-Passes.
+
+    It's a bit difficult to read, but go slowly, take your time and I'm sure
+    you'll understand it.
+
+    It's not that bad.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  69.65% */
+
+/* Time  Complexity: O(N) */ // One-Pass
+/* Space Complexity: O(N) */
+class Solution_One_Pass {
+public:
+    Node* copyRandomList(Node* head)
+    {
+        if (head == nullptr)
+            return nullptr;
+
+        unordered_map<Node*, Node*> orig_to_copy;
+        orig_to_copy.insert( {nullptr, nullptr} );
+
+        Node* orig = head;
+
+        while (orig)
+        {
+            // Fill "val"
+            if (orig_to_copy.find(orig) == orig_to_copy.end())
+            {
+                Node* empty_node = new Node(0);
+                orig_to_copy.insert( {orig, empty_node} );
+            }
+            orig_to_copy[orig]->val = orig->val;
+
+            // Fill "next" pointer
+            if (orig_to_copy.find(orig->next) == orig_to_copy.end())
+            {
+                Node* empty_node = new Node(0);
+                orig_to_copy.insert( {orig->next, empty_node} );
+            }
+            orig_to_copy[orig]->next = orig_to_copy[orig->next];
+
+            // Fill "random" pointer
+            if (orig_to_copy.find(orig->random) == orig_to_copy.end())
+            {
+                Node* empty_node = new Node(0);
+                orig_to_copy.insert( {orig->random, empty_node} );
+            }
+            orig_to_copy[orig]->random = orig_to_copy[orig->random];
+
+            // Move forward
+            orig = orig->next;
+        }
+
+        return orig_to_copy[head];
     }
 };
 
@@ -321,41 +390,41 @@ class Solution_DNA {
 public:
     Node* copyRandomList(Node* head)
     {
-        Node* curr_orig_node = head;
-        Node* next_orig_node = nullptr;
-        Node* prev_copy_node = nullptr;
+        Node* curr_orig = head;
+        Node* next_orig = nullptr;
+        Node* prev_copy = nullptr;
 
-        while (curr_orig_node)
+        while (curr_orig)
         {
-            next_orig_node = curr_orig_node->next;
+            next_orig = curr_orig->next;
 
-            Node* curr_copy = new Node(curr_orig_node->val);
-            curr_orig_node->next = curr_copy;
+            Node* curr_copy = new Node(curr_orig->val);
+            curr_orig->next = curr_copy;
 
             // Update Copy's next
-            if (prev_copy_node != nullptr)
-                prev_copy_node->next = curr_copy;
+            if (prev_copy != nullptr)
+                prev_copy->next = curr_copy;
 
             // Update Copy's random
-            curr_copy->random = curr_orig_node;
+            curr_copy->random = curr_orig;
 
-            prev_copy_node = curr_copy;
-            curr_orig_node = next_orig_node;
+            prev_copy = curr_copy;
+            curr_orig = next_orig;
         }
 
         // Since we have just adjusted it to point like this
-        Node* curr_copy_node = head->next;
+        Node* curr_copy = head->next;
 
         // Assign Copied Nodes to "random" pointers.
-        while (curr_copy_node)
+        while (curr_copy)
         {
-            if (curr_copy_node->random->random != nullptr)
-                curr_copy_node->random = curr_copy_node->random->random->next;
+            if (curr_copy->random->random != nullptr)
+                curr_copy->random = curr_copy->random->random->next;
             else
-                curr_copy_node->random = nullptr;
+                curr_copy->random = nullptr;
 
             // Move forward
-            curr_copy_node = curr_copy_node->next;
+            curr_copy = curr_copy->next;
         }
 
         return head->next;
