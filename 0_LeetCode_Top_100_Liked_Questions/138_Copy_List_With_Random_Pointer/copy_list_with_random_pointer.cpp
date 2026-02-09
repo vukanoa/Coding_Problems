@@ -1,6 +1,3 @@
-#include <iostream>
-#include <unordered_map>
-
 /*
     ==============
     === MEDIUM ===
@@ -73,7 +70,10 @@
 
 */
 
-class Node{
+#include <unordered_map>
+using namespace std;
+
+class Node {
 public:
     int val;
     Node* next;
@@ -87,14 +87,16 @@ public:
     }
 };
 
-
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Make a Hashmap<Node*, Node*> where the original node will be mapped
-    "1 to 1" to a copied node.
+    Make a:
+        Hashmap<Node*, Node*>
+
+    where the original node will be mapped "1 to 1" to a copied node.
+
     Thus, we won't have issues if we have, say, nodes with same values or
     something like that.
 
@@ -142,94 +144,39 @@ public:
 /* Time  Beats: 83.26% */
 /* Space Beats: 18.83% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_1 {
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Hash_Map_plus_Two_Passes {
 public:
     Node* copyRandomList(Node* head)
     {
         if (head == nullptr)
             return nullptr;
 
-        std::unordered_map<Node*, Node*> umap;
+        unordered_map<Node*, Node*> umap;
         umap.insert({nullptr, nullptr});
 
-        Node* curr_original = head;
+        Node* curr_orig_node = head;
 
-        while (curr_original)
+        while (curr_orig_node)
         {
-            Node* curr_copy = new Node(curr_original->val);
-            umap.insert({curr_original, curr_copy});
+            Node* curr_copy_node = new Node(curr_orig_node->val);
+            umap.insert({curr_orig_node, curr_copy_node});
 
-            curr_original = curr_original->next;
+            // Move forward
+            curr_orig_node = curr_orig_node->next;
         }
 
-        curr_original = head;
-        while (curr_original)
+        curr_orig_node = head;
+        while (curr_orig_node)
         {
-            Node* curr_copy = umap[curr_original];
+            Node* curr_copy = umap[curr_orig_node];
 
-            curr_copy->next   = umap[curr_original->next];
-            curr_copy->random = umap[curr_original->random];
+            curr_copy->next   = umap[curr_orig_node->next];
+            curr_copy->random = umap[curr_orig_node->random];
 
-            curr_original = curr_original->next;
-        }
-
-        return umap[head];
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    The only difference to the above Solution is in which order we have been
-    assignign copied node's next and random pointer.
-
-    In the above Solution we've iterated through the original list again and
-    then accessed the copied ones from the Hash Map.
-
-    However, in this one, we have iterated through the entries of Hash Map and
-    we have been assigning next and random pointers of the copied nodes.
-
-    It's cleaner to write it this way, plus since we have a Hash Map, we don't
-    really care in which order we assign all of those pointers.
-
-*/
-
-/* Time  Beats: 93.39% */
-/* Space Beats: 25.21% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution_2 {
-public:
-    Node* copyRandomList(Node* head)
-    {
-        std::unordered_map<Node*, Node*> umap;
-        umap.insert({nullptr, nullptr});
-
-        Node* tmp = head;
-        while (tmp)
-        {
-            Node* copy = new Node(tmp->val);
-            umap.insert({tmp, copy});
-
-            tmp = tmp->next;
-        }
-
-        /* This part is different */
-        for (auto& entry : umap)
-        {
-            if (entry.first == nullptr)
-                continue;
-
-            entry.second->next   = umap[entry.first->next];
-            entry.second->random = umap[entry.first->random];
+            // Move forward
+            curr_orig_node = curr_orig_node->next;
         }
 
         return umap[head];
@@ -247,7 +194,9 @@ public:
     --- IDEA ---
     ------------
 
+    ********************
     *** Solution_DNA ***
+    ********************
 
     Why am I calling it "DNA"? It is reminiscent of DNA replication. At least
     it reminds me of it.
@@ -294,18 +243,18 @@ public:
 
   Original List: (Before the while loop)
 
-      head -----
-               |
-      ----------
-      |
-      v
-    ->7     ->13     ->11     ->10     ->1                 (Original List)
-    | |     |  |     |  |     |  |     | |
-    | v     |  v     |  v     |  v     | v
-    --7 ==> --13 ==> --11 ==> --10 ==> --1 ==> nullptr     (Copied List)
+        head -----
+                 |
+        ----------
+        |
+        v
+     -->7     -->13     -->11     -->10     -->1               (Original List)
+     |  |     |   |     |   |     |   |     |  |
+     |  v     |   v     |   v     |   v     |  v
+     ---7 ==> ---13 ==> ---11 ==> ---10 ==> ---1 ==> nullptr    (Copied List)
 
-// From up (Origian List) downards is the "next" pointer of Original List.
-// From down(Copied List) upwards is the "random" pointer of the Copied List.
+// From up   (Original List) downards is the "next" pointer of Original List
+// From down (Copied   List) upwards is the "random" pointer of the Copied List
 
 
         2. Iterate through this Copied List and make:
@@ -372,230 +321,43 @@ class Solution_DNA {
 public:
     Node* copyRandomList(Node* head)
     {
-        Node* curr_original = head;
-        Node* next_original = nullptr;
-        Node* prev_copy = nullptr;
+        Node* curr_orig_node = head;
+        Node* next_orig_node = nullptr;
+        Node* prev_copy_node = nullptr;
 
-        while (curr_original)
+        while (curr_orig_node)
         {
-            next_original = curr_original->next;
+            next_orig_node = curr_orig_node->next;
 
-            Node* curr_copy = new Node(curr_original->val);
-            curr_original->next = curr_copy;
+            Node* curr_copy = new Node(curr_orig_node->val);
+            curr_orig_node->next = curr_copy;
 
             // Update Copy's next
-            if (prev_copy != nullptr)
-                prev_copy->next = curr_copy;
+            if (prev_copy_node != nullptr)
+                prev_copy_node->next = curr_copy;
 
             // Update Copy's random
-            curr_copy->random = curr_original;
+            curr_copy->random = curr_orig_node;
 
-            prev_copy = curr_copy;
-            curr_original = next_original;
+            prev_copy_node = curr_copy;
+            curr_orig_node = next_orig_node;
         }
 
         // Since we have just adjusted it to point like this
-        Node* curr_copy = head->next;
+        Node* curr_copy_node = head->next;
 
         // Assign Copied Nodes to "random" pointers.
-        while (curr_copy)
+        while (curr_copy_node)
         {
-            if (curr_copy->random->random != nullptr)
-                curr_copy->random = curr_copy->random->random->next;
+            if (curr_copy_node->random->random != nullptr)
+                curr_copy_node->random = curr_copy_node->random->random->next;
             else
-                curr_copy->random = nullptr;
+                curr_copy_node->random = nullptr;
 
-            curr_copy = curr_copy->next;
+            // Move forward
+            curr_copy_node = curr_copy_node->next;
         }
 
         return head->next;
     }
 };
-
-
-void
-print_list(Node* head)
-{
-    if (head == nullptr)
-    {
-        std::cout << "\n\tOriginal List is Empty, thus Copied List doesn't exist!\n\n";
-        return;
-    }
-
-    std::cout << "\n\tLegend of the Output:";
-    std::cout << "\n\t\t[Node value, value of random node] -> value of next node\n";
-
-    while (head)
-    {
-        if (head->next)
-        {
-            if (head->random)
-                std::cout << "\n\t[" << head->val << ", " << head->random->val << "] -> " << head->next->val;
-            else
-                std::cout << "\n\t[" << head->val << ", nullptr] -> " << head->next->val;
-
-        }
-        else
-        {
-            if (head->random)
-                std::cout << "\n\t[" << head->val << ", " << head->random->val << "] -> nullptr";
-            else
-                std::cout << "\n\t[" << head->val << ", nullptr] -> nullptr";
-        }
-
-        head = head->next;
-    }
-
-    std::cout << "\n\n";
-}
-
-
-int
-main()
-{
-    // Solution_1 sol_1;
-    Solution_2 sol_2;
-    // Solution_DNA sol_dna;
-
-    /* Example 1 */
-    Node* seven    = new Node(7);
-    Node* thirteen = new Node(13);
-    Node* eleven   = new Node(11);
-    Node* ten      = new Node(10);
-    Node* one      = new Node(1);
-    Node* head = seven;
-
-    seven->next = thirteen;
-    thirteen->next = eleven;
-    eleven->next = ten;
-    ten->next = one;
-
-    seven->random = nullptr;
-    thirteen->random = seven;
-    eleven->random = one;
-    ten->random = eleven;
-    one->random = seven;
-
-
-
-
-    /* Example 2 */
-    // Node* one = new Node(1);
-    // Node* two = new Node(2);
-    // Node* head = one;
-
-    // one->next = two;
-
-    // one->random = one;
-    // two->random = one;
-
-
-
-
-    /* Example 3 */
-    // Node* minus_one = new Node(-1);
-    // minus_one->next = nullptr;
-    // minus_one->random = minus_one;
-    // Node* head = minus_one;
-
-
-
-
-    /* Example 4 */
-    // Node* three_1       = new Node(3);
-    // Node* five_1        = new Node(5);
-    // Node* four          = new Node(4);
-    // Node* minus_nine_1  = new Node(-9);
-    // Node* minus_ten     = new Node(-10);
-    // Node* five          = new Node(5);
-    // Node* zero          = new Node(0);
-    // Node* six           = new Node(6);
-    // Node* minus_six_1   = new Node(-6);
-    // Node* three_2       = new Node(3);
-    // Node* minus_six_2   = new Node(-6);
-    // Node* nine          = new Node(-9);
-    // Node* minus_two_1   = new Node(-2);
-    // Node* minus_three_1 = new Node(-3);
-    // Node* minus_one     = new Node(-1);
-    // Node* two           = new Node(2);
-    // Node* minus_three_2 = new Node(-3);
-    // Node* minus_nine_2  = new Node(-9);
-    // Node* minus_two_2   = new Node(-2);
-    // Node* minus_eight   = new Node(8);
-    // Node* five_2        = new Node(5);
-    // Node* head = three_1;
-
-    // three_1->next = five_1;
-    // five_1->next = four;
-    // four->next = minus_nine_1;
-    // minus_nine_1->next = minus_ten;
-    // minus_ten->next = five;
-    // five->next = zero;
-    // zero->next = six;
-    // six->next = minus_six_1;
-    // minus_six_1->next = three_2;
-    // three_2->next = minus_six_2;
-    // minus_six_2->next = nine;
-    // nine->next = minus_two_1;
-    // minus_two_1->next = minus_three_1;
-    // minus_three_1->next = minus_one;
-    // minus_one->next = two;
-    // two->next = minus_three_2;
-    // minus_three_2->next = minus_nine_2;
-    // minus_nine_2->next = minus_two_2;
-    // minus_two_2->next = minus_eight;
-    // minus_eight->next = five_2;
-    // five_2->next = nullptr;
-
-    // three_1->random       = nullptr;
-    // five_1->random        = minus_nine_2;
-    // four->random          = nullptr;
-    // minus_nine_1->random  = zero;
-    // minus_ten->random     = minus_nine_1;
-    // five->random          = two;
-    // zero->random          = nine;
-    // six->random           = nullptr;
-    // minus_six_1->random   = minus_three_2;
-    // three_2->random       = minus_three_2;
-    // minus_six_2->random   = nine;
-    // nine->random          = minus_two_1;
-    // minus_two_1->random   = five;
-    // minus_three_1->random = nine;
-    // minus_one->random     = minus_six_2;
-    // two->random           = nine;
-    // minus_three_2->random = nullptr;
-    // minus_nine_2->random  = six;
-    // minus_two_2->random   = minus_ten;
-    // minus_eight->random   = nullptr;
-    // five_2->random        = nullptr;
-
-
-
-
-    /* Example 5 */
-    // Node* head = nullptr;
-
-
-    std::cout << "\n\t=====================================";
-    std::cout << "\n\t=== COPY LIST WITH RANDOM POINTER ===";
-    std::cout << "\n\t=====================================\n";
-
-
-    /* Write Input */
-    std::cout << "\n\t\t*** ORIGINAL LIST ***\n";
-    print_list(head);
-
-
-    /* Solution */
-    // Node* ret = sol_1.copyRandomList(head);
-    Node* ret = sol_2.copyRandomList(head);
-    // Node* ret = sol_dna.copyRandomList(head);
-
-
-    /* Write Output */
-    std::cout << "\n\n\n\t\t*** COPIED LIST ***\n";
-    print_list(ret);
-
-
-    return 0;
-}
