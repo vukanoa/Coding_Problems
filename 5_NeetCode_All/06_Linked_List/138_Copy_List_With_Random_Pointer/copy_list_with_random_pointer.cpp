@@ -358,6 +358,83 @@ public:
 
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Similar idea to the above "Space Optimized I", however instead of
+    interleaving copy-nodes with the original list, we can do something
+    similar, but better.
+
+    We use original nodes' "random" pointers to point at new copy nodes and
+    copy nodes point to original "random" nodes.
+
+    Then we can simply link "random" pointers of copy-nodes.
+
+    Once we've done that, we restore the original Linked-List and we link
+    "next" pointers of copy nodes.
+
+*/
+
+/* Time  Beats: 91.90% */
+/* Space Beats: 69.71% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */ // New Linked-List is not considered "Extra" space
+class Solution_Space_Optimized_II {
+public:
+    Node* copyRandomList(Node* head)
+    {
+        if ( ! head)
+            return nullptr;
+
+        Node* orig = head;
+        while (orig)
+        {
+            Node* copy = new Node(orig->val);
+
+            copy->next = orig->random; // Make copy point to orig's random node
+            orig->random = copy;       // Make orig->random be copy
+
+            // Move forward
+            orig = orig->next;
+        }
+
+        Node* new_head = head->random;
+
+        orig = head;
+        while (orig)
+        {
+            Node* copy = orig->random;
+
+            // Link "random" pointer of copy-nodes
+            copy->random = (copy->next) ? copy->next->random : nullptr;
+
+            // Move forward
+            orig = orig->next;
+        }
+
+        orig = head;
+        while (orig)
+        {
+            Node* copy = orig->random;
+
+            // Restore orig Linked_list & Link "next" pointers of copy nodes
+            orig->random = copy->next;
+            copy->next = (orig->next) ? orig->next->random : nullptr;
+
+            // Move forward
+            orig = orig->next;
+        }
+
+        return new_head;
+    }
+};
+
+
+
+
 /* This doesn't pass LeetCode tests since it modifies the original list */
 /* However, it's a genius idea in my opinion */
 
