@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -49,6 +47,10 @@
 
 */
 
+#include <string>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -61,15 +63,15 @@
 /* Time  Beats: 98.88% */
 /* Space Beats: 35.25% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution {
 public:
     int minimumDeletions(string s)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-
         const int N = s.length();
+        int result = N;
+
         vector<int> count_a_to_the_right(N, 0);
 
         for (int i = N-2; i >= 0; i--)
@@ -80,9 +82,7 @@ public:
                 count_a_to_the_right[i]++;
         }
 
-        int result = INT_MAX;
         int count_b_to_the_left = 0;
-
         for (int i = 0; i < N; i++)
         {
             int deletions = count_b_to_the_left + count_a_to_the_right[i];
@@ -111,36 +111,32 @@ public:
 /* Time  Beats: 99.04% */
 /* Space Beats: 66.99% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution_Space_Efficient {
 public:
     int minimumDeletions(string s)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        const int N = s.size();
+        int result = N;
 
-        const int N = s.length();
-        int count_a_to_the_right = 0;
-
-        for (int i = N-1; i >= 0; i--)
-        {
-            if (s[i] == 'a')
-                count_a_to_the_right++;
-        }
-
-        int result = INT_MAX;
-        int count_b_to_the_left = 0;
-
+        int a_count_right = 0;
         for (int i = 0; i < N; i++)
         {
             if (s[i] == 'a')
-                count_a_to_the_right--;
+                a_count_right++;
+        }
 
-            int deletions = count_b_to_the_left + count_a_to_the_right;
-            result = min(result, deletions);
+        int b_count_left = 0;
+        for (int i = 0; i < N; i++)
+        {
+            if (s[i] == 'a')
+                a_count_right--;
+
+            result = min(result, b_count_left + a_count_right);
 
             if (s[i] == 'b')
-                count_b_to_the_left++;
+                b_count_left++;
         }
 
         return result;
