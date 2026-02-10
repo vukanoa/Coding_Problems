@@ -255,6 +255,109 @@ public:
 
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Example:
+
+        // Original Linked-List 
+        2 --> 7 --> 8 --> 3 --> 5
+
+
+    Instead of using a Hash Map, we can create a new, copy, linked list and 
+    interleave it with the original list.
+
+        2 --> 2 --> 7 --> 7 --> 8 --> 8 --> 3  --> 3 --> 5 --> 5
+              C           C           C            C           C
+              ^           ^           ^            ^           ^
+              |           |           |            |           |
+              |___________|___________|____________|___________|
+                                      |
+                                    Copy nodes
+              
+    Then we link "random" pointers of this copy Linked-List by doing:
+
+        copy         = orig->next;
+        copy->random = orig->random->next;
+
+
+    Then we link "next" pointers of this copy Linked-List, which makes both the
+    original and copy Linked-List as they ought to be. The original list is
+    restored, whereas the copy list is as its required of us.
+
+        copy       = orig->next;
+        orig->next = copy->next;
+
+        if (copy->next)
+            copy->next = copy->next->next;
+
+*/
+
+/* Time  Beats: 92.74% */
+/* Space Beats: 95.80% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */ // New Linked-List is not considered "Extra" space
+class Solution_Space_Optimized {
+public:
+    Node* copyRandomList(Node* head)
+    {
+        if (head == nullptr)
+            return nullptr;
+
+        Node* orig = head;
+        while (orig)
+        {
+            // Create copy node
+            Node* copy = new Node(orig->val);
+
+            // Insert copy node into the original list
+            copy->next = orig->next;
+            orig->next = copy;
+
+            // Move forward
+            orig = copy->next;
+        }
+
+        Node* new_head = head->next;
+
+        orig = head;
+        while (orig)
+        {
+            // Link "random" pointers of copy nodes
+            if (orig->random)
+                orig->next->random = orig->random->next;
+
+            // Move forward
+            orig = orig->next->next;
+        }
+
+        orig = head;
+        while (orig)
+        {
+            // Get the copy node
+            Node* copy = orig->next;
+
+            // Restore original list by re-linking "next" pointers of orig node
+            orig->next = copy->next;
+
+            // Link "next" pointers of copy nodes
+            if (copy->next)
+                copy->next = copy->next->next;
+
+            // Move forward
+            orig = orig->next;
+        }
+
+        return new_head;
+    }
+};
+
+
+
+
 /* This doesn't pass LeetCode tests since it modifies the original list */
 /* However, it's a genius idea in my opinion */
 
