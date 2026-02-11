@@ -64,6 +64,7 @@
 
 */
 
+#include <cstdlib>
 #include <vector>
 using namespace std;
 
@@ -544,5 +545,55 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Since we're told that EVERY value in "nums" is going to be [1..N-1], then
+    every value should have its own unique position in the vector.
+
+    We can iterate through "nums" in order and each time we see a value, we
+    MARK it by multiplying the value at nums[correct_position] with -1.
+
+    However, if we stumble upon a value where the number correct_position is
+    ALREADY NEGATIVE, that indicates some previous number of the SAME VALUE has
+    already marked that position.
+
+    Therefore, we know there is a DUPLICATE value to the current one and that
+    is our answer.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  68.83% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Negative_Marking {
+public:
+    int findDuplicate(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        for (int i = 0; i < N; i++)
+        {
+            int value            = abs(nums[i]);
+            int correct_position = value - 1;
+
+            // If "val" is ALREADY SEEN--that's the answer
+            if (nums[correct_position] < 0)
+                return value;
+
+            nums[correct_position] *= -1; // Mark current value as SEEN so far
+        }
+
+        return -1; // Unreachable code
     }
 };
