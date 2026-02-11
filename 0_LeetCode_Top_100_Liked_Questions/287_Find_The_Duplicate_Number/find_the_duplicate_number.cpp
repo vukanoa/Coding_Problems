@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -67,6 +64,8 @@
 
 */
 
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -81,13 +80,11 @@
 
     First of all, where does the cycle come from? Let's use the function
     f(x) = nums[x] to construct the sequence:
+
         x, nums[x], nums[nums[x]], nums[nums[nums[x]]], ...
 
     Each new element in the sequence is an element in nums at the index of the
-    previous element.
-
-    If one starts from x = nums[0], such a sequence will produce a linked list
-    with a cycle.
+    previous element's value.
 
     The cycle appears because "nums" contains duplicates. The duplicate node
     is a cycle entrance
@@ -106,8 +103,8 @@
     instead.
 
     And dereferencing is the same:
-        nums[4] <==> *(nums + 4)
 
+        nums[4] <==> *(nums + 4)
 
 
     Explanation:
@@ -123,13 +120,13 @@
              i  0  1  2  3  4               nums[i] in [1, n]
 
     Here we have 5 elements and we know that the elements are going to be in
-    range [1 - 4].
+    range [1...4].
 
     So instead of thinking about elements as values, let's think of them as
     pointers.
 
     We know for sure that every single value in the array is going to be in the
-    range [1 - 4], that means - If we considered every value as a pointer, each
+    range [1...4], that means - If we considered every value as a pointer, each
     value is going to point at some position in this block of remaining 4
     elements.
 
@@ -141,16 +138,17 @@
         Element 2 points to index 2, which is element of value 4.
         Element 4 points ot index 4, which is element of value 2.
 
-        Linked List equivalent of this array:
+    Linked List equivalent of this array:
 
 
-    0 -> 3 -> 2 _
-             ^   \
-            /     \
-            \     /
-             \   /
-              \ v
-               4
+        0 -> 3 -> 2 _
+                 ^   \
+                /     \
+                \     /
+                 \   /
+                  \ v
+                   4
+
 
                 0  1  2  3  4
         nums = [1, 3, 4, 2, 2]
@@ -456,11 +454,11 @@
 /* Time  Beats: 82.73% */
 /* Space Beats: 87.42% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    int findDuplicate(std::vector<int>& nums)
+    int findDuplicate(vector<int>& nums)
     {
         int slow = nums[0];
         int fast = nums[0];
@@ -485,47 +483,66 @@ public:
 };
 
 
-int
-main()
-{
-    Solution sol;
 
 
-    /* Example 1 */
-    std::vector<int> nums = {1, 3, 4, 2, 2};
+/*
+    ------------
+    --- IDEA ---
+    ------------
 
-    /* Example 2 */
-    // std::vector<int> nums = {3, 1, 3, 4, 2};
+    Every number from range [1..N-1] should appear EXACTLY once, however in
+    our "nums", we know that one number appears TWICE.
 
-    /* Example 3 */
-    // std::vector<int> nums = {2, 2, 2, 2, 2};
+    Therefore, we count for each BIT, how many times does it appear.
 
-    std::cout << "\n\t=================================";
-    std::cout << "\n\t=== FIND THE DUPLICATE NUMBER ===";
-    std::cout << "\n\t=================================\n";
+    If it appears more than the time it SHOULD appear in range [1..N] were
+    there only non-duplicates, then we know this bit is CERTAINLY going to be
+    included in the final result.
 
+    We construct the final result by SETTING that bit.
 
-    /* Write Input */
-    bool first = true;
-    std::cout << "\n\tArray: [";
-    for (auto x: nums)
+*/
+
+/* Time  Beats: 20.44% */
+/* Space Beats: 89.51% */
+
+/* Time  Complexity: O(32 * N) --> O(N) */
+/* Space Complexity: O(1)               */
+class Solution_Bit_Masking {
+public:
+    int findDuplicate(vector<int>& nums)
     {
-        if (!first)
-            std::cout << ", ";
+        const int N = nums.size();
+        int result = 0;
 
-        std::cout << x;
-        first = false;
+        // O(32 * N) (entire block)
+        for (int bit_position = 0; bit_position < 32; bit_position++) // O(32)
+        {
+            int actual_count_at_bit_position = 0;
+            int expected_count_at_bit_position = 0;
+
+            int mask = 1 << bit_position;
+
+            // Count how many numbers in the array have this bit set
+            for (int number : nums) // O(N)
+            {
+                if (number & mask)
+                    actual_count_at_bit_position++;
+            }
+
+            // Count how many numbers in range [1..N-1] should have this bit set
+            for (int number = 1; number < N; number++) // O(N)
+            {
+                if (number & mask)
+                    expected_count_at_bit_position++;
+            }
+
+            // If we found more numbers with this bit set than expected,
+            // then that means duplicate number MUST have this bit set
+            if (actual_count_at_bit_position > expected_count_at_bit_position)
+                result |= mask;
+        }
+
+        return result;
     }
-    std::cout << "]\n";
-
-
-    /* Solution */
-    int output = sol.findDuplicate(nums);
-
-
-    /* Write Output */
-    std::cout << "\n\tDuplicate: " << output << "\n\n";
-
-
-    return 0;
-}
+};
