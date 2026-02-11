@@ -597,3 +597,55 @@ public:
         return -1; // Unreachable code
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The idea is very similar to the above one with "Negative Marking". However,
+    this one, instead, swaps elements to its correct positions.
+
+    As soon as some value is NOT where it should be, however in index "correct
+    position"  there is ALREADY that value, that indicates this is a DUPLICATE.
+
+    It is important to be aware of both techniques, as someone you can apply
+    only one and not the other.
+
+*/
+
+/* Time  Beats: 67.66% */
+/* Space Beats: 89.51% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_In_place_Swapping {
+public:
+    int findDuplicate(vector<int>& nums)
+    {
+        const int N = nums.size();
+        
+        // Place each number at its correct position
+        for (int i = 0; i < N; i++)
+        {
+            // While the current number is NOT at its correct position
+            while (nums[i] != (i+1))
+            {
+                int correct_position = nums[i] - 1;
+                
+                // If the correct position ALREADY has this number, we have
+                // found the duplicate
+                if (nums[correct_position] == nums[i])
+                    return nums[i];
+                    
+                // Swap the current number to its correct position
+                swap(nums[i], nums[correct_position]);
+            }
+        }
+
+        return -1; // Unreachable code
+    }
+};
