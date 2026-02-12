@@ -246,3 +246,163 @@ private:
         node->next       = &dummy_MRU;
     }
 };
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache* obj = new LRUCache(capacity);
+ * int param_1 = obj->get(key);
+ * obj->put(key,value);
+ */
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The only difference here is that we're using TWO Hash Map instead of one.
+
+    Why am I including this Solution as well?
+    Sometimes people forget that they can put additional information within
+    the node and then they're obligated to complicate their Solutions like this
+    so you should be aware of it.
+
+*/
+
+/* Time  Beats: 71.80% */
+/* Space Beats: 47.85% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(N) */
+struct MyNode {
+    int val;
+    MyNode* prev;
+    MyNode* next;
+
+    MyNode ()
+    {}
+
+    MyNode (int val)
+        : val(val), prev(nullptr), next(nullptr)
+    {}
+
+    MyNode (int val, MyNode* prev, MyNode* next)
+        : val(val), prev(prev), next(next)
+    {}
+};
+
+class LRUCache_2 {
+public:
+    LRUCache_2(int capacity)
+        : dummy_LRU(-1), dummy_MRU(-1), cap(capacity)
+    {
+        dummy_LRU.next = &dummy_MRU;
+        dummy_MRU.prev = &dummy_LRU;
+    }
+
+    /* Free Memory */
+    ~LRUCache_2()
+    {
+        MyNode* curr = dummy_LRU.next;
+
+        while (curr != &dummy_MRU)
+        {
+            MyNode* next = curr->next;
+
+            /* Clear & Free Memory */
+            curr->prev = nullptr;
+            curr->next = nullptr;
+            delete curr;
+
+            // Move forward
+            curr = next;
+        }
+
+        // Remember that "dummy_LRU" and "dummy_MRU" are allocated on the STACK 
+    }
+    
+    int get(int key)
+    {
+        if (cache_key_to_node.find(key) == cache_key_to_node.end()) // It does NOT exist
+            return -1;
+
+        MyNode* node = cache_key_to_node[key];
+
+        yank_from_linked_list(node);
+        insert_as_MRU_node(node);
+
+        return node->val;
+    }
+    
+    void put(int key, int value)
+    {
+        if (cache_key_to_node.find(key) != cache_key_to_node.end()) // Exists
+        {
+            MyNode* node = cache_key_to_node[key];
+            node->val = value; // Update value
+
+            yank_from_linked_list(node);
+            insert_as_MRU_node(node);
+
+            return;
+        }
+
+        if (cache_node_to_key.size() == cap) // Capacity is already full
+        {
+            /* Remove current LRU node */
+            MyNode* lru_node = dummy_LRU.next;
+            int     lru_key  = cache_node_to_key[lru_node];
+
+            yank_from_linked_list(lru_node);
+
+            cache_key_to_node.erase(lru_key);
+            cache_node_to_key.erase(lru_node);
+
+            /* Clear & Free Memory */
+            lru_node->prev = nullptr;
+            lru_node->next = nullptr;
+            delete lru_node;
+        }
+
+        /* Put new node */
+        MyNode* node = new MyNode(value);
+        cache_key_to_node[key]  = node;
+        cache_node_to_key[node] = key;
+
+        insert_as_MRU_node(node);
+    }
+
+private:
+    MyNode dummy_LRU; // Head (LEAST Recently Used), on the STACK
+    MyNode dummy_MRU; // Tail (MOST  Recently Used), on the STACK
+
+    unsigned cap;     // Maximum capacity for this cache
+
+    unordered_map<int, MyNode*> cache_key_to_node;
+    unordered_map<MyNode*, int> cache_node_to_key;
+
+    void yank_from_linked_list(MyNode* node)
+    {
+        /* Re-link previous and next node of the current "node" */
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+
+        /* Clear Pointers */
+        node->prev = nullptr;
+        node->next = nullptr;
+    }
+
+    /* Put in-between current MRU's node and dummy_MRU */
+    void insert_as_MRU_node(MyNode* node)
+    {
+        /* Link with current MRU's node */
+        dummy_MRU.prev->next = node;
+        node->prev           = dummy_MRU.prev;
+
+        /* Link with dummy_MRU */
+        dummy_MRU.prev   = node;
+        node->next       = &dummy_MRU;
+    }
+};
