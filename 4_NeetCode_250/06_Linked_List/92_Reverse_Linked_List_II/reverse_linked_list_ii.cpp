@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -44,16 +42,14 @@
 
 */
 
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode() : val(0), next(nullptr) {}
- *     ListNode(int x) : val(x), next(nullptr) {}
- *     ListNode(int x, ListNode *next) : val(x), next(next) {}
- * };
- */
+// Definition for singly-linked list.
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
+};
 
 /*
     ------------
@@ -68,41 +64,52 @@
 */
 
 /* Time  Beats: 100.00% */
-/* Space Beats:  52.39% */
+/* Space Beats:  71.59% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */ // One Pass
 /* Space Complexity: O(1) */
 class Solution {
 public:
     ListNode* reverseBetween(ListNode* head, int left, int right)
     {
-        if (!head || !head->next || left == right)
+        if (left == right)
             return head;
 
-        ListNode dummy(0);
-        dummy.next = head;
+        ListNode dummy(-1);
+        dummy.next = head; // Link with "head"
 
-        ListNode* tmp = &dummy;
-        for (int i = 1; i < left; i++)
-            tmp = tmp->next;
+        ListNode* before_left = &dummy;
+        ListNode* after_right = nullptr; // For now
 
-        ListNode* before = tmp; // One node before the reversion starting point
+        for (int i = 1; i < left ; i++)
+        {
+            // Move forward
+            before_left = before_left->next;
+        }
 
-        ListNode* prev = tmp;
-        ListNode* curr = tmp->next;
+        /* Reverse Linked List */
+        ListNode* prev = before_left;
+        ListNode* curr = before_left->next;
 
-        int count = right - left + 1;
-        while (count--)
+        while (left <= right)
         {
             ListNode* next = curr->next;
 
             curr->next = prev;
             prev = curr;
             curr = next;
-        }
 
-        before->next->next = curr;
-        before->next = prev;
+            // Increment
+            left++;
+        }
+        after_right = curr;
+
+        ListNode* head_of_reversed_list = prev;
+        ListNode* tail_of_reversed_list = before_left->next;
+
+        // It MUST be in this order
+        tail_of_reversed_list->next = after_right;
+        before_left->next           = head_of_reversed_list;
 
         return dummy.next;
     }
