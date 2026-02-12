@@ -91,147 +91,158 @@ using namespace std;
     we need to update that every time we use "put" or "get" functions.
 
     So how do we fulfill all these requirements?
-    Hash Map + Doubly Linked List.
+
+        Hash Map + Doubly Linked List(with two DUMMY nodes).
 
     First, in the Constructor, we'll assign the given capacity to the capacity
     of our cache(Hash Map).
 
-    Then we'll make 2 dummy nodes: head & tail.
-    head's next will point to LRU(Least Recently Used item).
-    tail's prev will point to MRU(Most  Recently Used item)
+    Then we'll make 2 dummy nodes: dummy_LRU & dummy_MRU.
 
-    We'll immediately link head's next to tail and tail's prev to head since
-    at the very beginning there are no items(Nodes) in our cache.
+        dummy_LRU's next pointer will point to actual LRU(Least Recently Used)
+        dummy_MRU's prev pointer will point to actual MRU(Most  Recently Used)
 
-    int get(int key):
-        If a key doesn't exist:
-            return -1;
-        else
-            Remove that Node(Remember that Node is the value in our Hash Map)
-            from the list.
-
-            Insert it again, in the list.(Now at position MRU since we've
-            just used it)
-
-            return that node's value.
-
-    void put(int key, int value):
-        If a key doesn't exist:
-            make a new Node and insert its pointer in the hashmap at cache[key]
-                cache[key] = new Node(key, value);
-
-            insert that newly made Node in the list as MRU(at tail->prev, since
-            we've just used it).
-
-            Check if by inserting this Node, we've gone out of bounds.
-
-            If we have gone out of bounds then we have to remove the LRU(Least
-            Recently Used) Node form the list. (i.e. Remove head's next)
-            And remove that key from the hashmap "cache".
-
-        else:
-            Remove the Node with that key from the list and then do the same
-            as if the key doesn't exist.
-
-            What this does, essentially, is making sure that the Updated key
-            (Updated means that the key exists, otherwise we wouldn't be able
-            to update it)gets put at MRU position in the list(i.e. tail's prev)
+    We'll immediately link dummy_LRU's next to dummy_MRU and dummy_MRU's prev
+    to dummy_LRU since at the very beginning there are no items(Nodes) in our
+    cache.
 
 
-    remove_from_list(struct Node* node) & insert_in_list(struct Node* node)
-    are just doing what the name suggest, respectively.
+    Now, go and read the code carefully and you'll get it. Names are verbose
+    and there are comments explaining blocks of code.
 
 */
 
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    TODO
-
-*/
-
-/* Time  Beats: 99.69% */
-/* Space Beats: 65.34% */
+/* Time  Beats: 88.08% */
+/* Space Beats: 55.83% */
 
 /* Time  Complexity: O(1) */
-/* Space Complexity: O(n) */
+/* Space Complexity: O(N) */
+struct Node {
+    int key; // This is VERY important
+    int val;
+    Node* prev;
+    Node* next;
+
+    Node ()
+    {}
+
+    Node (int key, int val)
+        : key(key), val(val), prev(nullptr), next(nullptr)
+    {}
+
+    Node (int key, int val, Node* prev, Node* next)
+        : key(key), val(val), prev(prev), next(next)
+    {}
+};
+
 class LRUCache {
-private:
-    struct Node
-    {
-        int key;
-        int val;
-        Node* prev;
-        Node* next;
-
-        Node(int k, int v) : key(k), val(v), prev(nullptr), next(nullptr)
-        {}
-    };
-
-    int cache_capacity;
-    Node* head;
-    Node* tail;
-
-    std::unordered_map<int, Node*> cache;
-
 public:
-    LRUCache(int capacity) : cache_capacity(capacity)
+    LRUCache(int capacity)
+        : dummy_LRU(-1, -1), dummy_MRU(-1, -1), cap(capacity)
     {
-        head = new Node(0, 0); // Left  Dummy Node that points to LRU(Least Recently used)
-        tail = new Node(0, 0); // RIght Dummy node that points to MRU(Most  Recently used)
-
-        head->next = tail;
-        tail->prev = head;
+        /* Link two dummy nodes */
+        dummy_LRU.next = &dummy_MRU;
+        dummy_MRU.prev = &dummy_LRU;
     }
 
+    /* Free Memory */
+    ~LRUCache()
+    {
+        Node* curr = dummy_LRU.next;
+
+        while (curr != &dummy_MRU)
+        {
+            Node* next = curr->next;
+
+            /* Clear & Free Memory */
+            curr->prev = nullptr;
+            curr->next = nullptr;
+            delete curr;
+
+            // Move forward
+            curr = next;
+        }
+
+        // Remember that "dummy_LRU" and "dummy_MRU" are allocated on the STACK 
+    }
+    
     int get(int key)
     {
-        if (cache.find(key) != cache.end())
-        {
-            remove_from_list(cache[key]);
-            append_to_list  (cache[key]);
+        if (cache.find(key) == cache.end()) // It does NOT exist
+            return -1;
 
-            return cache[key]->val;
-        }
+        Node* node = cache[key];
 
-        return -1;
+        yank_from_linked_list(node);
+        insert_as_MRU_node(node);
+
+        return node->val;
     }
-
+    
     void put(int key, int value)
     {
-        if (cache.find(key) != cache.end())
-            remove_from_list(cache[key]);
-
-        cache[key] = new Node(key, value);
-        append_to_list(cache[key]);
-
-        if (cache.size() > cache_capacity)
+        if (cache.find(key) != cache.end()) // It DOES already exist
         {
-            Node* lru = head->next;
-            remove_from_list(lru);
-            cache.erase(lru->key);
+            Node* node = cache[key];
+            node->val  = value;      // Update value
+
+            yank_from_linked_list(node);
+            insert_as_MRU_node(node);
+
+            return;
         }
+
+
+
+        if (cache.size() == cap) // Capacity is already full
+        {
+            /* Remove current LRU node */
+            Node* lru_node = dummy_LRU.next;
+
+            yank_from_linked_list(lru_node);
+            cache.erase(lru_node->key);
+
+            /* Clear & Free Memory */
+            lru_node->prev = nullptr;
+            lru_node->next = nullptr;
+            delete lru_node;
+        }
+
+        /* Put new node */
+        Node* new_node = new Node(key, value);
+
+        cache.insert( {key, new_node} );
+        insert_as_MRU_node(new_node);
     }
 
-    void remove_from_list(Node* node)
-    {
-        Node* prev_node = node->prev;
-        Node* next_node = node->next;
+private:
+    Node dummy_LRU; // Head (LEAST Recently Used), allocated on the STACK
+    Node dummy_MRU; // Tail (MOST  Recently Used), allocated on the STACK
 
-        prev_node->next = next_node;
-        next_node->prev = prev_node;
+    unsigned cap;   // Maximum capacity for this cache
+
+    unordered_map<int, Node*> cache;
+
+    void yank_from_linked_list(Node* node)
+    {
+        /* Re-link previous and next node of the current "node" */
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+
+        /* Clear Pointers */
+        node->prev = nullptr;
+        node->next = nullptr;
     }
 
-    void append_to_list(Node* node)
+    /* Put in-between current MRU's node and dummy_MRU */
+    void insert_as_MRU_node(Node* node)
     {
-        Node* last_node = tail->prev;
+        /* Link with current MRU's node */
+        dummy_MRU.prev->next = node;
+        node->prev           = dummy_MRU.prev;
 
-        last_node->next = node;
-        tail->prev = node;
-
-        node->prev = last_node;
-        node->next = tail;
+        /* Link with dummy_MRU */
+        dummy_MRU.prev   = node;
+        node->next       = &dummy_MRU;
     }
 };
