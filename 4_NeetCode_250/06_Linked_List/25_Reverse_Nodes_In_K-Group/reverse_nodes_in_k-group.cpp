@@ -72,22 +72,26 @@ class Solution {
 public:
     ListNode* reverseKGroup(ListNode* head, int k)
     {
-        ListNode* dummy = new ListNode(0, head);
-        ListNode* group_prev = dummy;
+        ListNode dummy(-1);
+        dummy.next = head;
 
-        for(;;)
+        ListNode* node_before_group = &dummy;
+
+        while (true)
         {
-            ListNode* kth = get_kth(group_prev, k);
+            // kth_node <==> last_node_of_the_current_group
+            ListNode* kth_node = get_kth_node_from(node_before_group, k);
 
-            if (!kth)
+            if (kth_node == nullptr) // There are less than 'k' nodes left
                 break;
-            ListNode* group_next = kth->next;
 
-            /* Reverse Linked List */
-            ListNode* prev = kth->next;
-            ListNode* curr = group_prev->next;
+            ListNode* node_after_group = kth_node->next;
 
-            while (curr != group_next)
+            /* Reverse Linked List(current "group" of 'k' nodes) */
+            ListNode* prev = node_after_group;     // This reduces re-linkage
+            ListNode* curr = node_before_group->next;
+
+            while (curr != node_after_group)
             {
                 ListNode* next = curr->next;
 
@@ -96,26 +100,26 @@ public:
                 curr = next;
             }
 
-            /* Crucial part */
-            ListNode* tmp = group_prev->next;
-            group_prev->next = kth;
-            group_prev = tmp;
+            ListNode* old_head = node_before_group->next; // Tail of reversed
+            ListNode* new_head = prev;                    // Head of reversed
 
+            node_before_group->next = new_head;
+            node_before_group       = old_head; // Tail of Reversed group
         }
 
-        return dummy->next;
+        return dummy.next;
     }
 
 private:
-    ListNode* get_kth(ListNode* group_prev, int k)
+    ListNode* get_kth_node_from(ListNode* node_before_group, int k)
     {
-        ListNode* tmp = group_prev;
-        while (tmp && k > 0)
+        ListNode* iter_node = node_before_group;
+        while (iter_node && k > 0)
         {
-            tmp = tmp->next;
+            iter_node = iter_node->next;
             k--;
         }
 
-        return tmp;
+        return iter_node;
     }
 };
