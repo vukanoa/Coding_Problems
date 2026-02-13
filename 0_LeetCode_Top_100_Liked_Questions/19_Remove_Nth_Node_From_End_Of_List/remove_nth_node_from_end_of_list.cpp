@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -68,7 +66,6 @@
 
 */
 
-
 // Definition for singly-linked list.
 struct ListNode {
     int val;
@@ -77,72 +74,6 @@ struct ListNode {
     ListNode(int x) : val(x), next(nullptr) {}
     ListNode(int x, ListNode *next) : val(x), next(next) {}
 };
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Count how many nodes there are in total.
-    Be always one node behind the i-th node we're trying to remove.
-
-    if (i == n) // meaning we're behind the i-tn consecutive node and i == n
-        set current node's next to point to current node's next's next pointer.
-
-    That's it.
-
-    However, this one requires two passes.
-
-*/
-
-/* Time  Beats: 67.28% */
-/* Space Beats: 10.83% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution_Two_Passes {
-public:
-    ListNode* removeNthFromEnd(ListNode* head, int n)
-    {
-        int nodes = count_nodes(head);
-
-        ListNode dummy(0);
-        dummy.next = head;
-
-        ListNode* tmp = &dummy;
-
-        while(tmp && tmp->next)
-        {
-            if (nodes == n)
-            {
-                tmp->next = tmp->next->next;
-                break;
-            }
-
-            tmp = tmp->next;
-            nodes--;
-        }
-
-        return dummy.next;
-    }
-
-private:
-    int count_nodes(ListNode* head)
-    {
-        int count = 0;
-        while (head)
-        {
-            count++;
-            head = head->next;
-        }
-
-        return count;
-    }
-};
-
-
-
 
 /*
     ------------
@@ -154,8 +85,8 @@ private:
 
     Why are we doing that?
     Consider this:
-            n = 2 // Meaning, we want to remove element 6
-                                                  |
+            n = 2 // Meaning, we want to remove element 6(2-nd from the back)
+                                                  |         (1-based index)
                                      _____________|
                                      |
                                      |
@@ -191,7 +122,9 @@ private:
          |
        head
 
-
+    **************************
+    *** UNDESIRED BEHAVIOR ***
+    **************************
     Now we want to start another pointer 'L'("left") at the beginning(head) and
     once the 'R'("right") pointer becomes nullptr, our 'L'("left") pointer is
     going to point at the node we want to remove.
@@ -222,8 +155,8 @@ private:
 
 
     However, this isn't the desired behaviour. If we want to remove some node,
-    we can't be on that node, we must be one node behind the node we're trying
-    to remove.
+    we can't be ON that node. We must be at one node BEFORE the node we're
+    trying to remove.
 
     Therefore, we'll initialize a "dummy node".
     We'll create it on the stack since it's faster and we'll make dummy.next to
@@ -239,14 +172,16 @@ private:
                  |
                head
 
-    Now, when 'R'("right") pointer gets to point to nullptr, our 'L'("left")
-    pointer is going to pointer at **one node BEFORE the one we're trying to
-    remove**.
+    Now, when 'R'("right") pointer is at the LAST node, our 'L'("left") pointer
+    is going to be at one node BEFORE the one we're trying to remove.
 
-                                L                   R
-                                |___                |___
-                                   |                   |
-                                   v                   v
+                                        --- n-th(2nd) node from the back
+                                        |
+                                        |
+                                L       |      R
+                                |___    |      |___
+                                   |    |         |
+                                   v    v         v
           0 ------> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> nullptr
         dummy       ^
                  ___|
@@ -260,19 +195,23 @@ private:
 
     And we'll have this:
 
-                                L                   R
-                                |___                |___
-                                   |                   |
-                                   v                   v
-          0 ------> 1 -> 2 -> 3 -> 4 -> 5 ------> 7 -> nullptr
-        dummy       ^
-                 ___|
+                                        --- n-th(2nd) node from the back
+                                        |
+                                        |
+                                L       |      R
+                                |___    |      |___
+                                   |    |         |
+                                   v    v         v
+          0 ------> 1 -> 2 -> 3 -> 4    5 -> 6 -> 7 -> nullptr
+        dummy       ^               \        ^
+                    |                \      /
+                 ___|                 \____/
                  |
                head
 
 
 
-    And now we can just return dummy.next(not dummy->next, 'cause it's an
+    And now we can just return dummy.next(not dummy->next, 'cause "dummy" is an
                                           object, not a pointer)
 
 
@@ -295,125 +234,63 @@ private:
     If we must, as we've already concluded, be at one node BEFORE the one we're
     trying to remove, how are we going to remove the very first one?
 
-    That's when "dummy node" shines.
+    That's when "dummy" node shines.
 
-    Now we can have our 'L' pointer point to "dummy node" and everything is
+    Now we can have our 'L' pointer point to "dummy" node and everything is
     alright.
 
 */
 
-/* Time  Beats: 100% */
-/* Space Beats: 8.95% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  58.92% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution_Single_Pass {
+class Solution {
 public:
     ListNode* removeNthFromEnd(ListNode* head, int n)
     {
-        ListNode dummy(0);
+        ListNode dummy(-1);
         dummy.next = head;
 
-        ListNode* right = head;
+        ListNode* left  = &dummy;
+        ListNode* right = &dummy;
+
+        // Move "right" pointer n nodes in
         for (int i = 0; i < n; i++)
             right = right->next;
 
-        ListNode* tmp = &dummy;
-        while (right)
+        /*
+            Move both pointers until "right" pointer is at the LAST node.
+            Distance between "left" and "right", at any moment, is n+1 nodes.
+
+                                            --- n-th(2nd) node from the back
+                                            |
+                                            |
+                                  left      |    right
+                                    |___    |      |___
+                                       |    |         |
+                                       v    v         v
+              0 ------> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> nullptr
+            dummy       ^              <~~~~~~~~~~~~~~>
+                        |              distance = n + 1  // Where n = 2
+                     ___|
+                     |
+                   head
+
+
+            At that moment our "left" pointer will be at one node BEFORE the
+            n-th node from the back.
+        */
+        while (right->next)
         {
-            tmp = tmp->next;
+            left  = left->next;
             right = right->next;
         }
 
-        tmp->next = tmp->next->next;
+        // Re-link AROUND the n-th node from the back
+        left->next = left->next->next;
 
         return dummy.next;
     }
-
 };
-
-
-void
-print_list(struct ListNode* head)
-{
-    std::cout << "\n\t[";
-
-    bool first = true;
-    while (head)
-    {
-        if (!first)
-            std::cout << " -> ";
-        else
-            first = false;
-
-        std::cout << head->val;
-        head = head->next;
-    }
-
-    std::cout << "]\n\n";
-}
-
-
-int
-main()
-{
-    Solution_Two_Passes   sol_two_passes;
-    Solution_Single_Pass  sol_one_pass;
-
-
-    /* Example 1 */
-    // struct ListNode five (5);
-    // struct ListNode four (4, &five);
-    // struct ListNode three(3, &four);
-    // struct ListNode two  (2, &three);
-    // struct ListNode one  (1, &two);
-    // int n = 2;
-
-    /* Example 2 */
-    // struct ListNode one(1);
-    // int n = 1;
-
-    /* Example 3 */
-    // struct ListNode two(2);
-    // struct ListNode one(1, &two);
-    // int n = 1;
-
-    /* Example 4 */
-    struct ListNode three(3);
-    struct ListNode two  (2, &three);
-    struct ListNode one  (1, &two);
-    int n = 3;
-
-
-    struct ListNode* head = &one;
-
-
-    std::cout << "\n\t========================================";
-    std::cout << "\n\t=== REMOVE NTH NODE FROM END OF LIST ===";
-    std::cout << "\n\t========================================\n";
-
-
-    /* Write Input */
-    std::cout << "\n\tOriginal List:";
-    print_list(head);
-
-
-    /* Solution */
-    head = sol_two_passes.removeNthFromEnd(head, n);
-    head = sol_one_pass.removeNthFromEnd(head, n);
-
-
-    /* Write Output */
-    if (n == 1)
-        std::cout << "\n\tAfter removal of 1st node from the End:";
-    else if (n == 2)
-        std::cout << "\n\tAfter removal of 2nd node from the End:";
-    else if (n == 3)
-        std::cout << "\n\tAfter removal of 3rd node from the End:";
-    else
-        std::cout << "\n\tAfter removal of n-th node from the End:";
-
-    print_list(head);
-
-    return 0;
-}
