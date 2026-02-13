@@ -123,3 +123,83 @@ private:
         return iter_node;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of solving it. Count the total number of nodes and then get
+    the remaining_groups.
+
+    Simply go through "remaining_groups" and reverse each one.
+
+    Dummy node is also used here as it facilitates the job.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats: 69.75% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Counting_Groups {
+public:
+    ListNode* reverseKGroup(ListNode* head, int k)
+    {
+        int remaining_groups = 0;
+        int total_nodes = 0;
+
+        /* Count Total Number of Nodes */
+        ListNode* iter_node = head;
+        while (iter_node) // O(N)
+        {
+            total_nodes++;
+
+            // Move Forward
+            iter_node = iter_node->next;
+        }
+
+        /* Create Dummy node */
+        ListNode dummy(-1); // Allocated on the Stack
+        dummy.next = head;
+
+        /* Prepare for Reversal */
+        ListNode* node_before_group = &dummy;
+        ListNode* node_after_group  = nullptr; // For now
+
+        remaining_groups = total_nodes / k; // Integer division
+        while (remaining_groups > 0) // O(N)
+        {
+            ListNode* prev = nullptr;
+            ListNode* curr = node_before_group->next;
+
+            /* Reverse current "group" of 'k' nodes */
+            for (int i = 0; i < k; i++)
+            {
+                ListNode* next = curr->next;
+
+                curr->next = prev;
+                prev = curr;
+                curr = next;
+            }
+            node_after_group = curr;
+
+            ListNode* old_head = node_before_group->next; // Tail of reversed
+            ListNode* new_head = prev;                    // Head of reversed
+
+            old_head->next          = node_after_group;
+            node_before_group->next = new_head;
+
+            remaining_groups--;
+
+            // Prepare for the next iteration
+            node_before_group = old_head; // Tail of reversed group
+        }
+
+        return dummy.next;
+    }
+};
