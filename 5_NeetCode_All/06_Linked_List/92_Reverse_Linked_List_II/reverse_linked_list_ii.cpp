@@ -114,3 +114,79 @@ public:
         return dummy.next;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one uses one common "trick" in reversing an INNER linked list.
+
+    Specifically, it assigns "prev" pointer to point at the first node AFTER
+    the last one we need to reverse.
+
+    That way we're correctly linking the "new tail" node of reversed linked
+    list to the remaining of the list.
+
+    Now after the reversal, all we have to do is link the node BEFORE the first
+    one we need to reverse.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  96.66% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    ListNode* reverseBetween(ListNode* head, int left, int right)
+    {
+        if (left == right)
+            return head;
+
+        ListNode dummy(-1);
+        dummy.next = head; // Link with "head"
+
+        ListNode* node_before_left = &dummy;
+        ListNode* node_after_right = nullptr; // For now
+
+        ListNode* node_left  = head;
+        ListNode* node_right = head;
+
+        int diff = right - left;
+        while (diff > 0)
+        {
+            node_right = node_right->next;
+            diff--;
+        }
+
+        for (int i = 1; i < left; i++)
+        {
+            node_before_left = node_before_left->next;
+            node_left        = node_left->next;
+            node_right       = node_right->next;
+        }
+        node_after_right = node_right->next;
+
+        ListNode* prev = node_right->next; // Tthis is the "trick"
+        ListNode* curr = node_left;
+
+        /* Reverse Linked List*/
+        while (curr != node_after_right)
+        {
+            ListNode* next = curr->next;
+
+            curr->next = prev;
+            prev = curr;
+            curr = next;
+        }
+
+        node_before_left->next = prev; // "prev" is the head of reversed list
+
+        return dummy.next;
+    }
+};
