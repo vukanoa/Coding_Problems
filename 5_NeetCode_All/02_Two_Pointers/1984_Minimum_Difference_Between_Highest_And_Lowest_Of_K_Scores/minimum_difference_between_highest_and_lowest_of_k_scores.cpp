@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
 /*
     ============
     === EASY ===
@@ -58,101 +54,48 @@
 
 */
 
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Sorting will greatly simplify this problem.
-
-        nums = [9, 3, 5, 8, 4, 1, 7], k = 3
-                0  1  2  3  4  5  6
-
-    Becomes:
-        nums = [1, 3, 4, 5, 7, 8, 9], k = 3
-                0  1  2  3  4  5  6
-                      ^
-                      |
-                      |__
-                        |
-    We begin at index (k-2) because from that point onward we are able to
-    consider previous 'k' numbers because:
-
-        (current_index - k + 1) // +1 because indexing start at 0
-         ~~~~~~~~~~~~~~~~~~~~~
-                   |
-                   |
-                   v
-        ----------------------------------------------------------
-        |Gives us the leftmost element in current range of size k|
-        ----------------------------------------------------------
-
-    We know that won't be out of bounds once the i points to index k-1 or
-    greater.
-
-    That's why we, simply, begin at that index and we don't have to worry about
-    anything else.
-*/
-
-/* Time  Beats: 82.29% */
-/* Space Beats: 23.67% */
-
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(1)        */ // Depending on the Sort. Can be O(n)
-class Solution_1 {
-public:
-    int minimumDifference(std::vector<int>& nums, int k)
-    {
-        if (k == 1)
-            return 0;
-
-        std::sort(nums.begin(), nums.end());
-        int min_diff = INT_MAX;
-
-        for (int i = k-1; i < nums.size(); i++)
-            min_diff = std::min(min_diff, nums[i] - nums[i+1 - k]);
-
-        return min_diff;
-    }
-};
-
-
-
+#include <climits>
+#include <vector>
+#include <algorithm>
+using namespace std;
 
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Same idea, implemented using while loop where "Two Pointers" technique is
-    a bit more explicit.
-
-    Usually "Two Pointers" technique is written using "left" and "right"
-    pointer, therefore I wanted to have this Implementation as well.
+    Classic Two-Pointer Solution.
 
 */
 
-/* Time  Beats: 82.29% */
-/* Space Beats: 42.82% */
+/* Time  Beats: 42.80% */
+/* Space Beats: 21.47% */
 
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(1)        */ // Depending on the Sort. Can be O(n)
-class Solution_2 {
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(logN)     */ // C++'s Intro Sort
+class Solution {
 public:
     int minimumDifference(vector<int>& nums, int k)
     {
-        if (k == 1)
-            return 0;
+        const int N = nums.size();
+        int result = INT_MAX;
 
-        std::sort(nums.begin(), nums.end());
-        int min_diff = INT_MAX;
+        /* Sort */
+        sort(nums.begin(), nums.end()); // O(N * logN)
 
-        int left  = 0;
-        int right = k-1;
+        int L = 0;
+        int R = k-1;
 
-        while (right < nums.size())
-            min_diff = std::min(min_diff, nums[right++] - nums[left++]);
+        // O(N - K) (entire block)
+        while (R < N)
+        {
+            result = min(result, nums[R] - nums[L]);
 
-        return min_diff;
+            // Increment
+            R++;
+            L++;
+        }
+
+        return result;
     }
 };
