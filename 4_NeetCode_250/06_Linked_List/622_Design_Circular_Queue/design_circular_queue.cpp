@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -96,89 +94,105 @@
     --- IDEA ---
     ------------
 
-    Self explanatory. Just code it up using Singly Linked List. There are no
-    tricks or pitfalls of any sort.
+    TODO
 
 */
 
-/* Time  Beats: 93.85% */
-/* Space Beats:  7.92% */
+/* Time  Beats:  5.50% */
+/* Space Beats: 43.11% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(k) */
+struct DoublyLinkedNode {
+    int val;
+    DoublyLinkedNode* prev;
+    DoublyLinkedNode* next;
+
+    DoublyLinkedNode ()
+    {}
+
+    DoublyLinkedNode (int val)
+        : val(val), prev(nullptr), next(nullptr)
+    {}
+
+    DoublyLinkedNode (int val, DoublyLinkedNode* prev, DoublyLinkedNode* next)
+        : val(val), prev(prev), next(next)
+    {}
+};
+
 class MyCircularQueue {
-private:
-    struct Node{
-        int val;
-        Node* next;
-
-        Node(int val) : val(val)
-        {}
-    };
-
 public:
     MyCircularQueue(int k)
-        : front(nullptr), rear(nullptr)
+        : dummy_head(-1), dummy_tail(-1), capacity(k), size(0)
     {
-        front = rear  = new Node(-1);
-        k--;
-
-        while (k > 0)
-        {
-            rear->next = new Node(-1); // -1 designates Unused Node
-            rear = rear->next;
-
-            k--;
-        }
-
-        rear->next = front; // To make it circular
+        dummy_head.next = &dummy_tail;
+        dummy_tail.prev = &dummy_head;
     }
-
+    
     bool enQueue(int value)
     {
         if (isFull())
             return false;
 
-        rear->next->val = value;
-        rear = rear->next;
+        DoublyLinkedNode* node = new DoublyLinkedNode(value);
+        DoublyLinkedNode* rear = dummy_tail.prev;
+
+        rear->next      = node;
+        node->prev      = rear;
+
+        node->next      = &dummy_tail;
+        dummy_tail.prev = node;
+
+        size++;
 
         return true;
     }
-
+    
     bool deQueue()
     {
         if (isEmpty())
             return false;
 
-        front->val = -1; // Now it's empty
-        front = front->next;
+        DoublyLinkedNode* front = dummy_head.next;
+
+        dummy_head.next   = front->next;
+        front->next->prev = &dummy_head;
+        size--;
 
         return true;
     }
-
+    
     int Front()
     {
-        return front->val;
-    }
+        if (isEmpty())
+            return -1;
 
-    int Rear()
-    {
-        return rear->val;
+        return dummy_head.next->val;
     }
+    
+    int Rear() {
+        if (isEmpty())
+            return -1;
 
+        return dummy_tail.prev->val;
+    }
+    
     bool isEmpty()
     {
-        return front->val == -1;
+        return size == 0;
     }
-
+    
     bool isFull()
     {
-        return rear->next->val != -1;
+        return size == capacity;
     }
 
 private:
-    Node* front;
-    Node* rear;
+    int capacity;
+    int size;
+
+    DoublyLinkedNode dummy_head; // On the Stack
+    DoublyLinkedNode dummy_tail; // On the Stack
 };
 
 /**
