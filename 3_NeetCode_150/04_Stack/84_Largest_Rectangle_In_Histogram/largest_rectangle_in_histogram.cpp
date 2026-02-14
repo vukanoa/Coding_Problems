@@ -683,7 +683,7 @@ public:
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution_22 {
+class Solution_2 {
 public:
     int largestRectangleArea(vector<int>& heights)
     {
@@ -720,6 +720,68 @@ public:
             int h = top_height;  // Height
             int w = N - top_idx; // Width
             result = max(result, h * w);
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way of solving it. This one is the most clena.
+
+*/
+
+/* Time  Beats: 35.87% */
+/* Space Beats: 24.70% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_3 {
+public:
+    int largestRectangleArea(vector<int>& heights)
+    {
+        const int N = heights.size();
+
+        vector<int> left(N);
+        vector<int> right(N);
+
+        stack<int> stack;
+
+        // Nearest Smaller to Left
+        for (int i = 0; i < N; i++)
+        {
+            while ( ! stack.empty() && heights[stack.top()] >= heights[i])
+                stack.pop();
+
+            left[i] = stack.empty() ? -1 : stack.top();
+            stack.push(i);
+        }
+
+        while ( ! stack.empty())
+            stack.pop();
+
+        // Nearest Smaller to Right
+        for (int i = N-1; i >= 0; i--)
+        {
+            while ( ! stack.empty() && heights[stack.top()] >= heights[i])
+                stack.pop();
+
+            right[i] = stack.empty() ? N : stack.top();
+            stack.push(i);
+        }
+
+        int result = 0;
+        for (int i = 0; i < N; i++)
+        {
+            int width = right[i] - left[i] - 1;
+            result = max(result, heights[i] * width);
         }
 
         return result;
