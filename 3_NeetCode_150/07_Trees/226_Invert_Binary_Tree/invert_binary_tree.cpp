@@ -86,7 +86,7 @@ struct TreeNode {
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution {
+class Solution_DFS {
 public:
     TreeNode* invertTree(TreeNode* root)
     {
@@ -111,61 +111,38 @@ public:
     --- IDEA ---
     ------------
 
-    The idea is that we need to swap the left and right child of all nodes in
-    the tree(even Leaf nodes).
-
-    We create a queue to store nodes whose left and right child have not been
-    swapped yet.
-    Initially, only the root is in the queue.
-
-    As long as the queue is not empty, remove the next node from the queue,
-    swap its children, and add the children to the queue. Null nodes are not
-    added to the queue.
-
-    Eventually, the queue will be empty and all the children swapped, and we
-    return the original root.
-
-
-    Note:
-    This Solution is a lot less Space efficient.
+    Simple BFS implementation.
 
 */
 
-/* Time  Beats:  100% */
-/* Space Beats: 5.27% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  25.83% */
 
-/*    Time  Complexity: O(n) */
-/*
-    Space Complexity: O(h)
-    In the worst case the queue will contain al nodes in one level of the
-    binary tree. For a full binary tree, the leaf level has ceil(n / 2) = O(n)
-    leaves.
-*/
-class Solution_iterative {
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_BFS {
 public:
     TreeNode* invertTree(TreeNode* root)
     {
-        if (!root)
+        if (root == nullptr)
             return nullptr;
 
-        std::queue<TreeNode*> queue;
+        queue<TreeNode*> queue;
         queue.push(root);
 
         while ( ! queue.empty())
         {
-            TreeNode* curr = queue.front();
+            TreeNode* node = queue.front();
             queue.pop();
 
-            /* Invert (Swap) */
-            TreeNode* tmp  = curr->left;
-            curr->left  = curr->right;
-            curr->right = tmp;
+            /* Swap Pointers */
+            swap(node->left, node->right);
 
-            if (curr->left)
-                queue.push(curr->left);
+            if (node->left)
+                queue.push(node->left);
 
-            if (curr->right)
-                queue.push(curr->right);
+            if (node->right)
+                queue.push(node->right);
         }
 
         return root;
