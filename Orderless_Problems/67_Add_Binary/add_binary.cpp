@@ -1,78 +1,89 @@
-#include<iostream>
-#include <algorithm>
-#include <string>
-
 /*
-	============
-	=== EASY ===
-	============
+    ============
+    === EASY ===
+    ============
 
-	===========================
-	67) Add Binary
-	===========================
+    ===========================
+    67) Add Binary
+    ===========================
 
-	============
-	Description:
-	============
+    ============
+    Description:
+    ============
 
-	Given two binary strings a and b, return their sum as a binary string.
+    Given two binary strings a and b, return their sum as a binary string.
 
-	===============================================
-	FUNCTION: string addBinary(string a, stirng b);
-	===============================================
+    ===============================================
+    FUNCTION: string addBinary(string a, stirng b);
+    ===============================================
 
-	==========================================================================
-	================================ EXAMPLES ================================
-	==========================================================================
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
 
-	--- Example 1 ---
-	Input: a = "11", b = "1"
-	Output: "100"
-
-
-	--- Example 2 ---
-	Input: a = "1010", b = "1011"
-	Output: "10101"
+    --- Example 1 ---
+    Input: a = "11", b = "1"
+    Output: "100"
 
 
-	*** Constraints ***
-	1 <= a.length, b.length <= 104
-	a and b consist only of '0' or '1' characters.
-	Each string does not contain leading zeros except for the zero itself.
+    --- Example 2 ---
+    Input: a = "1010", b = "1011"
+    Output: "10101"
+
+
+    *** Constraints ***
+    1 <= a.length, b.length <= 104
+    a and b consist only of '0' or '1' characters.
+    Each string does not contain leading zeros except for the zero itself.
 
 */
 
-/* Time  Beats: 100% */
-/* Space Beats: 41.40% */
+#include <algorithm>
+#include <string>
+using namespace std;
 
-/* Time  Complexity: O((m + n) * log(m + n)) */
-/* Space Complexity: O(1) */
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Self-explanatory. Just read the code carefully.
+
+*/
+
+/* Time  Beats: 22.17% */
+/* Space Beats: 20.90% */
+
+/* Time  Complexity: O(max(M, N)) */
+/* Space Complexity: O(1)         */ // Result is not "extra" Space
 class Solution {
 public:
-	std::string addBinary(std::string a, std::string b)
-	{
-		int i = a.length() - 1;
-		int j = b.length() - 1;
-		int carry = 0;
+    string addBinary(string a, string b)
+    {
+        string result;
+        result.reserve(max(a.size(), b.size()));
 
-		std::string result;
+        int i = a.size() - 1;
+        int j = b.size() - 1;
+        int carry = 0;
 
-		while (i >= 0 || j >= 0 || carry)
-		{
-			int digit_a = i >= 0 ? a[i] - '0' : 0;
-			int digit_b = j >= 0 ? b[j] - '0': 0;
+        while (i >= 0 || j >= 0 || carry > 0)
+        {
+            int a_digit = i >= 0 ? (a[i] - '0') : 0;
+            int b_digit = j >= 0 ? (b[j] - '0') : 0;
 
-			result += std::to_string(digit_a ^ digit_b ^ carry);
-			carry = ((digit_a & digit_b) || ((digit_a || digit_b) & carry));
-			i--;
-			j--;
-		}
+            result += to_string(a_digit ^ b_digit ^ carry);
 
-		std::cout << result;
+            carry  = (a_digit + b_digit + carry) >= 2 ? 1 : 0;
 
-		// O((m * n) * log(m * n))
-		std::reverse(result.begin(), result.end());
+            // Decrement
+            i -= i >= 0 ? 1 : 0;
+            j -= j >= 0 ? 1 : 0;
+        }
 
-		return result;
-	}
+        /* Reverse */
+        reverse(result.begin(), result.end());
+
+        return result;
+    }
 };
