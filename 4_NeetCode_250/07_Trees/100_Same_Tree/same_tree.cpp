@@ -60,6 +60,10 @@
 
 */
 
+#include <queue>
+#include <utility>
+using namespace std;
+
 // Definition for a binary tree node.
 struct TreeNode {
     int val;
@@ -75,7 +79,7 @@ struct TreeNode {
     --- IDEA ---
     ------------
 
-    Basic, self-explanatory Binary Tree problem.
+    Basic, self-explanatory, Binary Tree problem using DFS;
 
 */
 
@@ -84,7 +88,7 @@ struct TreeNode {
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_DFS {
 public:
     bool isSameTree(TreeNode* p, TreeNode* q)
     {
@@ -95,5 +99,45 @@ public:
             return false;
 
         return isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Implmentation using BFS(i.e. "Level Order") approach.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  12.81% */
+class Solution_BFS {
+public:
+    bool isSameTree(TreeNode* p, TreeNode* q)
+    {
+        queue<pair<TreeNode*, TreeNode*>> queue;
+        queue.push( {p, q} );
+
+        while ( ! queue.empty())
+        {
+            auto [node_p, node_q] = queue.front();
+            queue.pop();
+
+            if ( ! node_p && ! node_q) continue;
+            if ( ! node_p || ! node_q) return false; // One is nullptr, other is NOT
+
+            if (node_p->val != node_q->val)
+                return false;
+
+            queue.push( {node_p->left,  node_q->left}  );
+            queue.push( {node_p->right, node_q->right} );
+        }
+
+        return true;
     }
 };
