@@ -56,6 +56,9 @@
  * };
  */
 
+#include <string>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -134,5 +137,73 @@ private:
             return false;
 
         return isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
+    }
+};
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Instead of comparing trees directly, we can first convert each tree into a
+    string and then just check whether subRoot string is contained in the root
+    string.
+
+    For this implementation we've used: .find() function which operates in:
+
+        O(M * N) worst-case Time Complexity
+
+    That raises a question--Why haven't we used something like "KMP algorithm"
+    which has a:
+
+        O(M + N) worst-case Time Complexity
+
+
+
+    The reason is very simple. Function ".find()" uses two methods:
+
+        + Optimized naive(sliding window) aproach, for shorter patterns.
+        + Boyer-Moore approach, for longer patterns.
+
+    They both do indeed have a worst-case Time Complexity of: O(M * N), however
+    they AVERAGE Time Complexity is:
+
+        O(N), which is Linear.
+
+    In real-world scenarios, the worst-case happens only for some very specific
+    and almost pathological, repetitive, patterns. Those occur extremely
+    rarely. Thus, in practice, this runs faster than a "KMP algorithm" even if
+    "KMP algorithm" has a better worst-case Time Complexity.
+
+*/
+
+/* Time  Beats: 5.32% */
+/* Space Beats: 5.04% */
+
+/* Time  Complexity: O(M * N) */
+/* Space Complexity: O(M + N) */
+class Solution_Serialization {
+public:
+    bool isSubtree(TreeNode* root, TreeNode* subRoot)
+    {
+        string root_str    = serialize(root);
+        string subRoot_str = serialize(subRoot);
+
+        /* <string>.find() function uses "KMP" under-the-hood */
+        // O(M * N)
+        return root_str.find(subRoot_str) != string::npos;
+    }
+
+private:
+    string serialize(TreeNode* node)
+    {
+        if (node == nullptr)
+            return "$#";
+
+        string current_str = "$" + to_string(node->val);
+
+        return current_str + serialize(node->left) + serialize(node->right);
     }
 };
