@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === EASY ===
@@ -68,6 +65,20 @@
 
 */
 
+#include <bitset>
+#include <string>
+#include <vector>
+using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
 /* Time  Beats: 100.00% */
 /* Space Beats:  87.60% */
 
@@ -75,17 +86,89 @@
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    std::vector<std::string> readBinaryWatch(int num)
+    vector<string> readBinaryWatch(int turnedOn)
     {
-        std::vector<std::string> result;
+        vector<string> result;
 
         for (int h = 0; h < 12; h++)
         {
             for (int m = 0; m < 60; m++)
             {
-                if (bitset<10>(h << 6 | m).count() == num)
-                    result.emplace_back(std::to_string(h) + (m < 10 ? ":0" : ":") + std::to_string(m));
+                if (bitset<10>(h << 6 | m).count() == turnedOn)
+                    result.emplace_back(to_string(h) + (m < 10 ? ":0" : ":") + to_string(m));
             }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  65.38% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    vector<string> readBinaryWatch(int turnedOn)
+    {
+        vector<string> result;
+
+        for (int h = 0; h < 12; h++)
+        {
+            for (int m = 0; m < 60; m++)
+            {
+                if (__builtin_popcount(h) + __builtin_popcount(m) == turnedOn)
+                    result.push_back(to_string(h) + ":" + (m < 10 ? "0" : "") + to_string(m));
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  41.32% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_3 {
+public:
+    vector<string> readBinaryWatch(int turnedOn)
+    {
+        vector<string> result;
+
+        for (int i = 0; i < 1024; ++i)
+        {
+            int h = i >> 6;
+            int m = i & 63;
+
+            if (h < 12 && m < 60 && __builtin_popcount(i) == turnedOn)
+                result.push_back(to_string(h) + ":" + (m < 10 ? "0" : "") + to_string(m));
         }
 
         return result;
