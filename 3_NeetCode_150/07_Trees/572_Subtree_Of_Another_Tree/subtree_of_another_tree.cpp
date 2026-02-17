@@ -57,6 +57,7 @@
  */
 
 #include <string>
+#include <vector>
 using namespace std;
 
 /*
@@ -205,5 +206,117 @@ private:
         string current_str = "$" + to_string(node->val);
 
         return current_str + serialize(node->left) + serialize(node->right);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one uses "KMP algorithm" for patter matching, which indeed has a
+    better worst-case Time Complexity, althought(as mentioned above) it is
+    slower in practice than using a simple ".find()" function which runs in
+    worse worst-case
+
+    It is beneficial to know to implement "KMP algorithm" and to know about it
+    in general.
+
+*/
+
+/* Time  Beats: 5.32% */
+/* Space Beats: 5.04% */
+
+/* Time  Complexity: O(M + N) */
+/* Space Complexity: O(M + N) */
+class Solution_Serialization_and_KMP_algorithm {
+public:
+    bool isSubtree(TreeNode* root, TreeNode* subRoot)
+    {
+        string root_str    = serialize(root);
+        string subRoot_str = serialize(subRoot);
+
+        // "KMP algorihtm" <==> O(M + N)
+        return kmp_algorithm(root_str, subRoot_str);
+    }
+
+private:
+    string serialize(TreeNode* node)
+    {
+        if (node == nullptr)
+            return "$#";
+
+        string current_str = "$" + to_string(node->val);
+
+        return current_str + serialize(node->left) + serialize(node->right);
+    }
+
+    /* KMP algorithm */
+    bool kmp_algorithm(string s, string pattern)
+    {
+        const int N = s.length();
+        const int M = pattern.length();
+
+        vector<int> LPS = compute_LPS(pattern);
+
+        int i = 0;
+        int j = 0;
+        while (i < N && j < M)
+        {
+            if (s[i] == pattern[j])
+            {
+                i++;
+                j++;
+            }
+            else
+            {
+                if (j > 0)
+                {
+                    j = LPS[j - 1];
+                }
+                else
+                {
+                    i++;
+                }
+            }
+        }
+
+        return j == M;
+    }
+
+private:
+    vector<int> compute_LPS(string pattern)
+    {
+        const int M = pattern.length();
+        vector<int> LPS(M);
+
+        int prefix_len = 0;
+        int i = 1;
+        while (i < M)
+        {
+            if (pattern[prefix_len] == pattern[i])
+            {
+                LPS[i] = prefix_len + 1;
+                prefix_len++;
+                i++;
+            }
+            else
+            {
+                if (prefix_len > 0)
+                {
+                    prefix_len = LPS[prefix_len - 1];
+                }
+                else
+                {
+                    LPS[i] = 0;
+                    i++;
+                }
+            }
+        }
+
+        return LPS;
     }
 };
