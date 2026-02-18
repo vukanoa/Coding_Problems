@@ -70,7 +70,15 @@ struct TreeNode {
     --- IDEA ---
     ------------
 
-    TODO
+    Use the property of the BST(Binary Search Tree).
+
+    If both p's and q's values are LESS than the value of the current node,
+    then go to the left. We are 100% certain it's not in the right subtree
+    because of the property of the BST itself.
+
+    Conversely, if both p's and q's values are GREATER than the value of the
+    current node, then go to the right. It's certainly not in the remaining
+    part of the left subtree.
 
 */
 
@@ -79,7 +87,7 @@ struct TreeNode {
 
 /* Time  Complexity: O(H) */ // Where 'H' is the Height of the Tree
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Iterative {
 public:
     TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
     {
@@ -114,7 +122,7 @@ public:
     --- IDEA ---
     ------------
 
-    TODO
+    We do the same thing as above, just in a recursive way.
 
 */
 
@@ -123,7 +131,7 @@ public:
 
 /* Time  Complexity: O(H) */ // Where 'H' is the Height of the Tree
 /* Space Complexity: O(H) */
-class Solution_2 {
+class Solution_Recursive {
 public:
     TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
     {
@@ -148,16 +156,111 @@ public:
     --- IDEA ---
     ------------
 
-    Same as above, though implemented in a slightly different way. Or rather,
-    implemented in a slightly different order.
+    We, actually, do NOT need to use the BST property when it comes to values.
 
-    This one is more explicit, however it does seem to be less elegant and/or
-    more messy.
+    This is an important approach to understand for finding a LCA if you
+    haven't solved it this way.
 
-    But it's clear and explicit that if p is less than root and q is greater
-    than root or vice versa, that in that case we must return "root".
+    First, if the root itself is either p or q, we return immediately since
+    we're told that the node CAN be a descendant of ITSELF.
+
+    However, if that's NOT the case, then we try to find either of them(p or q)
+    in the left subtree.
+
+    If we ever hit either of the nodes(i.e. p or q), we return.
+    Why?
+
+    Consider this:
+
+                               
+                                    9             
+                            6               13     
+                        3       8       10      14  
+                      1   5                       17
+
+
+                                    9 
+                                  /   \
+                                 /     \
+                                /       \
+                               /         \
+                              /           \
+                             /             \
+                            /               \
+                           /                 \
+                          /                   \
+                         /                     \
+                        /                       \
+                       6                        13
+                     /   \                     /   \
+                    /     \                   /     \
+                   /       \                 /       \
+                  /         \               /         \
+                 /           \             /           \
+                3             8           10           14
+               / \           /                           \
+              /   \         /                             \
+             /     \       /                               \
+            1       5     7                                17
+
+
+    Let's say:
+
+        p = 1
+        q = 6
+
+    When we get to node 6(which equals to node q), we don't have to keep gong
+    down, we can STOP here and only check the right subtree of 9.
+
+    Why?
+
+    We'll since we have entered this left subtree where we've found 6, that
+    means the parent node is NEITHER p nor q.
+
+    Therefore, since we've successfully found a q in the left subtree of 9, we
+    do NOT have to keep searching below. Instead, we can only check 9's RIGHT
+    subtree.
+
+    If we do INDEED find p there, then we return 9(parent) as the LCA.
+    If we do NOT    find p there, then we return 6         as the LCA.
+
+    In the 2nd case we're allowed to return 6 immediately because we're told
+    in the Constraints that both p and q CERTAINLY exist in the tree.
+
+    So if we've found either of them at one point and the other is NOT in the
+    right subtree of its parent, then it's CERTAINLY BELOW us.
+
+    In that case 6 is guaranteed to be a LCA of p and q.
 
 */
+
+/* Time  Complexity: O(H) */ // Where 'H' is the Height of the Tree
+/* Space Complexity: O(H) */
+class Solution_Straightforward {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
+    {
+        if ( ! root)
+            return nullptr;
+
+        if (root == p || root == q)
+            return root;
+
+        TreeNode* left  = lowestCommonAncestor(root->left,  p, q);
+        TreeNode* right = lowestCommonAncestor(root->right, p, q);
+
+        if (left && right)
+            return root;
+
+        if (left)
+            return left;
+
+        if (right)
+            return right;
+
+        return nullptr;
+    }
+};
 
 
 
@@ -167,23 +270,26 @@ public:
     --- IDEA ---
     ------------
 
-    The most straightforwards and most concise way.
+    The is ABSOLUTELY equivalent to the above approach, it's just written in
+    a more concise way.
+
+    It's good to be aware of both implementations.
 
 */
 
 /* Time  Beats: 79.08% */
 /* Space Beats:  6.01% */
 
-/* Time  Complexity: O(logn) */
-/* Space Complexity: O(n)    */
-class Solution_4_Concise {
+/* Time  Complexity: O(H) */ // Where 'H' is the Height of the Tree
+/* Space Complexity: O(H) */
+class Solution_Straightforward_Concise {
 public:
     TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
     {
-        if (!root || root == p || root == q)
+        if ( ! root || root == p || root == q)
             return root;
 
-        TreeNode* left = lowestCommonAncestor(root->left, p, q);
+        TreeNode* left  = lowestCommonAncestor(root->left, p, q);
         TreeNode* right = lowestCommonAncestor(root->right, p, q);
 
         return left && right ? root : (left ? left : right);
