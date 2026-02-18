@@ -320,3 +320,86 @@ private:
         return LPS;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is also: O(M + N) in the worst case. This is "Z algorithm".
+
+*/
+
+/* Time  Beats: 5.43% */
+/* Space Beats: 5.08% */
+
+/* Time  Complexity: O(M + N) */
+/* Space Complexity: O(M + N) */
+class Solution_Z_algorithm {
+public:
+    bool isSubtree(TreeNode* root, TreeNode* subRoot)
+    {
+        string root_str    = serialize(root);
+        string subRoot_str = serialize(subRoot);
+
+        return match_pattern(root_str, subRoot_str);
+    }
+
+private:
+    string serialize(TreeNode* node)
+    {
+        if (node == nullptr)
+            return "$#";
+
+        return "$" + to_string(node->val)
+                   + serialize(node->left)
+                   + serialize(node->right);
+    }
+
+    bool match_pattern(const string& text, const string& pattern)
+    {
+        const int TEXT_SIZE    = text.size();
+        const int PATTERN_SIZE = pattern.size();
+
+        string combined_str = pattern + "@" + text;
+
+        vector<int> Z = z_function(combined_str);
+
+        for (unsigned i = 0; i < Z.size(); i++)
+        {
+            if (Z[i] == PATTERN_SIZE)
+                return true;
+        }
+
+        return false;
+    }
+
+    vector<int> z_function(const string& s)
+    {
+        const int STR_SIZE = s.size();
+        vector<int> Z(STR_SIZE, 0);
+
+        int left  = 0;
+        int right = 0;
+
+        for (int idx = 1; idx < STR_SIZE; idx++)
+        {
+            if (idx <= right)
+                Z[idx] = min(right - idx + 1, Z[idx - left]);
+
+            while (idx + Z[idx] < STR_SIZE && s[Z[idx]] == s[idx + Z[idx]])
+                Z[idx]++;
+
+            if (idx + Z[idx] - 1 > right)
+            {
+                left  = idx;
+                right = idx + Z[idx] - 1;
+            }
+        }
+
+        return Z;
+    }
+};
