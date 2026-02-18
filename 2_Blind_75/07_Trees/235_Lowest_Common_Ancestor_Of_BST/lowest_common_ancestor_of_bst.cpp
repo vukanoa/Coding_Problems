@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -56,15 +54,16 @@
 
 */
 
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
+#include <bits/stdc++.h>
+using namespace std;
+
+// Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
 
 /*
     ------------
@@ -78,7 +77,7 @@
 /* Time  Beats: 94.59% */
 /* Space Beats: 59.75% */
 
-/* Time  Complexity: O(logn) */
+/* Time  Complexity: O(H) */ // Where 'H' is the Height of the Tree
 /* Space Complexity: O(1) */
 class Solution {
 public:
@@ -88,15 +87,22 @@ public:
 
         while (curr)
         {
-            if (p->val > curr->val && q->val > curr->val)
-                curr = curr->right;
-            else if (p->val < curr->val && q->val < curr->val)
+            /* Using the property of the BST */
+            if (p->val < curr->val && q->val < curr->val)
+            {
                 curr = curr->left;
+            }
+            else if (p->val > curr->val && q->val > curr->val)
+            {
+                curr = curr->right;
+            }
             else
+            {
                 return curr;
+            }
         }
 
-        return root;
+        return nullptr;
     }
 };
 
@@ -115,8 +121,8 @@ public:
 /* Time  Beats: 96.39% */
 /* Space Beats: 72.79% */
 
-/* Time  Complexity: O(logn) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(H) */ // Where 'H' is the Height of the Tree
+/* Space Complexity: O(H) */
 class Solution_2 {
 public:
     TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
@@ -152,31 +158,6 @@ public:
     than root or vice versa, that in that case we must return "root".
 
 */
-
-/* Time  Beats: 96.39% */
-/* Space Beats: 72.79% */
-
-/* Time  Complexity: O(logn) */
-/* Space Complexity: O(n) */
-class Solution_3 {
-public:
-    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
-    {
-        if (root == p || root == q)
-            return root;
-
-        if ((p->val < root->val && q->val > root->val) ||
-            (p->val > root->val && q->val < root->val))
-        {
-            return root;
-        }
-
-        if (p->val < root->val && q->val < root->val)
-            return lowestCommonAncestor(root->left, p, q);
-
-        return lowestCommonAncestor(root->right, p, q);
-    }
-};
 
 
 
