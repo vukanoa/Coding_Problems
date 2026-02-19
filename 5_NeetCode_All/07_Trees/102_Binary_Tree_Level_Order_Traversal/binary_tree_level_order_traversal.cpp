@@ -118,3 +118,55 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a DFS implementation of "Level Order Traversal".
+
+    Usually, actually almost always, "Level Order Traversal" is implemented
+    using the above, BFS, approach.
+
+    However, I wanted to include this DFS one as well, to prove that it can be
+    implemented using DFS.
+
+*/
+
+/* Time  Beats: 14.23% */
+/* Space Beats: 43.91% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_DFS {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root)
+    {
+        if ( ! root)
+            return {};
+
+        vector<vector<int>> result;
+        dfs(root, 0, result);
+
+        return result;
+    }
+
+private:
+    void dfs(TreeNode* root, int curr_depth, vector<vector<int>>& result)
+    {
+        if ( ! root)
+            return;
+
+        if (result.size() == curr_depth)
+            result.push_back(vector<int>());
+
+        result[curr_depth].push_back(root->val);
+
+        dfs(root->left,  curr_depth + 1, result);
+        dfs(root->right, curr_depth + 1, result);
+    }
+};
