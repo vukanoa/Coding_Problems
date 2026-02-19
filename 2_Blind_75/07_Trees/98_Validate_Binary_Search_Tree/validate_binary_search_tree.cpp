@@ -45,6 +45,7 @@
 */
 
 // Definition for a binary tree node.
+#include <climits>
 struct TreeNode {
     int val;
     TreeNode *left;
@@ -190,5 +191,54 @@ private:
 
         return dfs(root->left,  lower_bound,   root     ) &&
                dfs(root->right,    root    , upper_bound);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    However, for this specific problems and these specific Constraints, we can
+    indeed use just numbers.
+
+    I could've used "long" instead of "long long", but whenever I use "long"
+    (because I wish the type to be 64bit), "long" is not consistent.
+
+    "long"      is AT LEAST 32 bits, and on Windows it tends to be 32bit.
+    "long long" is AT LEAST 64 bits, and it's 64bits on ALL architectures.
+
+    That's why I always prefer to use "long long" instead of "long".
+
+    TL;DR using "long" when I ALWAYS want 64 bits is NOT portable.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  94.03% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Using_Numbers {
+public:
+    bool isValidBST(TreeNode* root)
+    {
+        return dfs(root, LLONG_MIN, LLONG_MAX);
+    }
+
+private:
+    bool dfs(TreeNode* root, long long lower_bound, long long upper_bound)
+    {
+        if ( ! root)
+            return true;
+
+        if ( ! (lower_bound < root->val && root->val < upper_bound))
+            return false;
+
+        return dfs(root->left,   lower_bound,    root->val ) &&
+               dfs(root->right,   root->val ,   upper_bound);
     }
 };
