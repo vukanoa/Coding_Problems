@@ -72,7 +72,7 @@ struct TreeNode {
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution_inorder {
+class Solution_Inorder_plus_Array {
 public:
     int kthSmallest(TreeNode* root, int k)
     {
@@ -83,14 +83,68 @@ public:
     }
 
 private:
-    void inorder(TreeNode* root, std::vector<int>& vec)
+    void inorder(TreeNode* root, vector<int>& vec)
     {
-        if (!root)
+        if ( ! root)
             return;
 
         inorder(root->left,  vec);
         vec.push_back(root->val);
         inorder(root->right, vec);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Instead of traversing the entire Tree and only then finding the (k - 1)th
+    node, we can simply count kth_smallest nodes as we go.
+
+    We count the node ONLY AFTER we're DONE with its LEFT SUBTREE.
+
+    If at any point we find out that the current node is kth smallest, we
+    propagate its value all the way up the call stack.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  40.63% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Pure_Inorder {
+public:
+    int kthSmallest(TreeNode* root, int k)
+    {
+        int kth_smallest = 0;
+        return inorder_dfs(root, kth_smallest, k);
+    }
+
+private:
+    int inorder_dfs(TreeNode* root, int& kth_smallest, int& k)
+    {
+        if ( ! root)
+            return -1;
+
+        int left = inorder_dfs(root->left,  kth_smallest, k);
+        if (left != -1) return left;
+
+        kth_smallest++; // Count the current node we're at
+        if (kth_smallest == k)
+            return root->val;
+
+        int right = inorder_dfs(root->right,  kth_smallest, k);
+        if (right != -1) return right;
+
+        if (kth_smallest == k)
+            return root->val;
+
+        return -1;
     }
 };
 
