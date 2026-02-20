@@ -156,6 +156,194 @@ private:
     --- IDEA ---
     ------------
 
+    This one is the same as above, however it uses O(1) Space instead of O(N),
+    which is a huge improvement.
+
+    It's called "Morris Traversal". (There's also a "postorder" version)
+
+    The idea is:
+
+        If the left subtree does NOT exist -- Count the current node as the
+        "kth_smallest".
+
+        Otherwise, if the left subtree does INDEED exist -- Find a predecessor
+        of the current node(which is the rightmost node in current node's LEFT
+        subtree), and link its right pointer(which is a nullptr right now) to
+        point to the current node.
+
+        For example, if the current node is 9, then its predecessor is 8.
+        (Again, predecessor <==> rightmost node of the LEFT subtree)
+
+        Then we LINK 8's RIGHT POINTER with the current node(i.e. 5).
+
+                                    9
+                                  / ^ \
+                                 /  |  \
+                                /   |   \
+                               /    |    \
+                              /     |     \
+                             /      |___   \
+                            /          |    \
+                           /           |     \
+                          /            |      \
+                         /             |       \
+                        /              |        \
+                       5               |         30
+                     /   \             |           \
+                    /     \            |            \
+                   /       \           |             \
+                  /         \          |              \
+                 /           \         |               \
+               -2             6        |                40
+                 \             \       |
+                  \             \      |
+                   \             \     |
+                    2             8    |                     
+                   /               \___|
+                  1   
+
+
+
+    Similarly, predecessor of 5 is 2:
+
+
+                                    9
+                                  / ^ \
+                                 /  |  \
+                                /   |   \
+                               /    |    \
+                              /     |     \
+                             /      |___   \
+                            /          |    \
+                           /           |     \
+                          /            |      \
+                         /             |       \
+                        /              |        \
+                       5               |         30
+                     / ^ \             |           \
+                    /  |  \            |            \
+                   /   |   \           |             \
+                  /    |_   \          |              \
+                 /      |    \         |               \
+               -2       |     6        |                40
+                 \      |      \       |
+                  \     |       \      |
+                   \    |        \     |
+                    2   |         8    |                     
+                   / \__|          \___|
+                  1
+
+
+
+
+    And predecessor of 2 is 1:
+
+
+                                    9
+                                  / ^ \
+                                 /  |  \
+                                /   |   \
+                               /    |    \
+                              /     |     \
+                             /      |___   \
+                            /          |    \
+                           /           |     \
+                          /            |      \
+                         /             |       \
+                        /              |        \
+                       5               |         30
+                     / ^ \             |           \
+                    /  |  \            |            \
+                   /   |   \           |             \
+                  /    |_   \          |              \
+                 /      |    \         |               \
+               -2       |     6        |                40
+                 \      |      \       |
+                  \     |       \      |
+                   \    |        \     |
+                    2   |         8    |                     
+                   /^\__|          \___|
+                  1 |_
+                   \  |
+                    \_|
+
+
+    Also it's VERY important that we do NOT immeditely return the correct
+    result as soon as we find it.
+
+    Why?
+
+    Because some right pointers may still be changed, i.e. the Input Tree is
+    NOT the same, therefore if there's a Destructor, it wil try to access a
+    nullptr and dereference it at some point, creating a Segmentation Fault.
+
+    So be careful with that. That's why we just assign "result" to the value of
+    the curr_node and we continue until all of the pointers are restored.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  66.18% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */  // Efficient Space
+class Solution_Morris_Inorder_Traversal {
+public:
+    int kthSmallest(TreeNode* root, int k)
+    {
+        int result = -1;
+
+        TreeNode* curr_node = root;
+        int kth_smallest = 0;
+
+        while (curr_node)
+        {
+            if ( ! curr_node->left) // Left Subtree does NOT exist
+            {
+                kth_smallest++; // Count curr_node
+                if (kth_smallest == k)
+                    result = curr_node->val; 
+
+                curr_node = curr_node->right;
+            }
+            else // LEFT SUBTREE exists, therefore there a PREDECESSOR exists
+            {
+                TreeNode* predecessor = curr_node->left;
+
+                /* Find predecessor of the current node */
+                while (predecessor->right && predecessor->right != curr_node)
+                    predecessor = predecessor->right;
+
+                if ( ! predecessor->right)
+                {
+                    predecessor->right = curr_node; // Link temporarily
+                    curr_node = curr_node->left;
+                }
+                else
+                {
+                    predecessor->right = nullptr;   // Unlink. Restore original
+
+                    kth_smallest++;
+                    if (kth_smallest == k)
+                        result = curr_node->val; 
+
+                    curr_node = curr_node->right;
+                }
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     Iterative Inorder Traversal
 
     The above recursion could be converted into iteration, with the help of
