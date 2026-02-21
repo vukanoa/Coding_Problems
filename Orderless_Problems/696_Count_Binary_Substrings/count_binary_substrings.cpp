@@ -68,7 +68,7 @@ using namespace std;
 /* Space Beats: 24.33% */
 
 /* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
+/* Space Complexity: O(1) */
 class Solution {
 public:
     int countBinarySubstrings(string s)
@@ -117,32 +117,90 @@ public:
 */
 
 /* Time  Beats: 100.00% */
+/* Space Beats:  55.82% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Binary_String {
+public:
+    int countBinarySubstrings(string s)
+    {
+        const int N = s.size();
+        int result = 0;
+
+        int right = 1; // We must start "right" from index 1
+        while (right < N)
+        {
+            int left = right - 1;
+
+            int count = 0;
+            if (s[left] != s[right])
+            {
+                int left_val  = s[left];
+                int right_val = s[right];
+
+                while (left >= 0 && right < N && s[left] == left_val && s[right] == right_val)
+                {
+                    left--;
+                    right++;
+                    count++;
+                }
+
+                result += count;
+            }
+            else
+            {
+                right++;
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
 /* Space Beats:  33.50% */
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution_Efficient {
+class Solution_Clean {
 public:
     int countBinarySubstrings(string s)
     {
+        const int N = s.size();
         int result = 0;
 
-        int curr = 1;
-        int prev = 0;
-        for (int i = 1; i < s.size(); i++)
+        int prev_streak = 0;
+        int curr_streak = 1;
+
+        for (int i = 1; i < N; i++) // Start at 1
         {
-            if (s[i] == s[i - 1])
+            if (s[i - 1] == s[i])
             {
-                curr++;
+                curr_streak++;
             }
             else
             {
-                result += min(curr, prev);
-                prev = curr;
-                curr = 1;
+                prev_streak = curr_streak;
+                curr_streak = 1;
             }
+
+            if (curr_streak <= prev_streak)
+                result++;
         }
 
-        return result + min(curr, prev);
+        return result;
     }
 };
