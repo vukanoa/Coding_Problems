@@ -62,6 +62,7 @@ struct TreeNode {
     ------------
 
     Two key observations are:
+
         1. Preorder traversal follows:
             Root -> Left -> Right
            therefore given the preorder array "preorder", we have an easy
@@ -145,44 +146,44 @@ struct TreeNode {
 
 */
 
-/* Time  Beats: 98.46% */
-/* Space Beats: 33.34% */
+/* Time  Beats:   100% */
+/* Space Beats: 89.93% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_efficient {
-private:
-    int preorder_index;
-    unordered_map<int, int> umap_inorder_val_to_idx;
-
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N)   */
+class Solution {
 public:
     TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder)
     {
-        const int N = inorder.size();
+        const int N = preorder.size();
 
-        // Build a hashmap to store {value, index} of inorder vector
-        for (int i = 0; i < inorder.size(); i++)
-            umap_inorder_val_to_idx.insert( {inorder[i], i} );
-
-        return array_to_tree(preorder, 0, preorder.size() - 1);
+        int curr_idx = 0;
+        return helper(preorder, inorder, curr_idx, 0, N-1);
     }
 
-    TreeNode* array_to_tree(vector<int>& preorder, int first_index, int last_index)
+private:
+    TreeNode* helper(vector<int>& preorder, vector<int>& inorder, int& curr_idx, int start, int end)
     {
-        // If there are no elements to construct the tree
-        if (first_index > last_index)
+        if (start > end)
             return nullptr;
 
-        // Select the preorder_index element as the root and increment it
-        int root_value = preorder[preorder_index++];
-        TreeNode* root = new TreeNode(root_value);
+        int i = start;
+        while (i <= end)
+        {
+            if (preorder[curr_idx] == inorder[i])
+                break;
 
-        /* Build left and right subtree */
-        // Excluding inorder_value_index_hashmap[root_value] element because that's the root
-        root->left  = array_to_tree(preorder,               first_index                     , umap_inorder_val_to_idx.at(root_value) - 1);
-        root->right = array_to_tree(preorder, umap_inorder_val_to_idx.at(root_value) + 1,              last_index                       );
+            // Increment
+            i++;
+        }
 
-        return root;
+        TreeNode* node = new TreeNode(preorder[curr_idx]);
+        curr_idx++;
+
+        node->left  = helper(preorder, inorder, curr_idx, start, i-1);
+        node->right = helper(preorder, inorder, curr_idx,  i+1 , end);
+
+        return node;
     }
 };
 
@@ -194,61 +195,47 @@ public:
     --- IDEA ---
     ------------
 
-    TODO
+    Same idea as above, however, we can optimize the inner "searching" part by
+    pre-computing {val, idx} of inorder vector.
+
+    By using this HashMap we're reducing the Overall Time Complexity from
+    O(N^2) down to O(N).
 
 */
 
-/* Time  Beats:   100% */
-/* Space Beats: 89.93% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  65.76% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_My_Way {
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_efficient {
 public:
     TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder)
     {
-        int n = inorder.size();
-        TreeNode* root = nullptr;
+        const int N = preorder.size();
 
-        for (int i = 0; i < inorder.size(); i++)
-        {
-            if (inorder[i] == preorder[0])
-            {
-                root = new TreeNode(preorder[0]);
+        /* Create a Hash Map to speed up the Search */
+        unordered_map<int, int> umap_inorder_val_to_idx;
+        for (int i = 0; i < N; i++)
+            umap_inorder_val_to_idx.insert( {inorder[i], i} );
 
-                int x = 1;
-                root->left  = make_tree(preorder, inorder, x,   0, i-1);
-                root->right = make_tree(preorder, inorder, x, i+1, n-1);
-            }
-        }
-
-        return root;
+        int curr_preorder_root_idx = 0;
+        return helper(preorder, umap_inorder_val_to_idx, curr_preorder_root_idx, 0, N-1);
     }
 
 private:
-    TreeNode* make_tree(vector<int>& preorder,
-                        vector<int>& inorder,
-                        int& x,
-                        int start,
-                        int end)
+    TreeNode* helper(vector<int>& preorder, unordered_map<int,int>& umap_inorder_val_to_idx, int& curr_preorder_root_idx, int start, int end)
     {
-        if (x >= preorder.size())
+        if (start > end)
             return nullptr;
 
-        TreeNode* node = nullptr;
+        int i = umap_inorder_val_to_idx[preorder[curr_preorder_root_idx]];
 
-        for (int i = end; i >= start; i--)
-        {
-            if (preorder[x] == inorder[i])
-            {
-                node = new TreeNode(preorder[x]);
-                x++;
+        TreeNode* node = new TreeNode(preorder[curr_preorder_root_idx]);
+        curr_preorder_root_idx++;
 
-                node->left  = make_tree(preorder, inorder, x, start, i-1);
-                node->right = make_tree(preorder, inorder, x,   i+1, end);
-                break;
-            }
-        }
+        node->left  = helper(preorder, umap_inorder_val_to_idx, curr_preorder_root_idx, start, i-1);
+        node->right = helper(preorder, umap_inorder_val_to_idx, curr_preorder_root_idx,  i+1 , end);
 
         return node;
     }
