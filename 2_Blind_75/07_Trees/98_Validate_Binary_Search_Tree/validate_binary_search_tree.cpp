@@ -44,8 +44,12 @@
 
 */
 
-// Definition for a binary tree node.
 #include <climits>
+#include <queue>
+#include <tuple>
+using namespace std;
+
+// Definition for a binary tree node.
 struct TreeNode {
     int val;
     TreeNode *left;
@@ -240,5 +244,55 @@ private:
 
         return dfs(root->left,   lower_bound,    root->val ) &&
                dfs(root->right,   root->val ,   upper_bound);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Just a BFS implementation.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   9.16% */
+class Solution_BFS_Using_Numbers {
+public:
+    bool isValidBST(TreeNode* root)
+    {
+        queue<tuple<TreeNode*, long long, long long>> queue;
+        queue.push( {root, LLONG_MIN, LLONG_MAX} );
+
+        /* BFS */
+        while ( ! queue.empty())
+        {
+            int size = queue.size();
+
+            while (size > 0)
+            {
+                auto [root, lower_bound, upper_bound] = queue.front();
+                queue.pop();
+
+                if ( ! (lower_bound < root->val && root->val < upper_bound))
+                    return false;
+
+                if (root->left)
+                    queue.push( {root->left, lower_bound, root->val} );
+
+                if (root->right)
+                    queue.push( {root->right, root->val, upper_bound} );
+
+
+                // Decrement
+                size--;
+            }
+        }
+
+        return true;
     }
 };
