@@ -174,3 +174,71 @@ private:
         return node;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Virtually same idea, however it's beneficial to be aware of this in C++
+    because it makes the code much cleaner.
+
+*/
+
+/* Time  Beats: 80.25% */
+/* Space Beats: 41.74% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Codec_Concise {
+public:
+
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root)
+    {
+        ostringstream out;
+        inorder_serialize(root, out);
+
+        return out.str();
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data)
+    {
+        istringstream in(data);
+        return inorder_deserialize(in);
+    }
+
+private:
+    void inorder_serialize(TreeNode* root, ostringstream& out)
+    {
+        if (root == nullptr)
+        {
+            out << "# "; // '#' <==> nullptr
+            return;
+        }
+
+        out << root->val << " "; // Obligatory to use <Space> for this Solution
+        inorder_serialize(root->left, out);
+        inorder_serialize(root->right, out);
+    }
+
+    TreeNode* inorder_deserialize(istringstream& in)
+    {
+        string value_str;
+        in >> value_str; // Reads until it hits a <Space> character
+
+        if (value_str == "#")
+            return nullptr;
+
+        TreeNode* root = new TreeNode(stoi(value_str));
+
+        root->left  = inorder_deserialize(in);
+        root->right = inorder_deserialize(in);
+
+        return root;
+    }
+};
