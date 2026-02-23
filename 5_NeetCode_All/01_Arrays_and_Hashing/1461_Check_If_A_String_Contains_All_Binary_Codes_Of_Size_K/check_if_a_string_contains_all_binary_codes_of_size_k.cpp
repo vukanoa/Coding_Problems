@@ -1,6 +1,3 @@
-#include <iostream>
-#include <unordered_set>
-
 /*
     ==============
     === MEDIUM ===
@@ -52,6 +49,11 @@
 
 */
 
+#include <bitset>
+#include <string>
+#include <unordered_set>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -61,22 +63,73 @@
 
 */
 
-/* Time  Beats: 72.98% */
-/* Space Beats: 71.43% */
+/* Time  Beats: 69.02% */
+/* Space Beats: 71.74% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(2^k) */
-class Solution {
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_p {
 public:
     bool hasAllCodes(string s, int k)
     {
-        if (s.length() < 1<<k)
+        const int N = s.size();
+
+        if (N < (1 << k))
             return false;
 
-        std::unordered_set<std::string> uset;
-        for (int i = 0; i < s.length() - k + 1; i++)
+        unordered_set<string> uset;
+        for (int i = 0; i < N - k + 1; i++)
             uset.insert(s.substr(i, k));
 
-        return uset.size() == 1<<k;
+        return uset.size() == (1 << k);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 95.29% */
+/* Space Beats: 99.46% */
+
+/* Time  Complexity: O(N)   */
+/* Space Complexity: O(2^k) */
+class Solution_Rolling_Hash {
+public:
+    bool hasAllCodes(string s, int k)
+    {
+        const int N = s.size();
+        const int MAX_POSSIBLE_CODES = 1 << 20; // 2^20
+
+        int remaining_required_substrings = 1 << k;
+
+        bitset<MAX_POSSIBLE_CODES> seen;
+
+        int mask = remaining_required_substrings - 1;
+        int hash = 0;
+
+        for (int i = 0; i < N; ++i)
+        {
+            hash = ((hash << 1) & mask) | (s[i] & 1);
+
+            if ((i+1 >= k) && ( ! seen[hash]))
+            {
+                seen[hash] = 1;
+                remaining_required_substrings--;
+
+                if (remaining_required_substrings == 0)
+                    return true;
+            }
+        }
+
+        return false;
     }
 };
