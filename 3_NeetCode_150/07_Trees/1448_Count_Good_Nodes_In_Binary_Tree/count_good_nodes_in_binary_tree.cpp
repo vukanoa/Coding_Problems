@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -66,62 +64,97 @@
 
 */
 
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
- *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- * };
- */
+#include <algorithm>
+using namespace std;
+
+// Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
 
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Keep track of the "max on this path" while doing a DFS.
-
-    If the current node's value is greater than or equals to that
-    "max_on_this_path", then update the value of "max_on_this_path" variable
-    and increment "count" which is essentially what we are going to return at
-    the very end.
-
-    That's the whole problem.
+    Self-explanatory.
 
 */
 
-/* Time  Beats: 98.03% */
-/* Space Beats: 67.51% */
+/* Time  Beats: 75.82% */
+/* Space Beats: 64.20% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution {
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_DFS_1 {
 public:
     int goodNodes(TreeNode* root)
     {
-        int count = 0;
-        dfs(root, INT_MIN, count);
+        const int MIN_NODE_VALUE = -1e4;
 
-        return count;
+        int result = 0;
+        dfs(root, MIN_NODE_VALUE - 1, result);
+
+        return result;
     }
 
 private:
-    void dfs(TreeNode* root, int max_on_this_path, int& count)
+    void dfs(TreeNode* root, int max_so_far, int& result)
     {
-        if (!root)
+        if ( ! root)
             return;
 
-        if (root->val >= max_on_this_path)
-        {
-            max_on_this_path = root->val;
-            count++;
-        }
+        if (root->val >= max_so_far)
+            result++;
 
-        dfs(root->left,  max_on_this_path, count);
-        dfs(root->right, max_on_this_path, count);
+        dfs(root->left,  max(max_so_far, root->val), result);
+        dfs(root->right, max(max_so_far, root->val), result);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, but written in another way. It's always beneficial to look
+    more than one implementation. Especially for Tree Problems.
+
+*/
+
+/* Time  Beats: 95.53% */
+/* Space Beats: 64.20% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_DFS_2 {
+public:
+    int goodNodes(TreeNode* root)
+    {
+        return dfs(root, root->val);
+    }
+
+private:
+    int dfs(TreeNode* root, int max_so_far)
+    {
+        if ( ! root)
+            return 0;
+
+        int result = root->val >= max_so_far ? 1 : 0; 
+
+        max_so_far = max(max_so_far, root->val);
+
+        result += dfs(root->left,  max_so_far);
+        result += dfs(root->right, max_so_far);
+
+        return result;
     }
 };
