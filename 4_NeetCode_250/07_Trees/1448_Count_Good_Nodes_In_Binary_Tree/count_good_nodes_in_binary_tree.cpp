@@ -65,6 +65,8 @@
 */
 
 #include <algorithm>
+#include <climits>
+#include <queue>
 using namespace std;
 
 // Definition for a binary tree node.
@@ -148,12 +150,61 @@ private:
         if ( ! root)
             return 0;
 
-        int result = root->val >= max_so_far ? 1 : 0; 
+        int result = root->val >= max_so_far ? 1 : 0;
 
         max_so_far = max(max_so_far, root->val);
 
         result += dfs(root->left,  max_so_far);
         result += dfs(root->right, max_so_far);
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Just a BFS implementation.
+
+*/
+
+/* Time  Beats: 32.99% */
+/* Space Beats:  5.24% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_BFS {
+public:
+    int goodNodes(TreeNode* root)
+    {
+        int result = 0;
+
+        queue<pair<TreeNode*, int>> queue;
+        queue.push( {root, INT_MIN} );
+
+        while ( ! queue.empty())
+        {
+            int size = queue.size();
+            while (size > 0)
+            {
+                auto [node, max_so_far] = queue.front();
+                queue.pop();
+
+                if (node->val >= max_so_far)
+                    result++;
+
+                if (node->left)  queue.push( {node, max(max_so_far, node->val)} );
+                if (node->right) queue.push( {node, max(max_so_far, node->val)} );
+
+                // Decrement
+                size--;
+            }
+        }
 
         return result;
     }
