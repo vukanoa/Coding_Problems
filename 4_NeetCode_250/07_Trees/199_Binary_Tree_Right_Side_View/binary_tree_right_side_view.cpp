@@ -51,6 +51,7 @@
 
 */
 
+#include <queue>
 #include <vector>
 using namespace std;
 
@@ -123,7 +124,7 @@ struct TreeNode {
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution {
+class Solution_DFS {
 public:
     vector<int> rightSideView(TreeNode* root)
     {
@@ -145,5 +146,60 @@ private:
 
         right_dfs(root->right, curr_depth + 1, result);
         right_dfs(root->left,  curr_depth + 1, result);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    BFS Implementation. We do a basic BFS(i.e. "Level-Order Traversal") and we
+    push only the RIGHTMOST node, of each level, to the final "result" vector.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  40.22% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_BFS {
+public:
+    vector<int> rightSideView(TreeNode* root)
+    {
+        if ( ! root)
+            return {};
+
+        vector<int> result;
+
+        queue<TreeNode*> queue;
+        queue.push(root);
+
+        /* BFS(i.e. Level-Order Traversal) */
+        while ( ! queue.empty())
+        {
+            int size = queue.size();
+
+            while (size > 0)
+            {
+                TreeNode* node = queue.front();
+                queue.pop();
+
+                if (size == 1) // If it's the RIGHTMOST node on this level
+                    result.push_back(node->val);
+
+                if (node->left)  queue.push(node->left);
+                if (node->right) queue.push(node->right);
+
+                // Decrement
+                size--;
+            }
+        }
+
+        return result;
     }
 };
