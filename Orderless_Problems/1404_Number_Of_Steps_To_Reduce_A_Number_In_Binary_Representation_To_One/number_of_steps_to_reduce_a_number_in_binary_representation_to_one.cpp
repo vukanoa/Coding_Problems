@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -62,12 +60,15 @@
 
 */
 
+#include <string>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Intuitive.
+    TODO
 
 */
 
@@ -96,5 +97,42 @@ public:
         }
 
         return result + carry;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another implementation.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  58.55% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    int numSteps(string s)
+    {
+        const int N = s.size();
+        int steps = 0;
+        int carry = 0;
+
+        for (int i = N-1; i > 0; i--)
+        {
+            int bit = s[i] & 1; // We can do this because '0' = 48 and '1' = 49
+
+            steps += 1 + (bit ^ carry);
+            carry |= bit;
+        }
+
+        return steps + carry;
     }
 };
