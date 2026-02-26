@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -50,62 +48,70 @@
 
 */
 
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
- *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- * };
- */
+#include <bits/stdc++.h>
+using namespace std;
+
+// Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
 
 /*
     ------------
     --- IDEA ---
     ------------
 
-    TODO
+    Basic Iterative implementation.
 
 */
 
-/* Time  Beats: 72.10% */
-/* Space Beats: 64.96% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  57.38% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution {
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Iterative {
 public:
     TreeNode* insertIntoBST(TreeNode* root, int val)
     {
-        if (!root)
+        if ( ! root)
             return new TreeNode(val);
 
-        insert(root, val);
+        TreeNode* curr = root;
+        while (true)
+        {
+            if (val < curr->val)
+            {
+                if (curr->left == nullptr)
+                {
+                    curr->left = new TreeNode(val);
+                    break;
+                }
+                else
+                {
+                    curr = curr->left;
+                }
+            }
+            else
+            {
+                if (curr->right == nullptr)
+                {
+                    curr->right = new TreeNode(val);
+                    break;
+                }
+                else
+                {
+                    curr = curr->right;
+                }
+            }
+        }
 
         return root;
-    }
-
-private:
-    void insert(TreeNode* root, int val)
-    {
-        if (!root->left && val < root->val)
-        {
-            root->left = new TreeNode(val);
-        }
-        else if (!root->right && val > root->val)
-        {
-            root->right = new TreeNode(val);
-        }
-        else
-        {
-            if (val < root->val)
-                insert(root->left, val);
-            else
-                insert(root->right, val);
-        }
     }
 };
 
@@ -117,24 +123,22 @@ private:
     --- IDEA ---
     ------------
 
-    TODO
+    Basic Recursive_Implementation.
 
 */
 
-/* Time  Beats: 76.54% */
-/* Space Beats: 64.96% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  22.89% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_Elegant {
+class Solution_Recursive {
 public:
     TreeNode* insertIntoBST(TreeNode* root, int val)
     {
-        if (!root)
+        if ( ! root)
             return new TreeNode(val);
 
         if (val < root->val)
-            root->left  = insertIntoBST(root->left,  val);
+            root->left  = insertIntoBST(root->left, val);
         else
             root->right = insertIntoBST(root->right, val);
 
