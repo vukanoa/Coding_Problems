@@ -192,8 +192,8 @@ public:
 /* Time  Beats: 88.45% */
 /* Space Beats: 31.01% */
 
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
+/* Time  Complexity: O(N^2 * logN) */
+/* Space Complexity: O(N^2)        */
 class Solution {
 public:
     Node* construct(vector<vector<int>>& grid)
@@ -234,6 +234,75 @@ private:
         node->topRight    = dfs(grid, start_row      , start_row + N/2 - 1, start_col + N/2,             end_col);
         node->bottomLeft  = dfs(grid, start_row + N/2,             end_row, start_col      , start_col + N/2 - 1);
         node->bottomRight = dfs(grid, start_row + N/2,             end_row, start_col + N/2,             end_col);
+
+        return node;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 18.96% */
+/* Space Beats: 28.72% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_Optimized {
+public:
+    Node* construct(vector<vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+        
+        vector<vector<int>> prefix_sum(ROWS + 1, vector<int>(COLS + 1, 0));
+        for (int row = ROWS-1; row >= 0; row--)
+        {
+            for (int col = COLS-1; col >= 0; col--)
+            {
+                prefix_sum[row][col] = grid[row][col] + prefix_sum[row  ][col+1]
+                                                      + prefix_sum[row+1][col  ]
+                                                      - prefix_sum[row+1][col+1];
+            }
+        }
+
+        return dfs(grid, prefix_sum, 0, ROWS-1, 0, COLS-1);
+    }
+
+private:
+    Node* dfs(vector<vector<int>>& grid, vector<vector<int>>& prefix_sum, int start_row, int end_row, int start_col, int end_col)
+    {
+        if (start_row == end_row)
+            return new Node(grid[start_row][start_col], true);
+
+        const int N = end_row - start_row + 1;
+
+        int ones = prefix_sum[start_row    ][start_col    ]
+                 - prefix_sum[  end_row + 1][start_col    ]
+                 - prefix_sum[start_row    ][  end_col + 1]
+                 + prefix_sum[  end_row + 1][  end_col + 1];
+
+
+        if (ones == N * N)
+            return new Node(true, true);  // Leaf with all 1s
+
+        if (ones == 0) // i.e. All 0s
+            return new Node(false, true); // Leaf with all 0s
+
+
+        Node* node = new Node(true, false); // First parameter doesn't matter
+        node->topLeft     = dfs(grid, prefix_sum, start_row      , start_row + N/2 - 1, start_col      , start_col + N/2 - 1);
+        node->topRight    = dfs(grid, prefix_sum, start_row      , start_row + N/2 - 1, start_col + N/2,             end_col);
+        node->bottomLeft  = dfs(grid, prefix_sum, start_row + N/2,             end_row, start_col      , start_col + N/2 - 1);
+        node->bottomRight = dfs(grid, prefix_sum, start_row + N/2,             end_row, start_col + N/2,             end_col);
 
         return node;
     }
