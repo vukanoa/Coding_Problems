@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -102,6 +99,9 @@
 
 */
 
+#include <vector>
+using namespace std;
+
 /*
 // Definition for a QuadTree node.
 class Node {
@@ -142,55 +142,99 @@ public:
 };
 */
 
+// Definition for a QuadTree node.
+class Node {
+public:
+    bool val;
+    bool isLeaf;
+    Node* topLeft;
+    Node* topRight;
+    Node* bottomLeft;
+    Node* bottomRight;
+    
+    Node() {
+        val = false;
+        isLeaf = false;
+        topLeft = NULL;
+        topRight = NULL;
+        bottomLeft = NULL;
+        bottomRight = NULL;
+    }
+    
+    Node(bool _val, bool _isLeaf) {
+        val = _val;
+        isLeaf = _isLeaf;
+        topLeft = NULL;
+        topRight = NULL;
+        bottomLeft = NULL;
+        bottomRight = NULL;
+    }
+    
+    Node(bool _val, bool _isLeaf, Node* _topLeft, Node* _topRight, Node* _bottomLeft, Node* _bottomRight) {
+        val = _val;
+        isLeaf = _isLeaf;
+        topLeft = _topLeft;
+        topRight = _topRight;
+        bottomLeft = _bottomLeft;
+        bottomRight = _bottomRight;
+    }
+};
+
 /*
     ------------
     --- IDEA ---
     ------------
 
     TODO
-    (Check their implementation, of Node class, up above)
 
 */
 
-/* Time  Beats: 90.59% */
-/* Space Beats: 87.86% */
+/* Time  Beats: 88.45% */
+/* Space Beats: 31.01% */
 
-/* Time  Complexity: O(n^2 * logn) */
-/* Space Complexity: O(n^2)        */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution {
 public:
     Node* construct(vector<vector<int>>& grid)
     {
-        return helper(grid, 0, 0, grid.size());
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        return dfs(grid, 0, ROWS-1, 0, COLS-1);
     }
 
 private:
-    Node* helper(const vector<vector<int>>& grid, int i, int j, int w)
+    Node* dfs(vector<vector<int>>& grid, int start_row, int end_row, int start_col, int end_col)
     {
-        if (allSame(grid, i, j, w))
-            return new Node(grid[i][j], true);
+        if (start_row == end_row)
+            return new Node(grid[start_row][start_col], true);
 
-        Node* node = new Node(true, false);
-        node->topLeft     = helper(grid, i,     j    , w/2);
-        node->topRight    = helper(grid, i,     j+w/2, w/2);
-        node->bottomLeft  = helper(grid, i+w/2, j    , w/2);
-        node->bottomRight = helper(grid, i+w/2, j+w/2, w/2);
+        const int N = end_row - start_row + 1;
 
-        return node;
-    }
-
-    bool allSame(const vector<vector<int>>& grid, int i, int j, int w)
-    {
-        int value = grid[i][j];
-        for (int x = i; x < i+w; x++)
+        int ones = 0;
+        for (int row = start_row; row <= end_row; row++)
         {
-            for (int y = j; y < j+w; y++)
+            for (int col = start_col; col <= end_col; col++)
             {
-                if (grid[x][y] != value)
-                    return false;
+                if (grid[row][col] == 1)
+                    ones++;
             }
         }
 
-        return true;
+        if (ones == N * N)
+            return new Node(true, true);  // Leaf with all 1s
+
+        if (ones == 0) // i.e. All 0s
+            return new Node(false, true); // Leaf with all 0s
+
+
+        Node* node = new Node(true, false); // First parameter doesn't matter
+        node->topLeft     = dfs(grid, start_row      , start_row + N/2 - 1, start_col      , start_col + N/2 - 1);
+        node->topRight    = dfs(grid, start_row      , start_row + N/2 - 1, start_col + N/2,             end_col);
+        node->bottomLeft  = dfs(grid, start_row + N/2,             end_row, start_col      , start_col + N/2 - 1);
+        node->bottomRight = dfs(grid, start_row + N/2,             end_row, start_col + N/2,             end_col);
+
+        return node;
     }
 };
