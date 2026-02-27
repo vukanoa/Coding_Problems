@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -94,17 +92,16 @@
 
 */
 
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
- *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- * };
- */
+
+// Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
 
 /*
     ------------
@@ -112,31 +109,30 @@
     ------------
 
     A standard DFS traversal on a Binary Tree. If you find this difficult, make
-    sure to solve EASY Binary Tree Problems from Blind_75. After that, this
-    becomes a breeze.
+    sure to solve EASY Binary Tree Problems from Blind_75.
+
+    After that, this becomes a breeze.
 
 */
 
-/* Time  Beats: 92.90% */
-/* Space Beats: 47.43% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  83.09% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution {
 public:
     TreeNode* removeLeafNodes(TreeNode* root, int target)
     {
-        if (!root)
+        if ( ! root)
             return nullptr;
-
-        if (!root->left && !root->right)
-            return root->val == target ? nullptr : root;
 
         root->left  = removeLeafNodes(root->left,  target);
         root->right = removeLeafNodes(root->right, target);
 
-        if (!root->left && !root->right)
-            return root->val == target ? nullptr : root;
+        // I can't prevent Memory Leak because of LeetCode's Memory management
+        if (root->val == target && ! root->left && ! root->right)
+            return nullptr;
 
         return root;
     }
@@ -151,6 +147,15 @@ public:
     ------------
 
     Same as above, however this Implementation prevents Memory Leak.
+
+    The root of the tree (the original input) is owned by LeetCode, so you must
+    never delete it -- otherwise, the framework will try to free it afterward
+    and crash. 
+
+    Nodes are freed(delete) anyway by the LeetCode, so we can't do it manually.
+    Hwever, if for some reason you want to do it manually, then you can simply
+    free all of the nodes EXCEPT for the original root that is the Input of the
+    entire Tree.
 
 */
 
@@ -170,13 +175,13 @@ public:
 private:
     TreeNode* dfs(TreeNode* root, int target, TreeNode* parent)
     {
-        if (!root)
+        if ( ! root)
             return nullptr;
 
         root->left  = dfs(root->left,  target, root);
         root->right = dfs(root->right, target, root);
 
-        if (!root->left && !root->right && root->val == target)
+        if (root->val == target && ! root->left && ! root->right)
         {
             if (parent)
                 delete root;
