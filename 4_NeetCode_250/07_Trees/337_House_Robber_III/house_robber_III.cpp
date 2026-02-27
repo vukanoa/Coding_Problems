@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -49,17 +47,19 @@
 
 */
 
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
- *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- * };
- */
+#include <algorithm>
+#include <utility>
+using namespace std;
+
+// Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
 
 /*
     ------------
@@ -70,7 +70,7 @@
     if you take the root node of certain subtree, then you are NOT allowed to
     take its immediate children into account.
 
-    However, if you decide not to take the root nod eof the certain subtree,
+    However, if you decide not to take the root node of the certain subtree,
     then you are indeed allowed to take its immediate children into account.
 
     There is only one problem, or "edge case" that you need to be aware of.
@@ -124,45 +124,41 @@
 
 
     That's why we have this line in our code:
-        int with_root    = std::max(left.second + right.second + root->val, left.first + right.first);
+        return {without_root, max(without_root, with_root)};
 
     That's the equivalent of:
         int tmp = std::max(curr, prev + nums[i]);
+
     in the classical House Robber problem.
 
 */
 
-/* Time  Beats: 99.47% */
-/* Space Beats: 88.53% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  54.32% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution {
 public:
     int rob(TreeNode* root)
     {
-        if (!root)
-            return 0;
+        auto [without_root, with_root] = dfs(root);
 
-        std::pair<int, int> pair = dfs(root);
-
-        int with_root    = pair.first;
-        int without_root = pair.second;
-
-        return std::max(with_root, without_root);
+        return max(without_root, with_root);
     }
 
-    std::pair<int, int> dfs(TreeNode* root)
+private:
+    pair<int, int> dfs(TreeNode* root)
     {
-        if (!root)
+        if ( ! root)
             return {0, 0};
 
-        std::pair<int, int> left  = dfs(root->left);
-        std::pair<int, int> right = dfs(root->right);
+        auto [left_max,   left_max_with_neighbor] = dfs(root->left);
+        auto [right_max, right_max_with_neighbor] = dfs(root->right);
 
-        int with_root    = std::max(left.second + right.second + root->val, left.first + right.first);
-        int without_root = left.first  + right.first;
+        int without_root = left_max_with_neighbor + right_max_with_neighbor;
+        int with_root    = left_max               + right_max                + root->val;
 
-        return {with_root, without_root};
+        return {without_root, max(without_root, with_root)};
     }
 };
