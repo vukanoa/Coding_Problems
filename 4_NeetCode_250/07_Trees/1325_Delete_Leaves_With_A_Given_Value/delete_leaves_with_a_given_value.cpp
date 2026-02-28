@@ -267,3 +267,73 @@ public:
         return root;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same idea as above, however we do NOT need to use a HashMap to remember the
+    parent of the current node. Instead, we know that the top of the stack is
+    always the parent of the current node.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  13.57% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Optimal_Iterative_Postorder {
+public:
+    TreeNode* removeLeafNodes(TreeNode* root, int target)
+    {
+        stack<TreeNode*> stack;
+        TreeNode* curr = root;
+        TreeNode* last_right_node = nullptr;
+
+        while (curr || ! stack.empty())
+        {
+            // Find the leftmost node
+            while (curr)
+            {
+                stack.push(curr);
+                curr = curr->left;
+            }
+
+            curr = stack.top();
+
+            // Find the rightmost node that wasn't processed yet
+            if (curr->right && curr->right != last_right_node)
+            {
+                curr = curr->right;
+                continue;
+            }
+
+            stack.pop();
+
+            // If it's a LEAF
+            if (curr->val == target && curr->right == curr->left)
+            {
+                if (stack.empty()) // Global Root needs to be removed
+                    return nullptr;
+
+                TreeNode* curr_parent = stack.top();
+
+                // Unlink the current node from its parent
+                if (curr_parent->left == curr)
+                    curr_parent->left = nullptr;
+                else
+                    curr_parent->right = nullptr;
+            }
+
+            last_right_node = curr;
+            curr = nullptr;
+        }
+
+        return root;
+    }
+};
