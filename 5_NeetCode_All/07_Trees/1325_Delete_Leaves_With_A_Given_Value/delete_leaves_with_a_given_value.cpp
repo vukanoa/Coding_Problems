@@ -92,6 +92,10 @@
 
 */
 
+#include <stack>
+#include <unordered_map>
+#include <unordered_set>
+using namespace std;
 
 // Definition for a binary tree node.
 struct TreeNode {
@@ -187,6 +191,77 @@ private:
                 delete root;
 
             return nullptr;
+        }
+
+        return root;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   4.78% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Iterative_Postorder {
+public:
+    TreeNode* removeLeafNodes(TreeNode* root, int target)
+    {
+        unordered_set<TreeNode*> visited;
+
+        unordered_map<TreeNode*, TreeNode*> parent;
+        parent[root] = nullptr;
+
+        stack<TreeNode*> stack;
+        stack.push(root);
+
+        while ( ! stack.empty())
+        {
+            TreeNode* curr = stack.top();
+            stack.pop();
+
+            if (curr->val == target && curr->left == curr->right) // Leaf
+            {
+                TreeNode* curr_parent = parent[curr];
+
+                if (curr_parent == nullptr) // Global Root needs to be removed
+                    return nullptr;
+
+                if (curr_parent->left == curr)
+                    curr_parent->left = nullptr;
+
+                if (curr_parent->right == curr)
+                    curr_parent->right = nullptr;
+
+            }
+            else if (visited.find(curr) == visited.end()) // curr NOT visited
+            {
+                visited.insert(curr);
+                stack.push(curr);
+
+                if (curr->left)
+                {
+                    stack.push(curr->left);
+                    parent[curr->left] = curr;
+                }
+
+                if (curr->right)
+                {
+                    stack.push(curr->right);
+                    parent[curr->right] = curr;
+                }
+            }
         }
 
         return root;
