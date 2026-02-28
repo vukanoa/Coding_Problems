@@ -132,3 +132,27 @@ public:
         return true;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Bitwise_Trick {
+public:
+    bool hasAlternatingBits(int n)
+    {
+        unsigned int x = n ^ (n >> 1);
+
+        return (x & (x + 1)) == 0; // Are all bits from leftmost 1 of X also 1?
+    }
+};
