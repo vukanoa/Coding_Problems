@@ -65,7 +65,6 @@
 */
 
 #include <cstdlib>
-#include <iostream>
 #include <vector>
 #include <queue>
 using namespace std;
@@ -552,7 +551,7 @@ public:
     {
         max_heap.push(num);
 
-        if (!max_heap.empty() && !min_heap.empty() && max_heap.top() > min_heap.top())
+        if ( ! max_heap.empty() && ! min_heap.empty() && max_heap.top() > min_heap.top())
         {
             int elem = max_heap.top(); // O(1)
             max_heap.pop();            // O(logn)
@@ -609,237 +608,73 @@ private:
     --- IDEA ---
     ------------
 
-    Just another, slightly cleaner, implementation.
+    Same idea as above, implemented differently. Some people may find this one
+    much easier to read.
 
 */
 
-/* Time  Beats:  6.62% */
-/* Space Beats: 57.67% */
+/* Time  Beats: 92.35% */
+/* Space Beats: 29.97% */
 
-/* Time  Complexity: O(N * logN) */ // Since 5 * 10^4 calls are made to O(logN)
+/* Time  Complexity: O(M * logN) */
 /* Space Complexity: O(N)        */
 class MedianFinder_2 {
-private:
-        /* I'm naming it this way so that it's easier to discern */
-        priority_queue<int, vector<int>>               L_MAX_heap;
-        priority_queue<int, vector<int>, greater<int>> R_min_heap;
-        int size = 0;
-
 public:
-    MedianFinder_2()
+    MedianFinder_2 ()
+        : left_size(0), right_size(0)
     {
 
     }
 
-
-    /* Time  Complexity: O(logN) */
     void addNum(int num)
     {
-        size++;
-
-        if ( ! R_min_heap.empty() && num > R_min_heap.top())
-            R_min_heap.push(num);
-        else
-            L_MAX_heap.push(num);
-
-
-        // We always want the left to either have 1 more element, or equal nums
-        if (R_min_heap.size() > L_MAX_heap.size())
+        if (left_max_heap.empty() || num <= left_max_heap.top())
         {
-            int num_to_move = R_min_heap.top();
-            R_min_heap.pop();
+            left_max_heap.push(num); // O(logN)
+            left_size++;
 
-            L_MAX_heap.push(num_to_move);
+            if (abs(left_size - right_size) == 2)
+            {
+                int elem = left_max_heap.top(); // MAX
+                left_max_heap.pop(); // O(logN)
+                left_size--;
+
+                right_min_heap.push(elem); // O(logN)
+                right_size++;
+            }
         }
-        else if (L_MAX_heap.size() - R_min_heap.size() == 2) // 2 is too much
+        else
         {
-            int num_to_move = L_MAX_heap.top();
-            L_MAX_heap.pop();
+            right_min_heap.push(num); // O(logN)
+            right_size++;
 
-            R_min_heap.push(num_to_move);
+            if (abs(left_size - right_size) == 2)
+            {
+                int elem = right_min_heap.top(); // min
+                right_min_heap.pop(); // O(logN)
+                right_size--;
+
+                left_max_heap.push(elem); // O(logN)
+                left_size++;
+            }
         }
     }
 
-    /* Time  Complexity: O(1) */
     double findMedian()
     {
-        double median;
+        if (left_size == right_size)
+            return 1.0 * (left_max_heap.top() + right_min_heap.top()) / 2.0;
 
-        if (size & 1) // Size is odd
-            median =  L_MAX_heap.top();
-        else
-            median = static_cast<double>(L_MAX_heap.top() + R_min_heap.top()) / 2.0;
+        if (left_size > right_size)
+            return 1.0 * left_max_heap.top();
 
-        return median;
+        return 1.0 * right_min_heap.top();
     }
+
+private:
+    priority_queue<int>                             left_max_heap; // MAX Heap
+    priority_queue<int, vector<int>, greater<int>> right_min_heap; // min Heap
+
+    int left_size;
+    int right_size;
 };
-
-
-void
-print_stream(vector<int>& stream)
-{
-    bool first = true;
-    cout << "\n\n\tCurrent Stream: [";
-    for (auto x: stream)
-    {
-        if (!first)
-            cout << ", ";
-
-        cout << x;
-        first = false;
-    }
-    cout << "]";
-
-}
-
-
-int
-main()
-{
-    MedianFinder* obj = new MedianFinder();
-
-    cout << "\n\t====================================";
-    cout << "\n\t=== FIND MEDIAN FROM DATA STREAM ===";
-    cout << "\n\t====================================";
-
-    // For printing
-    vector<int> stream;
-
-    /* Example 1 */
-     // obj->addNum(1);
-    // stream.push_back(1);
-    // obj->addNum(2);
-    // stream.push_back(2);
-
-     // double mid = obj->findMedian();
-    // print_stream(stream);
-    // cout << "\n\tMid: " << mid;
-
-
-    // obj->addNum(3);
-    // stream.push_back(3);
-
-     // mid = obj->findMedian();
-    // print_stream(stream);
-    // cout << "\n\tMid: " << mid;
-
-
-
-
-    /* Example 2 */
-     obj->addNum(6);
-    stream.push_back(6);
-     double mid = obj->findMedian();
-    print_stream(stream);
-    cout << "\n\tMid: " << mid;
-
-    obj->addNum(10);
-    stream.push_back(10);
-     mid = obj->findMedian();
-    print_stream(stream);
-    cout << "\n\tMid: " << mid;
-
-    obj->addNum(2);
-    stream.push_back(2);
-     mid = obj->findMedian();
-    print_stream(stream);
-    cout << "\n\tMid: " << mid;
-
-    obj->addNum(6);
-    stream.push_back(6);
-     mid = obj->findMedian();
-    print_stream(stream);
-    cout << "\n\tMid: " << mid;
-
-    obj->addNum(5);
-    stream.push_back(5);
-     mid = obj->findMedian();
-    print_stream(stream);
-    cout << "\n\tMid: " << mid;
-
-    obj->addNum(0);
-    stream.push_back(0);
-     mid = obj->findMedian();
-    print_stream(stream);
-    cout << "\n\tMid: " << mid;
-
-    obj->addNum(6);
-    stream.push_back(6);
-     mid = obj->findMedian();
-    print_stream(stream);
-    cout << "\n\tMid: " << mid;
-
-    obj->addNum(3);
-    stream.push_back(3);
-     mid = obj->findMedian();
-    print_stream(stream);
-    cout << "\n\tMid: " << mid;
-
-    obj->addNum(1);
-    stream.push_back(1);
-     mid = obj->findMedian();
-    print_stream(stream);
-    cout << "\n\tMid: " << mid;
-
-    obj->addNum(0);
-    stream.push_back(0);
-     mid = obj->findMedian();
-    print_stream(stream);
-    cout << "\n\tMid: " << mid;
-
-
-
-
-
-    /* Example 3 */
-     // obj->addNum(-1);
-    // stream.push_back(-1);
-     // double mid = obj->findMedian();
-    // print_stream(stream);
-    // cout << "\n\tMid: " << mid;
-
-    // obj->addNum(-2);
-    // stream.push_back(-2);
-     // mid = obj->findMedian();
-    // print_stream(stream);
-    // cout << "\n\tMid: " << mid;
-
-    // obj->addNum(-3);
-    // stream.push_back(-3);
-     // mid = obj->findMedian();
-    // print_stream(stream);
-    // cout << "\n\tMid: " << mid;
-
-    // obj->addNum(-4);
-    // stream.push_back(-4);
-     // mid = obj->findMedian();
-    // print_stream(stream);
-    // cout << "\n\tMid: " << mid;
-
-    // obj->addNum(-5);
-    // stream.push_back(-5);
-     // mid = obj->findMedian();
-    // print_stream(stream);
-    // cout << "\n\tMid: " << mid;
-
-
-
-
-    /* Example 4 */
-     // obj->addNum(0);
-    // stream.push_back(0);
-     // double mid = obj->findMedian();
-    // print_stream(stream);
-    // cout << "\n\tMid: " << mid;
-
-    // obj->addNum(0);
-    // stream.push_back(0);
-     // mid = obj->findMedian();
-    // print_stream(stream);
-    // cout << "\n\tMid: " << mid;
-
-
-    cout << "\n\n";
-
-    return 0;
-}
