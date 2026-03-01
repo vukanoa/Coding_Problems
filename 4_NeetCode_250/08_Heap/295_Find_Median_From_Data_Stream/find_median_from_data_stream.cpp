@@ -65,6 +65,7 @@
 */
 
 #include <cstdlib>
+#include <cstring>
 #include <vector>
 #include <queue>
 using namespace std;
@@ -677,4 +678,70 @@ private:
 
     int left_size;
     int right_size;
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    If we knew that values will be from [0, 100], then we could have allocated
+    a "HashMap", on the Stack, of size 101 and thus reduce the O(logN) part
+    to O(1) since we can always immediately increasing the frequency of any
+    number in "addNumber" function.
+
+    As for "findMedian", we scan through, at worst, 100 elements, which is a
+    constant, which also makes it O(1).
+
+*/
+
+/* Time  Complexity: O(M) */
+/* Space Complexity: O(1) */
+class MedianFinder_Follow_Up_1 {
+public:
+    MedianFinder_Follow_Up_1 ()
+        : size(0)
+    {
+        memset(freq, 0x00, sizeof(freq));
+    }
+
+    void addNum(int num)
+    {
+        freq[num]++;
+        size++;
+    }
+
+    double findMedian()
+    {
+        int left_index  = (size - 1) / 2;
+        int right_index = size / 2;
+
+        int count = 0;
+
+        int left_val  = 0;
+        int right_val = 0;
+
+        for (int num = 0; num <= 100; num++)
+        {
+            count += freq[num];
+
+            if (freq[num] > 0 && count > left_index && left_val == 0)
+                left_val = num;
+
+            if (count > right_index)
+            {
+                right_val = num;
+                break;
+            }
+        }
+
+        return (left_val + right_val) / 2.0;
+    }
+
+private:
+    int freq[101]; // On the Stack
+    int size;
 };
