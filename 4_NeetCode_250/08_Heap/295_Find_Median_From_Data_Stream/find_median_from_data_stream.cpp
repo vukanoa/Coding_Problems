@@ -745,3 +745,132 @@ private:
     int freq[101]; // On the Stack
     int size;
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    The idea for the 2nd Follow up is to keep counting for these standard 99%
+    cases, and use 2 heaps for the "rare 1%" values.
+
+    Since 99% will be in [0, 100] we need O(1) insert for that, but we also
+    need to somehow take care of the rare values that are outside the range.
+
+    The idea is to have 3 parts:
+
+        + values < 0         in a left_max_heap
+        + values in [0, 100] in freq[101]
+        + values > 100       in a right_min heap
+
+    We'll also track sizes of each portion:
+
+        + left_count  = number < 0
+        + mid_count   = number in [0,100]
+        + right_count = number > 100
+
+
+    Since we're told that we'll have 99% of values in [0, 100] range, we can
+    simply designate the 1% as 'K'.
+
+    Therefore, the number of K values will createa a O(K * logK) in all of the
+    calls for both addNumber and findMedian functions.
+
+*/
+
+/* Time  Complexity: O(K * logK) */ // Where K is 1% of N
+/* Space Complexity: O(N)        */
+class MedianFinder_FollowUp_2 {
+public:
+    MedianFinder_FollowUp_2()
+        : left_count(0), mid_count(0), right_count(0)
+    {
+        memset(freq, 0x00, sizeof(freq));
+    }
+
+    void addNum(int num)
+    {
+        if (num < 0)
+        {
+            left_max_heap.push(num);
+            left_count++;
+        }
+        else if (num <= 100)
+        {
+            freq[num]++;
+            mid_count++;
+        }
+        else
+        {
+            right_min_heap.push(num);
+            right_count++;
+        }
+    }
+
+    double findMedian()
+    {
+        int size = total();
+
+        int left_num  = kth((size - 1) / 2);
+        int right_num = kth(size / 2);
+
+        return (left_num + right_num) / 2.0;
+    }
+
+private:
+    int total() const
+    {
+        return left_count + mid_count + right_count;
+    }
+
+    int kth(int k)
+    {
+        if (k < left_count)
+        {
+            auto tmp_left_max_heap = left_max_heap;
+            int for_popping = left_count - k - 1;
+
+            while (for_popping-- > 0)
+                tmp_left_max_heap.pop();
+
+            return tmp_left_max_heap.top();
+        }
+
+        k -= left_count;
+
+        if (k < mid_count)
+        {
+            int count = 0;
+
+            for (int i = 0; i <= 100; i++)
+            {
+                count += freq[i];
+
+                if (count > k)
+                    return i;
+            }
+        }
+
+        k -= mid_count;
+
+        auto tmp_right_min_heap = right_min_heap;
+
+        while (k--)
+            tmp_right_min_heap.pop();
+
+        return tmp_right_min_heap.top();
+    }
+
+private:
+    int freq[101];
+
+    priority_queue<int>                            left_max_heap;
+    priority_queue<int, vector<int>, greater<int>> right_min_heap;
+
+    int left_count;
+    int mid_count;
+    int right_count;
+};
