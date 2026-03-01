@@ -530,19 +530,8 @@ using namespace std;
 /* Time  Beats: 86.25% */
 /* Space Beats: 73.42% */
 
-/*
-    Time  Complexity:
-        addNum     --> O(log n)
-        findMedian --> O(1)
-*/
-/*
-    Space Complexity: O(n)
-        We don't use any extra memory then is absolutely necessary, however
-        in theory it could be possible that we only use the current element
-        that is being added and that we only update a single variable. So since
-        that is not the case, we could consider this Solution as having an
-        overall Space Complexity: O(n)
-*/
+/* Time  Complexity: O(M * logN) */
+/* Space Complexity: O(N)        */
 class MedianFinder{
 public:
     MedianFinder() : size(0)
@@ -623,9 +612,7 @@ class MedianFinder_2 {
 public:
     MedianFinder_2 ()
         : left_size(0), right_size(0)
-    {
-
-    }
+    {}
 
     void addNum(int num)
     {
@@ -678,6 +665,47 @@ private:
 
     int left_size;
     int right_size;
+};
+
+
+
+
+/* Time  Beats: 55.51% */
+/* Space Beats:  6.74% */
+
+/* Time  Complexity: O(M * logN) */
+/* Space Complexity: O(N)        */
+class MedianFinder_Elegant {
+public:
+    MedianFinder_Elegant()
+    {}
+
+    void addNum(int num)
+    {
+        left_heap.push(num);
+        right_heap.push(-left_heap.top());
+
+        left_heap.pop();
+
+        if (left_heap.size() < right_heap.size())
+        {
+            left_heap.push(-right_heap.top());
+            right_heap.pop();
+        }
+    }
+
+    double findMedian()
+    {
+        if (left_heap.size() > right_heap.size())
+            return left_heap.top();
+
+        return (left_heap.top() - right_heap.top()) / 2.0;
+    }
+
+private:
+    /* Both are MAX Heaps, however "right_heap" will store NEGATIVE values */
+    priority_queue<long> left_heap;
+    priority_queue<long> right_heap;
 };
 
 
