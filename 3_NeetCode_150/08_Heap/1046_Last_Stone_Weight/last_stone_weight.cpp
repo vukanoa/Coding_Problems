@@ -1,8 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm> // std::make_heap, std::pop_heap, std::push_heap
-
 /*
     ============
     === EASY ===
@@ -60,6 +55,11 @@
     1 <= stones[i] <= 1000
 
 */
+
+#include <vector>
+#include <queue>
+#include <algorithm> // std::make_heap, std::pop_heap, std::push_heap
+using namespace std;
 
 /*
     ------------
@@ -155,27 +155,25 @@
 
 */
 
-/* Time  Beats:  100% */
-/* Space Beats: 20.53% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  48.90% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution {
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_sssstone {
 public:
-    int lastStoneWeight(std::vector<int>& stones)
+    int lastStoneWeight(vector<int>& stones)
     {
-        std::priority_queue<int> max_heap(stones.begin(), stones.end());
+        priority_queue<int> max_heap(stones.begin(), stones.end());
 
-        while (max_heap.size() > 1)
+        // O(N * logN) (entire block)
+        while (max_heap.size() > 1) // O(N)
         {
-            int y = max_heap.top();
-            max_heap.pop(); // O(logn)
-
-            int x = max_heap.top();
-            max_heap.pop(); // O(logn)
+            int y = max_heap.top(); max_heap.pop(); // O(logN)
+            int x = max_heap.top(); max_heap.pop(); // O(logN)
 
             if (x != y)
-                max_heap.push(y - x);
+                max_heap.push(y - x); // O(logN)
         }
 
         return max_heap.empty() ? 0 : max_heap.top();
