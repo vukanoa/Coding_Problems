@@ -52,71 +52,9 @@
 
 */
 
-#include <cmath>
 #include <vector>
-#include <algorithm>
 #include <queue>
 using namespace std;
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Since we're looking for the distance between point P and Origin(0, 0), we
-    don't really have to use this formula: √(x1 - x2)^2 + (y1 - y2)^2).
-
-    Actually we do, but we don't need to pass x2 and y2 since they are always
-    going to be 0.
-
-    So when we're calculating the distance between point P and Origin(0, 0), we
-    can do it like this: √x1^2 + y1^2).
-
-    We calculate the distance for each point and store it in a vector of pairs
-    named "distances":
-    distances = ( {<distance>, [xi, yi]}, {<distance>, [xi, yi]}, ...)
-
-    After we're doing processing each point, we sort it by the first value,
-    i.e. "distance".
-
-    Then just iterate from 0 to k and push Points to vector "results".
-
-*/
-
-/* Time  Beats: 56.04% */
-/* Space Beats: 24.83% */
-
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(n) */
-class Solution {
-public:
-    vector<vector<int>> kClosest(vector<vector<int>>& points, int k)
-    {
-        vector<pair<double, vector<int>>> distances;
-
-        for (auto& point : points)
-            distances.push_back({euclidean_distance(point[0], point[1]), point});
-
-        sort(distances.begin(), distances.end());
-
-        vector<vector<int>> results;
-        int i = 0;
-        while (i < k)
-            results.push_back(distances[i++].second);
-
-        return results;
-    }
-
-private:
-    double euclidean_distance(int& x1, int& y1)
-    {
-        return sqrt(x1*x1 + y1*y1);
-    }
-};
-
-
-
 
 /*
     ------------
@@ -128,7 +66,7 @@ private:
            to be "higher" anyway. So don't need to compute that. We can just do
            this: x1*x1 + y1*y1
 
-        2. Since we don't need all n points, we don't have to sort all the
+        2. Since we don't need all N points, we don't have to sort all the
            computed distances. Imagine if we had a million of points and also
            imagine that k = 3.
 
@@ -147,43 +85,36 @@ private:
 /* Time  Beats: 35.28% */
 /* Space Beats: 37.94% */
 
-/*
-    Time  Complexity: O(n * logk)
-    k is less than or equal to n. Usually it's less than n, which makes this
-    Solution faster than O(n * logn)
-
-    This one in theory is faster, however on LeetCode, this Solution has a
-    worse Time Complexity than the one above.
-*/
-/*
-    Space Complexity: O(n)
-*/
-class Solution_2 {
+/* Time  Complexity: O(N * logK + K * logK) */
+/* Space Complexity: O(N)                   */
+class Solution {
 public:
     vector<vector<int>> kClosest(vector<vector<int>>& points, int k)
     {
-        priority_queue<pair<int, vector<int>>> max_heap;
+        const int N = points.size();
+        vector<vector<int>> result;
 
-        for (auto& point : points)
+        priority_queue<pair<int, int>> max_heap;
+
+        // O(N * logK) (entire block)
+        for (int i = 0; i < N; i++) // O(N)
         {
-            int x = point[0];
-            int y = point[1];
+            int x = points[i][0];
+            int y = points[i][1];
 
-            // Here instead of (x*x + y*y) we could've had this:
-            // euclidean_distance(point[0], point[1])
-            // However, it's unnecessary computation, hence (x*x + y*y)
-            max_heap.push({x*x + y*y, point});
+            max_heap.push( {x*x + y*y, i} ); // O(logK)
 
-            // O(log k)
             if (max_heap.size() > k)
-                max_heap.pop();
+                max_heap.pop(); // O(logK)
         }
 
-        vector<vector<int>> result;
-        for (int i = 0; i < k; i++)
+        // O(K * logK) (entire block)
+        while ( ! max_heap.empty()) // O(k)
         {
-            result.push_back(max_heap.top().second);
-            max_heap.pop();
+            auto [distance, idx] = max_heap.top(); // O(1)
+            max_heap.pop(); // O(logK)
+
+            result.push_back(points[idx]);
         }
 
         return result;
@@ -198,56 +129,9 @@ public:
     --- IDEA ---
     ------------
 
-    Same as above, however we are explicitly using "min_heap", instead of a
-    "max_heap", that's why there is this giant initialization of
-    "priority_queue".
-
-    The entire Solution is written in a slightly different way than above,
-    however the IDEA is absolutely equivalent.
-
-    We, again, do not have to calculate the entire Euclidean distance, we can
-    just use (x*x + y*y) as the integer that represents the distance. It's
-    completely the same whether we actually calculate the distance or we leave
-    it like this.
-
-    Therefore, why would we do some unnecessary computation every single time?
+    TODO
 
 */
-
-/* Time  Beats: 63.64% */
-/* Space Beats: 21.87% */
-
-/* Time  Complexity: O(n * logk) */
-/* Space Complexity: O(n) */
-class Solution_3 {
-public:
-    vector<vector<int>> kClosest(vector<vector<int>>& points, int k)
-    {
-        priority_queue<pair<int, vector<int>>,
-                            vector<pair<int, vector<int>>>,
-                            greater<pair<int, vector<int>>>> min_heap;
-
-        for (auto& point : points)
-        {
-            int distance = point[0]*point[0] + point[1]*point[1];
-            min_heap.push({distance, point});
-        }
-
-        vector<vector<int>> result;
-        while (k--)
-        {
-            auto top = min_heap.top();
-            min_heap.pop();
-
-            result.push_back(top.second);
-        }
-
-        return result;
-    }
-};
-
-
-
 
 /* Quick select */
 class Solution_Quick_Select {
