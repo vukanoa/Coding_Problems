@@ -160,7 +160,7 @@ using namespace std;
 
 /* Time  Complexity: O(N * logN) */
 /* Space Complexity: O(N)        */
-class Solution_sssstone {
+class Solution {
 public:
     int lastStoneWeight(vector<int>& stones)
     {
@@ -234,5 +234,64 @@ public:
         }
 
         return stones.empty() ? 0 : stones[0];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one uses Bucket sort since MAX_STONE_VALUE is only 1000.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  12.08% */
+
+/* Time  Complexity: O(N + MAX_STONE_VALUE) */
+/* Space Complexity: O(MAX_STONE_VALUE)     */
+class Solution_Bucket_Sort {
+public:
+    int lastStoneWeight(vector<int>& stones)
+    {
+        const int MAX_STONE_VALUE = 1000;
+
+        int bucket[MAX_STONE_VALUE + 1] = {0};
+        for (const int& stone : stones)
+            bucket[stone]++;
+
+        int first  = 1000; // 1st Heaviest that wasn't crushed yet
+        int second = 1000; // 2nd Heaviest that wasn't crushed yet
+        while (first > 0)
+        {
+            if (bucket[first] % 2 == 0)
+            {
+                bucket[first] = 0;
+                first--;
+                continue;
+            }
+
+            second = min(first - 1, second);
+            while (second > 0 && bucket[second] == 0)
+                second--;
+
+            if (second == 0)
+                break;
+
+            /* Remove two heaviest from the bucket */
+            bucket[first]--;
+            bucket[second]--;
+
+            /* Add a difference to the Bucket */
+            bucket[first - second]++;
+
+            first = max(first - second, second);
+        }
+
+        return first;
     }
 };
