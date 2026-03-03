@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -97,5 +95,49 @@ public:
 
         // If k is in the second half, find the bit in Sn-1 and invert it
         return findKthBit(n - 1, length - k + 1) == '0' ? '1' : '0';
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  63.07% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Bit_Manipulation {
+public:
+    char findKthBit(int n, int k)
+    {
+        // Find the position of the rightmost set bit in k
+        // This helps determine which "section" of the string we're in
+        int position_in_section = k & -k;
+
+        // Determine if k is in the inverted part of the string
+        // This checks if the bit to the left of the rightmost set bit is 1
+        bool is_inverted_part = ((k / position_in_section) >> 1 & 1) == 1;
+
+        // Determine if the original bit (before any inversion) would be 1
+        // This is true if k is even (i.e., its least significant bit is 0)
+        bool original_bit_is_one = (k & 1) == 0;
+
+        if (is_inverted_part)
+        {
+            // If we're in the inverted part, we need to flip the bit
+            return original_bit_is_one ? '0' : '1';
+        }
+
+        // If we're NOT in the inverted part, return the original bit
+        return original_bit_is_one ? '1' : '0';
     }
 };
