@@ -129,62 +129,65 @@ public:
     --- IDEA ---
     ------------
 
-    TODO
+    Quick-Select.
 
 */
 
-/* Quick select */
-class Solution_Quick_Select {
+/* Time  Beats:  6.92% */
+/* Space Beats: 90.96% */
+
+/* Time  Complexity: O(N^2), but O(N) AVERAGE time */
+/* Space Complexity: O(1)                          */ // Result doesn't count
+class Solution_2 {
 public:
     vector<vector<int>> kClosest(vector<vector<int>>& points, int k)
     {
         int N = points.size();
 
         int left  = 0;
-        int right = N - 1;
+        int right = N-1;
 
-        while (left <= right)
+        int pivot_idx = N; // Out-of-Bounds initially
+        while (pivot_idx != k)
         {
-            int mid = quick_select_algo(points, left, right);
+            pivot_idx = quick_select(points, left, right);
 
-            if (mid == k)
-                break;
-
-            if (mid < k)
-                left  = mid + 1;
+            if (pivot_idx < k)
+                left  = pivot_idx + 1;
             else
-                right = mid - 1;
+                right = pivot_idx - 1;
         }
 
         return vector<vector<int>>(points.begin(), points.begin() + k);
     }
 
 private:
-    int quick_select_algo(vector<vector<int>>& points, int left, int right)
+    int quick_select(vector<vector<int>>& points, int left, int right)
     {
-        vector<int> pivot_point = points[left];
+        int pivot_idx = right;
+        int pivot_distance = euclid_distance(points[pivot_idx]);
 
-        while (left < right)
+        int i = left - 1;
+        int j = left;
+        while (j < right)
         {
-            while (left < right && compare(points[right], pivot_point) >= 0)
-                right--;
+            int curr_distance = euclid_distance(points[j]);
 
-            points[left] = points[right];
+            if (curr_distance <= pivot_distance)
+                swap(points[++i], points[j]);
 
-            while (left < right && compare(points[left], pivot_point) <= 0)
-                left++;
-
-            points[right] = points[left];
+            // Increment
+            j++;
         }
+        swap(points[++i], points[pivot_idx]);
 
-        points[left] = pivot_point;
-
-        return left;
+        return i;
     }
 
-    int compare(vector<int>& first, vector<int>& second)
+    /* Euclid Distance from ORIGIN */
+    int euclid_distance(vector<int>& point)
     {
-        return  first[0] *  first[0] +  first[1] *  first[1] -
-               second[0] * second[0] - second[1] * second[1];
+        return point[0] * point[0] +
+               point[1] * point[1];
     }
 };
