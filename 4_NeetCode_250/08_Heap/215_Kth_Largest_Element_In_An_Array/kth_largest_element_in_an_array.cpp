@@ -114,3 +114,111 @@ public:
         return nums[k-1];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one gives TLE for Inputs such as:
+
+        [1, 2, 3, 4, 5, 1, 1, 1, 1, 1, ..., 1, 1, 1, -5, -4, -3, -2, -1]
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                    ^
+                                    |
+                                    |
+                                    |
+                                a LOT of 1s
+
+    However, for most Inputs, this one is faster than the above two Solutions.
+
+*/
+
+/* Time  Complexity: O(N^2), but O(N) AVERAGE */
+/* Space Complexity: O(1)                     */
+class Solution_Quick_Select_TLE {
+public:
+    int findKthLargest(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+
+        int left  = 0;
+        int right = N-1;
+
+        int pivot_idx = N;
+        while (pivot_idx != (N - k))
+        {
+            pivot_idx = quick_select(nums, left, right);
+
+            if (pivot_idx < (N - k))
+                left  = pivot_idx + 1;
+            else
+                right = pivot_idx - 1;
+        }
+
+        return nums[pivot_idx];
+    }
+
+private:
+    int quick_select(vector<int>& nums, int left, int right)
+    {
+        int pivot_idx = right;
+
+        int i = left - 1;
+        int j = left;
+        while (j < pivot_idx)
+        {
+            if (nums[j] <= nums[pivot_idx])
+                swap(nums[++i], nums[j]);
+
+            // Increment
+            j++;
+        }
+        swap(nums[++i], nums[pivot_idx]);
+
+        return i;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Quickselect works by partitioning around a pivot and recursing only into
+    the side that contains the desired order statistic. Unlike Quicksort, it
+    does NOT recurse into both sides.
+
+    That is precisely why its average time complexity is O(N), not O(N log N).
+
+    However, naive Quickselect can degrade to O(N^2) if bad pivots are
+    repeatedly chosen.
+
+    Modern standard libraries avoid that by using Introselect, an introspective
+    selection algorithm. It starts as Quickselect, but if recursion depth grows
+    too large, it switches to a guaranteed O(N log N) fallback such as
+    heapsort-based selection. This design mirrors Introsort for sorting.
+
+*/
+
+/* Time  Beats: 95.12% */
+/* Space Beats: 86.81% */
+
+/* Time  Complexity: O(N * logN), but O(N) AVERAGE */
+/* Space Complexity: O(N)                          */
+class Solution_Nth_Element___Builtin_Quick_Select {
+public:
+    int findKthLargest(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+
+        nth_element(nums.begin(), nums.end() - k, nums.end());
+        return nums[N - k];
+    }
+};
