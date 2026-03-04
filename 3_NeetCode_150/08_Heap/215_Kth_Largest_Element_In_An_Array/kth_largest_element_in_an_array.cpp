@@ -11,13 +11,14 @@
     Description:
     ============
 
-    Given an integer array "nums" and an integer "k", return the k-th largest
+    Given an integer array nums and an integer k, return the kth largest
     element in the array.
 
     Note that it is the kth largest element in the sorted order, not the kth
     distinct element.
 
-    You must solve it in O(n) time complexity.
+    Can you solve it without sorting?
+
 
     =============================================================
     FUNCTION: int findKthLargest(std::vector<int>& nums, int k);
@@ -41,6 +42,7 @@
 
 */
 
+#include <algorithm>
 #include <queue>
 #include <vector>
 using namespace std;
@@ -77,5 +79,38 @@ public:
         }
 
         return min_heap.top();
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is essentially the same as above, however we haven't explicitly
+    used "min_heap", instead we "partially sorted it" by using
+    "std::partial_sort" which uses the heap and heap_sort under the hood.
+
+    It's beneficial to know about it if you're using C++.
+
+*/
+
+/* Time  Beats: 18.90% */
+/* Space Beats: 97.12% */
+
+/* Time  Complexity: O(N * logK) */
+/* Space Complexity: O(1)        */
+class Solution_Partial_Sort {
+public:
+    int findKthLargest(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+
+        partial_sort(nums.begin(), nums.begin() + k, nums.end(), greater<int>());
+
+        return nums[k-1];
     }
 };
