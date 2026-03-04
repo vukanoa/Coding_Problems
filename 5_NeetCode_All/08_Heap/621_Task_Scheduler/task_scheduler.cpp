@@ -64,6 +64,7 @@
 
 */
 
+#include <algorithm>
 #include <vector>
 #include <queue>
 using namespace std;
@@ -138,5 +139,46 @@ public:
         }
 
         return curr_cycle;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  95.43% */
+
+/* Time  Complexity: O(SIZE) */
+/* Space Complexity: O(1)    */
+class Solution_Greedy {
+public:
+    int leastInterval(vector<char>& tasks, int n)
+    {
+        const int SIZE = tasks.size();
+
+        int frequency[26] = {0}; // On the STACK
+        for (const char& task_chr : tasks) // O(SIZE)
+            frequency[task_chr - 'A']++;
+
+        /* Sort in ASCENDING order */
+        sort(begin(frequency), end(frequency)); // O(26 * log 26) --> O(1)
+
+        int max_freq = frequency[25];
+        int idle_gaps = (max_freq - 1) * n;
+
+        // O(25) --> O(1)
+        for (int i = 24; i >= 0; i--)
+            idle_gaps -= min(max_freq - 1, frequency[i]);
+
+        return max(0, idle_gaps) + SIZE;
     }
 };
