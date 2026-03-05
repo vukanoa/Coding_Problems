@@ -186,3 +186,121 @@ private:
  * obj->follow(followerId,followeeId);
  * obj->unfollow(followerId,followeeId);
  */
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one does NOT push ALL of the tweets of all of the followees. Instead
+    it pushes, to max_heap, only one per followee and then each time the tweet
+    is pushed in "news_feed", it pushes its earlier tweet to max_heap if it has
+    one.
+
+    This way, we're, at worst, going to push 1 tweet per followee or at best
+    only <= 10 tweets just enough to populate our news_feed.
+
+*/
+
+/* Time  Beats: 93.94% */
+/* Space Beats: 64.28% */
+
+/* Time  Complexity: O((10 + F) * logF) */
+/* Space Complexity: O(F)               */
+class Twitter_Optimal {
+public:
+    Twitter_Optimal ()
+    {
+
+    }
+
+    void postTweet(int userId, int tweetId)
+    {
+        user_to_tweets[userId].push_back( {my_time++, tweetId} ); // O(1)
+    }
+    
+    vector<int> getNewsFeed(int userId)
+    {
+        vector<int> news_feed;
+
+        struct Node {
+            int time_posted;
+            int tweetId;
+            int userId;
+            int internal_tweet_idx;
+
+            Node (int time_posted, int tweetId, int userId, int internal_tweet_idx)
+                : time_posted(time_posted), tweetId(tweetId), userId(userId), internal_tweet_idx(internal_tweet_idx)
+            {
+
+            }
+        };
+
+        auto comparator = [](const Node* a, const Node* b) {
+            return a->time_posted < b->time_posted;
+        };
+
+        priority_queue<Node*, vector<Node*>, decltype(comparator)> max_heap(comparator);
+
+        if ( ! user_to_tweets[userId].empty())
+        {
+            auto [time_posted, tweetId] = user_to_tweets[userId].back();
+            int internal_tweet_idx = user_to_tweets[userId].size() - 1;
+
+            max_heap.push( new Node(time_posted, tweetId, userId, internal_tweet_idx) );
+        }
+
+        for (const auto& followee : user_to_folowees[userId])
+        {
+            if ( ! user_to_tweets[followee].empty())
+            {
+                auto [time_posted, tweetId] = user_to_tweets[followee].back();
+                int internal_tweet_idx = user_to_tweets[followee].size() - 1;
+
+                max_heap.push( new Node(time_posted, tweetId, followee, internal_tweet_idx) );
+            }
+        }
+
+        while ( ! max_heap.empty() && news_feed.size() < 10)
+        {
+            Node* node = max_heap.top();
+            max_heap.pop();
+
+            int prev_internal_tweet_idx = node->internal_tweet_idx - 1;
+            if (prev_internal_tweet_idx >= 0)
+            {
+                auto [time_posted, tweetId] = user_to_tweets[node->userId][prev_internal_tweet_idx];
+                max_heap.push( new Node(time_posted, tweetId, node->userId, prev_internal_tweet_idx) );
+            }
+
+            news_feed.push_back(node->tweetId);
+
+            delete node; // To prevent Memory Leak
+        }
+
+        while ( ! max_heap.empty())
+        {
+            delete max_heap.top();
+            max_heap.pop();
+        }
+
+        return news_feed;
+    }
+
+    void follow(int followerId, int followeeId)
+    {
+        user_to_folowees[followerId].insert(followeeId); // O(1)
+    }
+    
+    void unfollow(int followerId, int followeeId)
+    {
+        user_to_folowees[followerId].erase(followeeId); // O(1)
+    }
+
+private:
+    unordered_map<int, vector<pair<int,int>>> user_to_tweets;
+    unordered_map<int, unordered_set<int>> user_to_folowees;
+};
