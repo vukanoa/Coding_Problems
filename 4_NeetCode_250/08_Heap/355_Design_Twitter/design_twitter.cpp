@@ -304,3 +304,122 @@ private:
     unordered_map<int, vector<pair<int,int>>> user_to_tweets;
     unordered_map<int, unordered_set<int>> user_to_folowees;
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Important note:
+
+    This version only keeps the last 10 tweets per user, so getNewsFeed never
+    looks at more than 10 per followee.
+
+    That INDEED makes it fast for small F (number of followees).
+
+    However the truly optimal approach is the above "k-way merge" with a
+    max-heap.
+
+    That way, each user can have any number of tweets, and getNewsFeed looks
+    ONLY at the NEWEST tweets from each followee using a heap.
+
+
+
+    This is fast and memory-efficient only if the contraint it "last 10 tweets
+    per user". Otherwise, if a user posts hundreds or thousands of tweets, then
+    the heap-based "k-way merge" is strictly better.
+
+*/
+
+/* Time  Beats: 38.76% */
+/* Space Beats: 43.93% */
+
+/* Time  Complexity: O(F) */
+/* Space Complexity: O(F) */
+class Twitter_Most_Optimal {
+public:
+    Twitter_Most_Optimal ()
+    {
+
+    }
+
+    void postTweet(int userId, int tweetId)
+    {
+        if (user_to_tweets[userId].size() >= 10)
+            user_to_tweets[userId].pop_front(); // Keep only last 10 tweets
+
+        user_to_tweets[userId].push_back( {my_time++, tweetId} ); // O(1)
+    }
+
+    vector<int> getNewsFeed(int userId)
+    {
+        vector<int> news_feed;
+
+        user_to_folowees[userId].insert(userId); // Always follow self
+
+        // Keep iterators for reversed deques
+        unordered_map<int, deque<pair<int,int>>::reverse_iterator> iterators;
+        unordered_map<int, deque<pair<int,int>>::reverse_iterator> iterators_end;
+        unordered_map<int, pair<int,int>> current_tweets;
+
+        for (int followee : user_to_folowees[userId])
+        {
+            if ( ! user_to_tweets[followee].empty())
+            {
+                iterators[followee] = user_to_tweets[followee].rbegin();
+                iterators_end[followee] = user_to_tweets[followee].rend();
+                current_tweets[followee] = *iterators[followee];
+            }
+        }
+
+        while (news_feed.size() < 10)
+        {
+            int best_time = -1;
+            int best_followee = -1;
+
+            for (const auto& [followee, tweet_info] : current_tweets)
+            {
+                if (tweet_info.first > best_time)
+                {
+                    best_time = tweet_info.first;
+                    best_followee = followee;
+                }
+            }
+
+            if (best_followee == -1)
+                break;
+
+            news_feed.push_back(current_tweets[best_followee].second);
+
+            iterators[best_followee]++;
+
+            if (iterators[best_followee] != iterators_end[best_followee])
+                current_tweets[best_followee] = *iterators[best_followee];
+            else
+                current_tweets[best_followee] = {-1, -1}; // Exhausted
+        }
+
+        return news_feed;
+    }
+
+    void follow(int followerId, int followeeId)
+    {
+        user_to_folowees[followerId].insert(followeeId);
+        user_to_folowees[followerId].insert(followerId); // Follow self
+    }
+
+    void unfollow(int followerId, int followeeId)
+    {
+        if (followerId == followeeId)
+            return;
+
+        user_to_folowees[followerId].erase(followeeId);
+    }
+
+private:
+    unordered_map<int, deque<pair<int,int>>> user_to_tweets; // Stores ONLY LAST 10 tweets per user
+    unordered_map<int, unordered_set<int>> user_to_folowees;
+};
