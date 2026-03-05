@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ============
     === EASY ===
@@ -53,8 +51,8 @@
 
 */
 
+#include <string>
 using namespace std;
-
 
 /*
     ------------
@@ -94,37 +92,33 @@ using namespace std;
 
     So it's either 1 or 3 differences. But do you notice something?
 
-    We don't have to have two passes where we check how many differences are
-    there with the first desired string and how many with the other.
+    We don't need two passes where we check how many differences are there with
+    the first desired string and how many with the other.
 
-    We can only go through and and conclude that the second amount of
+    We can only go through once and and conclude that the second amount of
     differences will certainly be:
 
-        s.length() - previous_difference
+        N - previous_difference
 
     
     That means we'll only have a single pass and we'll return:
 
-        return min(previous_difference, s.length() - previous_difference);
-
-    (Note that in C++ s.length is "unsigned long", therefore
-     "previous_difference" also has to be of that type so that we can put both
-     in std::min)
-
+        return min(previous_difference, N - previous_difference);
 */
 
 /* Time  Beats: 100.00% */
 /* Space Beats:  26.20% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
     int minOperations(string s)
     {
+        const int N = s.size();
         unsigned long count = 0; // Operations if string s starts with 0
 
-        for (int i = 0; i < s.length(); i++)
+        for (int i = 0; i < N; i++)
         {
             if (i & 1) // Odd
                 count += (s[i] == '0') ? 1 : 0;
@@ -132,6 +126,51 @@ public:
                 count += (s[i] == '1') ? 1 : 0;
         }
 
-        return min(count, s.length() - count);
+        return min(count, N - count);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Essentially the same as above, however it's much more explicit and I
+    believe it's much more easier to read and grasp.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  95.63% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    int minOperations(string s)
+    {
+        const int N = s.size();
+
+        int start_0_count = 0;
+        int start_1_count = 0;
+
+        for (int i = 0; i < N; i++)
+        {
+            if (i % 2 == 0)
+            {
+                start_0_count += s[i] == '0' ? 0 : 1;
+                start_1_count += s[i] == '1' ? 0 : 1;
+            }
+            else
+            {
+                start_0_count += s[i] == '1' ? 0 : 1;
+                start_1_count += s[i] == '0' ? 0 : 1;
+            }
+        }
+
+        return min(start_0_count, start_1_count);
     }
 };
