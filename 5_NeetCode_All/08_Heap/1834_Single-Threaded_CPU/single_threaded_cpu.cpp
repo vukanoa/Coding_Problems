@@ -88,8 +88,17 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-/* Time  Beats: 35.83% */
-/* Space Beats: 47.24% */
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 55.49% */
+/* Space Beats: 89.96% */
 
 /* Time  Complexity: O(N * logN) */
 /* Space Complexity: O(N)        */
@@ -97,42 +106,48 @@ class Solution {
 public:
     vector<int> getOrder(vector<vector<int>>& tasks)
     {
-        // So that after the sort we have correct original indices available
-        for (int i = 0; i < tasks.size(); i++)
+        const int N = tasks.size();
+        vector<int> result;
+        result.reserve(N); // To prevent reallocations
+
+        vector<vector<int>> tasks_extra;
+        for (int i = 0; i < N; i++)
             tasks[i].push_back(i);
 
-        stable_sort(tasks.begin(), tasks.end(), [](const vector<int>& a,
-                                                   const vector<int>& b)
-                                                   {
-                                                       return a[0] < b[0];
-                                                   });
-        vector<int> results;
+        /* Sort */
+        sort(tasks.begin(), tasks.end());
 
-        priority_queue<pair<int, int>,
-                            vector<pair<int, int>>,
-                            greater<pair<int, int>>> available_tasks;
-
-
-        unsigned long long curr_time = tasks[0][0];
         int i = 0;
+        unsigned long long time = 0LL;
+        int processed_tasks = 0;
 
-        while (!available_tasks.empty() || i < tasks.size())
+        priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> available_tasks;
+
+        while (processed_tasks < N)
         {
-            while (i < tasks.size() && tasks[i][0] <= curr_time)
-                available_tasks.push( {tasks[i][1], tasks[i++][2]} );
-
-            if (available_tasks.empty())
-                curr_time = tasks[i][0];
-            else
+            while (i < N && tasks[i][0] <= time)
             {
-                pair<int, int> task = available_tasks.top();
+                available_tasks.push( {tasks[i][1], tasks[i][2]} );
+                i++;
+            }
+
+            if ( ! available_tasks.empty())
+            {
+                auto [process_time, orig_idx] = available_tasks.top();
                 available_tasks.pop();
 
-                curr_time += task.first;
-                results.push_back(task.second);
+                result.push_back(orig_idx);
+                processed_tasks++;
+
+                time += process_time;
+            }
+            else
+            {
+                // To skip "idle time"
+                time = tasks[i][0];
             }
         }
 
-        return results;
+        return result;
     }
 };
