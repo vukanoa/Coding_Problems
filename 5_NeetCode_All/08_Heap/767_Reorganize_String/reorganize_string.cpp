@@ -39,10 +39,86 @@
 
 */
 
+#include <algorithm>
+#include <numeric>
 #include <queue>
 #include <string>
 #include <unordered_map>
 using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  89.92% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */ // "result" is not EXTRA space
+class Solutionqr {
+public:
+    string reorganizeString(string s)
+    {
+        const int N = s.size();
+        string result;
+        result.reserve(N);
+
+        int freq[26] = {0}; // On the STACK
+        for (const char& chr : s) // O(N)
+            freq[chr - 'a']++;
+
+        int max_freq = *max_element(begin(freq), end(freq));  // O(N)
+        int sum      = accumulate(begin(freq), end(freq), 0); // O(N);
+
+        int sum_without_max_freq = sum - max_freq;
+
+        if (max_freq - sum_without_max_freq > 1)
+            return "";
+
+        // O(26 * log26) --> O(1)
+        priority_queue<pair<int,char>> max_heap; // {freq, char}
+        for (int i = 0; i < 26; i++) // O(26) --> O(1)
+        {
+            if (freq[i] > 0)
+                max_heap.push( {freq[i], i + 'a'} ); // O(log26) -> O(1)
+        }
+
+        // O(N) (entire block)
+        while ( ! max_heap.empty())
+        {
+            auto [frequency_one, chr_one] = max_heap.top();
+            max_heap.pop();
+
+            result += chr_one;
+            frequency_one--;
+
+            if ( ! max_heap.empty())
+            {
+                auto [frequency_two, chr_two] = max_heap.top();
+                max_heap.pop();
+
+                result += chr_two;
+                frequency_two--;
+
+                if (frequency_two > 0)
+                    max_heap.push ( {frequency_two, chr_two} );
+            }
+
+            if (frequency_one > 0)
+                max_heap.push ( {frequency_one, chr_one} );
+        }
+
+        return result;
+    }
+};
+
+
+
 
 /*
     ------------
