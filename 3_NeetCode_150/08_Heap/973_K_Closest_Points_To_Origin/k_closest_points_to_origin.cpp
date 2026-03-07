@@ -52,6 +52,7 @@
 
 */
 
+#include <cmath>
 #include <vector>
 #include <queue>
 using namespace std;
@@ -189,5 +190,55 @@ private:
     {
         return point[0] * point[0] +
                point[1] * point[1];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 65.65% */
+/* Space Beats: 61.46% */
+
+/* Time  Complexity: O(N * logK + K * logK) --> O((N + K) * logK)*/
+/* Space Complexity: O(K)                                        */
+class Solution_3 {
+public:
+    vector<vector<int>> kClosest(vector<vector<int>>& points, int k)
+    {
+        const int N = points.size();
+        vector<vector<int>> result;
+
+        priority_queue<pair<double,int>> max_heap;
+
+        // O(N * logK) (entire block)
+        for (int i = 0; i < N; i++) // O(N)
+        {
+            double distance = 1.0 * sqrt(1.0 * points[i][0] * points[i][0] + points[i][1] * points[i][1]);
+
+            max_heap.push( {distance, i} ); // O(logk)
+
+            if (max_heap.size() > k)
+                max_heap.pop(); // O(logK)
+        }
+
+        // O(K * logK) (entire block)
+        while ( ! max_heap.empty()) // O(K)
+        {
+            auto [distance, idx] = max_heap.top();
+            max_heap.pop(); // O(logK)
+
+            result.push_back(points[idx]);
+        }
+
+        return result;
     }
 };
