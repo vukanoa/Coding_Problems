@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-
 /*
     ==============
     === MEDIUM ===
@@ -54,71 +50,75 @@
 
 */
 
+#include <string>
+#include <queue>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    TODO
+    If you try to be greedy by appending more than a SINGLE letter per
+    iteration, then consider this example:
 
-    Good example to consider:
-    a = 0, b = 8, c = 11
+        a = 0, b = 8, c = 11
 
     This is NOT    the longest string: "ccbbccbbccbbccbbcc"
-
     This is INDEED the longest stirng: "ccbccbbccbbccbbccbc"
 
 */
 
-/* Time  Beats:   100% */
-/* Space Beats: 42.57% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  30.99% */
 
-/* Time  Complexity: O(1) */ // But in general it could be n
-/* Space Complexity: O(1) */ // We don't count result string as additional
-class Solution {
+/* Time  Complexity: O(N * log3) ---> O(N) */
+/* Space Complexity: O(3)        ---> O(1) */ // "result" is not EXTRA space
+class Solutionqr {
 public:
     string longestDiverseString(int a, int b, int c)
     {
-        std::priority_queue<std::pair<int, char>> max_heap;
+        string result;
+        result.reserve(a + b + c); // Prevent reallocations
+
+        priority_queue<pair<int,char>> max_heap;
 
         if (a > 0) max_heap.push( {a, 'a'} );
         if (b > 0) max_heap.push( {b, 'b'} );
         if (c > 0) max_heap.push( {c, 'c'} );
 
-        std::string str;
-        while (!max_heap.empty())
+        // O(N * log3) --> O(N)(entire block), where N is (a + b + c)
+        while ( ! max_heap.empty())
         {
-            std::pair<int, char> one = max_heap.top();
-            max_heap.pop();
+            auto [freq_one, chr_one] = max_heap.top();
+            max_heap.pop(); // O(log3) --> O(1)
 
-            if (
-                str.length() >= 2 &&
-                str[str.length() - 2] == str[str.length() - 1] &&
-                str[str.length() - 1] == one.second
-               )
+            if (result.size() >= 2 && result[result.size() - 2] == chr_one && result[result.size() - 1] == chr_one)
             {
                 if (max_heap.empty())
                     break;
 
-                std::pair<int, char> two = max_heap.top();
-                max_heap.pop();
+                auto [freq_two, chr_two] = max_heap.top();
+                max_heap.pop(); // O(log3) --> O(1)
 
-                str += two.second;
-                two.first--;
+                result += chr_two;
+                freq_two--;
 
-                if (two.first > 0)
-                    max_heap.push(two);
+                if (freq_two > 0)
+                    max_heap.push( {freq_two, chr_two} ); // O(logN) --> O(1)
+
+                max_heap.push( {freq_one, chr_one} ); // O(logN) --> O(1)
             }
             else
             {
-                str += one.second;
-                one.first--;
-            }
+                result += chr_one;
+                freq_one--;
 
-            if (one.first > 0)
-                max_heap.push(one);
+                if (freq_one > 0)
+                    max_heap.push( {freq_one, chr_one} ); // O(logN)
+            }
         }
 
-        return str;
+        return result;
     }
 };
