@@ -105,6 +105,40 @@ public:
     --- IDEA ---
     ------------
 
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  46.93% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    bool checkOnesSegment(string s)
+    {
+        const int N = s.size();
+        
+        int changes = 0;
+        for (int i = 1; i < N; i++)
+        {
+            if (s[i-1] != s[i])
+                changes++;
+        }
+
+        return changes <= 1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     A much more concise example. We really utilize the fact there are no
     LEADING 0s.
 
@@ -112,7 +146,7 @@ public:
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution_One_Liner{
+class Solution_One_Liner {
 public:
     bool checkOnesSegment(string s)
     {
