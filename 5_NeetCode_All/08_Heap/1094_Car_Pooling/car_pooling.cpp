@@ -431,115 +431,35 @@ public:
     add all the passegers for a given "from" station and we have to subtract
     all of the passengers from a given "to" station.
 
-
-    Example:
-        trips = [[9,0,3],[2,1,4],[3,3,7],[8,5,6]]
-
-    the "stops" or rather "stations" we are going to add and subtract values in
-    are:
-
-         |  |     |  |  |  |  |
-         v  v     v  v  v  v  v
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ..., 0]
-         0  1  2  3  4  5  6  7  8  9      1000
-
-    These pointed slots are the ONLY "stations" at which we have take to drop
-    off passengers.
-
-    Since all of the other slots(i.e. "stations") are 0, they will not
-    interfere with our calculations.
-
-    This is how our array will look after processing every "trip" one by one:
-
-    Before:
-
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ..., 0]
-         0  1  2  3  4  5  6  7  8  9      1000
-
-
-    1. [9, 0, 3]
-           |  |_____
-         __|       |
-         |         |
-         v         v
-        [9, 0, 0, -9, 0, 0, 0, 0, 0, 0, ..., 0]
-         0  1  2   3  4  5  6  7  8  9      1000
-
-
-
-    2. [2, 1, 4]
-           |  |_________
-           |_          |
-            |          |
-            v          v
-        [9, 2, 0, -9, -2, 0, 0, 0, 0, 0, ..., 0]
-         0  1  2   3   4  5  6  7  8  9      1000
-
-
-
-    3. [3, 3, 7]
-           |  |___________________
-           |________             |
-                   |             |
-                   v             v
-        [9, 2, 0, -6, -2, 0, 0, -3, 0, 0, ..., 0]
-         0  1  2   3   4  5  6   7  8  9      1000
-
-
-
-    4. [8, 5, 6]
-           |  |________________
-           |_______________   |
-                          |   |
-                          v   v
-        [9, 2, 0, -6, -2, 8, -8, -3, 0, 0, ..., 0]
-         0  1  2   3   4  5   6   7  8  9      1000
-
-
-                        Initial capacity: 11
-
-    capacity -= 9                         // capacity = 2
-    capacity -= 2                         // capacity = 0
-    capacity -= 0                         // capacity = 0
-    capacity -= -6 ==> capacity += 6      // capacity = 6
-    capacity -= -2 ==> capacity += 2      // capacity = 8
-    capacity -= 8                         // capacity = 0
-    capacity -= -8 ==> capacity += 8      // capacity = 8
-    capacity -= -3 ==> capacity += 3      // capacity = 11
-
-
-
-    Out capacity must NOT get below the zero at any point. If it happens to get
-    below zero, we immediately return false.
-
-    Otherwise we've been able to take and dropp off every passenger using our
-    car with given capacity.
-
-
-    As you can see, our capacity wasn't below zero at any point, therefore we
-    can return true.
+    It's essentially the same as above, but instead of pushing in a Map, we
+    insert it at the right positions since the space range is small(1000).
 
 */
 
-/* Time  Beats: 78.33% */
-/* Space Beats: 60.76% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  40.02% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(m) */
-class Solution_Multimap_Thousand_and_One_Stops {
+/* Time  Complexity: O(M + N) */
+/* Space Complexity: O(M + N) */
+class Solution_Line_Sweep {
 public:
     bool carPooling(vector<vector<int>>& trips, int capacity)
     {
-        int stops[1001] = {};
+        static constexpr int M = 1000;
+        int stops[M + 1] = {};
 
-        for (auto& trip : trips)
+        for (const auto& trip : trips) // O(N)
         {
-            stops[trip[1]] += trip[0]; // Take people in car at "From" station
-            stops[trip[2]] -= trip[0]; // take people in car at "To"   station
+            const int& num_passengers = trip[0];
+            const int& from           = trip[1];
+            const int& to             = trip[2];
+
+            stops[from] -= num_passengers; // Pick up  people at "from" station
+            stops[to]   += num_passengers; // Drop off people at "to"   station
         }
 
-        for (int i = 0; capacity >= 0 && i < 1001; i++)
-            capacity -= stops[i];
+        for (int i = 0; capacity >= 0 && i < 1001; i++) // O(M)
+            capacity += stops[i];
 
         return capacity >= 0;
     }
