@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-
 /*
     ==============
     === MEDIUM ===
@@ -53,6 +49,12 @@
 
 */
 
+#include <algorithm>
+#include <map>
+#include <vector>
+#include <queue>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -89,8 +91,8 @@
     That wouldn't make any sense.
 
     If a car goes strictly from the East to the West, then how is it possible
-    to first take those 2 waiting passengers at station 7, than those 4 at
-    "station" 3?
+    to first take those 2 waiting passengers at station 7, instead of those 4
+    at "station" 3?
 
     It's not. It's absurd.
 
@@ -117,6 +119,7 @@
     1. [9,0,7]
 
         The first trip we'll "hit" when going from West to East is:
+
             [9,0,7]
 
         Remember:
@@ -137,8 +140,8 @@
 
         As you can see, we'll push a pair of (to, Number_of_passengers) because
         we want a Minimum Heap to be "balancing" itself based on an "ending
-        station"(i.e. "to", i.e. index[2]), since we want to know the EARLIEST
-        "station" to the East at which we must drop off passengers.
+        station"(i.e. "to", i.e. index[2] of trips), since we want to know the
+        EARLIEST "station" to the East at which we must drop off passengers.
 
 
     2. [2,1,4]
@@ -151,19 +154,18 @@
         "ending stations" that we've put in our min_heap.
 
         Remember how we've put a pair {to, Number_of_passengers} in a Heap?
-        "Number_of_passengers are now, "Number_of_passengers_to_drop_off",
-        since we got them in our car at the moment.
+        Number_of_passengers are now, "Number_of_passengers_to_drop_off", since
+        we got them in our car at the moment.
 
         Therefore, before taking new passengers in this next trip, we first
         must check if before arriving at THIS TRIP's "starting station"(i.e.
         "from"), we were supposed to drop off some passengers.
 
-        Since in our Heap, we only have: [ {3,9} ], meaning - EARLIEST station
-        at which we must drop off passengers is station 3.
-
-        Currently, since we see that this trip's "starting station"(i.e.
-        "from") is equal 1, then that means we still don't have to drop off any
-        passengers in our car.
+        Since in our Heap we only have: [ {3,9} ], meaning - EARLIEST station
+        at which we must drop off passengers is station 3 and since we see that
+        this trip's "starting station"(i.e. "from") is equal 1, then that means
+        we still don't have to drop off any passengers that are currently in
+        our car.
 
         We can proceed to check if we can put all of the passengers at current
         trip's "station" to our car.
@@ -177,8 +179,8 @@
         If (capacity < Number_of_passengers)
             Then we MUST return "false"
 
-        However, the upper condition is NOT true, therefore, we can take all
-        passengers, i.e. all 2, i.e. both passengers.
+        However, since the above condition is NOT true in our case, we can take
+        all the passengers, i.e. all 2, i.e. both passengers.
 
         Then we update our capacity:
             capacity = capacity - Number_of_passengers ==> capacity = 2 - 2 = 0
@@ -313,52 +315,46 @@
 
 */
 
-/* Time  Beats: 99.48% */
-/* Space Beats: 60.01% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  99.37% */
 
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(n) */
-class Solution {
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solutionn {
 public:
     bool carPooling(vector<vector<int>>& trips, int capacity)
     {
-        // O(n * logn)
-        // Sort by index 1's value(second element out of 3) in ASCENDING order
-        std::sort(trips.begin(), trips.end(), [](const std::vector<int>& a,
-                                                 const std::vector<int>& b)
-                                                {
-                                                    return a[1] < b[1];
-                                                });
+        const int N = trips.size();
 
-        std::priority_queue<std::pair<int, int>,
-                            std::vector<std::pair<int, int>>,
-                            std::greater<std::pair<int, int>>> min_heap;
+        /* Sort in ASCENDING order by "from" position */
+        sort(trips.begin(), trips.end(),
+             [](const vector<int>& a, const vector<int>& b)
+             {
+                return a[1] < b[1];
+             });
 
-        // O(n * logk)
-        for (std::vector<int>& trip : trips)
+        // {to, num_passengers_to_drop_off}
+        priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> min_heap;
+
+        for (int i = 0; i < N; i++)
         {
-            int to_take_passengers = trip[0];
-            int from = trip[1];
-            int to = trip[2];
-
-            /*
-                min_heap.top().first <==> Earliest destination from some trip
-                                          that already started(its passengers
-                                          are currently in the car)
-            */
-            while (!min_heap.empty() && min_heap.top().first <= from)
+            while ( ! min_heap.empty() && min_heap.top().first <= trips[i][1])
             {
-                int to_drop_passengers = min_heap.top().second;
-                min_heap.pop(); // O(logk)
+                auto [to, num_passengers_to_drop_off] = min_heap.top();
+                min_heap.pop(); // O(logN)
 
-                capacity += to_drop_passengers;
+                capacity += num_passengers_to_drop_off;
             }
 
-            if (capacity < to_take_passengers)
+            const int& num_passengers_to_take_in = trips[i][0];
+            const int& from                      = trips[i][1];
+            const int& to                        = trips[i][2];
+
+            if (capacity < num_passengers_to_take_in)
                 return false;
 
-            capacity -= to_take_passengers;
-            min_heap.push( {to, to_take_passengers} ); // O(logk)
+            capacity -= num_passengers_to_take_in;
+            min_heap.push( {to, num_passengers_to_take_in} );
         }
 
         return true;
@@ -377,7 +373,7 @@ public:
     that one before this one, that's why I'm referring it from here).
 
     The point is that at a given "station" we can have multiple "takings" or
-    "drop offs"(or both, of course, but that is implicit in logical OR).
+    "drop offs"(or both, of course).
 
     Therefore, we need a HashMap where we can have "stations" as keys and all
     the different values associated with that key, hence a MultiMap.
@@ -447,6 +443,7 @@ public:
 
 
     Notice two importants things:
+
         1. Keys are sorted in ASCENDING order BY THE KEY, however, they are NOT
            by any means sorted by the values as well! Values appear next to
            keys in order in which they were inserted to the MultiMap!
@@ -475,19 +472,24 @@ public:
 /* Time  Beats: 55.99% */
 /* Space Beats: 20.10% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(m) */
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
 class Solution_Multimap {
 public:
-    bool carPooling(std::vector<std::vector<int>>& trips, int capacity)
+    bool carPooling(vector<vector<int>>& trips, int capacity)
     {
-        std::multimap<int, int> multi_map;
+        const int N = trips.size();
+        multimap<int, int> multi_map;
 
-        for(int i = 0; i < trips.size(); i++)
+        // O(N * logN) (entire block)
+        for (int i = 0; i < N; i++)
         {
             int num_passengers = trips[i][0];
-            multi_map.insert( {trips[i][1], -num_passengers} ); // From
-            multi_map.insert( {trips[i][2],  num_passengers} ); // To
+            int from           = trips[i][1];
+            int to             = trips[i][2];
+
+            multi_map.insert( {from, -num_passengers} ); // From
+            multi_map.insert( {to,    num_passengers} ); // To
         }
 
         for (auto iter = multi_map.begin(); iter != multi_map.end(); iter++)
@@ -499,7 +501,7 @@ public:
 
             // The main part comes here because for a particular interval we
             // have to check until the next value is not same
-            if(capacity < 0 && iter->first != iter_next->first)
+            if (capacity < 0 && iter->first != iter_next->first)
                 return false;
         }
 
@@ -619,7 +621,7 @@ public:
 /* Space Complexity: O(m) */
 class Solution_Multimap_Thousand_and_One_Stops {
 public:
-    bool carPooling(std::vector<std::vector<int>>& trips, int capacity)
+    bool carPooling(vector<vector<int>>& trips, int capacity)
     {
         int stops[1001] = {};
 
