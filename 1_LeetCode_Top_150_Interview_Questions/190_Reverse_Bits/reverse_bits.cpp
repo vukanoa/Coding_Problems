@@ -58,25 +58,27 @@
 
 */
 
-/* Time  Beats: 100% */
-/* Space Beats: 71.9% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  46.45% */
 
 /* Time  Complexity: O(1) */
 /* Space Complexity: O(1) */
-class Solution_Efficient {
+class Solution {
 public:
     int reverseBits(int n)
     {
-        int rev = 0;
+        int result = 0x00000000; // "int" is 32-bit on 64bit architecture
 
         for (int i = 0; i < 32; i++)
         {
-            rev <<= 1;
-            rev += n % 2;
+            int last_bit = n & 1;
+
+            result <<= 1;
+            result |= last_bit;
 
             n >>= 1;
         }
 
-        return rev;
+        return result;
     }
 };
