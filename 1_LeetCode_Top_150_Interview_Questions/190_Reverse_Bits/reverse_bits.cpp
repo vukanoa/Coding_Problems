@@ -1,8 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <cmath>
-
 /*
     ============
     === EASY ===
@@ -53,61 +48,6 @@
 
 */
 
-
-/* Time  Beats: 55.10% */
-/* Space Beats:  5.73% */
-
-/*
-    Time  Complexity: O(1)
-    Since it's always 32 bits. We always have to go through the 32 bits no
-    matter how big is the input, since we are told it is within the bounds of
-    an unsigned integer.
-*/
-/* Space Complexity: O(n) */
-class Solution {
-public:
-    uint32_t reverseBits(uint32_t n)
-    {
-        uint32_t sum = 0;
-        int degree = 31;
-
-        std::vector<int> bits;
-
-        while (degree >= 0)
-        {
-            if (sum + std::pow(2, degree) <= n)
-            {
-                sum += std::pow(2, degree);
-                bits.push_back(1);
-            }
-            else
-                bits.push_back(0);
-
-            degree--;
-        }
-
-
-        std::reverse(bits.begin(), bits.end());
-
-
-        degree = 31;
-        uint32_t value = 0;
-
-        for (int i = 0; i < 32; i++)
-        {
-            if (bits[i] == 1)
-                value += bits[i] * std::pow(2, degree);
-
-            degree--;
-        }
-
-        return value;
-    }
-};
-
-
-
-
 /*
     ------------
     --- IDEA ---
@@ -125,9 +65,9 @@ public:
 /* Space Complexity: O(1) */
 class Solution_Efficient {
 public:
-    uint32_t reverseBits(uint32_t n)
+    int reverseBits(int n)
     {
-        uint32_t rev = 0;
+        int rev = 0;
 
         for (int i = 0; i < 32; i++)
         {
