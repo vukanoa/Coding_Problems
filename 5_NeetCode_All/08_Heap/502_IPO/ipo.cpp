@@ -75,72 +75,102 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    1. Sort Projects by Capital:
-       Begin by sorting the projects based on the capital required to ensure
-       you look at the cheapest projects first.
+    We can ONLY profit from the projects we can afford to start, i.e. we have
+    (w + obtained_capital_so_far) >= capita[i];
 
-    2. Use Max-Heap for Profits:
-       Employ a max-heap (inverted to a min-heap using negative values) to
-       always have quick access to the project with the highest available
-       profit.
+    But, since we can finish at most k projects, we always want to finish
+    projects that will give us the biggest ROI(Return of Investement).
 
-    3. Process Projects Within Capital:
-       As long as there are projects you can afford, add their profits
-       (negatively) to the heap.
+    However, it is VERY important to note this: We don't actually "invest"
+    anything. Meaning, once we start some project with capital X, we don't lose
+    X profit.
 
-    4. Select Top Profit Projects:
-       For up to k iterations, choose the most profitable project you can
-       afford by popping from the heap, increasing your capital.
+    This is unintuitive, but that's how it's specified in the Description.
 
-    5. Resulting Capital:
-       After potentially choosing k projects, the resulting capital is the
-       maximum capital achieved.
+    But the point still remains--We should ALWAYS take the biggest profits from
+    the projects we can afford to start.
+
+        (i.e. our (w + obtained_capital_so_far) > capital[i])
+
+
+    Therefore, first, we push all of the projects we can afford to work on and
+    we push it to a MAX_HEAP. However, we're only interested in profits,
+    therefore we'll have only priority_queue<int> and not of pair<int,int>.
+
+    Then, after we're done obtaining the highest profit from the projects we
+    can afford to start, we decrement our 'k' and since we know have a new:
+    "final_capital" values, which is incremeneted by the highest profit of a
+    project we can afford, we know need to push all of the additional projects
+    we can afford to work on.
+
+    It's important to note that the while loop below will execute N times
+    IN TOTAL, per problem. We'll process each profit AT MOST once.
+
+        // This block will execute N times IN TOTAL and NOT N times per k
+        while (i < N && final_capital >= capitals_profits[i].first)
+        {
+            max_heap.push(capitals_profits[i].second);
+
+            // Increment
+            i++;
+        }
+
+    At the end we simply return "final_capital".
 
 */
 
-/* Time  Beats: 76.67% */
-/* Space Beats: 42.83% */
+/* Time  Beats: 61.52% */
+/* Space Beats: 71.14% */
 
-/* Time  Complexity: O(n * logn + k * logn) */
-/* Space Complexity: O(n)                   */
+/* Time  Complexity: O(N * logN + K * logN) */
+/* Space Complexity: O(N)                   */
 class Solution {
 public:
     int findMaximizedCapital(int k, int w, vector<int>& profits, vector<int>& capital)
     {
-        const int n = profits.size();
+        const int N = profits.size();
+        int final_capital = w;
 
-        vector<pair<int, int>> projects;
+        priority_queue<int> max_heap;
 
-        // Creating vector of pairs (capital, profits)
-        for (int i = 0; i < n; ++i)
-            projects.emplace_back(capital[i], profits[i]);
+        vector<pair<int,int>> capitals_profits;
+        for (int i = 0; i < N; i++)
+            capitals_profits.push_back( {capital[i], profits[i]} );
 
-        // Sorting projects by capital required
-        sort(projects.begin(), projects.end());
+        /* Sort */
+        sort(capitals_profits.begin(), capitals_profits.end());
 
-        // Max-heap to store profits, using greater to create a max-heap
-        priority_queue<int> maxHeap;
         int i = 0;
-
-        // Main loop to select up to k projects
-        for (int j = 0; j < k; ++j)
+        // This block will execute N times IN TOTAL, per problem
+        while (i < N && final_capital >= capitals_profits[i].first)
         {
-            // Add all profitable projects that we can afford
-            while (i < n && projects[i].first <= w)
+            max_heap.push(capitals_profits[i].second);
+
+            // Increment
+            i++;
+        }
+
+        // O(K * logN) (entire block)
+        while (k > 0 && ! max_heap.empty()) // O(K)
+        {
+            int curr_profit = max_heap.top();
+            max_heap.pop(); // O(logN)
+
+            final_capital += curr_profit;
+
+            // This block will execute N times IN TOTAL and NOT N times per k
+            while (i < N && final_capital >= capitals_profits[i].first)
             {
-                maxHeap.push(projects[i].second);
+                max_heap.push(capitals_profits[i].second);
+
+                // Increment
                 i++;
             }
 
-            // If no projects can be funded, break out of the loop
-            if (maxHeap.empty())
-                break;
-
-            // Otherwise, take the project with the maximum profit
-            w += maxHeap.top();
-            maxHeap.pop();
+            // Decrement
+            k--;
         }
 
-        return w;
+        return final_capital;
     }
 };
