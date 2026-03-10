@@ -296,6 +296,51 @@ private:
     --- IDEA ---
     ------------
 
+    This is a standard "trick" to generate all of the subsets WITHOUT using
+    Backtracking.
+
+    However, this produces unnecessarily high Space Complexity, but it's
+    beneficial to be aware of this "trick" for other Backtracking problems
+    where "subsets" are required.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  13.14% */
+
+/* Time  Complexity: O(N * 2^N) */
+/* Space Complexity: O(2^N)     */
+class Solution_Non_Backtracking_Subset_Trick {
+public:
+    int subsetXORSum(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        vector<int> subset_xor_values;
+        subset_xor_values.reserve(1 << N); // To prevent reallocations
+
+        for (int i = 0; i < N; i++)
+        {
+            vector<int> additional_xor_values = {nums[i]};
+
+            for (const int& value : subset_xor_values)
+                additional_xor_values.push_back(value ^ nums[i]);
+
+            subset_xor_values.insert(subset_xor_values.end(), additional_xor_values.begin(), additional_xor_values.end());
+        }
+
+        return accumulate(subset_xor_values.begin(), subset_xor_values.end(), 0);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     However, we DON'T have to generate all the subsets first. There is a trick.
 
     The code calculates the sum of XOR totals for all subsets by accumulating
