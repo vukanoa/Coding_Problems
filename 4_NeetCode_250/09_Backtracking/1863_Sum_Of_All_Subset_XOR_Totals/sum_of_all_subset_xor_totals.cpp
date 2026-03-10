@@ -341,6 +341,47 @@ public:
     --- IDEA ---
     ------------
 
+    TODO
+
+*/
+
+/* Time  Beats: 32.94% */
+/* Space Beats: 34.80% */
+
+/* Time  Complexity: O(2^N * N) */
+/* Space Complexity: O(1)       */
+class Solution_Bit_Manipulation {
+public:
+    int subsetXORSum(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        for (int mask = 0; mask < (1 << N); mask++)
+        {
+            int xor_value = 0;
+
+            for (int i = 0; i < N; i++)
+            {
+                if ((mask & (1 << i)) != 0)
+                    xor_value ^= nums[i];
+            }
+
+            result += xor_value;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     However, we DON'T have to generate all the subsets first. There is a trick.
 
     The code calculates the sum of XOR totals for all subsets by accumulating
