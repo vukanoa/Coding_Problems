@@ -194,6 +194,108 @@ private:
     --- IDEA ---
     ------------
 
+    This is a classic, standard, Backtracking Solution. This was probably the
+    point and the "desired" solution for this EASY problem.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  88.00% */
+
+/* Time  Complexity: O(2^N) */
+/* Space Complexity: O(N)   */
+class Solution_Classic_Backtracking {
+public:
+    int subsetXORSum(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        backtracking(0, 0, result, nums);
+
+        return result;
+    }
+
+private:
+    // O(2^N) (entire function)
+    void backtracking(int start, int xor_value, int& result, vector<int>& nums)
+    {
+        result += xor_value;
+
+        const int N = nums.size();
+        if (start == N)
+            return;
+
+        // O(2^N) (entire block)
+        for (int i = start; i < N; i++)
+        {
+            xor_value ^= nums[i];
+            backtracking(i + 1, xor_value, result, nums);
+            xor_value ^= nums[i];
+        }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Skeleton of a Memoization approach.
+
+    Even tough this is effectively producing the same result as the above
+    "Classic Bactracking" Solution, it is conceptually different.
+
+    This approach here is the standard "Memoization" approach, however since
+    N is very small in this problem and since we're told we actually need to
+    compute all of the states, we can't really "Memoize", however this is
+    really the classic "skeleton" of the "Memoization" technique.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  42.82% */
+
+/* Time  Complexity: O(2^N) */ // Since N <= 12, this is acceptable
+/* Space Complexity: O(N)   */
+class Solution_Skeleton_of_Memoization {
+public:
+    int subsetXORSum(vector<int>& nums)
+    {
+        int result = 0;
+
+        solve(0, 0, result, nums);
+
+        return result;
+    }
+
+private:
+    // O(2^N) (entire function)
+    void solve(int idx, int curr_xor, int& result, vector<int>& nums)
+    {
+        const int N = nums.size();
+        if (idx == N)
+        {
+            result += curr_xor;
+            return;
+        }
+
+        solve(idx+1, curr_xor ^ nums[idx], result, nums); // Take
+        solve(idx+1, curr_xor            , result, nums); // Skip
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     However, we DON'T have to generate all the subsets first. There is a trick.
 
     The code calculates the sum of XOR totals for all subsets by accumulating
@@ -255,46 +357,5 @@ public:
             total |= num;
 
         return total << (nums.size() - 1);
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Skeleton of a Memoization approach.
-
-*/
-
-/* Time  Beats: 100.00% */
-/* Space Beats:  42.82% */
-
-/* Time  Complexity: O(2^N) */ // Since N <= 12, this is acceptable
-/* Space Complexity: O(N)   */
-class Solution_Skeleton_of_Memoization {
-public:
-    int subsetXORSum(vector<int>& nums)
-    {
-        int result = 0;
-        solve(nums, 0, 0, result);
-
-        return result;
-    }
-
-private:
-    void solve(vector<int>& nums, int pos, int curr_xor, int& result)
-    {
-        if ((unsigned)pos == nums.size())
-        {
-            result += curr_xor;
-            return;
-        }
-
-        solve(nums, pos+1, curr_xor ^ nums[pos], result); // Take
-        solve(nums, pos+1, curr_xor            , result); // Skip
     }
 };
