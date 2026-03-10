@@ -68,8 +68,18 @@
 
 */
 
+#include <numeric>
 #include <vector>
 using namespace std;
+
+
+/*
+   I highly recommend you read ALL of the Solutions in this file, IN ORDER!
+
+   I've purposefully included many Brute-Forces so that you can see all the
+   little optimizations we can do in "Backtracking" problems.
+
+*/
 
 /*
     ------------
@@ -87,18 +97,18 @@ using namespace std;
 /* Time  Beats: 17.12% */
 /* Space Beats: 14.59% */
 
-/* Time  Complexity: O(2^n * n) */
-/* Space Complexity: O(2^n * n) */
+/* Time  Complexity: O(2^N * N) */
+/* Space Complexity: O(2^N * N) */
 class Solution_Brute_Force {
 public:
-    int subsetXORSum(std::vector<int>& nums)
+    int subsetXORSum(vector<int>& nums)
     {
-        std::vector<std::vector<int>> subsets;
+        vector<vector<int>> subsets;
         backtracking(nums, 0, {}, subsets); // Generate all Subsets
 
         /* XOR each subset and sum all of them */
         int total = 0;
-        for (const std::vector<int>& subset : subsets)
+        for (const vector<int>& subset : subsets)
         {
             int xors = 0;
             for (const int& num : subset)
@@ -111,20 +121,67 @@ public:
     }
 
 private:
-    void backtracking(
-                      std::vector<int>& nums,
-                      int start_from,
-                      std::vector<int> current,
-                      std::vector<std::vector<int>>& subsets
-                     )
+    void backtracking(vector<int>& nums, int start, vector<int> curr_subset, vector<vector<int>>& subsets)
     {
-        subsets.push_back(current);
+        subsets.push_back(curr_subset);
 
-        for (int i = start_from; i < nums.size(); i++)
+        const int N = nums.size();
+        for (int i = start; i < N; i++)
         {
-            current.push_back(nums[i]);
-            backtracking(nums, i + 1, current, subsets);
-            current.pop_back();
+            curr_subset.push_back(nums[i]);
+            backtracking(nums, i + 1, curr_subset, subsets);
+            curr_subset.pop_back();
+        }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is SLIGHTLY better than the above Brute Force. It's only better in
+    terms of Space.
+
+*/
+
+/* Time  Beats: 10.30% */
+/* Space Beats: 12.55% */
+
+/* Time  Complexity: O(2^N * N) */
+/* Space Complexity: O(N)       */
+class Solution_Better_Brute_Force {
+public:
+    int subsetXORSum(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        backtracking(0, {}, result, nums);
+
+        return result;
+    }
+
+private:
+    // O(2^N * N) (entire function)
+    void backtracking(int start, vector<int> subset, int& result, vector<int>& nums)
+    {
+        // O(N)
+        result += accumulate(subset.begin(), subset.end(), 0, bit_xor<int>());
+
+        const int N = nums.size();
+        if (start == N)
+            return;   
+
+        // O(2^N) (entire block)
+        for (int i = start; i < N; i++)
+        {
+            subset.push_back(nums[i]);
+            backtracking(i + 1, subset, result, nums);
+            subset.pop_back();
         }
     }
 };
@@ -216,8 +273,8 @@ public:
 /* Time  Beats: 100.00% */
 /* Space Beats:  42.82% */
 
-/* Time  Complexity: O(2^n) */ // Since n <= 12, this is acceptable
-/* Space Complexity: O(n)   */
+/* Time  Complexity: O(2^N) */ // Since N <= 12, this is acceptable
+/* Space Complexity: O(N)   */
 class Solution_Skeleton_of_Memoization {
 public:
     int subsetXORSum(vector<int>& nums)
