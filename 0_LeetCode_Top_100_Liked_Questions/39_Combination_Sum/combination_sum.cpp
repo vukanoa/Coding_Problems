@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
 /*
     ==============
     === MEDIUM ===
@@ -55,6 +51,9 @@
 
 */
 
+#include <vector>
+#include <algorithm>
+using namespace std;
 
 /*
     ------------
@@ -118,24 +117,24 @@
 */
 class Solution_Combination_Sum {
 public:
-    std::vector<std::vector<int>> combinationSum(std::vector<int>& candidates, int target)
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target)
     {
         // Sorting won't make the Time Complexity worse, so make sure to sort
-        std::sort(candidates.begin(), candidates.end());
+        sort(candidates.begin(), candidates.end());
 
-        std::vector<std::vector<int>> results;
+        vector<vector<int>> results;
         backtracking(candidates, target, 0, {}, 0, results);
 
         return results;
     }
 
 private:
-    void backtracking(std::vector<int>& candidates,
+    void backtracking(vector<int>& candidates,
                       int target,
                       int start,
-                      std::vector<int> curr_comb,
+                      vector<int> curr_comb,
                       int curr_sum,
-                      std::vector<std::vector<int>>& results)
+                      vector<vector<int>>& results)
     {
         /* Backtrack */
         if (curr_sum == target)
@@ -157,174 +156,3 @@ private:
         }
     }
 };
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    This Solution is almost equivalent to the one above, the only difference is
-    that here, instead of passing another argument in "backtracking" function
-    we can just decrement the "target" instead.
-
-    Target is passed by value, so it won't mess up anything.
-
-    Since we now decrement "target" and since we don't have "curr_sum" variable
-    anymore, we have to change to snippets in the code(two if statements):
-
-
-    1.
-        ***********                                 ***********
-        *** Old ***                                 *** New ***
-        ***********                                 ***********
-
-        if (curr_sum == target)                     if (target == 0)
-
-
-    2.
-        ***********                                 ***********
-        *** Old ***                                 *** New ***
-        ***********                                 ***********
-
-        if (curr_sum + candidates[i] > target)      if (target - candidates[i] < 0)
-
-*/
-
-/* Time  Beats: 35.08% */
-/* Space Beats: 42.44% */
-
-/* Time  Complexity: O(2^n) */
-/* Space Complexity: O(2^n) */
-class Solution_Target_Decrement {
-public:
-    std::vector<std::vector<int>> combinationSum(std::vector<int>& candidates, int target)
-    {
-        // Sorting won't make the Time Complexity worse, so make sure to sort
-        std::sort(candidates.begin(), candidates.end());
-
-        std::vector<std::vector<int>> results;
-        backtracking(candidates, target, 0, {}, results);
-
-        return results;
-    }
-
-private:
-    void backtracking(std::vector<int>& candidates,
-                      int target,
-                      int start,
-                      std::vector<int> curr_comb,
-                      std::vector<std::vector<int>>& results)
-    {
-        /* Backtrack */
-        if (target == 0) // Since we are subtracting from target every time
-        {
-            results.push_back(curr_comb);
-            return;
-        }
-
-        for (int i = start; i < candidates.size(); i++)
-        {
-            /* Backtrack */
-            if (target - candidates[i] < 0)
-                return;
-
-            curr_comb.push_back(candidates[i]);
-            backtracking(candidates, target - candidates[i], i, curr_comb, results);
-            curr_comb.pop_back();
-        }
-    }
-};
-
-
-int
-main()
-{
-    Solution_Combination_Sum   sol_comb_sum;
-    Solution_Target_Decrement  sol_targ_dec;
-
-    /* Example 1 */
-    std::vector<int> candidates = {2, 3, 6, 7};
-    int target = 7;
-
-    /* Example 2 */
-    // std::vector<int> candidates = {2, 3, 5};
-    // int target = 8;
-
-    /* Example 3 */
-    // std::vector<int> candidates = {2};
-    // int target = 1;
-
-    /* Example 4 */
-    // std::vector<int> candidates = {2, 5, 6, 7, 9, 11};
-    // int target = 14;
-
-    /* Example 5 */
-    // std::vector<int> candidates = {1, 2, 3, 4, 7, 9};
-    // int target = 5;
-
-    /* Example 6 */
-    // std::vector<int> candidates = {4, 5, 8, 9, 12};
-    // int target = 22;
-
-    /* Example 7 */
-    // std::vector<int> candidates = {5, 6, 8};
-    // int target = 32;
-
-    /* Example 8 */
-    // std::vector<int> candidates = {1, 5, 8};
-    // int target = 6;
-
-    std::cout << "\n\t=======================";
-    std::cout << "\n\t=== COMBINATION SUM ===";
-    std::cout << "\n\t=======================\n";
-
-
-    /* Write Input */
-    bool first = true;
-    std::cout << "\n\tCandidates: [";
-    for (auto x: candidates)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        std::cout << x;
-        first = false;
-    }
-    std::cout << "]\n";
-    std::cout << "\tTarget: " << target << "\n\n";
-
-
-    /* Solution */
-    // std::vector<std::vector<int>> results = sol_comb_sum.combinationSum(candidates, target);
-    std::vector<std::vector<int>> results = sol_targ_dec.combinationSum(candidates, target);
-
-
-    /* Write Output */
-    first = true;
-    std::cout << "\n\tResults: [";
-    for (auto x: results)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        bool first_first = true;
-        std::cout << "[";
-        for (const auto& xx : x)
-        {
-            if (!first_first)
-                std::cout << ", ";
-
-            std::cout << xx;
-            first_first = false;
-        }
-        std::cout << "]";
-
-        first = false;
-    }
-    std::cout << "]\n\n";
-
-    return 0;
-}
