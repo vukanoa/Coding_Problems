@@ -116,7 +116,7 @@ public:
                 vector<int> new_subset = subsets[j];
                 new_subset.push_back(nums[i]);
 
-                subsets.push_back(new_subset);
+                subsets.push_back(new_subset); // O(N)
             }
         }
 
@@ -181,7 +181,7 @@ class Solution_Backtracking {
 private:
     void backtracking(int start_from, vector<int>& nums, vector<int> curr_subset, vector<vector<int>>& results)
     {
-        results.push_back(curr_subset);
+        results.push_back(curr_subset); // O(N)
 
         const int N = nums.size();
         for (int i = start_from; i < nums.size(); i++)
@@ -243,7 +243,7 @@ private:
 
         if (idx == N)
         {
-            result.push_back(curr_subset);
+            result.push_back(curr_subset); // O(N)
             return;
         }
 
@@ -254,5 +254,52 @@ private:
 
         /* Skip */
         dfs(idx+1, curr_subset, nums, result);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a "Bit Manipulation" trick to generate all of the subsets.
+
+    Since we know that there are exactly 2^N subsets, we can treat each of
+    the number from [0, 2^N - 1] as a binary representation of subset_mask.
+
+    Then we simply go through the "nums" and if the idx bit is present(0-based,
+    from the right), we include current nums[idx] in the current subset.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  82.37% */
+
+/* Time  Complexity: O(N * 2^N) */
+/* Space Complexity: O(N * 2^N) */ // However extra is only: O(N)
+class Solution_Bit_Manipulation {
+public:
+    vector<vector<int>> subsets(vector<int>& nums)
+    {
+        const int N = nums.size();
+        vector<vector<int>> result;
+
+        for (int subset_mask = 0; subset_mask < (1 << N); subset_mask++)
+        {
+            vector<int> subset;
+
+            for (int idx = 0; idx < N; idx++)
+            {
+                if (subset_mask & (1 << idx))
+                    subset.push_back(nums[idx]);
+            }
+
+            result.push_back(subset);
+        }
+
+        return result;
     }
 };
