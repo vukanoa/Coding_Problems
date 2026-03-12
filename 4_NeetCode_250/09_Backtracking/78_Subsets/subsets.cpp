@@ -95,6 +95,11 @@ using namespace std;
     can result in a maximum depth of N in the call stack. Therefore, the space
     complexity is O(N * 2^N) due to the subsets generated and O(n) due to the
     recursion call stack, for a total of O(N * 2^N + N).
+
+    However, it's important that the total EXTRA Space is only O(N).
+    Why?
+
+    Because usually we do not count "result" Space as EXTRA Space.
 */
 class Solution_Iterative_trick {
 public:
@@ -166,6 +171,11 @@ public:
     can result in a maximum depth of N in the call stack. Therefore, the space
     complexity is O(N * 2^N) due to the subsets generated and O(n) due to the
     recursion call stack, for a total of O(N * 2^N + N).
+
+    However, it's important that the total EXTRA Space is only O(N).
+    Why?
+
+    Because usually we do not count "result" Space as EXTRA Space.
 */
 class Solution_Backtracking {
 private:
@@ -190,5 +200,59 @@ public:
         backtracking(0, nums, {}, results);
 
         return results;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Effectively produces the same result as the above "Solution_Backtracking",
+    however this is much more common way of implementing it.
+
+    Also this is a "skeleton" of a usual "Memoization" approach.
+    Classic "Take-Skip" approach.
+
+*/
+
+/* Time  Beats: 29.78% */
+/* Space Beats:  6.59% */
+
+/* Time  Complexity: O(N * 2^N) */
+/* Space Complexity: O(N * 2^N) */ // However extra is only: O(N)
+class Solution_Take_Skip_Backtracking {
+public:
+    vector<vector<int>> subsets(vector<int>& nums)
+    {
+        const int N = nums.size();
+        vector<vector<int>> result;
+
+        dfs(0, {}, nums, result);
+
+        return result;
+    }
+
+private:
+    void dfs(int idx, vector<int> curr_subset, vector<int>& nums, vector<vector<int>>& result)
+    {
+        const int N = nums.size();
+
+        if (idx == N)
+        {
+            result.push_back(curr_subset);
+            return;
+        }
+
+        /* Take */
+        curr_subset.push_back(nums[idx]);
+        dfs(idx+1, curr_subset, nums, result);
+        curr_subset.pop_back();
+
+        /* Skip */
+        dfs(idx+1, curr_subset, nums, result);
     }
 };
