@@ -167,7 +167,7 @@ private:
 
 /* Time  Complexity: O(N * 2^N) */
 /* Space Complexity: O(N)       */
-class Solution {
+class Solution_Skip_Duplicates {
 public:
     vector<vector<int>> combinationSum2(vector<int>& candidates, int target)
     {
@@ -209,6 +209,70 @@ private:
             // Don't use duplicates
             while (i < N && candidates[i-1] == candidates[i])
                 i++;
+        }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is essentially the same as above, however this is a much more
+    clean way than the above one. It uses a standard for-loop approach and it
+    uses an if-continue combination instead of using a while-loop to skip the
+    duplicates.
+
+    The difference is subtle, but it's very important to get these tiny details
+    correct as it can grow large as problems start to complicate.
+
+*/
+
+/* Time  Beats: 22.92% */
+/* Space Beats: 14.49% */
+
+/* Time  Complexity: O(N * 2^N) */
+/* Space Complexity: O(N)       */
+class Solution_Skip_Duplicates_2 {
+public:
+    vector<vector<int>> combinationSum2(vector<int>& candidates, int target)
+    {
+        const int N = candidates.size();
+        vector<vector<int>> result;
+
+        /* Sort */
+        sort(candidates.begin(), candidates.end()); // O(N * logN)
+
+        /* Backtracking */
+        backtracking(0, {}, 0, candidates, target, result); // O(N * 2^N)
+
+        return result;
+    }
+
+private:
+    void backtracking(int start_from, vector<int> curr_combination, int sum, vector<int>& candidates, int& target, vector<vector<int>>& result)
+    {
+        if (sum == target)
+        {
+            result.push_back(curr_combination); // O(N)
+            return;
+        }
+
+        const int N = candidates.size();
+        for (int i = start_from; i < N; i++)
+        {
+            if (sum + candidates[i] > target)
+                break;
+
+            if (i > start_from && candidates[i-1] == candidates[i])
+                continue;
+
+            curr_combination.push_back(candidates[i]);
+            backtracking(i+1, curr_combination, sum + candidates[i], candidates, target, result);
+            curr_combination.pop_back();
         }
     }
 };
