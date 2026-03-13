@@ -1,9 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <queue>
-#include <unordered_set>
-
 /*
     ==============
     === MEDIUM ===
@@ -51,14 +45,16 @@
 
 */
 
-
+#include <vector>
+#include <algorithm>
+#include <queue>
+#include <unordered_set>
+using namespace std;
 
 /*
     ------------
     --- IDEA ---
     ------------
-
-    A bit trickier Backtracking, but the main idea is to see the decision Tree.
 
                               [1, 2, 3]
                              /    |   \
@@ -115,47 +111,47 @@
 /* Time  Beats: 53.48% */
 /* Space Beats:  5.25% */
 
-/* Time  Complexity: O(n * n!) */
-/* Space Complexity: O(n!) */
-class Solution_Backtracking_Queue {
+/* Time  Complexity: O( N * N! ) */
+/* Space Complexity: O(     N! )  */
+class Solution_Queue {
 public:
-    std::vector<std::vector<int>> permute(std::vector<int>& nums)
+    vector<vector<int>> permute(vector<int>& nums)
     {
-        std::vector<std::vector<int>> results;
-        std::queue<int> queue;
-        std::vector<int> curr;
+        vector<vector<int>> results;
 
+        queue<int> queue;
         for (int& num : nums)
             queue.push(num);
 
-        backtracking(queue, curr, results);
+        /* Backtracking */
+        backtracking(queue, {}, results);
 
         return results;
     }
 
 private:
-    void backtracking(std::queue<int> queue, std::vector<int> curr, std::vector<std::vector<int>>& results)
+    void backtracking(queue<int> queue, vector<int> curr_permutation, vector<vector<int>>& results)
     {
         if (queue.empty())
         {
-            results.push_back(curr);
+            results.push_back(curr_permutation);
             return;
         }
 
-        for (int i = 0; i < queue.size(); i++)
+        const int QUEUE_SIZE = queue.size();
+        for (int i = 0; i < QUEUE_SIZE; i++)
         {
             int num = queue.front();
             queue.pop();
-            curr.push_back(num);
 
-            backtracking(queue, curr, results);
+            curr_permutation.push_back(num);
+            backtracking(queue, curr_permutation, results);
+            curr_permutation.pop_back();
 
-            curr.pop_back();
             queue.push(num);
         }
     }
 };
-
 
 
 
@@ -165,10 +161,11 @@ private:
     --- IDEA ---
     ------------
 
-    Very similar to the one above. However, this one doesn't use a queue,
-    instead it always iterates from 0 to nums.size(), however it uses an
-    unordered Set to determine if some number was already in use in our current
-    combination.
+    Very similar to the one above(with the Queue).
+
+    However, this one doesn't use a queue, instead it always iterates from 0 to
+    N, however it uses an unordered Set to determine if some number was already
+    in use in our current combination.
 
     That's the whole difference.
 
@@ -177,47 +174,46 @@ private:
 
 */
 
-/* Time  Beats: 51.61% */
-/* Space Beats:  8.86% */
+/* Time  Beats: 6.12% */
+/* Space Beats: 5.05% */
 
-/* Time  Complexity: O(n * n!) */
-/* Space Complexity: O(n!) */
-class Solution_Backtracking_Basic {
+/* Time  Complexity: O(N * N!) */
+/* Space Complexity: O(N)      */
+class Solution {
 public:
-    std::vector<std::vector<int>> permute(std::vector<int>& nums)
+    vector<vector<int>> permute(vector<int>& nums)
     {
-        std::vector<std::vector<int>> results;
-        std::unordered_set<int> uset_curr_comb; // Unordered set of a curr comb
+        const int N = nums.size();
+        vector<vector<int>> results;
 
-        backtracking(nums, {}, uset_curr_comb, results);
+        /* Backtracking */
+        backtracking({}, {}, nums, results);
 
         return results;
     }
 
 private:
-    void backtracking(std::vector<int>& nums,
-                      std::vector<int> curr_comb,
-                      std::unordered_set<int>& uset_curr_comb,
-                      std::vector<std::vector<int>>& results)
+    void backtracking(vector<int> curr_permutation, unordered_set<int> used, vector<int>& nums, vector<vector<int>>& results)
     {
-        if (curr_comb.size() == nums.size())
+        if (curr_permutation.size() == nums.size())
         {
-            results.push_back(curr_comb);
+            results.push_back(curr_permutation); // O(N)
             return;
         }
 
-        for (int i = 0; i < nums.size(); i++)
+        const int N = nums.size();
+        for (int i = 0; i < N; i++)
         {
-            if (uset_curr_comb.count(nums[i])) // If it exists in the Set
+            if (used.count(nums[i]))
                 continue;
 
-            curr_comb.push_back(nums[i]);
-            uset_curr_comb.insert(nums[i]);
+            used.insert(nums[i]);
+            curr_permutation.push_back(nums[i]);
 
-            backtracking(nums, curr_comb, uset_curr_comb, results);
+            backtracking(curr_permutation, used, nums, results);
 
-            uset_curr_comb.erase(nums[i]);
-            curr_comb.pop_back();
+            curr_permutation.pop_back();
+            used.erase(nums[i]);
         }
     }
 };
@@ -282,9 +278,9 @@ private:
 /* Space Complexity: O(1) */
 class Solution_Next_Permutation {
 public:
-    std::vector<std::vector<int>> permute(std::vector<int>& nums)
+    vector<vector<int>> permute(vector<int>& nums)
     {
-        std::vector<std::vector<int>> results;
+        vector<vector<int>> results;
 
         /* Base case */
         if (nums.size() == 1)
@@ -295,12 +291,12 @@ public:
         }
 
         /* Sort */
-        std::sort(nums.begin(), nums.end());
+        sort(nums.begin(), nums.end());
 
         /* Push the current permutation and permute nums again */
         do
         {
-            std::vector<int> vec_tmp;
+            vector<int> vec_tmp;
             for (int i = 0; i < nums.size(); i++)
                 vec_tmp.push_back(nums[i]);
 
@@ -311,7 +307,7 @@ public:
     }
 
 private:
-    int next_permutation(std::vector<int>& nums)
+    int next_permutation(vector<int>& nums)
     {
         int n = nums.size();
 
@@ -367,74 +363,3 @@ private:
         return 1;
     }
 };
-
-
-int
-main()
-{
-    Solution_Backtracking_Queue sol_queue;
-    Solution_Backtracking_Basic sol_basic;
-    Solution_Next_Permutation   sol_next;
-
-    /* Example 1 */
-    std::vector<int> nums = {1, 2, 3};
-
-    /* Example 2 */
-    // std::vector<int> nums = {0, 1};
-
-    /* Example 3 */
-    // std::vector<int> nums = {1};
-
-    /* Example 4 */
-    // std::vector<int> nums = {0, 7, -2, -5};
-
-    std::cout << "\n\t====================";
-    std::cout << "\n\t=== PERMUTATIONS ===";
-    std::cout << "\n\t====================\n";
-
-    /* Write Input */
-    bool first = true;
-    std::cout << "\n\tArray: [";
-    for (auto x: nums)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        std::cout << x;
-        first = false;
-    }
-    std::cout << "]\n";
-
-
-    /* Solution */
-    // std::vector<std::vector<int>> results = sol_queue.permute(nums);
-    // std::vector<std::vector<int>> results = sol_basic.permute(nums);
-    std::vector<std::vector<int>> results = sol_next.permute(nums);
-
-
-    /* Write Output */
-    first = true;
-    std::cout << "\n\tResults: [";
-    for (auto x: results)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        bool first_first = true;
-        std::cout << "[";
-        for (const auto& xx : x)
-        {
-            if (!first_first)
-                std::cout << ", ";
-
-            std::cout << xx;
-            first_first = false;
-        }
-        std::cout << "]";
-
-        first = false;
-    }
-    std::cout << "]\n\n";
-
-    return 0;
-}
