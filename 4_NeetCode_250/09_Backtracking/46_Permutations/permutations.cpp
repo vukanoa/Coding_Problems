@@ -226,6 +226,56 @@ private:
     --- IDEA ---
     ------------
 
+    Read the code and you'll understand. This is the most clean Backtracking
+    Solution you'll find for this problem. Very useful concept.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  70.02% */
+
+/* Time  Complexity: O(N * N!) */
+/* Space Complexity: O(N)      */
+class Solution_Clean_Backtracking {
+public:
+    vector<vector<int>> permute(vector<int>& nums)
+    {
+        vector<vector<int>> results;
+
+        /* Backtracking */
+        backtracking(0, nums, results);
+
+        return results;
+    }
+
+private:
+    void backtracking(int idx, vector<int>& nums, vector<vector<int>>& results)
+    {
+        const int N = nums.size();
+
+        if (idx == N)
+        {
+            results.push_back(nums);
+            return;
+        }
+
+        for (int i = idx; i < N; i++)
+        {
+            swap(nums[idx], nums[i]);
+            backtracking(idx + 1, nums, results);
+            swap(nums[idx], nums[i]);
+        }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     - First we sort our initial "nums" array since that won't
       change the runtime complexity and we need our array values in
       sorted order
