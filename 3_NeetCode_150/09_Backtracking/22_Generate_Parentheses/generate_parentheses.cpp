@@ -133,3 +133,49 @@ public:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, but written Bottom-Up.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  97.95% */
+
+/* Time  Complexity: O(4^n/sqrt(n)) */
+/* Space Complexity: O(4^n/sqrt(n)) */
+class Solution_DP_Catalan_Bottom_Up {
+public:
+    vector<string> generateParenthesis(int n)
+    {
+        vector<vector<string>> result(n + 1);
+        result[0] = {""};
+
+        for (int curr_pairs = 1; curr_pairs <= n; curr_pairs++)
+        {
+            for (int left_pairs = 0; left_pairs < curr_pairs; left_pairs++)
+            {
+                int right_pairs = curr_pairs - left_pairs - 1;
+
+                for (const string& left_combination : result[left_pairs])
+                {
+                    for (const string& right_combination : result[right_pairs])
+                    {
+                        string curr_combination = "(" + left_combination + ")" + right_combination;
+
+                        result[curr_pairs].push_back(curr_combination);
+                    }
+                }
+            }
+        }
+
+        return result[n];
+    }
+};
