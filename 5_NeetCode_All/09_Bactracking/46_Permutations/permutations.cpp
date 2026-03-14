@@ -226,6 +226,55 @@ private:
     --- IDEA ---
     ------------
 
+    TODO
+
+*/
+
+/* Time  Beats: 27.59% */
+/* Space Beats: 10.05% */
+
+/* Time  Complexity: O(N * N!) */
+/* Space Complexity: O(N * N!) */
+class Solution_Bit_Manipulation {
+public:
+    vector<vector<int>> permute(vector<int>& nums)
+    {
+        vector<vector<int>> result;
+
+        /* Backtracking */ 
+        backtrack({}, 0, nums, result);
+
+        return result;
+    }
+
+    void backtrack(vector<int> curr_permutation, int mask, vector<int>& nums, vector<vector<int>>& result)
+    {
+        if (curr_permutation.size() == nums.size())
+        {
+            result.push_back(curr_permutation);
+            return;
+        }
+
+        for (int i = 0; i < nums.size(); i++)
+        {
+            if ((mask & (1 << i)) == 0)
+            {
+                curr_permutation.push_back(nums[i]);
+                backtrack(curr_permutation, mask | (1 << i), nums, result);
+                curr_permutation.pop_back();
+            }
+        }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     Read the code and you'll understand. This is the most clean Backtracking
     Solution you'll find for this problem. Very useful concept.
 
