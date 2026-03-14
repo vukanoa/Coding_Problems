@@ -93,27 +93,28 @@ public:
         if (happy_strings.size() < k)
             return "";
 
+        /* Sort */
         sort(happy_strings.begin(), happy_strings.end());
 
-        return happy_strings[k-1];
+        return happy_strings[k - 1];
     }
 
 private:
-    void backtracking(int n, vector<string>& uset_strings, string str)
+    void backtracking(int n, vector<string>& happy_strings, string str)
     {
         if (str.length() == n)
         {
-            uset_strings.push_back(str);
+            happy_strings.push_back(str);
             return;
         }
 
         for (const char& chr : {'a','b','c'})
         {
-            if (chr == str.back())
+            if ( ! str.empty() && chr == str.back())
                 continue;
 
             str += chr;
-            backtracking(n, uset_strings, str);
+            backtracking(n, happy_strings, str);
             str.pop_back();
         }
     }
