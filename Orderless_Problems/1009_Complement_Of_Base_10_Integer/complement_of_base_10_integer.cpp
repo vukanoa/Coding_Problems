@@ -79,8 +79,71 @@ public:
         double log_value = log(n) / log(base); // Base-2 logarithm of 8
 
         int ceil_value = static_cast<int>(1.0 * ceil(log_value));
+        int mask = (1 << ceil_value) - 1;
 
 
-        return (~n) & ((1 << ceil_value) - 1);
+        return (~n) & mask;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, but a much cleaner way. Instead of utilizing Logarithm, we
+    use "__builtin_clz" which counts the number of LEADING 0s in a number in
+    its binary representation.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  34.89% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_builtin_clz {
+public:
+    int bitwiseComplement(int n)
+    {
+        if (n == 0)
+            return 1; 
+
+        int mask = (1 << (32 - __builtin_clz(n))) - 1; 
+
+        return (~n) &  mask ;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  65.28% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_builtin_clz_XOR {
+public:
+    int bitwiseComplement(int n)
+    {
+        if (n == 0)
+            return 1; 
+
+        int mask = (1 << (32 - __builtin_clz(n))) - 1; 
+
+        return n ^ mask ;
     }
 };
