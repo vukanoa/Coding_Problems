@@ -147,3 +147,65 @@ public:
         return n ^ mask ;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  34.89% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Bit_Smearing {
+public:
+    int bitwiseComplement(int n)
+    {
+        if (n == 0)
+            return 1;
+
+        int mask = n;
+        for (int i = 0; i <= 4; i++)
+            mask |= mask >> (1 << i);
+
+        return ~n & mask;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  65.28% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Bit_Smearing_XOR {
+public:
+    int bitwiseComplement(int n)
+    {
+        int mask = n | 1; // Edge case n == 0
+
+        for (int i = 0; i <= 4; i++)
+            mask |= mask >> (1 << i);
+
+        return n ^ mask;
+    }
+};
