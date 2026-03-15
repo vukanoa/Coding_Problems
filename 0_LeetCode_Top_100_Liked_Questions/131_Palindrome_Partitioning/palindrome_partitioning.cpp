@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -39,6 +36,10 @@
     's' containts only lowercase English letters
 
 */
+
+#include <string>
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -138,123 +139,59 @@
 /* Space Complexity: O(n^2) */
 class Solution {
 public:
-    std::vector<std::vector<std::string>> partition(std::string s)
+    vector<vector<string>> partition(string s)
     {
-        std::vector<std::vector<std::string>> results;
-        std::vector<std::string> current_vec;
+        const int N = s.size();
+        vector<vector<string>> results;
 
-        backtracking_dfs(s, 0, current_vec, results);
+        vector<string> curr_partition = {};
+        backtracking(0, {}, s, results);
 
         return results;
     }
 
 private:
-    // O(2^n)
-    void backtracking_dfs(std::string& s,
-                          int start,
-                          std::vector<std::string>& current_vec,
-                          std::vector<std::vector<std::string>>& results)
+    void backtracking(int start, vector<string> curr_partition, string& s, vector<vector<string>>& results)
     {
-        if (start == s.length())
-            results.push_back(current_vec);
-        else
+        const int N = s.size();
+
+        if (start == N)
         {
-            for (int i = start; i < s.length(); i++)
+            results.push_back(curr_partition);
+            return;
+        }
+
+        for (int i = start; i < N; i++)
+        {
+            int len = i - start + 1;
+            string substr = s.substr(start, len);
+
+            if (is_palindrome(substr))
             {
-                if (palindrome(s, start, i))
-                {
-                    current_vec.push_back(s.substr(start, i - start + 1));
-                    backtracking_dfs(s, i + 1, current_vec, results);
-                    current_vec.pop_back();
-                }
+                curr_partition.push_back(substr);
+                backtracking(i + 1, curr_partition, s, results);
+                curr_partition.pop_back();
             }
         }
     }
 
-    // O(n)
-    bool palindrome(std::string& str, int left, int right)
+    bool is_palindrome(const string& str)
     {
-        while (left < right)
+        const int N = str.size();
+
+        int L = 0;
+        int R = N - 1;
+
+        while (L < R)
         {
-            if (str[left++] != str[right--])
+            if (str[L] != str[R])
                 return false;
+
+            L++;
+            R--;
         }
 
         return true;
     }
+
 };
-
-
-int
-main()
-{
-    Solution sol;
-
-    /* Example 1 */
-    // std::string s = "aab";
-
-    /* Example 2 */
-    // std::string s = "a";
-
-    /* Example 3 */
-    // std::string s = "";
-
-    /* Example 4 */
-    // std::string s = "abcba";
-
-    /* Example 5 */
-    // std::string s = "baab";
-
-    /* Example 6 */
-    // std::string s = "bab";
-
-    /* Example 7 */
-    std::string s = "abcdcba";
-
-    /* Example 8 */
-    // std::string s = "aaa";
-
-
-    std::cout << "\n\t===============================";
-    std::cout << "\n\t=== PALINDROME PARTITIONING ===";
-    std::cout << "\n\t===============================\n\n";
-
-
-    /* Write Input */
-    std::cout << "\tString: \"";
-    for (const auto& x: s)
-        std::cout << x;
-    std::cout << "\"\n";
-
-
-    /* Solution */
-    std::vector<std::vector<std::string>> results = sol.partition(s);
-
-
-    /* Write Output */
-    bool first = true;
-    std::cout << "\n\tResults: [";
-    for (auto x: results)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        bool first_first = true;
-        std::cout << "[";
-        for (const auto& xx : x)
-        {
-            if (!first_first)
-                std::cout << ", ";
-
-            std::cout << "\"" << xx << "\"";
-            first_first = false;
-        }
-        std::cout << "]";
-
-        first = false;
-    }
-    std::cout << "]\n\n";
-
-
-    return 0;
-}
