@@ -97,3 +97,47 @@ private:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 15.49% */
+/* Space Beats: 58.60% */
+
+/* Time  Complexity: O(N * 4^N) */
+/* Space Complexity: O(N)       */
+class Solution_Iterative {
+public:
+    vector<string> letterCombinations(string digits)
+    {
+        if (digits.empty())
+            return {};
+
+        vector<string> result = {""}; // We'll overwrite this, but it must be set like this initially
+
+        const string buttons[10] = {"", "", "abc", "def", "ghi", "jkl", "mno", "qprs", "tuv", "wxyz"};
+
+        for (const char& digit_chr : digits)
+        {
+            vector<string> combinations;
+            for (const string& curr_incomplete_combination : result)
+            {
+                for (const char& letter : buttons[digit_chr - '0'])
+                    combinations.push_back(curr_incomplete_combination + letter);
+            }
+
+            result = combinations;
+        }
+
+        return result;
+    }
+};
