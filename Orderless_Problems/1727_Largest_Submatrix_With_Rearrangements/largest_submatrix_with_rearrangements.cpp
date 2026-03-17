@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
 /*
     ==============
     === MEDIUM ===
@@ -58,6 +54,10 @@
 
 */
 
+#include <vector>
+#include <algorithm>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -67,39 +67,34 @@
 
 */
 
-/* Time  Beats: 92.52% */
-/* Space Beats: 66.44% */
+/* Time  Beats: 77.13% */
+/* Space Beats: 67.02% */
 
-/* Time  Complexity: O(M * N * logN) */
-/* Space Complexity: O(M * N)        */
+/* Time  Complexity: O(ROWS * COLS * logCOLS) */
+/* Space Complexity: O(ROWS * COLS)           */
 class Solution {
 public:
     int largestSubmatrix(vector<vector<int>>& mat)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-
         const int ROWS = mat.size();
         const int COLS = mat[0].size();
-
         int result = 0;
 
-        for (int i = 0; i < ROWS; i++)
+        for (int row = 0; row < ROWS; row++)
         {
-            for (int j = 0; j < COLS; j++)
+            for (int col = 0; col < COLS; col++)
             {
-                if (mat[i][j] != 0 and i != 0)
-                    mat[i][j] += mat[i-1][j];
+                if (mat[row][col] != 0 and row != 0)
+                    mat[row][col] += mat[row-1][col];
             }
 
-            vector<int>tmp = mat[i];
+            vector<int>curr_row = mat[row];
 
             // Sort in DESCENDING order
-            sort(tmp.begin(), tmp.end(), greater());
+            sort(curr_row.begin(), curr_row.end(), greater<int>());
 
-            for (int j = 0; j < COLS; j++)
-            {
-                result = max(result, tmp[j] * (j+1));
-            }
+            for (int col = 0; col < COLS; col++)
+                result = max(result, curr_row[col] * (col+1));
         }
 
         return result;
