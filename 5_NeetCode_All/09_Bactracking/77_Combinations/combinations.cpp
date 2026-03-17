@@ -141,3 +141,45 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is much slower than the previous ones, however it's still good
+    to be aware of this approach.
+
+*/
+
+/* Time  Beats: 5.01% */
+/* Space Beats: 5.36% */
+
+/* Time  Complexity: O(n * 2^n) */
+/* Space Complexity: O(n)       */
+class Solution_Bit_Manipulation {
+public:
+    vector<vector<int>> combine(int n, int k)
+    {
+        vector<vector<int>> result;
+
+        for (int mask = 0; mask < (1 << n); mask++)
+        {
+            vector<int> curr_combination;
+
+            for (int bit = 0; bit < n; bit++)
+            {
+                if (mask & (1 << bit))
+                    curr_combination.push_back(bit + 1);
+            }
+
+            if (curr_combination.size() == static_cast<unsigned>(k))
+                result.push_back(curr_combination);
+        }
+
+        return result;
+    }
+};
