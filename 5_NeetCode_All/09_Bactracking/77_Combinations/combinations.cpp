@@ -90,3 +90,54 @@ private:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 95.04% */
+/* Space Beats: 99.05% */
+
+/* Time  Complexity: O(C(n,k) * k) */
+/* Space Complexity: O(C(n,k) * k) */
+class Solution_Iterative {
+public:
+    vector<vector<int>> combine(int n, int k)
+    {
+        vector<vector<int>> result;
+        vector<int> curr_combination(k, 0);
+
+        int idx = 0;
+        while (idx >= 0)
+        {
+            curr_combination[idx]++;
+
+            if (curr_combination[idx] > n)
+            {
+                idx--;
+                continue;
+            }
+
+            if (idx == k - 1)
+            {
+                result.push_back(curr_combination);
+                continue;
+            }
+
+            curr_combination[idx + 1] = curr_combination[idx];
+
+            // Increment
+            idx++;
+        }
+
+        return result;
+    }
+};
