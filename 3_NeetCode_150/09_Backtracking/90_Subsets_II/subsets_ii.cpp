@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -46,82 +43,9 @@
 
 */
 
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Very similar to:
-    1. "Subsets" (First version of this problem)
-    2. "Permutations" problem, or
-    3. "Combination Sum", or
-    4. "Combination Sum II"
-
-*/
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    It is very similar to Subset I(first version of this problem), however
-    since there are duplicate values in "nums", we must skip them.
-
-    How are we going to do that?
-
-    This is the crux of the Solution:
-
-        while (i != start && i > 0 && i < nums.size() && nums[i-1] == nums[i])
-            i++;
-
-*/
-
-/* Time  Beats: 100.00% */
-/* Space Beats:  65.72% */
-
-/* Time  Complexity: O(n * 2^n) */
-/* Space Complexity: O(n * 2^n) */
-class Solution {
-public:
-    std::vector<std::vector<int>> subsetsWithDup(std::vector<int>& nums)
-    {
-        std::vector<std::vector<int>> results = {{}};
-        std::sort(nums.begin(), nums.end());
-
-        backtracking(nums, 0, {}, results);
-
-        return results;
-    }
-
-private:
-    void backtracking(std::vector<int>& nums,
-                      int start,
-                      std::vector<int>& subset,
-                      std::vector<std::vector<int>>& results)
-    {
-        if (start == nums.size())
-            return;
-
-        for (int i = start; i < nums.size(); i++)
-        {
-            while (i != start && i > 0 && i < nums.size() && nums[i-1] == nums[i])
-                i++;
-
-            if (i == nums.size())
-                return;
-
-            subset.push_back(nums[i]);
-            results.push_back(subset);
-
-            backtracking(nums, i+1, subset, results);
-
-            subset.pop_back();
-        }
-    }
-};
-
-
-
+#include <algorithm>
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -141,24 +65,24 @@ private:
 
 /* Time  Complexity: O(n * 2^n) */
 /* Space Complexity: O(n * 2^n) */
-class Solution_2 {
+class Solution {
 public:
-    std::vector<std::vector<int>> subsetsWithDup(std::vector<int>& nums)
+    vector<vector<int>> subsetsWithDup(vector<int>& nums)
     {
-        std::vector<std::vector<int>> results; // Don't add initial '{}'
-        std::sort(nums.begin(), nums.end());
+        vector<vector<int>> results; // Don't add initial '{}'
+        sort(nums.begin(), nums.end());
 
-        std::vector<int> subset;
+        vector<int> subset;
         backtracking(nums, 0, subset, results);
 
         return results;
     }
 
 private:
-    void backtracking(std::vector<int>& nums,
+    void backtracking(vector<int>& nums,
                       int i,
-                      std::vector<int>& subset,
-                      std::vector<std::vector<int>>& results)
+                      vector<int>& subset,
+                      vector<vector<int>>& results)
     {
         if (i == nums.size())
         {
