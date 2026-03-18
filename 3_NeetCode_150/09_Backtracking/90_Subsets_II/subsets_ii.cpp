@@ -44,6 +44,7 @@
 */
 
 #include <algorithm>
+#include <set>
 #include <vector>
 using namespace std;
 
@@ -52,11 +53,57 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    A diferent way of implementing the same idea. I'd say this one makes more
-    sense, but the above one comes to mind first. At least in my case, since
-    that is how I usually write a Batracking Solution.
+    Brute Force. It's beneficial to see this before optimizing.
 
-    Notice that we don't have a "for loop" in this bactracking function.
+*/
+
+/* Time  Beats: 6.58% */
+/* Space Beats: 5.40% */
+
+/* Time  Complexity: O(N * 2^N * log(2^N)) */
+/* Space Complexity: O(N * 2^N)            */
+class Solution_Bruteforce {
+private:
+    set<vector<int>> result;
+
+public:
+    vector<vector<int>> subsetsWithDup(vector<int>& nums)
+    {
+        /* Sort */
+        sort(nums.begin(), nums.end());
+
+        backtrack(0, {}, nums);
+
+        return vector<vector<int>>(result.begin(), result.end());
+    }
+
+    void backtrack(int i, vector<int> subset, vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        if (i == N)
+        {
+            result.insert(subset);
+            return;
+        }
+
+        subset.push_back(nums[i]);
+        backtrack(i + 1, subset, nums);
+        subset.pop_back();
+
+        backtrack(i + 1, subset, nums);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
 
 */
 
@@ -105,6 +152,15 @@ private:
 
 
 
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
 
 /* Time  Beats: 40.31% */
 /* Space Beats: 30.78% */
