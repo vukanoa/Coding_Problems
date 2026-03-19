@@ -40,6 +40,7 @@
 */
 
 #include <algorithm>
+#include <cstring>
 #include <numeric>
 #include <vector>
 using namespace std;
@@ -96,6 +97,71 @@ private:
                 return true;
 
             used[idx] = false;
+        }
+
+        return false;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  71.38% */
+
+/* Time  Complexity: O(k^N) */
+/* Space Complexity: O(N)   */
+class Solution_Elegant {
+public:
+    bool canPartitionKSubsets(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+
+        /* Sort */
+        sort(nums.begin(), nums.end(), greater<int>());
+
+        unsigned long long total_sum  = accumulate(nums.begin(), nums.end(), 0ULL);
+        if (total_sum % k != 0)
+            return false;
+
+        unsigned long long target_sum = total_sum / k;
+
+        unsigned long long sums[16];
+        memset(sums, 0x00, sizeof(sums)); /* Memset */
+        
+        return backtracking(0, sums, target_sum, nums, k);
+    }
+
+private:
+    bool backtracking(int idx, unsigned long long (&sums)[16], unsigned long long& target_sum, vector<int>& nums, int& k)
+    {
+        const int N = nums.size();
+        if (idx == N)
+            return true;
+
+        for (int subset_idx = 0; subset_idx < k; subset_idx++)
+        {
+            if (sums[subset_idx] + nums[idx] > target_sum)
+                continue;
+
+            if (subset_idx > 0 && sums[subset_idx - 1] == sums[subset_idx])
+                continue;
+
+            sums[subset_idx] += nums[idx];
+
+            if (backtracking(idx + 1, sums, target_sum, nums, k))
+                return true;
+
+            sums[subset_idx] -= nums[idx];
         }
 
         return false;
