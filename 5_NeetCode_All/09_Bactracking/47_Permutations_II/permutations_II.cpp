@@ -99,3 +99,56 @@ private:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 20.21% */
+/* Space Beats:  8.58% */
+
+/* Time  Complexity: O(N * N!) */
+/* Space Complexity: O(N * N!) */
+class Solution_Iterative {
+public:
+    vector<vector<int>> permuteUnique(vector<int>& nums)
+    {
+        const int N = nums.size();
+        vector<vector<int>> result = {nums};
+
+        /* Sort */
+        sort(nums.begin(), nums.end());
+
+        while (true)
+        {
+            int i = N - 2;
+
+            while (i >= 0 && nums[i] >= nums[i + 1])
+                i--;
+
+            if (i < 0)
+                break;
+
+            int j = N - 1;
+            while (nums[i] >= nums[j])
+                j--;
+
+            swap(nums[i], nums[j]);
+
+            /* Reverse */
+            reverse(nums.begin() + i + 1, nums.end());
+
+            result.push_back(nums);
+        }
+
+        return result;
+    }
+};
