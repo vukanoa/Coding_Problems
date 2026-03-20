@@ -167,3 +167,64 @@ private:
         return false;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  71.39% */
+
+/* Time  Complexity: O(N * 2^N) */
+/* Space Complexity: O(N)       */
+class Solution_Bitmasking {
+public:
+    bool canPartitionKSubsets(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+        int total_sum = accumulate(nums.begin(), nums.end(), 0);
+
+        if (total_sum % k != 0)
+            return false;
+
+        int target_sum = total_sum / k;
+
+        /* Sort in DESCENDING order */
+        sort(nums.begin(), nums.end(), greater<int>());
+
+        return backtrack(0, (1 << N) - 1, 0, target_sum, nums, k);
+    }
+
+private:
+    bool backtrack(int start, int mask, int subset_sum, int& target_sum, vector<int>& nums, int k)
+    {
+        if (k == 0)
+            return true;
+
+        if (subset_sum == target_sum)
+            return backtrack(0, mask, 0, target_sum, nums, k - 1);
+
+        const int N = nums.size();
+        for (int i = start; i < N; i++)
+        {
+            if ((mask & (1 << i)) == 0 || subset_sum + nums[i] > target_sum)
+                continue;
+
+            if (backtrack(i+1, mask ^ (1 << i), subset_sum + nums[i], target_sum, nums, k))
+                return true;
+
+            if (subset_sum == 0)
+                return false;
+        }
+
+        return false;
+    }
+};
