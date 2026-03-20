@@ -196,3 +196,64 @@ public:
         return count;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, however here we're utilizing the fact that the Constaints
+    are small, i.e. 1 <= n <= 9, therefore we can simply use a bitmasking
+    technqiue to "check" whether a queen is present there.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  87.15% */
+
+/* Time  Complexity: O(N!) */
+/* Space Complexity: O(N)  */
+class Solution_Bitmasking {
+public:
+    int totalNQueens(int n)
+    {
+        int used_col       = 0;
+        int used_diag      = 0;
+        int used_anti_diag = 0;
+
+        return backtracking(0, n, used_col, used_diag, used_anti_diag);
+    }
+
+private:
+    int backtracking(int row, const int& N, int& used_col, int& used_diag, int& used_anti_diag)
+    {
+        if (row == N)
+            return 1;
+
+        int count = 0;
+        for (int col = 0; col < N; col++)
+        {
+            int col_mask       = 1 << col;
+            int diag_mask      = 1 << (row + col);
+            int anti_diag_mask = 1 << (row - col + N - 1);
+
+            if ((used_col & col_mask) || (used_diag & diag_mask) || (used_anti_diag & anti_diag_mask))
+                continue;
+
+            used_col       |= col_mask;
+            used_diag      |= diag_mask;
+            used_anti_diag |= anti_diag_mask;
+
+            count += backtracking(row + 1, N, used_col, used_diag, used_anti_diag);
+
+            used_col       &= ~col_mask;
+            used_diag      &= ~diag_mask;
+            used_anti_diag &= ~anti_diag_mask;
+        }
+
+        return count;
+    }
+};
