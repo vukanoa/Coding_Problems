@@ -45,6 +45,7 @@
 
 #include <algorithm>
 #include <set>
+#include <unordered_set>
 #include <vector>
 using namespace std;
 
@@ -213,6 +214,72 @@ public:
             latest_subsets = new_subsets.size();
 
             // O(N)
+            result.insert(result.end(), new_subsets.begin(), new_subsets.end());
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  21.35% */
+
+/* Time  Complexity: O(N * 2^N) */
+/* Space Complexity: O(N * 2^N) */
+struct VectorHash
+{
+    size_t operator()(const vector<int>& arr) const
+    {
+        size_t h = 0;
+        hash<int> hasher;
+
+        for (const int& num : arr)
+            h ^= hasher(num) + 0x9e3779b9 + (h << 6) + (h >> 2);
+
+        return h;
+    }
+};
+
+class Solution_Rolling_Hash {
+public:
+    vector<vector<int>> subsetsWithDup(vector<int>& nums)
+    {
+        const int N = nums.size();
+        vector<vector<int>> result = {{}};
+
+        /* Sort */
+        sort(nums.begin(), nums.end());
+
+        VectorHash hasher;
+
+        unordered_set<size_t> uset_hashes;
+        for (int i = 0; i < N; i++)
+        {
+            vector<vector<int>> new_subsets;
+            for (vector<int> subset : result)
+            {
+                subset.push_back(nums[i]);
+                size_t hash = hasher(subset);
+
+                if ( ! uset_hashes.count(hash))
+                {
+                    new_subsets.push_back(subset);
+                    uset_hashes.insert(hash);
+                }
+            }
+
             result.insert(result.end(), new_subsets.begin(), new_subsets.end());
         }
 
