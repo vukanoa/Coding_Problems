@@ -138,3 +138,129 @@ private:
         return true;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    There are (2 * (N-1) + 1) diagonals of each "type", where types are:
+
+        + "Forward  slash" diagonals    formula: 1 << (row + col)
+        + "Backward slash" diagonals    formula: 1 << (row - col + N)
+
+
+        Forward slashes:
+
+                      /   /   /   /
+                     /   /   /   /
+                +---+---+---+---+
+                |  /|  /|  /|  /|
+                | / | / | / | / | /
+                |/  |/  |/  |/  |/
+                +---+---+---+---+
+               /|  /|  /|  /|  /| 
+              / | / | / | / | / | /
+ row + col = 0  |/  |/  |/  |/  |/
+                +---+---+---+---+
+               /|  /|  /|  /|  /| 
+              / | / | / | / | / | /
+             1  |/  |/  |/  |/  |/ 
+                +---+---+---+---+
+               /|  /|  /|  /|  /| 
+              / | / | / | / | / | 
+             2  |/  |/  |/  |/  | 
+                +---+---+---+---+
+               /   /   /   /
+              /   /   /   /
+             3   4   5   6
+
+
+
+        Backward slashes:
+
+              \   \   \   \
+               \   \   \   \
+                +---+---+---+---+
+                |\  |\  |\  |\  |
+              \ | \ | \ | \ | \ |
+               \|  \|  \|  \|  \|
+                +---+---+---+---+
+                |\  |\  |\  |\  | \
+              \ | \ | \ | \ | \ |  \
+               \|  \|  \|  \|  \|   1 = row - col + N
+                +---+---+---+---+
+                |\  |\  |\  |\  | \
+              \ | \ | \ | \ | \ |  \
+               \|  \|  \|  \|  \|   2
+                +---+---+---+---+
+                |\  |\  |\  |\  | \
+                | \ | \ | \ | \ |  \
+                |  \|  \|  \|  \|   3
+                +---+---+---+---+
+                     \   \   \   \
+                      \   \   \   \
+                       7   6   5   4
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  92.97% */
+
+/* Time  Complexity: O(N!) */
+/* Space Complexity: O(N)  */ // Because of the Call Stack, w/o "results"
+class Solution_Bitmask {
+private:
+        int column = 0;
+        int forward_slash_diagonal  = 0; // There are (2 * (N-1) + 1) diagonals
+        int backward_slash_diagonal = 0; // There are (2 * (N-1) + 1) diagonals
+
+public:
+    vector<vector<string>> solveNQueens(int n)
+    {
+        vector<vector<string>> results;
+
+        vector<string> board(n, string(n, '.'));
+        backtracking(0, board, results, n);
+
+        return results;
+    }
+
+private:
+    void backtracking(int row, vector<string>& board, vector<vector<string>>& results, int& n)
+    {
+        if (row == n)
+        {
+            results.push_back(board);
+            return;
+        }
+
+        for (int col = 0; col < n; col++)
+        {
+            if (
+                (column                  & (1 << (col)))           ||
+                (backward_slash_diagonal & (1 << (row + col)))     ||
+                (forward_slash_diagonal  & (1 << (row - col + n)))
+               )
+            {
+                continue;
+            }
+
+            board[row][col] = 'Q';
+            column                  ^= 1 << (col);
+            backward_slash_diagonal ^= 1 << (row + col);
+            forward_slash_diagonal  ^= 1 << (row - col + n);
+
+            backtracking(row + 1, board, results, n);
+
+            forward_slash_diagonal  ^= 1 << (row - col + n);
+            backward_slash_diagonal ^= 1 << (row + col);
+            column                  ^= 1 << (col);
+            board[row][col] = '.';
+        }
+    }
+};
