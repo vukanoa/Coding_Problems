@@ -49,6 +49,7 @@
 
 */
 
+#include <algorithm>
 #include <cstring>
 #include <vector>
 using namespace std;
@@ -71,12 +72,11 @@ class Solution {
 public:
     bool findRotation(vector<vector<int>>& mat, vector<vector<int>>& target)
     {
+        const int N = mat.size();
         bool rotation_matches[4];
 
         // "true" == 0x01
         memset(rotation_matches, true, sizeof(rotation_matches));
-
-        const int N = mat.size();
 
         for (int row = 0; row < N; row++)
         {
@@ -89,11 +89,47 @@ public:
             }
         }
 
-        return rotation_matches[0]
-            || rotation_matches[1]
-            || rotation_matches[2]
-            || rotation_matches[3];
+        return rotation_matches[0] || 
+               rotation_matches[1] ||
+               rotation_matches[2] ||
+               rotation_matches[3];
     }
 };
 
 
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(1)   */
+class Solution_2 {
+public:
+    bool findRotation(vector<vector<int>>& mat, vector<vector<int>>& target)
+    {
+        const int N = mat.size();
+        
+        for (int k = 0; k < 4; k++)
+        {
+            if (mat == target)
+                return true;
+
+            for (int i = 0; i < N; i++)
+            {
+                for (int j = i; j < N; j++)
+                    swap(mat[i][j], mat[j][i]);
+            }
+
+            reverse(mat.begin(), mat.end());
+        }
+
+        return false;
+    }
+};
