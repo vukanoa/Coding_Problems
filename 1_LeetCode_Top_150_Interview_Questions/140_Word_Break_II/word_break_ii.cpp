@@ -210,3 +210,54 @@ private:
         return memo[start] = results;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  88.95% */
+
+/* Time  Complexity: O(N^2 + N * 2^N) */
+/* Space Complexity: O(N * 2^N)       */
+class Solution_Bottom_Up_DP {
+public:
+    vector<string> wordBreak(string s, vector<string>& wordDict)
+    {
+        const int N = s.size();
+
+        unordered_set<string> dictionary(wordDict.begin(), wordDict.end());
+
+        vector<vector<string>> dp(N + 1);
+        dp[0] = {""};
+
+        for (int space_at_idx = 1; space_at_idx <= N; space_at_idx++)
+        {
+            for (int i = 0; i < space_at_idx; i++)
+            {
+                string word = s.substr(i, space_at_idx - i);
+
+                if ( ! dictionary.count(word))
+                    continue;
+
+                for (const string& sentence : dp[i])
+                {
+                    if (sentence.empty())
+                        dp[space_at_idx].push_back(word);
+                    else
+                        dp[space_at_idx].push_back(sentence + " " + word);
+                }
+            }
+        }
+
+        return dp[N];
+    }
+};
