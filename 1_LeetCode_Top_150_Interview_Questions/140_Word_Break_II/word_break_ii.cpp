@@ -67,6 +67,7 @@
 */
 
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 using namespace std;
@@ -131,5 +132,81 @@ private:
                     sentence.pop_back();
             }
         }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   7.12% */
+
+/* Time  Complexity: O(N * 2^N) */
+/* Space Complexity: O(N * 2^N) */
+class Solution_Memoization {
+public:
+    vector<string> wordBreak(string s, vector<string>& wordDict)
+    {
+        const int N = s.size();
+
+        unordered_set<string> dictionary(wordDict.begin(), wordDict.end());
+        unordered_map<int, vector<string>> memo;
+
+        return backtracking(0, memo, s, dictionary);
+    }
+
+private:
+    vector<string> backtracking(int start, unordered_map<int, vector<string>>& memo, string s, unordered_set<string>& dictionary)
+    {
+        const int N = s.size();
+
+        if (start == N)
+            return {""};
+
+        if (memo.count(start))
+            return memo[start];
+
+        vector<string> results = {};
+
+        string word;
+        word.reserve(N);
+        for (int i = start; i < N; i++)
+        {
+            word += s[i];
+
+            if ( ! dictionary.count(word))
+                continue;
+
+            vector<string> partial_sentences = backtracking(i+1, memo, s, dictionary);
+
+            if (partial_sentences.empty())
+                continue;
+
+            for (const string& partial : partial_sentences)
+            {
+                string sentence;
+                sentence.reserve(N);
+
+                sentence += word;
+                sentence += " ";
+                sentence += partial;
+
+                if (partial.empty())
+                    sentence.pop_back();
+
+                results.push_back(sentence);
+            }
+        }
+
+        return memo[start] = results;
     }
 };
