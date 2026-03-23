@@ -58,6 +58,7 @@
 
 */
 
+#include <algorithm>
 #include <vector>
 using namespace std;
 
@@ -86,7 +87,7 @@ public:
 
         const int MOD = 1e9 + 7;
 
-        long long dp[15][15][2]; // [2] is for {MAX, MIN}
+        long long dp[15][15][2]; // [0]=Max, [1]=Min 
         dp[ROWS-1][COLS-1][0] = 1LL * grid[ROWS-1][COLS-1];
         dp[ROWS-1][COLS-1][1] = 1LL * grid[ROWS-1][COLS-1];
 
@@ -146,5 +147,74 @@ public:
         }
 
         return dp[0][0][0] >= 0 ? static_cast<int>(dp[0][0][0] % MOD): -1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  96.19% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(COLS)        */
+class Solution_Optimized_Space_Reverse {
+public:
+    int maxProductPath(vector<vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+        const int MOD = 1e9 + 7;
+
+        long long dp[15][2]; // [0]=Max, [1]=Min
+
+        /* Initialize last CELL */
+        dp[COLS-1][0] = grid[ROWS-1][COLS-1];
+        dp[COLS-1][1] = grid[ROWS-1][COLS-1];
+
+        /* Initialize last ROW */
+        long long row_product = grid[ROWS-1][COLS-1];
+        for (int col = COLS-2; col >= 0; col--)
+        {
+            row_product *= grid[ROWS-1][col];
+
+            dp[col][0] = row_product;
+            dp[col][1] = row_product;
+        }
+
+        for (int row = ROWS-2; row >= 0; row--)
+        {
+            /* Update CELL in the last column */
+            long long col_product = grid[row][COLS-1] * dp[COLS-1][0];
+            dp[COLS-1][0] = col_product;
+            dp[COLS-1][1] = col_product;
+
+            for (int col = COLS-2; col >= 0; col--)
+            {
+                long long val = grid[row][col];
+
+                long long candidates[4] =
+                {
+                    val * dp[col+1][0], // From Right max
+                    val * dp[col+1][1], // From Right min
+                    val * dp[col  ][0], // From Down  max
+                    val * dp[col  ][1]  // From Down  min
+                };
+
+                dp[col][0] = *max_element(begin(candidates), end(candidates));
+                dp[col][1] = *min_element(begin(candidates), end(candidates));
+            }
+        }
+
+        return dp[0][0] >= 0 ? static_cast<int>(dp[0][0] % MOD) : -1;
     }
 };
