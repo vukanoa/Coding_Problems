@@ -47,6 +47,8 @@
 */
 
 #include <algorithm>
+#include <climits>
+#include <cstring>
 #include <numeric>
 #include <vector>
 using namespace std;
@@ -165,5 +167,81 @@ private:
         if (backtracking(idx + 1, left    , top    , right    , bottom + x, target_sum, matchsticks)) return true;
 
         return false;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 67.41% */
+/* Space Beats: 60.01% */
+
+/* Time  Complexity: O(N * 2^N) */
+/* Space Complexity: O(2^N)     */
+class Solution_Bitmask {
+private:
+    int memo[1 << 16];
+    int side_length;
+    int N;
+
+public:
+    bool makesquare(vector<int>& matchsticks)
+    {
+        N = matchsticks.size();
+
+        if (N < 4)
+            return false;
+
+        int total_sum = accumulate(matchsticks.begin(), matchsticks.end(), 0);
+
+        if (total_sum % 4 != 0)
+            return false;
+
+        side_length = total_sum / 4;
+
+        if (*max_element(matchsticks.begin(), matchsticks.end()) > side_length)
+            return false;
+
+        sort(matchsticks.begin(), matchsticks.end(), greater<int>());
+
+        for (int i = 0; i < (1 << N); i++)
+            memo[i] = INT_MIN;
+
+        return solve((1 << N) - 1, matchsticks) == 0;
+    }
+
+private:
+    int solve(int mask, vector<int>& matchsticks)
+    {
+        if (mask == 0)
+            return 0;
+
+        if (memo[mask] != INT_MIN)
+            return memo[mask];
+
+        for (int i = 0; i < N; i++)
+        {
+            if ( ! (mask & (1 << i)))
+                continue;
+
+            int prev = solve(mask ^ (1 << i), matchsticks);
+
+            if (prev >= 0 && prev + matchsticks[i] <= side_length)
+                return memo[mask] = (prev + matchsticks[i]) % side_length;
+
+            if (mask == (1 << N) - 1)
+                return memo[mask] = -1;
+        }
+
+        return memo[mask] = -1;
     }
 };
