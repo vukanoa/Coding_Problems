@@ -296,3 +296,44 @@ private:
         return memo[mask] = false;
     }
 };
+
+
+
+
+/* Time  Beats: 54.08% */
+/* Space Beats: 54.60% */
+
+/* Time  Complexity: O(N * 2^N) */
+/* Space Complexity: O(2^N)     */
+class Solution_Bottom_Up_DP {
+public:
+    bool canPartitionKSubsets(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+        int total_sum = accumulate(nums.begin(), nums.end(), 0);
+
+        if (total_sum % k != 0)
+            return false;
+
+        int target = total_sum / k;
+
+        int dp[1 << 16];
+        memset(dp, 0xff, sizeof(dp));
+
+        dp[0] = 0;
+
+        for (int mask = 0; mask < (1 << N); mask++)
+        {
+            if (dp[mask] == -1)
+                continue;
+
+            for (int i = 0; i < N; i++)
+            {
+                if ((mask & (1 << i)) == 0 && dp[mask] + nums[i] <= target)
+                    dp[mask | (1 << i)] = (dp[mask] + nums[i]) % target;
+            }
+        }
+
+        return dp[(1 << N) - 1] == 0;
+    }
+};
