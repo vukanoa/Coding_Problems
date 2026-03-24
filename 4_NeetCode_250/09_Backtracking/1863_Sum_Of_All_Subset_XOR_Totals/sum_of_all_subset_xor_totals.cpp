@@ -296,6 +296,43 @@ private:
     --- IDEA ---
     ------------
 
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  88.35% */
+
+/* Time  Complexity: O(2^N) */
+/* Space Complexity: O(N)   */
+class Solution_Recursion {
+public:
+    int subsetXORSum(vector<int>& nums)
+    {
+        return solve(0, 0, nums);
+    }
+
+private:
+    int solve(int idx, int total, vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        if (idx == N)
+            return total;
+
+        return solve(idx + 1, total ^ nums[idx], nums) +
+               solve(idx + 1, total            , nums);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     This is a standard "trick" to generate all of the subsets WITHOUT using
     Backtracking.
 
@@ -308,8 +345,8 @@ private:
 /* Time  Beats: 100.00% */
 /* Space Beats:  13.14% */
 
-/* Time  Complexity: O(N * 2^N) */
-/* Space Complexity: O(2^N)     */
+/* Time  Complexity: O(2^N) */
+/* Space Complexity: O(2^N) */
 class Solution_Non_Backtracking_Subset_Trick {
 public:
     int subsetXORSum(vector<int>& nums)
@@ -348,7 +385,7 @@ public:
 /* Time  Beats: 32.94% */
 /* Space Beats: 34.80% */
 
-/* Time  Complexity: O(2^N * N) */
+/* Time  Complexity: O(N * 2^N) */
 /* Space Complexity: O(1)       */
 class Solution_Bit_Manipulation {
 public:
@@ -431,17 +468,18 @@ public:
 /* Time  Beats: 100.00% */
 /* Space Beats:  88.36% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution_Elegant {
 public:
     int subsetXORSum(vector<int>& nums)
     {
+        const int N = nums.size();
         int total = 0;
 
         for (const int& num : nums)
             total |= num;
 
-        return total << (nums.size() - 1);
+        return total << (N - 1);
     }
 };
