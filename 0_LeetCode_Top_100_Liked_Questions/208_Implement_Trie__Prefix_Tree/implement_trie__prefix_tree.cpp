@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -81,6 +79,8 @@
 
 */
 
+#include <string>
+using namespace std;
 
 /*
     ------------
@@ -395,36 +395,13 @@
 
     Searching for a prefix in a Trie from dataset {le, leet, code};
 
-    ============
-    === CODE ===
-    ============
 
-    class Trie{
-    public:
-        bool start_with(std::string prefix)
-        {
-            struct TrieNode* node = search_prefix(prefix);
+    Practice Problems:
 
-            return node != nullptr;
-        }
-    };
-
-
-    ** Complexity Analysis **
-        - Time complexity: O(m)
-        - Space complexity: O(1)
-
-
-    Practice Problems
-    Here are some wonderful problems for you to practice which uses the Trie
-    data structure.
+        Here are some additional problems to practice the Trie data structure.
 
     1. Add and Search Word - Data structure design
-        - Pretty much a direct application of Trie.
-
     2. Word Search II
-        - Similar to Boggle.
-
 */
 
 /* Time  Beats: 95.61% */
@@ -434,13 +411,12 @@
 /* Space Complexity: O(n) */
 class Trie {
 public:
-
     struct TrieNode{
         TrieNode* child[26];
         bool is_leaf_node;
     };
 
-    TrieNode* root = NULL;
+    TrieNode* root = nullptr;
 
     TrieNode* get_trie_node()
     {
@@ -454,7 +430,7 @@ public:
     }
 
 
-    void insert(std::string word)
+    void insert(string word)
     {
         // Already inserted then return
         if (search(word))
@@ -480,12 +456,12 @@ public:
     }
 
 
-    bool search(std::string word)
+    bool search(string word)
     {
         TrieNode* node = root;
         if (!root)
         {
-            // std::cout << "root is null" << "\n";
+            // cout << "root is null" << "\n";
             return false;
         }
 
@@ -502,7 +478,7 @@ public:
     }
 
 
-    bool startsWith(std::string prefix)
+    bool startsWith(string prefix)
     {
         TrieNode* node = root;
 
@@ -518,146 +494,3 @@ public:
         return (node != nullptr);
     }
 };
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Just another way of writing it. Thought a bit more inefficient.
-
-*/
-
-/* Time  Beats: 68.26% */
-/* Space Beats: 23.00% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Trie_Cleaner_Impl {
-public:
-
-    Trie()
-    {
-        root = new Node();
-    }
-
-    void insert(std::string word)
-    {
-        if (search(word))
-            return;
-
-        Node* tmp = root;
-
-        for (int i = 0; i < word.length(); i++)
-        {
-            if (tmp->letters[word[i] - 'a'] == nullptr)
-                tmp->letters[word[i] - 'a'] = new Node();
-
-            tmp = tmp->letters[word[i] - 'a'];
-        }
-
-        tmp->end = true;
-    }
-
-
-    bool search(std::string word)
-    {
-        Node* tmp = root;
-
-        for (int i = 0; i < word.length(); i++)
-        {
-            if (tmp->letters[word[i] - 'a'] == nullptr)
-                return false;
-
-            tmp = tmp->letters[word[i] - 'a'];
-        }
-
-        return tmp->end;
-    }
-
-
-    bool startsWith(std::string prefix)
-    {
-        Node* tmp = root;
-
-        for (int i = 0; i < prefix.length(); i++)
-        {
-            if (tmp->letters[prefix[i] - 'a'] == nullptr)
-                return false;
-
-            tmp = tmp->letters[prefix[i] - 'a'];
-        }
-
-        return true;
-    }
-
-private:
-    struct Node{
-        std::vector<Node*> letters;
-        bool end = false;
-
-        Node() : letters(26, nullptr) {}
-    };
-
-    struct Node* root = nullptr;
-};
-
-
-int
-main()
-{
-    std::cout << "\n\t==================================";
-    std::cout << "\n\t=== IMPLEMENT TRIE PREFIX NODE ===";
-    std::cout << "\n\t==================================\n";
-
-    /* Example 1 */
-    /*
-
-    ["Trie", "insert", "search", "search", "startsWith", "insert", "search"]
-    [[], ["apple"], ["apple"], ["app"], ["app"], ["app"], ["app"]]
-    Output: [null, null, true, false, true, null, true]
-
-    Explanation
-    Trie *trie = new Trie();
-    trie.insert("apple");
-    trie.search("apple");    // return true
-    trie.search("app");      // return false
-    trie.startsWith("app");  // return true
-    trie.insert("app");
-    trie.search("app");      // return true
-
-    */
-    Trie *trie = new Trie();
-    std::cout << "\n\tInsert \"apple\"\n";
-    trie->insert ("apple");
-
-    if (trie->search("apple"))
-        std::cout << "\n\tWord \"apple\" does INDEED exist!\n";
-    else
-        std::cout << "\n\tWord \"apple\" does NOT exist!\n";
-
-    if (trie->search("app"))
-        std::cout << "\n\tWord \"app\" does INDEED exist!\n";
-    else
-        std::cout << "\n\tWord \"app\" does NOT exist!\n";
-
-    if (trie->startsWith("app"))
-        std::cout << "\n\tPrefix \"app\" does INDEED exist!\n";
-    else
-        std::cout << "\n\tPrefix \"app\" does NOT exist!\n";
-
-    std::cout << "\n\tInsert \"app\"\n";
-    trie->insert("app");
-
-    if (trie->search("app"))
-        std::cout << "\n\tWord \"app\" does INDEED exist!\n";
-    else
-        std::cout << "\n\tWord \"app\" does NOT exist!\n";
-
-    std::cout << "\n\n";
-
-    return 0;
-}
