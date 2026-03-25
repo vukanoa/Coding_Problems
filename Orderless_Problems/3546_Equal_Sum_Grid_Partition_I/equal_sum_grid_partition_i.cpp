@@ -64,11 +64,11 @@ using namespace std;
 
 */
 
-/* Time  Beats: 10.11% */
-/* Space Beats:  6.94% */
+/* Time  Beats: 45.68% */
+/* Space Beats: 99.28% */
 
 /* Time  Complexity: O(ROWS * COLS) */
-/* Space Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(1)           */
 class Solution {
 public:
     bool canPartitionGrid(vector<vector<int>>& grid)
@@ -76,52 +76,34 @@ public:
         const int ROWS = grid.size();
         const int COLS = grid[0].size();
 
-        vector<vector<long long>> magic(ROWS, vector<long long>(COLS, 0));
-
-        if (ROWS == 1)
+        long long total_sum = 0;
+        for (int row = 0; row < ROWS; row++)
         {
-            long long to_the_right = 0;
-            for (int col = COLS-1; col >= 0; col--)
-            {
-                magic[0][col]  = grid[0][col] + to_the_right;
-                to_the_right  += grid[0][col];
-            }
-        }
-        else if (COLS == 1)
-        {
-            long long under = 0;
-            for (int row = ROWS-1; row >= 0; row--)
-            {
-                magic[row][0]  = grid[row][0] + under;
-                under         += grid[row][0];
-            }
-        }
-        else
-        {
-            for (int row = ROWS-1; row >= 0; row--)
-            {
-                long long to_the_right = 0;
-                for (int col = COLS-1; col >= 0; col--)
-                {
-                    if (row + 1 < ROWS)
-                        magic[row][col] += magic[row+1][col];
-
-                    magic[row][col] += grid[row][col] + to_the_right;
-                    to_the_right    += grid[row][col];
-                }
-            }
+            for (int col = 0; col < COLS; col++)
+                total_sum += grid[row][col];
         }
 
+        long long prefix = 0;
 
-        for (int row = 1; row < ROWS; row++)
+        /* Horizontal cuts */
+        for (int row = 0; row < ROWS-1; row++)
         {
-            if (magic[0][0] - magic[row][0] == magic[row][0])
+            for (int col = 0; col < COLS; col++)
+                prefix += grid[row][col];
+
+            if (prefix == total_sum - prefix)
                 return true;
         }
 
-        for (int col = 1; col < COLS; col++)
+        prefix = 0; // Reset
+
+        /* Vertical cuts */
+        for (int col = 0; col < COLS-1; col++)
         {
-            if (magic[0][0] - magic[0][col] == magic[0][col])
+            for (int row = 0; row < ROWS; row++)
+                prefix += grid[row][col];
+
+            if (prefix == total_sum - prefix)
                 return true;
         }
 
