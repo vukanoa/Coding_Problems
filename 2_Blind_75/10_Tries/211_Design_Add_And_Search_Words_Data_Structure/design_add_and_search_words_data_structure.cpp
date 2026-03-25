@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -84,78 +81,103 @@
 
 */
 
-/* Time  Beats: 95.27% */
-/* Space Beats: 78.10% */
+#include <string>
+using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    Fundamental Trie problem.
+
+*/
+
+/* Time  Beats: 54.63% */
+/* Space Beats: 30.72% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(T) */
 class WordDictionary {
 private:
     struct TrieNode {
-        TrieNode* children[26];
-        bool end_of_a_word;
+        TrieNode* letter[26] = {nullptr};
+        bool is_end;
 
         TrieNode()
-        {
-            end_of_a_word = false;
-            memset(children, NULL, sizeof(children));
-        }
+            : is_end(false)
+        {}
     };
 
+    TrieNode* root;
+
 public:
-    /* Initialize */
     WordDictionary()
+        : root(nullptr)
     {
-        root = new TrieNode();
+
     }
 
-    /* Add */
-    void addWord(std::string word)
+    void addWord(string word)
     {
+        if (search(word)) // If it's already added
+            return;
+
+        if ( ! root)
+            root = new TrieNode();
+
         TrieNode* node = root;
-
-        for (const char& c : word)
+        for (const char& chr : word)
         {
-            if (node->children[c - 'a'] == nullptr)
-                node->children[c - 'a'] = new TrieNode();
+            if ( ! node->letter[chr - 'a'])
+                node->letter[chr - 'a'] = new TrieNode();
 
-            node = node->children[c - 'a'];
+            node = node->letter[chr - 'a'];
         }
 
-        node->end_of_a_word = true;
+        node->is_end = true;
+    }
+    
+    bool search(string word)
+    {
+        return dfs_search(0, word, root);
     }
 
-    /* Search */
-    bool search(std::string word)
+    bool dfs_search(int start, string word, TrieNode* node)
     {
-        return backtracking(word, 0, root);
-    }
+        if ( ! root)
+            return false;
 
-    bool backtracking(std::string& word, int i, TrieNode* curr_node)
-    {
-        TrieNode* node = curr_node;
+        const int N = word.size();
+        if (start == N && node->is_end)
+            return true;
 
-        while (i < word.length() && node)
+        for (int letter_idx = start; letter_idx < N; letter_idx++)
         {
-            if (word[i] == '.')
+            char chr = word[letter_idx];
+
+            if (chr == '.')
             {
-                TrieNode* tmp = node;
-                for (int j = 0; j < 26; j++)
+                for (int i = 0; i < 26; i++)
                 {
-                    node = tmp->children[j];
-                    if (backtracking(word, i+1, node))
+                    if (node->letter[i] && dfs_search(letter_idx+1, word, node->letter[i]))
                         return true;
                 }
+
+                return false;
             }
             else
-                node = node->children[word[i] - 'a'];
+            {
+                if ( ! node->letter[chr - 'a'])
+                    return false;
 
-            i++;
+                node = node->letter[chr - 'a'];
+            }
         }
 
-        return node && node->end_of_a_word;
+        return node->is_end;
     }
-
-
-private:
-    struct TrieNode* root;
 };
 
 /**
