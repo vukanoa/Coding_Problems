@@ -85,127 +85,20 @@
 #include <vector>
 using namespace std;
 
-/* Time  Complexity: TLE. Used to pass all tests prior to June 2022. */
-
-/* Time  Complexity: O(words.length * m * n * 4^(m * n)) */
-/* Space Complexity: O(words.length + m * n) */
-class Solution_TLE_Solution {
-public:
-    vector<string> findWords(vector<vector<char>>& board, vector<string>& words)
-    {
-        vector<string> results;
-        int m = board.size();
-        int n = board[0].size();
-
-        for (int i = 0; i < words.size(); i++)
-        {
-            for (int row = 0; row < m; row++)
-            {
-                for (int col = 0; col < n; col++)
-                {
-                    if (words[i][0] == board[row][col])
-                    {
-                        char starting_letter = words[i][0];
-                        board[row][col] = '#';
-
-                        string current;
-                        current += starting_letter;
-
-                        bool found;
-                        found = dfs(board, words, current, results, words[i], row, col, 1);
-
-                        board[row][col] = starting_letter;
-
-                         if (found)
-                        {
-                            // Breaks out of 2 for loops
-                            row = col = 32000;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        return results;
-    }
-
-private:
-    bool dfs(vector<vector<char>>& board,
-             vector<string>& words,
-             string current,
-             vector<string>& results,
-             string& search_word,
-             int row,
-             int col,
-             int word_pos)
-    {
-        if (word_pos >= search_word.size())
-        {
-            results.push_back(current);
-            return true;
-        }
-
-        // Up, Right, Down, Up
-        vector<pair<int, int>> directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
-
-        for (const auto& dir : directions) // Constant time
-        {
-            // Out of bounds
-            if (row + dir.first < 0 || row + dir.first >= board.size() || col + dir.second < 0 || col + dir.second >= board[0].size())
-                continue;
-            
-            if (board[row + dir.first][col + dir.second] == search_word[word_pos])
-            {
-                char previously_on_board = board[row + dir.first][col + dir.second];
-                board[row + dir.first][col + dir.second] = '#';
-                current += previously_on_board;
-
-                bool found = dfs(board, words, current, results, search_word, row + dir.first, col + dir.second, word_pos + 1);
-
-                // If found, we still have to give back the "previously_on_board" character;
-                board[row + dir.first][col + dir.second] = previously_on_board;
-
-                if (found)
-                    return true;
-                else
-                    current.pop_back();
-            }
-        }
-
-        return false;
-    }
-};
-
-
-
-
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Looking at the previous TLE Solution we can see that we are, sort of, doing
-    repetitive work. It seems as though we can optimize it.
+    While doing a DFS traversal on the board, we can, simultaneously go through
+    the Trie data structure that we've constructed from the words vector.
 
-    In the above Solution, we're going through each word and for each word,
-    we're going to try each of the letter in the board(unless, of course, we
-    happen to find the whole word starting from a position before the last one
-    in the board, in that case, we won't check the remaining letter on the
-    board for that specific word, since we have already found it).
+    Then we ask a question:"Does the current PREFIX exists in our wordlist?"
 
-    However, thinking about it, we can see that it would be more optimal, if we
-    could, somehow, iterate through the board only once, and for each letter
-    we're on we can ask if that is the starting letter and then if it is, we
-    consider it as we do a dfs on that letter. And then every subsequent letter
-    we "take" while doing this dfs we can ask if that prefix exists in our
-    wordlist.
 
-    Since we have asked a question:"Does that PREFIX exists in our wordlist?"
-    that highly suggests that, to solve this problem optimally, we must use a
-    Trie as a data structure.
+    Let's have an example wordlist:
 
-    Let's have an example wordlist:["app", "ape", "ace", "blue"]
+        words = ["app", "ape", "ace", "blue"]
 
     For this wordlist, our Prefix Tree(aka "Trie") would look like this:
 
@@ -285,97 +178,103 @@ private:
     That way the Time Complexity is highly optimized.
 
     From:
-        O(words.length * m * n * 4^words.length)
+        O(W * ROWS * COLS * 4^L)
     to
-        O(m * n * 4^words.length)
+        O(ROWS * COLS * 4 * 3^(L - 1) + S)
+
+    L is the maximum length of ANY word.
+    S is the sum of lengths of ALL the lengths of all the words.
 
 */
 
-/* Time  Beats: 95.83% */
-/* Space Beats: 69.66% */
+/* Time  Beats: 74.13% */
+/* Space Beats: 70.06% */
 
-/* Time  Complexity: O(m * n * 4^(m * n)) */
-/* Space Complexity: O(words.length + m * n) */
+/* Time  Complexity: O(ROWS * COLS * 4 * 3^(L - 1) + S) */
+/* Space Complexity: O(S)                               */
 class Solution {
+private:
     struct TrieNode {
-    TrieNode *children[26];
-    string word;
+        TrieNode* letter[26] = {nullptr};
+        string    full_word;
 
-    TrieNode() : word("")
-    {
-        for (int i = 0; i < 26; i++)
-            children[i] = nullptr;
-    }
-};
+        TrieNode()
+            : full_word("")
+        {}
+    };
+
+    TrieNode* root = nullptr;
 
 public:
     vector<string> findWords(vector<vector<char>>& board, vector<string>& words)
     {
-        TrieNode *root = buildTrie(words);
-        vector<string> result;
+        const int ROWS = board.size();
+        const int COLS = board[0].size();
 
-        for (int i = 0; i < board.size(); i++)
+        vector<string> results;
+
+        /* Insert all words in Trie */
+        for (const string& word : words)
+            insert(word);
+
+        for (int row = 0; row < ROWS; row++)
         {
-            for (int j = 0; j < board[0].size(); j++)
+            for (int col = 0; col < COLS; col++)
             {
-                dfs(board, i, j, root, result);
+                backtracking(row, col, root, results, board);
             }
         }
 
-        return result;
+        return results;
     }
 
-    /* Inserts a word into the Trie */
-    TrieNode *buildTrie(vector<string>& words)
+private:
+    void insert(const string& word)
     {
-        TrieNode *root = new TrieNode();
+        if ( ! root)
+            root = new TrieNode();
 
-        for (int i = 0; i < words.size(); i++)
+        TrieNode* node = root;
+        for (const char& chr : word)
         {
-            string word = words[i];
-            TrieNode *curr = root;
+            if ( ! node->letter[chr - 'a'])
+                node->letter[chr - 'a'] = new TrieNode();
 
-            for (int j = 0; j < word.length(); j++) 
-            {
-                int letter_index = word[j] - 'a';
-
-                if (curr->children[letter_index] == nullptr)
-                    curr->children[letter_index] = new TrieNode();
-
-                curr = curr->children[letter_index];
-            }
-
-            curr->word = word;
+            node = node->letter[chr - 'a'];
         }
-
-        return root;
+        node->full_word = word;
     }
 
-    void dfs(vector<vector<char>>& board, int i, int j, TrieNode *trie_node, vector<string>& result)
+    void backtracking(int row, int col, TrieNode* node, vector<string>& results, vector<vector<char>>& board)
     {
-        char c = board[i][j];
+        const int ROWS = board.size();
+        const int COLS = board[0].size();
 
-        if (c == '#' || !trie_node->children[c - 'a'])
+        if (row < 0 || col < 0 || row >= ROWS || col >= COLS)
             return;
 
-        trie_node = trie_node->children[c - 'a'];
+        char chr = board[row][col];
+        if (chr == '#')
+            return;
 
-        if (trie_node->word.size() > 0)
+        if ( ! node->letter[chr - 'a'])
+            return;
+
+        node = node->letter[chr - 'a'];
+
+        if ( ! node->full_word.empty())
         {
-            result.push_back(trie_node->word);
-            trie_node->word = "";
+            results.push_back(node->full_word);
+            node->full_word = ""; // To avoid pushing same word multiple times
         }
 
-        int m = board.size();
-        int n = board[0].size();
+        board[row][col] = '#';
 
-        board[i][j] = '#';
+        backtracking(row - 1, col    , node, results, board);
+        backtracking(row + 1, col    , node, results, board);
+        backtracking(row    , col - 1, node, results, board);
+        backtracking(row    , col + 1, node, results, board);
 
-        if (i > 0)     dfs(board, i - 1, j    , trie_node, result); // Up
-        if (j > 0)     dfs(board, i    , j - 1, trie_node, result); // Left
-        if (i < m - 1) dfs(board, i + 1, j    , trie_node, result); // Down
-        if (j < n - 1) dfs(board, i    , j + 1, trie_node, result); // Right
-
-        board[i][j] = c;
+        board[row][col] = chr;
     }
 };
