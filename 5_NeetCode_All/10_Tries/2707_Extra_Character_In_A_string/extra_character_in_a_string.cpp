@@ -19,9 +19,9 @@
     Return the minimum number of extra characters left over if you break up s
     optimally.
 
-    ================================================================================
+    =================================================================
     FUNCTION: int minExtraChar(string s, vector<string>& dictionary);
-    ================================================================================
+    =================================================================
 
     ==========================================================================
     ================================ EXAMPLES ================================
@@ -75,27 +75,29 @@ using namespace std;
 /* Time  Complexity: O(N^3)                           */
 /* Space Complexity: O(N + total_chars_in_dictionary) */
 class Solution_Memoization {
+private:
+        unordered_map<int, int> memo;
+
 public:
     int minExtraChar(string s, vector<string>& dictionary)
     {
         const int N = s.size();
         unordered_set<string> words(dictionary.begin(), dictionary.end());
 
-        unordered_map<int, int> dp;
-        dp[N] = 0;
+        memo[N] = 0; // Initialize
 
-        return solve(0, dp, s, words);
+        return solve(0, s, words);
     }
 
 private:
-    int solve(int start, unordered_map<int, int>& dp, string& s, unordered_set<string>& words)
+    int solve(int start, string& s, unordered_set<string>& words)
     {
-        if (dp.find(start) != dp.end())
-            return dp[start];
+        if (memo.find(start) != memo.end())
+            return memo[start];
 
         const int N = s.size();
 
-        int skip = 1 + solve(start + 1, dp, s, words);
+        int skip = 1 + solve(start + 1, s, words);
         int take = INT_MAX;
 
         string substr;
@@ -107,10 +109,10 @@ private:
             substr += s[idx];
 
             if (words.find(substr) != words.end()) // O(L) for Hashing
-                take = min(take, solve(idx + 1, dp, s, words));
+                take = min(take, solve(idx + 1, s, words));
         }
 
-        return dp[start] = min(take, skip);
+        return memo[start] = min(take, skip);
     }
 };
 
@@ -159,5 +161,90 @@ public:
         }
 
         return dp[0];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Here, by using Trie data structure, we've managed to recude the Time
+    Compleixty from O(N^3) down to O(N^2) which is HUGE in a general case.
+
+*/
+
+/* Time  Beats: 84.82% */
+/* Space Beats: 26.92% */
+
+/* Time  Complexity: O(N^2)                           */
+/* Space Complexity: O(N + total_chars_in_dictionary) */
+class Solution_Optimal_Using_Trie {
+private:
+    struct TrieNode {
+        TrieNode* letter[26] = {nullptr};
+        bool is_end;
+
+        TrieNode()
+            : is_end(false)
+        {}
+    };
+
+    TrieNode* root = nullptr;
+
+public:
+    int minExtraChar(string s, vector<string>& dictionary)
+    {
+        const int N = s.size();
+
+        vector<int> dp(51, INT_MAX);
+        dp[N] = 0;
+
+        /* Insert words to Trie */
+        for (const string& word : dictionary)
+            insert(word);
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            TrieNode* node = root;
+
+            for (int j = i; j < N; j++)
+            {
+                char chr = s[j];
+
+                if ( ! node || ! node->letter[chr - 'a'])
+                    break;
+
+                node = node->letter[chr - 'a'];
+
+                if (node->is_end)
+                    dp[i] = min(dp[i], dp[i + (j - i + 1)]);
+            }
+
+            dp[i] = min(dp[i], 1 + dp[i+1]);
+        }
+
+        return dp[0];
+    }
+
+private:
+    void insert(const string& word)
+    {
+        if ( ! root)
+            root = new TrieNode();
+
+        TrieNode* node = root;
+        for (const char& chr : word)
+        {
+            if ( ! node->letter[chr - 'a'])
+                node->letter[chr - 'a'] = new TrieNode();
+
+            node = node->letter[chr - 'a'];
+        }
+
+        node->is_end = true;
     }
 };
