@@ -1,9 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-#include <unordered_set>
-#include <climits>
-
 /*
     ==============
     === MEDIUM ===
@@ -26,7 +20,7 @@
     optimally.
 
     ================================================================================
-    FUNCTION: int minExtraChar(std::string s, std::vector<std::string>& dictionary);
+    FUNCTION: int minExtraChar(string s, vector<string>& dictionary);
     ================================================================================
 
     ==========================================================================
@@ -59,41 +53,64 @@
 
 */
 
-/* Time  Beats: 34.52% */
-/* Space Beats: 36.91% */
+#include <string>
+#include <unordered_set>
+#include <vector>
+#include <unordered_map>
+#include <climits>
+using namespace std;
 
-/* Time  Complexity: O(n^3) */
-/* Space Complexity: O(n) */
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 68.86% */
+/* Space Beats: 73.86% */
+
+/* Time  Complexity: O(N^3)                           */
+/* Space Complexity: O(N + total_chars_in_dictionary) */
 class Solution_Memoization {
 public:
-    int minExtraChar(std::string s, std::vector<std::string>& dictionary)
+    int minExtraChar(string s, vector<string>& dictionary)
     {
-        std::unordered_set<std::string> words(dictionary.begin(), dictionary.end());
+        const int N = s.size();
+        unordered_set<string> words(dictionary.begin(), dictionary.end());
 
-        std::unordered_map<int, int> dp;
-        dp[s.length()] = 0;
+        unordered_map<int, int> dp;
+        dp[N] = 0;
 
-        return dfs(s, words, dp, 0);
+        return solve(0, dp, s, words);
     }
 
 private:
-    int dfs(std::string& s, std::unordered_set<std::string>& words, std::unordered_map<int, int>& dp, int start)
+    int solve(int start, unordered_map<int, int>& dp, string& s, unordered_set<string>& words)
     {
         if (dp.find(start) != dp.end())
             return dp[start];
 
-        int result = 1 + dfs(s, words, dp, start+1); // Skip current character
+        const int N = s.size();
 
-        for (int i = start; i < s.length(); i++)
+        int skip = 1 + solve(start + 1, dp, s, words);
+        int take = INT_MAX;
+
+        string substr;
+        substr.reserve(N-1 - start + 1);
+
+        /* Take */
+        for (int idx = start; idx < N; idx++)
         {
-            std::string substr = s.substr(start, i - start + 1);
-            if (words.find(substr) != words.end())
-                result = std::min(result, dfs(s, words, dp, i + 1));
+            substr += s[idx];
+
+            if (words.find(substr) != words.end()) // O(L) for Hashing
+                take = min(take, solve(idx + 1, dp, s, words));
         }
 
-        dp[start] = result;
-
-        return dp[start];
+        return dp[start] = min(take, skip);
     }
 };
 
@@ -109,34 +126,36 @@ private:
 
 */
 
-/* Time  Beats: 47.21% */
-/* Space Beats: 43.30% */
+/* Time  Beats: 32.71% */
+/* Space Beats: 51.58% */
 
-/* Time  Complexity: O(n^3) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N^3)                           */
+/* Space Complexity: O(N + total_chars_in_dictionary) */
 class Solution {
 public:
-    int minExtraChar(std::string s, std::vector<std::string>& dictionary)
+    int minExtraChar(string s, vector<string>& dictionary)
     {
-        std::unordered_set<std::string> dict(dictionary.begin(), dictionary.end());
-        std::vector<int> dp(s.length() + 1, INT_MAX);
+        const int N = s.size();
 
-        dp[s.length()] = 0;
+        vector<int> dp(51, INT_MAX);
+        dp[N] = 0;
 
-        // O(n)
-        for (int start = s.length() - 1; start >= 0; start--)
+        unordered_set<string> uset(dictionary.begin(), dictionary.end());
+
+        for (int i = N-1; i >= 0; i--)
         {
-            // O(n)
-            for (int i = start; i < s.length(); i++)
-            {
-                // O(n)
-                std::string current_substr = s.substr(start, i - start + 1);
+            string substr;
+            substr.reserve(N-1 - i + 1);
 
-                if (dict.find(current_substr) != dict.end())
-                    dp[start] = std::min(dp[start], dp[start + current_substr.length()]);
+            for (int j = i; j < N; j++)
+            {
+                substr += s[j];
+
+                if (uset.count(substr)) // O(N) to hash + O(1) for comparison
+                    dp[i] = min(dp[i], dp[i + (j - i + 1)]);
             }
 
-            dp[start] = std::min(dp[start], 1+dp[start+1]);
+            dp[i] = min(dp[i], 1 + dp[i+1]);
         }
 
         return dp[0];
