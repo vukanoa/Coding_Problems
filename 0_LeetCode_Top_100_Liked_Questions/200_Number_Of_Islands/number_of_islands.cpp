@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include<queue>
-
 /*
     ==============
     === MEDIUM ===
@@ -56,6 +52,9 @@
 
 */
 
+#include <vector>
+#include <queue>
+using namespace std;
 
 /*
     ------------
@@ -63,14 +62,6 @@
     ------------
 
     A simple self-explanatory DFS.
-
-    The only important thing here is that we're somehow allowed to modify our
-    "grid" matrix.
-
-    If that wasn't the case then we would've had to use an unordered_set and/or
-    we could implement a BFS Solution instead of DFS.
-
-    There is also an elegant Find&Union Solution, but I won't implement it yet.
 
 */
 
@@ -85,22 +76,31 @@
 */
 class Solution_DFS {
 public:
-    int numIslands(std::vector<std::vector<char>>& grid)
+    int numIslands(vector<vector<char>>& grid)
     {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
         int islands = 0;
 
-        int ROWS = grid.size();
-        int COLS = grid[0].size();
-
-        for (int i = 0; i < ROWS; i++)
+        for (int row = 0; row < ROWS; row++)
         {
-            for (int j = 0; j < COLS; j++)
+            for (int col = 0; col < COLS; col++)
             {
-                if (grid[i][j] == '1')
+                if (grid[row][col] == '1')
                 {
-                    dfs(grid, i, j);
+                    dfs(row, col, grid);
                     islands++;
                 }
+            }
+        }
+
+        /* Restore original Grid */
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                if (grid[row][col] == '#')
+                    grid[row][col] = '1';
             }
         }
 
@@ -108,24 +108,24 @@ public:
     }
 
 private:
-    void dfs(std::vector<std::vector<char>>& grid, int i, int j)
+    void dfs(int row, int col, vector<vector<char>>& grid)
     {
-        int ROWS = grid.size();
-        int COLS = grid[0].size();
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
 
-        if (i < 0 || j < 0 || i == ROWS || j >= COLS)
+        if (row < 0 || col < 0 || row >= ROWS || col >= COLS)
             return;
 
-        if (grid[i][j] != '1')
+        if (grid[row][col] != '1')
             return;
 
-        grid[i][j] = 'x'; // visited
+        grid[row][col] = '#';
 
         /* Signing Cross */
-        dfs(grid, i-1, j  ); // Up
-        dfs(grid, i+1, j  ); // Down
-        dfs(grid, i  , j+1); // Right
-        dfs(grid, i  , j-1); // Left
+        dfs(row-1, col  , grid); // Up
+        dfs(row+1, col  , grid); // Down
+        dfs(row  , col-1, grid); // Left
+        dfs(row  , col+1, grid); // Right
     }
 };
 
@@ -137,30 +137,25 @@ private:
     --- IDEA ---
     ------------
 
-    It's a similar IDEA, just implemented using BFS.
-
-    I wanted to implement it in as different way as possible, that's why I've
-    used: lambda function, directions, pairs, etc.
-
-    BFS does NOT use recursion. BFS uses a Queue, instead.
+    TODO
 
 */
 
 /* Time  Beats: 91.73% */
 /* Space Beats: 26.98% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
 class Solution_BFS{
 public:
-    int numIslands(std::vector<std::vector<char>>& grid)
+    int numIslands(vector<vector<char>>& grid)
     {
         int ROWS = grid.size();
         int COLS = grid[0].size();
 
         /* Signing Cross */
         // (Up, Down, Left, Right)
-        std::vector<std::pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        vector<pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
         int islands = 0;
 
@@ -183,15 +178,15 @@ public:
                     grid[i][j] = 'x'; // Mark as processed
 
                     /* BFS */
-                    std::queue<std::pair<int, int>> queue;
+                    queue<pair<int, int>> queue;
                     queue.push({i, j});
 
                     while (!queue.empty())
                     {
-                        std::pair<int, int> curr = queue.front();
+                        pair<int, int> curr = queue.front();
                         queue.pop();
 
-                        for (const std::pair<int, int>& dir : directions)
+                        for (const pair<int, int>& dir : directions)
                         {
                             int row = curr.first  + dir.first;
                             int col = curr.second + dir.second;
@@ -210,70 +205,3 @@ public:
         return islands;
     }
 };
-
-
-int
-main()
-{
-    Solution_DFS sol_dfs;
-    Solution_BFS sol_bfs;
-
-
-    /* Example 1 */
-    // std::vector<std::vector<char>> grid {
-    //     {'1', '1', '1', '1', '0'},
-    //     {'1', '1', '0', '1', '0'},
-    //     {'1', '1', '0', '0', '0'},
-    //     {'0', '0', '0', '0', '0'}
-    // };
-
-    /* Example 2 */
-    std::vector<std::vector<char>> grid {
-        {'1', '1', '0', '0', '0'},
-        {'1', '1', '0', '0', '0'},
-        {'0', '0', '1', '0', '0'},
-        {'0', '0', '0', '1', '1'}
-    };
-
-
-    std::cout << "\n\t=========================";
-    std::cout << "\n\t=== NUMBER OF ISLANDS ===";
-    std::cout << "\n\t=========================\n";
-
-
-    /* Write Input */
-    bool first = true;
-    std::cout << "\n\tGrid: \n\t[\n\t\t";
-    for (auto x: grid)
-    {
-        if (!first)
-            std::cout << ", \n\t\t";
-
-        bool first_first = true;
-        std::cout << "[";
-        for (const auto& xx : x)
-        {
-            if (!first_first)
-                std::cout << ", ";
-
-            std::cout << "\"" << xx << "\"";
-            first_first = false;
-        }
-        std::cout << "]";
-
-        first = false;
-    }
-    std::cout << "\n\t]\n";
-
-
-    /* Solution */
-    int islands = sol_dfs.numIslands(grid);
-    // int islands = sol_bfs.numIslands(grid);
-
-
-    /* Write Output */
-    std::cout << "\n\tNumber of Islands: " << islands << "\n\n";
-
-
-    return 0;
-}
