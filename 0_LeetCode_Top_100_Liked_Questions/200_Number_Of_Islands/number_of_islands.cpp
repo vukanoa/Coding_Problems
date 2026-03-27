@@ -141,64 +141,74 @@ private:
 
 */
 
-/* Time  Beats: 91.73% */
-/* Space Beats: 26.98% */
+/* Time  Beats: 41.82% */
+/* Space Beats: 29.37% */
 
 /* Time  Complexity: O(ROWS * COLS) */
 /* Space Complexity: O(ROWS * COLS) */
-class Solution_BFS{
+class Solution_BFS {
 public:
     int numIslands(vector<vector<char>>& grid)
     {
-        int ROWS = grid.size();
-        int COLS = grid[0].size();
-
-        /* Signing Cross */
-        // (Up, Down, Left, Right)
-        vector<pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
         int islands = 0;
 
-        /* Lambda */
-        auto inside = [&](int i, int j)
-        {
-            return i >= 0 && j >= 0 && i < ROWS && j < COLS;
-        };
+        /* Signing Cross */
+        vector<pair<int, int>> directions = {{-1,0}, {1,0}, {0,-1}, {0,1}};
 
-        for (int i = 0; i < ROWS; i++)
+        for (int row = 0; row < ROWS; row++)
         {
-            for (int j = 0; j < COLS; j++)
+            for (int col = 0; col < COLS; col++)
             {
-                if (inside(i, j) && grid[i][j] == '1')
+                if (grid[row][col] == '1')
                 {
                     islands++;
-                    /* If we are not allowed to modify original given "grid",
-                       then use vector<vector<bool>> visisted.
-                    */
-                    grid[i][j] = 'x'; // Mark as processed
+
+                    grid[row][col] = '#'; // Visited
+
+                    queue<pair<int, int>> queue;
+                    queue.push( {row, col} );
 
                     /* BFS */
-                    queue<pair<int, int>> queue;
-                    queue.push({i, j});
-
-                    while (!queue.empty())
+                    while ( ! queue.empty())
                     {
-                        pair<int, int> curr = queue.front();
+                        /* We don't care about level-by-level, just do flood */
+                        auto [curr_row, curr_col] = queue.front();
                         queue.pop();
 
-                        for (const pair<int, int>& dir : directions)
+                        for (const auto& dir : directions)
                         {
-                            int row = curr.first  + dir.first;
-                            int col = curr.second + dir.second;
+                            int new_row = curr_row + dir.first;
+                            int new_col = curr_col + dir.second;
 
-                            if (inside(row, col) && grid[row][col] == '1')
+                            if (new_row < 0      || 
+                                new_col < 0      ||
+                                new_row >= ROWS  ||
+                                new_col >= COLS)
                             {
-                                grid[row][col] = 'x'; // Mark as processed
-                                queue.push({row, col});
+                                continue;
                             }
+
+                            if (grid[new_row][new_col] != '1')
+                                continue;
+
+                            grid[new_row][new_col] = '#'; // Mark as visited
+                            queue.push( {new_row, new_col} );
                         }
+
                     }
                 }
+            }
+        }
+
+        /* Restore original Grid */
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                if (grid[row][col] == '#')
+                    grid[row][col] = '1';
             }
         }
 
