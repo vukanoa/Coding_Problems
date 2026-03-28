@@ -168,3 +168,48 @@ private:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Single Pass implementation.
+
+*/
+
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V)     */
+
+/* Time  Beats: 34.07% */
+/* Space Beats: 45.26% */
+class Solution_Single_Pass {
+public:
+    Node* cloneGraph(Node* node)
+    {
+        unordered_map<Node*, Node*> orig_to_copy;
+        orig_to_copy.insert( {nullptr, nullptr} );
+
+        return dfs(node, orig_to_copy);
+    }
+
+private:
+    Node* dfs(Node* node, unordered_map<Node*, Node*>& orig_to_copy)
+    {
+        if (orig_to_copy.count(node))
+            return orig_to_copy[node];
+
+        /* Create a Clone */
+        Node* copy = new Node(node->val);
+        orig_to_copy[node] = copy;
+
+        /* Link Neighbors */
+        for (Node* nei : node->neighbors)
+            copy->neighbors.push_back(dfs(nei, orig_to_copy));
+
+        return copy;
+    }
+};
