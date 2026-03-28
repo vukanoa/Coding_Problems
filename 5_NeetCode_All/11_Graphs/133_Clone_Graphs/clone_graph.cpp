@@ -113,60 +113,58 @@ public:
     However, Graph is, obviously, a different Data Structure, so the code
     differs as well.
 
-    1. Do a DFS on a give Graph
-    2. While performing a DFS, make a copy of the current node and push current
-       original node, as a key in the Hash Map and copied node as a value.
-    3. When ou finish, you must link copied nodes.
-    4. Iterate through entires in the Hash Map and do this:
-           Node* original  = entry.first;
-           Node* copy_node = entry.second;
+    1. Do a DFS on a given Graph and clone vertices, i.e. populate Hash Map.
 
-           // This is the CRUX
-           for (int i = 0; i < original->neighbors.size(); i++)
-               copy_node->neighbors.push_back(umap[original->neighbors[i]]);
+    2. While performing a DFS, make a copy of the current node and push current
+       original node as a key in the Hash Map and copied node as a value.
+
+    3. Link new, cloned/copied, vertices.
+
+    4. Return the clone of the Input "node".
 
 */
 
-/* Time  Beats: 100% */
-/* Space Beats: 67.55% */
+/* Time  Beats: 67.66% */
+/* Space Beats: 45.26% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V)     */
 class Solution {
 public:
     Node* cloneGraph(Node* node)
     {
-        if (node == nullptr)
-            return nullptr;
-
         unordered_map<Node*, Node*> umap;
 
-        // Create Clones
-        clone_graph(umap, node);
+        /* Clone vertices of Graph, i.e. Populate Hash Map */
+        dfs(node, umap);
 
-        // Link all Clones
-        for (auto& entry : umap)
+        /* Link all Clones(copied vertices) */
+        for (auto& [orig, copy] : umap)
         {
-            Node* original  = entry.first;
-            Node* copy_node = entry.second;
-
-            for (int i = 0; i < original->neighbors.size(); i++)
-                copy_node->neighbors.push_back(umap[original->neighbors[i]]);
+            for (const auto& orig_nei : orig->neighbors)
+                copy->neighbors.push_back(umap[orig_nei]);
         }
 
         return umap[node];
     }
 
-    void clone_graph(unordered_map<Node*, Node*>& umap, Node* curr_node)
+private:
+    // TC: O(V + E) --> O(V + E)
+    // SC: O(V + V) --> O(V)      // Recursion of depth V + Hash Map of V size
+    void dfs(Node* node, unordered_map<Node*, Node*>& umap)
     {
-        // If it was already processed
-        if (umap.find(curr_node) != umap.end())
+        if ( ! node)
             return;
 
-        Node* copy_node = new Node(curr_node->val); // Make a Copy Node
-        umap.insert({curr_node, copy_node});        // Insert in Hash Map
+        Node* copy = new Node(node->val);
+        umap.insert( {node, copy} );
 
-        for (int i = 0; i < curr_node->neighbors.size(); i++)
-            clone_graph(umap, curr_node->neighbors[i]);
+        for (const auto& nei : node->neighbors)
+        {
+            if (umap.count(nei))
+                continue;
+
+            dfs(nei, umap);
+        }
     }
 };
