@@ -80,6 +80,7 @@
 
 */
 
+#include <queue>
 #include <unordered_map>
 #include <vector>
 using namespace std;
@@ -211,5 +212,59 @@ private:
             copy->neighbors.push_back(dfs(nei, orig_to_copy));
 
         return copy;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    An implementation using BFS.
+
+*/
+
+/* Time  Beats: 67.66% */
+/* Space Beats: 97.10% */
+
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V)     */
+class Solution_BFS {
+public:
+    Node* cloneGraph(Node* node)
+    {
+        if ( ! node)
+            return nullptr;
+
+        unordered_map<Node*, Node*> umap;
+        umap.insert( {node, new Node(node->val)} );
+
+        queue<Node*> queue;
+        queue.push(node);
+
+        /* BFS */
+        while ( ! queue.empty())
+        {
+            Node* orig = queue.front();
+            queue.pop();
+
+            for (const auto& orig_nei : orig->neighbors)
+            {
+                if ( ! umap.count(orig_nei))
+                {
+                    umap.insert( {orig_nei, new Node(orig_nei->val)} );
+                    queue.push(orig_nei);
+                }
+
+                Node* copy     = umap[orig];
+                Node* copy_nei = umap[orig_nei];
+                copy->neighbors.push_back(copy_nei);
+            }
+        }
+
+        return umap[node];
     }
 };
