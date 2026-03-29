@@ -106,6 +106,7 @@
 
 */
 
+#include <queue>
 #include <vector>
 using namespace std;
 
@@ -197,7 +198,7 @@ using namespace std;
 
 /* Time  Complexity: O(ROWS * COLS) */
 /* Space Complexity: O(ROWS * COLS) */
-class Solution {
+class Solution_DFS {
 public:
     vector<vector<int>> pacificAtlantic(vector<vector<int>>& heights)
     {
@@ -261,5 +262,134 @@ private:
         dfs(row+1, col  , heights[row][col], visited, heights);
         dfs(row  , col-1, heights[row][col], visited, heights);
         dfs(row  , col+1, heights[row][col], visited, heights);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Just a BFS Solution.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  94.96% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
+class Solution_BFS {
+public:
+    vector<vector<int>> pacificAtlantic(vector<vector<int>>& heights)
+    {
+        const int ROWS = heights.size();
+        const int COLS = heights[0].size();
+        vector<vector<int>> results;
+
+        vector<vector<bool>> pacific (ROWS, vector<bool>(COLS, false));
+        vector<vector<bool>> atlantic(ROWS, vector<bool>(COLS, false));
+
+        /* Signing Cross */
+        vector<pair<int, int>> directions = {{-1,0}, {1,0}, {0,-1}, {0,1}};
+
+
+        queue<pair<int,int>> queue_pacific;
+        queue<pair<int,int>> queue_atlantic;
+
+        /*************************/
+        /* First and Last Column */
+        /*************************/
+        for (int row = 0; row < ROWS; row++)
+        {
+            queue_pacific.push ( {row, 0     } );
+            queue_atlantic.push( {row, COLS-1} );
+
+            pacific [row][0]      = true;
+            atlantic[row][COLS-1] = true;
+        }
+
+        /**********************/
+        /* First and Last Row */
+        /**********************/
+        for (int col = 0; col < COLS; col++)
+        {
+            queue_pacific.push ( {0     , col} );
+            queue_atlantic.push( {ROWS-1, col} );
+
+            pacific [0     ][col] = true;
+            atlantic[ROWS-1][col] = true;
+        }
+
+        /***************/
+        /* BFS Pacific */
+        /***************/
+        while ( ! queue_pacific.empty())
+        {
+            auto [row, col] = queue_pacific.front();
+            queue_pacific.pop();
+
+            for (const auto& dir : directions)
+            {
+                int new_row = row + dir.first;
+                int new_col = col + dir.second;
+
+                if (new_row < 0 || new_col < 0 || new_row >= ROWS || new_col >= COLS)
+                    continue;
+
+                if (heights[new_row][new_col] < heights[row][col])
+                    continue;
+
+                if (pacific[new_row][new_col]) // Already visited
+                    continue;
+
+                pacific[new_row][new_col] = true;
+                queue_pacific.push( {new_row, new_col} );
+            }
+        }
+
+        /****************/
+        /* BFS Atlantic */
+        /****************/
+        while ( ! queue_atlantic.empty())
+        {
+            auto [row, col] = queue_atlantic.front();
+            queue_atlantic.pop();
+
+            for (const auto& dir : directions)
+            {
+                int new_row = row + dir.first;
+                int new_col = col + dir.second;
+
+                if (new_row < 0 || new_col < 0 || new_row >= ROWS || new_col >= COLS)
+                    continue;
+
+                if (heights[new_row][new_col] < heights[row][col])
+                    continue;
+
+                if (atlantic[new_row][new_col]) // Already visited
+                    continue;
+
+                atlantic[new_row][new_col] = true;
+                queue_atlantic.push( {new_row, new_col} );
+            }
+        }
+
+        /***********/
+        /* Results */
+        /***********/
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                if (pacific[row][col] && atlantic[row][col])
+                    results.push_back( {row, col} );
+            }
+        }
+
+        return results;
     }
 };
