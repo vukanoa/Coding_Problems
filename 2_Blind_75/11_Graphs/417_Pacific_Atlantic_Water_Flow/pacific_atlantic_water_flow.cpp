@@ -115,8 +115,13 @@ using namespace std;
     ------------
 
     If you try to do it in a naive way, you would do a simple DFS for each
-    height in the matrix. However that is very inefficient. The Time Complexity
-    of that approach would be O((n * m)^2), which is unacceptable.
+    height in the matrix. However that is very inefficient.
+
+    The Time Complexity of that approach would be:
+
+        O((ROWS * COLS * 4^(ROWS * COLS)),
+
+    which is unacceptable.
 
     Then you'd maybe think: I can **memoize** paths that I've tried and I can
     use some other matrix, say "indicators" which will have the calculated
@@ -126,16 +131,18 @@ using namespace std;
     However that approach is almost impossible to code up. Try it yourself, I
     haven't managed to do it.
 
-    The right way to solve this problem is - First Start from the Pacific ocean
-    and do a DFS from 0th row and then do the same for 0th Column and do a DFS
-    from each of those heights and mark all the heights that you can reach.
+    The right way to solve this problem is to start from the Pacific ocean and
+    do a DFS from 0th row and 0th column and mark all the heights that you can
+    reach.
 
-    Second, start from the Atlantic ocean and do a DFS from last row and then
-    from last column and, again, do a DFS from each of those heights and mark
-    all the heights that you can reach.
+    Second, start from the Atlantic ocean and do a DFS from the last row and
+    last column and mark all the heights that you can reach.
 
-    At the end Iterate through all the positions of heights and check if from
-    that point both oceans can be reach. If it can - push in vector "results'.
+    At the end iterate through all the positions of heights and check if that
+    cell is reachable from BOTH the Pacific and Atlantic oceans.
+
+    If it is reachable from BOTH the Pacific and Atlantic oceans, simply put
+    its row and col to "results" as a pair.
 
     *******************************
     *** Important thing to note ***
@@ -150,31 +157,30 @@ using namespace std;
 
     But in this approach, we're doing the exact opposite. We're starting from
     the Ocean/s and then doing a DFS from it, therefore we can continue in a
-    certain direction if current heights is LESS than or EQUAL to the one we're
+    certain direction if current heights is LESS THAN OR EQUAL to the one we're
     trying to go on.
 
     Consider te very first example:
 
-          0     1     2     3     4
-       +-----+-----+-----+-----+-----+
-    0  |  1  |  2  |  2  |  3  |  5  |
-       +-----+-----+-----+-----+-----+
-    1  |  3  |  2  |  3  |  4  |  4  |
-       +-----+-----+-----+-----+-----+
-    2  |  2  |  4  |  5  |  3  |  1  |
-       +-----+-----+-----+-----+-----+
-    3  |  6  |  7  |  1  |  4  |  5  |
-       +-----+-----+-----+-----+-----+
-    4  |  3  |  1  |  1  |  2  |  4  |
-       +-----+-----+-----+-----+-----+
+                      0     1     2     3     4
+                   +-----+-----+-----+-----+-----+
+                0  |  1  |  2  |  2  |  3  |  5  |
+                   +-----+-----+-----+-----+-----+
+                1  |  3  |  2  |  3  |  4  |  4  |
+                   +-----+-----+-----+-----+-----+
+                2  |  2  |  4  |  5  |  3  |  1  |
+                   +-----+-----+-----+-----+-----+
+                3  |  6  |  7  |  1  |  4  |  5  |
+                   +-----+-----+-----+-----+-----+
+                4  |  3  |  1  |  1  |  2  |  4  |
+                   +-----+-----+-----+-----+-----+
 
-    Consider heights[2][2], which is 5. From it, we can go to the right. To:
-    3, then from 3 we can go to 1 and then from 1 to the Atlantic Ocean.
+    Consider heights[2][2], which is 5. From it, we can go to the right to 3,
+    then from 3 we can go to 1 and then from 1 to the Atlantic Ocean.
 
     We can go from 5 to 3 because 5 is GREATER THAN OR EQUAL TO 3. Similarly,
-    we can go from 3 to 1 because 3 is GREATER THAN OR EQUAL TO 1. And from 1
-    we can reach the Atlantic Ocean.
-
+    we can go from 3 to 1 because 3 is GREATER THAN OR EQUAL TO 1. And finally
+    we can go from 1 to Atlantic Ocean.
 
     However, since we're going in the opposite direction, from the last column
     and 2nd row, which is value 1, we can go to the left because now we have to
@@ -182,48 +188,54 @@ using namespace std;
 
     We can go from 1 to 3 because 1 is LESS THAN OR EQUAL TO 3. Etc.
 
-    It's important to notice this.
+    It's important to note this.
 
 */
 
-/* Time  Beats: 95.60% */
-/* Space Beats: 89.06% */
+/* Time  Beats: 87.47% */
+/* Space Beats: 95.50% */
 
-/* Time  Complexity: O(M * N) */
-/* Space Complexity: O(M * N) */
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
 class Solution {
 public:
-    // Trick for this problem: Go from outside towards the inside
     vector<vector<int>> pacificAtlantic(vector<vector<int>>& heights)
     {
-        int m = heights.size();
-        int n = heights[0].size();
-
-        vector<vector<bool>> pacific (m, vector<bool>(n, false));
-        vector<vector<bool>> atlantic(m, vector<bool>(n, false));
-
-        /* First and Last Row */
-        for (int i = 0; i < m; i++)
-        {
-            dfs(heights, pacific,  i, 0  , heights[i][ 0 ]);
-            dfs(heights, atlantic, i, n-1, heights[i][n-1]);
-        }
-
-        /* First and Last Column */
-        for (int j = 0; j < n; j++)
-        {
-            dfs(heights, pacific,  0,   j, heights[ 0 ][j]);
-            dfs(heights, atlantic, m-1, j, heights[m-1][j]);
-        }
-
-        /* Overlapping positions are results */
+        const int ROWS = heights.size();
+        const int COLS = heights[0].size();
         vector<vector<int>> results;
-        for (int i = 0; i < m; i++)
+
+        vector<vector<bool>> pacific (ROWS, vector<bool>(COLS, false));
+        vector<vector<bool>> atlantic(ROWS, vector<bool>(COLS, false));
+
+        /**********************/
+        /* First and Last Row */
+        /**********************/
+        for (int row = 0; row < ROWS; row++)
         {
-            for (int j = 0; j < n; j++)
+            dfs(row, 0     , -1, pacific,  heights); // Pacific
+            dfs(row, COLS-1, -1, atlantic, heights); // ATLANTIC
+        }
+
+        /*************************/
+        /* First and Last Column */
+        /*************************/
+        for (int col = 0; col < COLS; col++)
+        {
+            dfs(0     , col, -1, pacific,  heights); // Pacific
+            dfs(ROWS-1, col, -1, atlantic, heights); // ATLANTIC
+        }
+
+
+        /***********/
+        /* Results */
+        /***********/
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
             {
-                if (pacific[i][j] && atlantic[i][j]) // If both oceans can be reached from that particular point
-                    results.push_back({i, j});       // Store it in results
+                if (pacific[row][col] && atlantic[row][col])
+                    results.push_back( {row, col} );
             }
         }
 
@@ -231,23 +243,23 @@ public:
     }
 
 private:
-    void dfs(vector<vector<int>>& heights,
-             vector<vector<bool>>& visited,
-             int i,
-             int j,
-             int prev_height)
+    void dfs(int row, int col, int prev_height, vector<vector<bool>>& visited, vector<vector<int>>& heights)
     {
-        int m = heights.size();
-        int n = heights[0].size();
+        const int ROWS = heights.size();
+        const int COLS = heights[0].size();
 
-        if (i < 0 || j < 0 || i == m || j == n || visited[i][j] || heights[i][j] < prev_height)
+        if (row < 0 || col < 0 || row >= ROWS || col >= COLS)
             return;
 
-        visited[i][j] = true;
+        if (heights[row][col] < prev_height || visited[row][col])
+            return;
 
-        dfs(heights, visited, i-1, j  , heights[i][j]); // Up
-        dfs(heights, visited, i+1, j  , heights[i][j]); // Down
-        dfs(heights, visited, i  , j-1, heights[i][j]); // Left
-        dfs(heights, visited, i  , j+1, heights[i][j]); // Right
+        visited[row][col] = true;
+
+        /* Signing Cross */
+        dfs(row-1, col  , heights[row][col], visited, heights);
+        dfs(row+1, col  , heights[row][col], visited, heights);
+        dfs(row  , col-1, heights[row][col], visited, heights);
+        dfs(row  , col+1, heights[row][col], visited, heights);
     }
 };
