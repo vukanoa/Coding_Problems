@@ -151,46 +151,52 @@ using namespace std;
 
 /* Time  Complexity: O(V + E) */
 /* Space Complexity: O(V) */
-class Solution{
-private:
-    bool is_cyclic(vector<vector<int>>& adj, vector<int>& visited, int curr)
-    {
-        if (visited[curr] == 2)
-            return true;
-
-        visited[curr] = 2;
-        for (int i = 0; i < adj[curr].size(); i++)
-        {
-            if (visited[adj[curr][i]] != 1)
-            {
-                if (is_cyclic(adj, visited, adj[curr][i]))
-                    return true;
-            }
-        }
-
-        visited[curr] = 1;
-
-        return false;
-    }
-
+class Solution_DFS {
 public:
     bool canFinish(int numCourses, vector<vector<int>>& prerequisites)
     {
-        vector<vector<int>> adj(numCourses);
+        vector<vector<int>> adj_list(numCourses);
 
-        // Make adjacency matrix(Directed Graph)
-        for (int i = 0; i < prerequisites.size(); i++)
-            adj[prerequisites[i][0]].push_back(prerequisites[i][1]);
+        /* Create an Adjacency List(DAG) */
+        for (const auto& edge : prerequisites)
+        {
+            const auto& a = edge[0]; // To complete course 'a'
+            const auto& b = edge[1]; // you MUST FIRST complete 'b'
+
+            adj_list[a].push_back(b);
+        }
 
         vector<int> visited(numCourses, 0);
-        for (int i = 0; i < numCourses; i++)
+        for (int course_idx = 0; course_idx < numCourses; course_idx++)
         {
-            if (visited[i] == 0)
-            {
-                if (is_cyclic(adj, visited, i))
-                    return false;
-            }
+            if ( ! possible(course_idx, visited, adj_list))
+                return false;
         }
+
+        return true;
+    }
+
+private:
+    bool possible(int course_idx, vector<int>& visited, vector<vector<int>>& adj_list)
+    {
+        if (visited[course_idx] == 2) // Cycle detected
+            return false;
+
+        if (visited[course_idx] == 1) // Already completed
+            return true;
+
+        visited[course_idx] = 2; // Mark as currently in PATH
+
+        for (const int& neighbor : adj_list[course_idx])
+        {
+            if (visited[neighbor] == 1)
+                continue;
+
+            if ( ! possible(neighbor, visited, adj_list))
+                return false;
+        }
+
+        visited[course_idx] = 1; // Mark as successfully completed
 
         return true;
     }
