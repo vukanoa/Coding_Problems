@@ -396,3 +396,93 @@ public:
  * bool param_2 = obj->search(word);
  * bool param_3 = obj->startsWith(prefix);
  */
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, this just utilizes the syntactic sugar of "Defaul Argument".
+
+
+    These are the SAME FUNCTION SIGNATURES:
+
+        bool search(string word&
+        bool search(string word, bool search_for_prefix=false)
+
+    The compiler treats them as same, that's why we're allowed to "change" it
+    and utilize the "default argument" to help us have a cleaner code.
+
+*/
+
+/* Time  Beats: 30.07% */
+/* Space Beats: 54.93% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(T) */ // 'T' <==> total number of created "TrieNode"s
+class Trie_Clean {
+private:
+    struct TrieNode {
+        TrieNode* letter[26] = {nullptr};
+        bool is_end;
+
+        TrieNode()
+            : is_end(false)
+        {}
+    };
+
+    TrieNode* root;
+
+public:
+    Trie_Clean()
+        : root(nullptr)
+    {}
+    
+    void insert(string word)
+    {
+        if ( ! root)
+            root = new TrieNode();
+
+        if (search(word)) // If it already exists, do nothing
+            return;
+
+        TrieNode* node = root;
+        for (const char& chr : word)
+        {
+            if ( ! node->letter[chr - 'a'])
+                node->letter[chr - 'a'] = new TrieNode();
+
+            node = node->letter[chr - 'a'];
+        }
+
+        node->is_end = true;
+    }
+    
+    bool search(string word, bool search_for_prefix=false)
+    {
+        if ( ! root)
+            return false;
+
+        TrieNode* node = root;
+        for (const char& chr : word)
+        {
+            if ( ! node->letter[chr - 'a'])
+                return false;
+
+            node = node->letter[chr - 'a'];
+        }
+        
+        if (search_for_prefix == false)
+            return node->is_end;
+
+        return true;
+    }
+    
+    bool startsWith(string prefix)
+    {
+        return search(prefix, true);
+    }
+};
