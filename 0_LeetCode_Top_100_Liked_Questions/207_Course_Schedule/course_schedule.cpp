@@ -150,7 +150,7 @@ using namespace std;
 /* Space Beats: 90.15% */
 
 /* Time  Complexity: O(V + E) */
-/* Space Complexity: O(V) */
+/* Space Complexity: O(V + E) */
 class Solution_DFS {
 public:
     bool canFinish(int numCourses, vector<vector<int>>& prerequisites)
@@ -211,26 +211,24 @@ private:
     ------------
 
     Consider this Graph represented:
-        1. Adjacency Matrix
-        2. ASCII picture
 
-    1. Adjacency Matrix
-       [[5, 3], [5, 1], [7, 3], [7, 0], [6, 3], [6, 4], [3, 0], [3, 2], [4, 1]]
+    Adjacency List:
+    [[5, 3], [5, 1], [7, 3], [7, 0], [6, 3], [6, 4], [3, 0], [3, 2], [4, 1]]
 
-    2. ASCII Picture
-       2    0    1
-       |   /|   /|
-       |  / |  / |
-       | /  | /  |
-       v    |/   v
-    ---3    /    4
-    |  | \ /|    |
-    |  |  \ |    |
-    |  | / \|    |
-    |  v    v    v
-    |  5    7    6
-    |            ^
-    |____________|
+
+                               2    0    1
+                               |   /|   /|
+                               |  / |  / |
+                               | /  | /  |
+                               v    |/   v
+                            ---3    /    4
+                            |  | \ /|    |
+                            |  |  \ |    |
+                            |  | / \|    |
+                            |  v    v    v
+                            |  5    7    6
+                            |            ^
+                            |____________|
 
 
     Valid Topological Orders for this Graph would be:
@@ -249,28 +247,7 @@ private:
         5)
             2, 0, 3, 1, 5, 7, 4, 6 (arbitrary)
 
-    Kahn's Algorithm:
-        Find a list of "start nodes" where there are no incoming edges and
-        collect them into a set startSet(or zeroSet), at least one such node
-        should exist in a non-empty ACYCLIC graph; "result" is the empty list
-        that will contain the sorted elements.
-
-        -------------------
-        --- Pseudo Code ---
-        -------------------
-
-        while startSet is no empty:
-            take a node "n" from "startSet"
-            add "n" to the tail of "result"
-            for each node "m" with an edge "e" from "n" to "m":
-                mark "e" as removed
-                if "m" does not have incoming edges anymore:
-                    add "m" into "startSet"
-
-        if graph still has edges
-            return false
-        else
-            return true
+    Topological Sort is also known as a "Kahn's Algorithm".
 
 */
 
@@ -278,36 +255,66 @@ private:
 /* Space Beats: 90.15% */
 
 /* Time  Complexity: O(V + E) */
-/* Space Complexity: O(V) */
-class Solution_Topological_2{
+/* Space Complexity: O(V + E) */
+class Solution_Topological {
 public:
-    bool canFinish(int n, vector<vector<int>>& pre)
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites)
     {
-        vector<vector<int>> adj(n, vector<int>());
-        vector<int> degree(n, 0);
+        vector<vector<int>> adj_list(numCourses);
+        vector<int> indegree(numCourses, 0);
 
-        for (int i = 0; i < pre.size(); i++)
+        /* Populate an Adjacency List & Indegree vector */
+        for (const auto& edge : prerequisites)
         {
-            adj[pre[i][1]].push_back(pre[i][0]);
-            degree[pre[i][0]]++;
+            const auto& a = edge[0]; // To complete course 'a'
+            const auto& b = edge[1]; // you MUST FIRST complete 'b'
+
+            /*
+               In Topological Sort algorithm, the Adjacency List MUST be in an
+               UNINTUITIVE way(at least it's unintuitive to me)
+
+               This Adjacency List(i.e. Graph) can be interpreted as:
+
+                   MY(b) dependents: [..., a, ...]
+
+
+               This is required because we need to decrement the "indegree" of
+               dependents as soon as we finish the current course.
+
+               That's why it needs to be in this UNINTUITIVE way.
+            */
+            adj_list[b].push_back(a);
+
+            indegree[a]++; // Number of INCOMING edges
         }
 
-        queue<int> q;
+        queue<int> queue;
 
-        for (int i = 0; i < n; i++)
-            if (degree[i] == 0) q.push(i);
-
-        while (!q.empty())
+        /* Populate Queue with courses that have NO prerequisites */
+        for (int course = 0; course < numCourses; course++)
         {
-            int curr = q.front(); q.pop(); n--;
+            if (indegree[course] == 0)
+                queue.push(course);
+        }
 
-            for (auto next: adj[curr])
+        /* Multi-source BFS from the immediately completable courses */
+        int finished_courses = 0;
+        while ( ! queue.empty())
+        {
+            int course = queue.front();
+            queue.pop();
+
+            finished_courses++;
+
+            for (int& neighbor : adj_list[course])
             {
-                if (--degree[next] == 0)
-                    q.push(next);
+                indegree[neighbor]--;
+
+                if (indegree[neighbor] == 0)
+                    queue.push(neighbor);
             }
         }
 
-        return n == 0;
+        return finished_courses == numCourses;
     }
 };
