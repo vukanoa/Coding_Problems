@@ -72,52 +72,93 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    This one is much more Space efficient for it does not use recursion.
-    However I think this was not the point of this problem, but it is faster
-    on LeetCode, so here it is.
-
-    The point of this problem is to practice "Number of Islands" kind of
-    problem.
+    Self-explanatory.
 
 */
 
-/* Time  Beats: 93.74% */
-/* Space Beats: 79.44% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  36.38% */
 
-/* Time  Complexity: O(M * N) */
-/* Space Complexity: O(1) */
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(1)           */
 class Solution {
 public:
     int islandPerimeter(vector<vector<int>>& grid)
     {
-        int perimeter = 0;
         const int ROWS = grid.size();
         const int COLS = grid[0].size();
+        int perimeter = 0;
 
-        for(int i = 0; i < ROWS; i++)
+        vector<pair<int,int>> directions = {{-1,0}, {1,0}, {0, -1}, {0,1}};
+
+        for (int row = 0; row < ROWS; row++)
         {
-            for(int j = 0; j < COLS; j++)
+            for (int col = 0; col < COLS; col++)
             {
-                if(grid[i][j] == 1)
+                if (grid[row][col] == 1)
                 {
-                    // Unconnected cell
                     perimeter += 4;
 
-                    // Check if it's connected Upwards
-                    if(i > 0        && grid[i-1][j] == 1)
-                        perimeter -= 1;
+                    perimeter -= (row-1 >= 0    && grid[row-1][col  ] == 1 ? 1 : 0);
+                    perimeter -= (row+1 <  ROWS && grid[row+1][col  ] == 1 ? 1 : 0);
+                    perimeter -= (col-1 >= 0    && grid[row  ][col-1] == 1 ? 1 : 0);
+                    perimeter -= (col+1 <  COLS && grid[row  ][col+1] == 1 ? 1 : 0);
+                }
+            }
+        }
 
-                    // Check if it's connected Downwards
-                    if(i < ROWS - 1 && grid[i+1][j] == 1)
-                        perimeter -= 1;
+        return perimeter;
+    }
+};
 
-                    // Check if it's connected to the Left
-                    if(j > 0        && grid[i][j - 1] == 1)
-                        perimeter -= 1;
 
-                    // Check if it's connected to the Right
-                    if(j < COLS - 1 && grid[i][j + 1] == 1)
-                        perimeter -= 1;
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    A little bit more efficient. This way we only checking "Down" and "Right"
+    instead of all 4 directions, each time.
+
+    It's not a big optimization, but it's:
+
+        O(ROWS * COLS * 4) --> O(ROWS * COLS * 2)
+
+    In terms of Big O notation it's virtually the same, but the "wall time
+    clock" is better with this one.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  46.04% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(1)           */
+class Solution_2 {
+public:
+    int islandPerimeter(vector<vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+        int perimeter = 0;
+
+        vector<pair<int,int>> directions = {{-1,0}, {1,0}, {0, -1}, {0,1}};
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                if (grid[row][col] == 1)
+                {
+                    perimeter += 4;
+
+                    if (row+1 < ROWS && grid[row+1][col  ] == 1)
+                        perimeter -= 2; // One for each land cell
+
+                    if (col+1 < COLS && grid[row  ][col+1] == 1)
+                        perimeter -= 2;
                 }
             }
         }
