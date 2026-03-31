@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === EASY ===
@@ -63,14 +60,17 @@
 
 */
 
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
     Count:
-        1. indegree  (i.e. "num_of_people_who_trust_person") and
-        2. outdegree (i.e. "trusts_of_person")
+        1. indegree
+        2. outdegree
 
     of each person(i.e. node) in this Graph. It's a graph problem if you
     haven't noticed.
@@ -84,30 +84,79 @@
 
 */
 
-/* Time  Beats: 52.52% */
-/* Space Beats: 86.09% */
+/* Time  Beats: 60.13% */
+/* Space Beats: 35.66% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V)     */
 class Solution {
 public:
     int findJudge(int n, vector<vector<int>>& trust)
     {
-        if (n == 1)
-            return trust.empty() ? 1 : -1;
+        vector<int> indegree (n+1);
+        vector<int> outdegree(n+1);
 
-        vector<int> num_of_people_who_trust_person(n+1, 0);
-        vector<int> trusts_of_person(n+1, 0);
-
-        for (const auto& entry : trust)
+        for (const auto& edge : trust)
         {
-            trusts_of_person[entry[0]]++;
-            num_of_people_who_trust_person[entry[1]]++;
+            const auto& from = edge[0]; // The one that trusts
+            const auto& to   = edge[1]; // The one that is TRUSTED
+
+            outdegree[from]++;
+            indegree [to]++; // Because "to" is being TRUSTED
         }
 
-        for (int i = 0; i < n+1; i++)
+        for (int i = 1; i < n+1; i++)
         {
-            if (num_of_people_who_trust_person[i] == n-1 && trusts_of_person[i] == 0)
+            if (outdegree[i] == 0 && indegree[i] == n-1)
+                return i;
+        }
+
+        return -1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We can use one vector instead. A little bit less explicit, but saves a bit
+    of Space.
+
+    I believe in production, the above Solution is still prefferable because
+    the save in space is not meaningful, however it's much more difficult to
+    read and maintaing the code.
+
+    But it's good to be aware that you can actually use a single vector.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  92.90% */
+
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V)     */
+class Solution_2 {
+public:
+    int findJudge(int n, vector<vector<int>>& trust)
+    {
+        vector<int> delta (n+1);
+
+        for (const auto& edge : trust)
+        {
+            const auto& from = edge[0]; // The one that trusts
+            const auto& to   = edge[1]; // The one that is TRUSTED
+
+            delta[from]--;
+            delta[to]++;
+        }
+
+        for (int i = 1; i < n+1; i++)
+        {
+            if (delta[i] == n-1)
                 return i;
         }
 
