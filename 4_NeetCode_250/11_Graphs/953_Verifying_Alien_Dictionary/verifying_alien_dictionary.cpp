@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ============
     === EASY ===
@@ -58,6 +56,11 @@
     All characters in words[i] and order are English lowercase letters.
 
 */
+
+#include <string>
+#include <unordered_map>
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -150,167 +153,46 @@
     is the prefix of the first word and the second word is the longer one:
         words = ["hello", "he"] // This is INCORRECT
 
-    How are we going to check for that?
-    Well, since we are always checking for the differing characters within the
-    length of the first word, we can check if at any point, our index j is
-    "out of bounds"(i.e. equal to word_2.length()).
-
-    If that happens to be the case, we're certain that the words are not sorted
-    correcly according to the alien permutation of lowercase English letters,
-    therefore we return false.
-
 */
 
-/* Time  Beats:  100% */
-/* Space Beats: 8.36% */
-
-/* Time  Complexity: O(words.length * longest_word) */
-/*
-    Space Complexity: O(1)
-    Because we always need a HashMap of exactly 26 characters which is constant
-*/
+/* Time  Complexity: O(N * W) */ // W is the length of the longest word
+/* Space Complexity: O(1)     */
 class Solution {
 public:
-    bool isAlienSorted(std::vector<std::string>& words, std::string order)
+    bool isAlienSorted(vector<string>& words, string order)
     {
-        std::unordered_map<char, int> order_map;
+        const int N = words.size();
+        const int LOWERCASE_ENGLISH_LETTERS = 26;
+        unordered_map<char, int> idx_of_chr;
 
-        // Time: O(1), Space: O(1) since order.length is always 26
-        for (int i = 0; i < order.length(); i++)
-            order_map[order[i]] = i;
+        for (int i = 0; i < LOWERCASE_ENGLISH_LETTERS; i++)
+            idx_of_chr.insert( {order[i], i} );
 
-        for (int i = 0; i < words.size() - 1; i++)
+        for (int left = 0; left < N-1; left++)
         {
-            std::string word_1 = words[i];
-            std::string word_2 = words[i + 1];
+            int right = left + 1;
 
-            for (int j = 0; j < word_1.length(); j++)
+            int i = 0;
+            const int LEFT_WORD_SIZE  = words[left].size();
+            const int RIGHT_WORD_SIZE = words[right].size();
+
+            bool lexicographically_smaller = false;
+            while (i < LEFT_WORD_SIZE && i < RIGHT_WORD_SIZE)
             {
-                // Word_2 is a prefix of Word_1 and not the other way around
-                if (j == word_2.length())
+                if (idx_of_chr[words[left][i]] > idx_of_chr[words[right][i]])
                     return false;
 
-                if (word_1[j] != word_2[j])
+                if (idx_of_chr[words[left][i]] < idx_of_chr[words[right][i]])
                 {
-                    if (order_map[word_2[j]] < order_map[word_1[j]])
-                        return false;
-
+                    lexicographically_smaller = true;
                     break;
                 }
-            }
-        }
 
-        return true;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    We can convert every word into a normal order by having mapped letters
-    from a-z to alien order of lowercase english letters.
-
-    Example:
-    "hog..."    Alien   order
-    "abc..."    English order
-
-         Hash Map
-    |  Key  :  Value |
-    +----------------|
-    |  'h'  :   'a'  |
-    +----------------|
-    |  'o'  :   'b'  |
-    +----------------|
-    |  'g'  :   'c'  |
-    +----------------|
-    |  ...  :   ...  |
-    +----------------|
-
-
-    Alien  order of words = ["go", "hoho"]
-
-        *** Convert every word into standard English order ***
-
-    English order of words = ["cb", "abab"]
-
-    std::is_sorted(words.begin(), words.end()) will return false in this case
-    since word "cb" comes before "abab" which should not be the case in English
-
-*/
-
-/* Time  Beats: 59.08% */
-/* Space Beats: 14.53% */
-
-/* Time  Complexity: O(words.length * longest_word) */
-/*
-    Space Complexity: O(1)
-    Because we always need a HashMap of exactly 26 characters which is constant
-*/
-class Solution_Convert_Word_Into_Normal_Order {
-public:
-    bool isAlienSorted(std::vector<std::string>& words, std::string order)
-    {
-        std::unordered_map<char, char> order_map;
-
-        for(int i = 0; i < 26; i++)
-            order_map[order[i]] = (i + 'a');
-
-        for(int i = 0; i < words.size(); i++)
-        {
-            for(int j = 0; j < words[i].size(); j++)
-                words[i][j] = order_map[words[i][j]];
-        }
-
-        return std::is_sorted(words.begin(), words.end());
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Use vector as a HashMap.
-
-*/
-
-/* Time  Beats: 83.41% */
-/* Space Beats: 82.40% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution {
-public:
-    bool isAlienSorted(std::vector<std::string>& words, std::string order)
-    {
-        std::vector<int> alphabet(26, 0);
-
-        for (int i = 0; i < order.length(); i++)
-            alphabet[order[i] - 'a'] = i;
-
-        for (int i = 1; i < words.size(); i++)
-        {
-            int x = 0;
-            int y = 0;
-            while (x < words[i-1].size() && y < words[i].size() && words[i-1][x] == words[i][y])
-            {
-                x++;
-                y++;
+                // Increment
+                i++;
             }
 
-            if (x < words[i-1].size() && y == words[i].size())
-                return false; // ["apple", "app"]
-            else if (x == words[i-1].size())
-                continue;
-            else if (alphabet[words[i-1][x] - 'a'] > alphabet[words[i][y] - 'a'])
+            if ( ! lexicographically_smaller && LEFT_WORD_SIZE > RIGHT_WORD_SIZE)
                 return false;
         }
 
