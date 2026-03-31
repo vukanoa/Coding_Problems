@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === EASY ===
@@ -67,135 +64,8 @@
 
 */
 
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Almost equivalent to problem "Number of Islands", so check out that one.
-
-*/
-
-/* Time  Beats: 79.80% */
-/* Space Beats: 24.85% */
-
-/* Time  Complexity: O(4^(M * N)) */
-/* Space Complexity: O(M * N) */
-class Solution {
-public:
-    int islandPerimeter(std::vector<std::vector<int>>& grid)
-    {
-        const int ROWS = grid.size();
-        const int COLS = grid[0].size();
-
-        int perimeter = 0;
-
-        for (int row = 0; row < ROWS; row++)
-        {
-            for (int col = 0; col < COLS; col++)
-            {
-                if (grid[row][col] == 1)
-                {
-                    dfs(grid, row, col, perimeter);
-
-                    row = ROWS; // break the outer loop
-                    break;      // break the inner loop
-                }
-            }
-        }
-
-        return perimeter;
-    }
-
-private:
-    void dfs(std::vector<std::vector<int>>& grid, int row, int col, int& perimeter)
-    {
-        const int ROWS = grid.size();
-        const int COLS = grid[0].size();
-
-        if (row < 0 || col < 0 || row == ROWS || col == COLS || grid[row][col] == 0)
-        {
-            perimeter++;
-            return;
-        }
-        else if (grid[row][col] == 2)
-            return;
-
-        grid[row][col] = 2;
-
-        /* Signing Cross */
-        dfs(grid, row-1, col  , perimeter);
-        dfs(grid, row+1, col  , perimeter);
-        dfs(grid, row  , col-1, perimeter);
-        dfs(grid, row  , col+1, perimeter);
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Similar as above, the implementation is a bit different.
-
-*/
-
-/* Time  Beats: 83.70% */
-/* Space Beats: 25.46% */
-
-/* Time  Complexity: O(4^(M * N)) */
-/* Space Complexity: O(M * N) */
-class Solution {
-public:
-    int islandPerimeter(std::vector<std::vector<int>>& grid)
-    {
-        const int ROWS = grid.size();
-        const int COLS = grid[0].size();
-
-        int perimeter = 0;
-
-        for (int i = 0; i < ROWS; i++)
-        {
-            for (int j = 0; j < COLS; j++)
-            {
-                if (grid[i][j] == 1)
-                    return dfs(grid, i, j);
-            }
-        }
-
-        return 0;
-    }
-
-private:
-    int dfs(std::vector<std::vector<int>>& grid, int i, int j)
-    {
-        const int ROWS = grid.size();
-        const int COLS = grid[0].size();
-
-        if (i < 0 || j < 0 || i == ROWS || j == COLS || grid[i][j] == 0)
-            return 1;
-
-        if (grid[i][j] == 2)
-            return 0;
-
-        grid[i][j] = 2;
-        int perimeter = 0;
-
-        /* Signing Cross */
-        perimeter += dfs(grid, i-1, j  );
-        perimeter += dfs(grid, i+1, j  );
-        perimeter += dfs(grid, i  , j-1);
-        perimeter += dfs(grid, i  , j+1);
-
-        return perimeter;
-    }
-};
-
-
-
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -218,7 +88,7 @@ private:
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    int islandPerimeter(std::vector<std::vector<int>>& grid)
+    int islandPerimeter(vector<vector<int>>& grid)
     {
         int perimeter = 0;
         const int ROWS = grid.size();
