@@ -1,8 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_set>
-#include <queue>
-
 /*
     ==============
     === MEDIUM ===
@@ -74,6 +69,12 @@
 
 */
 
+#include <string>
+#include <vector>
+#include <unordered_set>
+#include <queue>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -83,63 +84,71 @@
 
 */
 
-/* Time  Beats: 85.85% */
-/* Space Beats: 69.83% */
+/* Time  Beats: 45.77% */
+/* Space Beats: 19.59% */
 
-/* Time  Complexity: O(n * 10) */ // n == 4 --> 10 * 10 * 10 * 10 = 10000
-/* Space Complexity: O(n * 10) */ // n == 4 --> 10 * 10 * 10 * 10 = 10000
+/* Time  Complexity: O(d^WHEELS + DEADENDS_SIZE * WHEELS) */
+/* Space Complexity: O(d^WHEELS)                          */
 class Solution {
 public:
-    int openLock(vector<string> &deadends, string target)
+    int openLock(vector<string>& deadends, string target)
     {
-        std::unordered_set<std::string> visited(deadends.begin(), deadends.end());
+        if (target == "0000")
+            return 0;
 
-        if (visited.find("0000") != visited.end())
+        // O(DEADENDS_SIZE * WHEELS), because of the hashing of size WHEELS */
+        unordered_set<string> visited(deadends.begin(), deadends.end());
+
+        if (visited.count("0000")) // Starting combination is a deadend itself
             return -1;
+
+        queue<pair<string,int>> queue; // {combination_str, number_of_turns};
+        queue.push( {"0000", 0} );
         visited.insert("0000");
 
-        std::queue<std::string> wheel_queue;
-        wheel_queue.push("0000");
-
-        /* BFS */
-        int result = 0;
-        while (!wheel_queue.empty())
+        while ( ! queue.empty())
         {
-            int level_size = wheel_queue.size();
-            while (level_size--)
+            auto [combination_str, number_of_turns] = queue.front();
+            queue.pop();
+
+            vector<string> new_states = generate_new_states(combination_str);
+
+            for (const string& state : new_states)
             {
-                std::string current_wheel = wheel_queue.front();
-                wheel_queue.pop();
+                if (state == target)
+                    return number_of_turns + 1;
 
-                if (current_wheel == target)
-                    return result;
+                if (visited.count(state))
+                    continue;
 
-                std::string up;
-                std::string down;
-                for (int i = 0; i < 4; i++)
-                {
-                    down = up = current_wheel;
-
-                    up[i]   = (up[i]   == '9' ? '0' : up[i]   + 1);
-                    down[i] = (down[i] == '0' ? '9' : down[i] - 1);
-
-                    if (visited.find(up) == visited.end())
-                    {
-                        wheel_queue.push(up);
-                        visited.insert(up);
-                    }
-
-                    if (visited.find(down) == visited.end())
-                    {
-                        wheel_queue.push(down);
-                        visited.insert(down);
-                    }
-                }
+                visited.insert(state);
+                queue.push( {state, number_of_turns+1} );
             }
-
-            result++;
         }
 
         return -1;
+    }
+
+    vector<string> generate_new_states(string combination_str)
+    {
+        const int WHEELS = 4;
+        const int MOD    = 10; // WHEEL_VALUES
+
+        vector<string> new_states;
+        new_states.reserve(WHEELS * 2);
+
+        for (int i = 0; i < WHEELS; i++)
+        {
+            string prev_state = combination_str;
+            string next_state = combination_str;
+
+            prev_state[i] = (((prev_state[i] - '0') - 1 + MOD) % MOD) + '0';
+            next_state[i] = (((next_state[i] - '0') + 1 + MOD) % MOD) + '0';
+
+            new_states.push_back(prev_state);
+            new_states.push_back(next_state);
+        }
+
+        return new_states;
     }
 };
