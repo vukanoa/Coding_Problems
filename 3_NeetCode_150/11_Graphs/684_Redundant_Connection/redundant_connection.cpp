@@ -67,6 +67,7 @@
 
 */
 
+#include <queue>
 #include <unordered_set>
 #include <vector>
 using namespace std;
@@ -203,6 +204,7 @@ public:
 
         dfs(1, -1, visited, start_of_cycle, uset_cycle, adj_list);
 
+        /* Iterate in REVERSE */
         for (int i = N-1; i >= 0; i--)
         {
             int& a = edges[i][0];
@@ -244,5 +246,100 @@ private:
         }
 
         return false; // It's NOT a CYCLE
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Even if Graph is "undirected" we can still remove nodes with indegree == 1.
+
+    1. Nodes with indegree == 1 CANNOT be inside the cycle(every cycle requires
+       all of its nodes to hvae indegree >= 2)
+
+    2. Initially push all the nodes with indegree == 1 in a Queue.
+
+    3. When we remove the front node from the Queue, the indegree of all of its
+       neighbors is decremented by one and if that neighbor's indegree is now
+       1 itself, then push it in a Queue.
+
+    4. Once the entire process is finished, nodes with indegree > 0 are
+       CERTAINLY "cycles nodes".
+
+
+    The redundant edge MUST be the edge where its BOTH NODES are still inside
+    the cycle.
+
+    However, since we're required to return the LAST such edge from the Input,
+    we must iterate through edges in REVERSE order and return the first edge
+    that connects remaining nodes.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  20.41% */
+
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V + E) */
+class Solution_Topological_Trimming {
+public:
+    vector<int> findRedundantConnection(vector<vector<int>>& edges)
+    {
+        const int N = edges.size();
+
+        vector<vector<int>> adj_list(N+1);
+        vector<int> indegree(N+1, 0);
+
+        for (const auto& edge : edges)
+        {
+            const int& a = edge[0];
+            const int& b = edge[1];
+
+            adj_list[a].push_back(b);
+            adj_list[b].push_back(a);
+
+            indegree[a]++;
+            indegree[b]++;
+        }
+
+        queue<int> queue;
+        for (int node = 1; node < N+1; node++)
+        {
+            if (indegree[node] == 1)
+                queue.push( {node} );
+        }
+
+        while ( ! queue.empty())
+        {
+            int node = queue.front();
+            queue.pop();
+
+            indegree[node]--;
+
+            for (const auto& neighbor : adj_list[node])
+            {
+                indegree[neighbor]--;
+
+                if (indegree[neighbor] == 1)
+                    queue.push(neighbor);
+            }
+        }
+
+        /* Iterate in REVERSE */
+        for (int i = N-1; i >= 0; i--)
+        {
+            int& a = edges[i][0];
+            int& b = edges[i][1];
+
+            if (indegree[a] == 2 && indegree[b] > 0)
+                return {a, b};
+        }
+
+        return {}; // Unreachable
     }
 };
