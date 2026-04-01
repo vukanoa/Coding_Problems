@@ -67,6 +67,7 @@
 
 */
 
+#include <unordered_set>
 #include <vector>
 using namespace std;
 
@@ -141,7 +142,7 @@ public:
     }
 };
 
-class Solution_dsuuu {
+class Solution_DSU {
 public:
     vector<int> findRedundantConnection(vector<vector<int>>& edges)
     {
@@ -158,5 +159,90 @@ public:
         }
 
         return {}; // Unreachable
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  18.46% */
+
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V + E) */
+class Solution_DFS_Cycle_Detection {
+public:
+    vector<int> findRedundantConnection(vector<vector<int>>& edges)
+    {
+        const int N = edges.size();
+
+        vector<vector<int>> adj_list(N+1);
+
+        for (const auto& edge : edges)
+        {
+            const int& a = edge[0];
+            const int& b = edge[1];
+
+            adj_list[a].push_back(b);
+            adj_list[b].push_back(a);
+        }
+
+        vector<bool> visited(N+1, false);
+        unordered_set<int> uset_cycle;
+
+        int start_of_cycle = -1;
+
+        dfs(1, -1, visited, start_of_cycle, uset_cycle, adj_list);
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            int& a = edges[i][0];
+            int& b = edges[i][1];
+
+            if (uset_cycle.count(a) && uset_cycle.count(b))
+                return {a, b};
+        }
+
+        return {};
+    }
+
+private:
+    bool dfs(int node, int prev, vector<bool>& visited, int& start_of_cycle, unordered_set<int>& uset_cycle, vector<vector<int>>& adj_list)
+    {
+        if (visited[node])
+        {
+            start_of_cycle = node;
+            return true; // It's a CYCLE
+        }
+
+        visited[node] = true;
+
+        for (const int& neighbor : adj_list[node])
+        {
+            if (neighbor == prev)
+                continue;
+
+            if (dfs(neighbor, node, visited, start_of_cycle, uset_cycle, adj_list))
+            {
+                if (start_of_cycle != -1)
+                    uset_cycle.insert(node);
+
+                if (node == start_of_cycle)
+                    start_of_cycle = -1;
+
+                return true;
+            }
+        }
+
+        return false; // It's NOT a CYCLE
     }
 };
