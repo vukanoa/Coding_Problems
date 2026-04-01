@@ -67,7 +67,6 @@
 
 */
 
-#include <numeric>
 #include <vector>
 using namespace std;
 
@@ -76,80 +75,88 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    This is a typical Union_&_Find Problem.
+    This is a typical Union_&_Find(aka "Disjoint-Set Union") Problem.
 
     If you haven't done "Number of Connected Components in an Undirected Graph"
     do that first.
 
-    There is a detailed Explanation(IDEA) about how and why Union_&_Find works.
-
-    One small thing I've changed in this Implementation of Union_&_Find is that
-    in "Find" function, I only have one line in body of a "while loop".
-
-    But, for didactic purposes, it is better to write it as two liners as in
-    the "Number of Connected Components in an Undirected Graph" version of this
-    Solution.
-
 */
 
-/* Time  Beats: 90.67% */
-/* Space Beats: 79.01% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  53.63% */
 
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
-class Solution {
+/* Time  Complexity: O(E * alpha(V)) */
+/* Space Complexity: O(E)            */
+class DSU {
+private:
+    vector<int> rank;
+    vector<int> parent;
+
+public:
+    DSU(int n)
+    {
+        rank.resize(n+1);
+        parent.resize(n+1);
+
+        for (int i = 1; i <= n; i++)
+        {
+            rank[i]   = 1;
+            parent[i] = i;
+        }
+    }
+
+    int find_root(int node)
+    {
+        while (node != parent[node])
+        {
+            /* Reverse Ackerman function, i.e. <= 5 in practice */
+            parent[node] = parent[parent[node]];
+
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    bool union_components(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        if (root_1 == root_2)
+            return false;
+
+        if (rank[root_1] < rank[root_2])
+            swap(root_1, root_2);
+
+        parent[root_2] = root_1;
+        rank[root_1]  += rank[root_2];
+
+        return true;
+    }
+
+    bool already_connected(int node_1, int node_2)
+    {
+        return find_root(node_1) == find_root(node_2);
+    }
+};
+
+class Solution_dsuuu {
 public:
     vector<int> findRedundantConnection(vector<vector<int>>& edges)
     {
         const int N = edges.size();
 
-        std::vector<int> rank  (N+1, 1);
-        std::vector<int> parent(N+1, 0);
+        DSU dsu(N);
 
-        // parent = [0, 1, 2, 3, ..., n]
-        iota(parent.begin(), parent.end(), 0);
-
-        vector<int> result;
         for (const auto& edge : edges)
         {
-            int node_1 = edge[0];
-            int node_2 = edge[1];
+            if (dsu.already_connected(edge[0], edge[1]))
+                return edge; // Because there's AT MOST ONE extra edge
 
-            if ( ! Union(node_1, node_2, parent, rank))
-                result = edge;
+            dsu.union_components(edge[0], edge[1]);
         }
 
-        return result;
-    }
-
-private:
-    int Find(int node, vector<int>& parent)
-    {
-        while (node != parent[node])
-            node = parent[parent[node]]; // We can write it in one line instead
-
-        return node;
-    }
-
-    bool Union(int node_1, int node_2, vector<int>& parent, vector<int>& rank)
-    {
-        int p1 = Find(node_1, parent);
-        int p2 = Find(node_2, parent);
-
-        if (p1 == p2)
-            return false;
-
-        if (rank[p2] > rank[p1])
-        {
-            parent[p1] = parent[p2];
-            rank[p2] += rank[p1];
-        }
-        else // rank[p1] > rank[p2]
-        {
-            parent[p2] = parent[p1];
-            rank[p1] += rank[p2];
-        }
-
-        return true;
+        return {}; // Unreachable
     }
 };
