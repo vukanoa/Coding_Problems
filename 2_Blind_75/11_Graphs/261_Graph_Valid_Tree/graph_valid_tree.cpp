@@ -297,53 +297,51 @@ private:
 
 */
 
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V + E) */
 class Solution_BFS {
 public:
-    bool validTree(int n, vector<pair<int, int>> edges)
+    bool validTree(int n, vector<vector<int>>& edges)
     {
-        unordered_map<int, vector<int>> adj_list;
+        if (edges.size() > n-1)
+            return false;
 
+        unordered_set<int> visited;
+
+        unordered_map<int, vector<int>> adj_list;
         for (const auto& entry : edges)
         {
-            adj_list[entry.first].push_back (entry.second);
-            adj_list[entry.second].push_back(entry.first);
+            const auto& a = entry[0];
+            const auto& b = entry[1];
+
+            /* Undirected Graph */
+            adj_list[a].push_back(b);
+            adj_list[b].push_back(a);
         }
 
-        unordered_set<int> processed;
-        unordered_set<int> visited;
-        visited.insert(0);
+        queue<pair<int,int>> queue;
+        queue.push( {0, -1} );
 
         /* BFS */
-        queue<int> queue;
-        queue.push(0);
         while ( ! queue.empty())
         {
-            int size = queue.size();
+            auto [node, parent] = queue.front();
+            queue.pop();
 
-            for (int x = 0; x < size; x++)
+            visited.insert(node);
+
+            for (const int& neighbor : adj_list[node])
             {
-                int curr_node = queue.front();
-                queue.pop();
+                if (neighbor == parent)
+                    continue;
 
-                for (const int& nei : adj_list[curr_node])
-                {
-                    if (processed.count(nei)) // Ignore the very previous one
-                        continue;
+                if (visited.count(neighbor))
+                    return false;
 
-                    // If "nei" was already visited ==> Loop exists ==> false
-                    if (visited.count(nei))
-                        return false;
-
-                    queue.push(nei);
-                    visited.insert(nei);
-                }
-
-                processed.insert(curr_node);
+                queue.push( {neighbor, node} );
             }
         }
 
-        return n == visited.size();
+        return visited.size() == n;
     }
 };
