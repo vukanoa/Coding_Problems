@@ -1,15 +1,10 @@
-#include <iostream>
-#include <vector>
-#include <unordered_set>
-#include <queue>
-
 /*
     ==============
     === MEDIUM ===
     ==============
 
     ===========================
-    178) Graph Valid Tree
+    261) Graph Valid Tree
     ===========================
 
     ============
@@ -51,17 +46,25 @@
     Uknown
 */
 
+#include <queue>
+#include <unordered_map>
+#include <vector>
+#include <unordered_set>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
     We have to check if this Graph is a Valid Tree.
+
     We can have something like this:
 
                   X
                  / \
-                X   X
+                /   \
+               X     X
 
     Let's say this is a shape of our Graph.
     Does this count as a Valid Tree? Yes!
@@ -70,10 +73,13 @@
 
                   X
                  / \
-                X - X
+                /   \
+               X-----X
 
     Does this count as a Valid Tree? No!
+
     Trees don't have cycles(loops) in them. That's what being a Tree means.
+
     In this problem they don't tell us that, but you should know that
     definition yourself.
 
@@ -84,15 +90,18 @@
     Consider this:
 
                   X
-                 /
-                X   X
+                 /  
+                /    
+               X     X
 
     Does this count as a Valid Tree? No!
+
+
     This is not a Tree because every node has to be connected.
 
     To summarize - For it to be a Valid Tree:
             1. We can't have loops inside this Graph
-            2. All nodes have to be connected.
+            2. All nodes MUST to be connected.
 
     Also it's worth pointing out, just in case, that a Tree doesn't have to be
     a BST or Binary Tree in general. Any node can have infinite amount of
@@ -173,22 +182,22 @@
 
     Now do a DFS on 1's neighbors, which in this case, is only node 0.
 
-    This a problem I was talking about. If we were to do a DFS on 0, we would
-    conclude that there is a Loop inside of this Graph, while there really is
-    not.
+    This is a problem I was talking about. If we were to do a DFS on 0, we
+    would conclude that there is a Loop inside of this Graph, while there
+    really is not.
 
     So how do we handle this case?
-    We have to keep track of the previous node. That's it.
+    Simply, keep track of the previous, parent, node. That's it.
 
     Once we're on the node 1, previous node is a node which from we've jump to
     the current node, in this case it's node 0. We've jumped on this node 1
     from 0's neighbors listed in its adjacency list.
 
-    Therefore, we have to ignore the "previous node" in current node's list of
-    adjacent nodes.
+    Therefore, we have to ignore the "previous node"(i.e. parent) in current
+    node's list of adjacent nodes.
 
-    We'll do that by passing a "prev_node" in the function DFS, and while
-    iterating through the list of neighbors, if prev_node matches one of the
+    We'll do that by passing a "parent" node in the function DFS, and while
+    iterating through the list of neighbors, if "parent" matches one of the
     neighbors in current node's adjacency list, just ignore that with
     "continue" inside the "for" loop we're using to traverse the neighbors of
     the current node.
@@ -209,7 +218,7 @@
             4 : 1, 3
 
     Once we're on node 4, we'd ignore node 1 in 4's adjacency list of neighbors
-    because node 1 is 4's previous node.
+    because node 1 is 4's previous, parent, node.
 
     But once we get to 4's neighbor of node 3, we'd do a DFS on it.
 
@@ -227,59 +236,52 @@
 
 */
 
-/* Time  Complexity: O(E + V) */
-/* Space Complexity: O(E + V) */
-class Solution{
-private:
-    static const int default_previous_node = -1;
-
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V + E) */
+class Solution_DFS {
 public:
-    bool validTree(int n, std::vector<std::pair<int, int>> edges)
+    bool validTree(int n, vector<vector<int>>& edges)
     {
-        if (n == 0)
-            return true; // Empty Graph does count as a Valid Tree
-
-        std::vector<std::vector<int>> adj_list;
-        std::unordered_set<int> visited;
-
-        // Represent Graph using Adjacency List
-        for (const auto& edge : edges)
-        {
-            adj_list[edge.first].push_back(edge.second);
-            adj_list[edge.second].push_back(edge.first);
-        }
-
-        // DFS
-        bool loop = dfs(adj_list, visited, default_previous_node, 0);
-
-        // If there is a Loop or Not all n nodes are connected
-        if (loop || visited.size() < n)
+        if (edges.size() > n-1)
             return false;
 
-        return true; // This Graph is a Valid Tree
+        unordered_set<int> visited;
+
+        unordered_map<int, vector<int>> adj_list;
+        for (const auto& entry : edges)
+        {
+            const auto& a = entry[0];
+            const auto& b = entry[1];
+
+            /* Undirected Graph */
+            adj_list[a].push_back(b);
+            adj_list[b].push_back(a);
+        }
+
+        if ( ! dfs(0, -1, visited, adj_list))
+            return false;
+
+        return visited.size() == n;
     }
 
 private:
-    void dfs(std::vector<std::vector<int>& adj_list, std::unordered_set<int>& visited, int prev_node, int curr_node)
+    bool dfs(int node, int parent, unordered_set<int>& visited, unordered_map<int, vector<int>>& adj_list)
     {
-        // There is a loop
-        if (visited.count(curr_node))
-            return true;
+        if (visited.count(node))
+            return false;
 
-        visited.insert(curr_node);
+        visited.insert(node);
 
-        for (const int& curr_node_ith_neighbor : adj_list[curr_node])
+        for (const auto& neighbor : adj_list[node])
         {
-            // Ignore previous node in adjacency list
-            if (curr_node_ith_neighbor == prev_node)
+            if (neighbor == parent)
                 continue;
 
-            // There is a loop
-            if (dfs(adj_list, uset_visited, curr_node, curr_node_ith_neighbor))
-                return true;
+            if ( ! dfs(neighbor, node, visited, adj_list))
+                return false;
         }
 
-        return false;
+        return true;
     }
 };
 
@@ -299,14 +301,14 @@ private:
 /* Space Complexity: O(N) */
 class Solution_BFS {
 public:
-    bool validTree(int n, std::vector<std::pair<int, int>> edges)
+    bool validTree(int n, vector<pair<int, int>> edges)
     {
-        std::unordered_map<int, std::vector<int>> adj_list;
+        unordered_map<int, vector<int>> adj_list;
 
         for (const auto& entry : edges)
         {
-            adj_list[edge.first].push_back(edge.second);
-            adj_list[edge.second].push_back(edge.first);
+            adj_list[entry.first].push_back (entry.second);
+            adj_list[entry.second].push_back(entry.first);
         }
 
         unordered_set<int> processed;
