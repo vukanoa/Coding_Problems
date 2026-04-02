@@ -90,8 +90,8 @@ using namespace std;
     Consider this:
 
                   X
-                 /  
-                /    
+                 /
+                /
                X     X
 
     Does this count as a Valid Tree? No!
@@ -412,5 +412,88 @@ public:
         }
 
         return visited.size() == n;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Classic Disjoint-Set Union(aka "Union & Find") Solution.
+
+*/
+
+/* Time  Complexity: O(V + E * alpha(V)) */
+/* Space Complexity: O(V + E)            */
+class DSU {
+private:
+    vector<int> rank;
+    vector<int> parent;
+
+public:
+    DSU(int n)
+    {
+        rank.resize(n);
+        parent.resize(n);
+
+        for (int i = 0; i < n; i++)
+        {
+            rank[i]   = 1;
+            parent[i] = i;
+        }
+    }
+
+    int find_root(int node)
+    {
+        while (node != parent[node])
+        {
+            /* Reverse Ackerman function, <= 5 for all practical purposes */
+            parent[node] = parent[parent[node]];
+
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    bool union_components(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        if (root_1 == root_2)
+            return false;
+
+        if (rank[root_1] < rank[root_2])
+            swap(root_1, root_2);
+
+        parent[root_2] = root_1;
+        rank[root_1]  += rank[root_2];
+
+        return true;
+    }
+};
+
+class Solution_DSU {
+public:
+    bool validTree(int n, vector<vector<int>>& edges)
+    {
+        if (edges.size() > n-1)
+            return false;
+
+        DSU dsu(n);
+
+        for (const auto& edge : edges)
+        {
+            // Components are NOT merged only when they're already a component
+            if ( ! dsu.union_components(edge[0], edge[1]))
+                return false;
+        }
+
+        return true;
     }
 };
