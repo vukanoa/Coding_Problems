@@ -306,8 +306,6 @@ public:
         if (edges.size() > n-1)
             return false;
 
-        unordered_set<int> visited;
-
         unordered_map<int, vector<int>> adj_list;
         for (const auto& entry : edges)
         {
@@ -321,6 +319,9 @@ public:
 
         queue<pair<int,int>> queue;
         queue.push( {0, -1} );
+
+        unordered_set<int> visited;
+
 
         /* BFS */
         while ( ! queue.empty())
@@ -339,6 +340,74 @@ public:
                     return false;
 
                 queue.push( {neighbor, node} );
+            }
+        }
+
+        return visited.size() == n;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a VERY VERY subtle difference from the above BFS Solution, but it
+    is benefiial to be aware of this.
+
+    Here we're marking as "visited" as soon as we push it to the queue. That
+    way we're preventing the pushing of the same nodes more than once.
+
+    This is a common theme in Graph problems, especially in BFS problems and it
+    really pays the dividends to learn this subtle difference.
+
+*/
+
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V + E) */
+class Solution_BFS_2 {
+public:
+    bool validTree(int n, vector<vector<int>>& edges)
+    {
+        if (edges.size() > n-1)
+            return false;
+
+        unordered_map<int, vector<int>> adj_list;
+        for (const auto& entry : edges)
+        {
+            const auto& a = entry[0];
+            const auto& b = entry[1];
+
+            /* Undirected Graph */
+            adj_list[a].push_back(b);
+            adj_list[b].push_back(a);
+        }
+
+        queue<pair<int,int>> queue;
+        queue.push( {0, -1} );
+
+        unordered_set<int> visited;
+        visited.insert(0);
+
+        /* BFS */
+        while ( ! queue.empty())
+        {
+            auto [node, parent] = queue.front();
+            queue.pop();
+
+            for (const int& neighbor : adj_list[node])
+            {
+                if (neighbor == parent)
+                    continue;
+
+                if (visited.count(neighbor))
+                    return false;
+
+                queue.push( {neighbor, node} );
+                visited.insert(neighbor);
             }
         }
 
