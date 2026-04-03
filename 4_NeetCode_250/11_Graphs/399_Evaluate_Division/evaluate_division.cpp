@@ -158,3 +158,85 @@ private:
         return -1.0;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same idea, just using BFS.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  72.56% */
+
+/* Time  Complexity: O(N * W  +  M * N * W) */
+/* Space Complexity: O(N * W)               */
+class Solution_DFS {
+public:
+    vector<double> calcEquation(vector<vector<string>>& equations, vector<double>& values, vector<vector<string>>& queries)
+    {
+        const int N = equations.size();
+        const int M = queries.size();
+
+        unordered_map<string, unordered_map<string, double>> adj_list;
+
+        // O(N * W), where 'W' is the length of the longest string in equations
+        for (int i = 0; i < N; i++)
+        {
+            const string& a = equations[i][0];
+            const string& b = equations[i][1];
+
+            adj_list[a].insert( {b, values[i]      } );
+            adj_list[b].insert( {a, 1.0 / values[i]} ); // Reverse
+        }
+
+        // O(M * N * W)
+        vector<double> results(M, -1.0);
+        for (int j = 0; j < M; j++)
+        {
+            unordered_set<string> path;
+            results[j] = dfs(1.0, queries[j][0], queries[j][1], path, adj_list);
+        }
+
+        return results;
+    }
+
+private:
+    double dfs(double curr_value, string curr_str, string& target_str, unordered_set<string>& path, unordered_map<string, unordered_map<string, double>>& adj_list)
+    {
+        if (adj_list.find(curr_str) == adj_list.end() || adj_list[curr_str].empty())
+            return -1.0;
+
+        if (curr_str == target_str)
+            return 1.0;
+
+        if (adj_list[curr_str].find(target_str) != adj_list[curr_str].end())
+            return curr_value * adj_list[curr_str][target_str];
+
+        path.insert(curr_str);
+
+        // O(N * W), where 'W' is the length of the longest string in equations
+        double result = -1.0;
+        for (const auto& neighbor_entry : adj_list[curr_str])
+        {
+            const auto& neighbor_str   = neighbor_entry.first;
+            const auto& neighbor_value = neighbor_entry.second;
+
+            if (path.count(neighbor_str))
+                continue;
+
+            result = dfs(curr_value * neighbor_value, neighbor_str, target_str, path, adj_list); 
+            if (result != -1)
+                break;
+        }
+
+        path.erase(curr_str);
+
+        return result;
+    }
+};
