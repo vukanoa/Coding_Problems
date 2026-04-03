@@ -240,3 +240,112 @@ private:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Very unusual DSU, be careful when implementing a Solution like this.
+
+*/
+
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  82.80% */
+
+/* Time  Complexity: O(N * M * alpha(N)) */
+/* Space Complexity: O(N + M)            */
+class DSU {
+public:
+    unordered_map<string, string> parent;
+    unordered_map<string, int>    rank;
+    unordered_map<string, double> weight; // node --> parent ratio
+
+    void initialize_node_if_missing(const string& node)
+    {
+        if (parent.count(node))
+            return;
+
+        parent[node] = node;
+        rank[node]   = 1;
+        weight[node] = 1.0;
+    }
+
+    string find_root_node(const string& node)
+    {
+        if (node != parent[node])
+        {
+            string original_parent = parent[node];
+            parent[node] = find_root_node(parent[node]);
+            weight[node] *= weight[original_parent];
+        }
+
+        return parent[node];
+    }
+
+    bool union_components(const string& node_1, const string& node_2, double value)
+    {
+        initialize_node_if_missing(node_1);
+        initialize_node_if_missing(node_2);
+
+        string root_1 = find_root_node(node_1);
+        string root_2 = find_root_node(node_2);
+
+        if (root_1 == root_2)
+            return false;
+
+        parent[root_2] = root_1;
+        weight[root_2] = value * weight[node_1] / weight[node_2];
+
+        // rank still preserved but not actually used
+        rank[root_1] += rank[root_2];
+
+        return true;
+    }
+
+    double get_ratio(const string& node_1, const string& node_2)
+    {
+        if ( ! parent.count(node_1) ||  ! parent.count(node_2))
+            return -1.0;
+
+        string root_1 = find_root_node(node_1);
+        string root_2 = find_root_node(node_2);
+
+        if (root_1 != root_2)
+            return -1.0;
+
+        return weight[node_2] / weight[node_1];
+    }
+};
+
+class Solution_Unusual_DSU {
+public:
+    vector<double> calcEquation(vector<vector<string>>& equations, vector<double>& values, vector<vector<string>>& queries)
+    {
+        const int N = equations.size();
+        DSU dsu;
+
+        for (int i = 0; i < N; i++)
+        {
+            string& a = equations[i][0];
+            string& b = equations[i][1];
+
+            dsu.union_components(a, b, values[i]);
+        }
+
+        vector<double> result;
+        for (const auto& query : queries)
+        {
+            const string& a = query[0];
+            const string& b = query[1];
+
+            result.push_back(dsu.get_ratio(a, b));
+        }
+
+        return result;
+    }
+};
