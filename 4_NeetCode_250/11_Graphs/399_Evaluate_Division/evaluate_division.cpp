@@ -1,9 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_set>
-#include <unordered_map>
-#include <queue>
-
 /*
     ==============
     === MEDIUM ===
@@ -83,6 +77,13 @@
 
 */
 
+#include <string>
+#include <vector>
+#include <unordered_set>
+#include <unordered_map>
+#include <queue>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -93,64 +94,64 @@
 */
 
 /* Time  Beats:   100% */
-/* Space Beats: 67.81% */
+/* Space Beats: 72.56% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution {
+/* Time  Complexity: O(N * W  +  M * N * @) */
+/* Space Complexity: O(N * W)               */
+class Solution_BFS {
 public:
-    std::vector<double> calcEquation(std::vector<std::vector<std::string>>& equations,
-                                     std::vector<double>& values,
-                                     std::vector<std::vector<std::string>>& queries)
+    vector<double> calcEquation(vector<vector<string>>& equations, vector<double>& values, vector<vector<string>>& queries)
     {
-        std::unordered_map<std::string, std::vector<std::pair<std::string, double>>> adj_list;
+        const int N = equations.size();
+        const int M = queries.size();
 
-        for (int i = 0; i < equations.size(); i++)
+        unordered_map<string, unordered_map<string, double>> adj_list;
+
+        // O(N * W), where 'W' is the length of the longest string in equations
+        for (int i = 0; i < N; i++)
         {
-            adj_list[equations[i][0]].push_back( {equations[i][1], 1.0 * values[i]} );
-            adj_list[equations[i][1]].push_back( {equations[i][0], 1.0 / values[i]} );
+            const string& a = equations[i][0];
+            const string& b = equations[i][1];
+
+            adj_list[a].insert( {b, values[i]      } );
+            adj_list[b].insert( {a, 1.0 / values[i]} ); // Reverse
         }
 
-        std::vector<double> result;
-        for (auto& query : queries)
-            result.push_back( BFS(adj_list, query[0], query[1]) );
+
+        vector<double> result(M, -1.0);
+        for (int j = 0; j < M; j++)
+            result[j] = BFS(queries[j][0], queries[j][1], adj_list);
 
         return result;
     }
 
 private:
-    double BFS(std::unordered_map<std::string, std::vector<std::pair<std::string, double>>>& adj_list,
-               std::string& source,
-               std::string& target)
+    double BFS(string& source, string& target, unordered_map<string, unordered_map<string, double>>& adj_list)
     {
         if (adj_list.find(source) == adj_list.end() || adj_list.find(target) == adj_list.end())
             return -1.0;
 
-        std::queue<std::pair<std::string, double>> queue;
+        queue<pair<string, double>> queue;
         queue.push( {source, 1.0} );
 
-        std::unordered_set<std::string> visited;
+        unordered_set<string> visited;
         visited.insert(source);
 
-        while(!queue.empty())
+        while ( ! queue.empty())
         {
-            std::string node   = queue.front().first;
-            double      weight = queue.front().second;
+            auto [curr_str, curr_value] = queue.front();
             queue.pop();
 
-            if (node == target)
-                return weight;
+            if (curr_str == target)
+                return curr_value;
 
-            for (auto& entry : adj_list[node])
+            for (auto& [neighbor_str, neighbor_value] : adj_list[curr_str])
             {
-                std::string neighbor = entry.first;
-                double curr_weight   = entry.second;
+                if (visited.count(neighbor_str))
+                    continue;
 
-                if (visited.find(neighbor) == visited.end())
-                {
-                    queue.push({neighbor, weight * curr_weight});
-                    visited.insert(neighbor);
-                }
+                queue.push( {neighbor_str, curr_value * neighbor_value} );
+                visited.insert(neighbor_str);
             }
         }
 
