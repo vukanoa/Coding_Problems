@@ -1,8 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <stack>
-
 /*
     ============
     === HARD ===
@@ -86,6 +81,13 @@
 
 */
 
+#include <string>
+#include <unordered_map>
+#include <vector>
+#include <algorithm>
+#include <stack>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -95,144 +97,61 @@
 
 */
 
-/* Time  Beats: 69.47% */
-/* Space Beats: 32.82% */
+/* Time  Beats: 18.56% */
+/* Space Beats: 18.56% */
 
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(n)        */
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
 class Solution {
 public:
     vector<int> survivedRobotsHealths(vector<int>& positions, vector<int>& healths, string directions)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-
         const int N = positions.size();
 
-        unordered_map<int, int> position_index_map;
+        unordered_map<int, int> position_to_robot;
         for (int i = 0; i < N; i++)
-            position_index_map.insert( {positions[i], i}  );
+            position_to_robot.insert( {positions[i], i}  );
 
         stack<int> stack;
 
         /* Sort positions */
         sort(positions.begin(), positions.end());
 
-        for (int& pos : positions)
+        for (const int& curr_position : positions)
         {
-            int curr_idx = position_index_map[pos];
+            int robot_idx = position_to_robot[curr_position];
 
-            if (directions[curr_idx] == 'L')
+            if (directions[robot_idx] == 'L')
             {
-                while (!stack.empty() && directions[stack.top()] == 'R' && healths[curr_idx] > 0)
+                while ( ! stack.empty() && healths[robot_idx] > 0)
                 {
                     int stack_top_idx = stack.top();
                     stack.pop();
 
-                    if (healths[stack_top_idx] < healths[curr_idx])
+                    if (healths[stack_top_idx] < healths[robot_idx])
                     {
                         healths[stack_top_idx] = 0;
-                        healths[curr_idx]--;
+                        healths[robot_idx]--;
                     }
-                    else if (healths[stack_top_idx] > healths[curr_idx])
+                    else if (healths[stack_top_idx] > healths[robot_idx])
                     {
                         healths[stack_top_idx]--;
-                        healths[curr_idx] = 0;
+                        healths[robot_idx] = 0;
 
                         stack.push(stack_top_idx);
                     }
                     else // if (healths[stack_top_idx] == healths[curr_idx])
                     {
-                        healths[stack_top_idx] = healths[curr_idx] = 0;
-                    }
-                }
-
-                if (healths[curr_idx] > 0)
-                    stack.push(curr_idx);
-            }
-            else // if (directions[curr_idx] == 'R')
-                stack.push(curr_idx);
-        }
-
-        vector<int> results;
-        for (int& health : healths)
-        {
-            if (health > 0)
-                results.push_back(health);
-        }
-
-        return results;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    TODO
-
-*/
-
-/* Time  Beats: 88.93% */
-/* Space Beats: 34.35% */
-
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(n)        */
-class Solution_Slightly_Optimized {
-public:
-    vector<int> survivedRobotsHealths(vector<int>& positions, vector<int>& healths, string directions)
-    {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-
-        const int N = positions.size();
-
-        unordered_map<int, int> position_index_map;
-        for (int i = 0; i < N; i++)
-            position_index_map.insert( {positions[i], i}  );
-
-        stack<int> stack;
-
-        /* Sort positions */
-        sort(positions.begin(), positions.end());
-
-        for (int& pos : positions)
-        {
-            int curr_idx = position_index_map[pos];
-
-            if (directions[curr_idx] == 'L')
-            {
-                while (!stack.empty() && healths[curr_idx] > 0)
-                {
-                    int stack_top_idx = stack.top();
-                    stack.pop();
-
-                    if (healths[stack_top_idx] < healths[curr_idx])
-                    {
-                        healths[stack_top_idx] = 0;
-                        healths[curr_idx]--;
-                    }
-                    else if (healths[stack_top_idx] > healths[curr_idx])
-                    {
-                        healths[stack_top_idx]--;
-                        healths[curr_idx] = 0;
-
-                        stack.push(stack_top_idx);
-                    }
-                    else // if (healths[stack_top_idx] == healths[curr_idx])
-                    {
-                        healths[stack_top_idx] = healths[curr_idx] = 0;
+                        healths[stack_top_idx] = healths[robot_idx] = 0;
                     }
                 }
             }
             else // if (directions[curr_idx] == 'R')
-                stack.push(curr_idx);
+                stack.push(robot_idx);
         }
 
         vector<int> results;
-        for (int& health : healths)
+        for (const int& health : healths)
         {
             if (health > 0)
                 results.push_back(health);
