@@ -56,6 +56,7 @@
 
 */
 
+#include <queue>
 #include <vector>
 using namespace std;
 
@@ -198,5 +199,81 @@ private:
         dfs(row+1, col  , visited, grid, area);
         dfs(row  , col-1, visited, grid, area);
         dfs(row  , col+1, visited, grid, area);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    A standard BFS implementation.
+
+*/
+
+/* Time  Beats: 24.09% */
+/* Space Beats: 17.11% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
+class Solution_BFS {
+public:
+    int maxAreaOfIsland(vector<vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+        int result = 0;
+
+        vector<vector<bool>> visited(ROWS, vector<bool>(COLS, false));
+
+        /* Signing Cross */
+        vector<pair<int, int>> directions = {{-1,0}, {1,0}, {0,-1}, {0,1}};
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                if (grid[row][col] == 1 && ! visited[row][col])
+                {
+                    /* BFS */
+                    queue<pair<int,int>> queue;
+                    queue.push( {row, col} );
+
+                    visited[row][col] = true;
+
+                    int area = 0;
+
+                    while ( ! queue.empty())
+                    {
+                        auto [curr_row, curr_col] = queue.front();
+                        queue.pop();
+                        area++;
+
+                        for (const auto& dir : directions)
+                        {
+                            int new_row = curr_row + dir.first;
+                            int new_col = curr_col + dir.second;
+
+                            if (new_row < 0 || new_col < 0 || new_row >= ROWS || new_col >= COLS)
+                                continue;
+
+                            if (visited[new_row][new_col] || grid[new_row][new_col] == 0)
+                                continue;
+
+                            queue.push( {new_row, new_col} );
+
+                            visited[new_row][new_col] = true;
+                        }
+                    }
+
+                    result = max(result, area);
+                }
+            }
+        }
+
+        return result;
     }
 };
