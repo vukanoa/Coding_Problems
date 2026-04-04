@@ -56,6 +56,7 @@
 
 */
 
+#include <algorithm>
 #include <queue>
 #include <vector>
 using namespace std;
@@ -275,5 +276,129 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Disjoint-Set Union(aka "DSU") Solution.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  39.01% */
+
+/* Time  Complexity: O(ROWS * COLS * alpha(ROWS * COLS)) */
+/* Space Complexity: O(ROWS * COLS)                      */
+class DSU {
+private:
+    vector<int> rank;
+    vector<int> parent;
+    int components;
+
+public:
+    DSU(const int& ROWS, const int& COLS)
+    {
+        components = ROWS * COLS;
+
+        rank.resize(ROWS * COLS);
+        parent.resize(ROWS * COLS);
+
+        for (int i = 0; i < ROWS * COLS; i++)
+        {
+            rank[i]   = 0; // Because there are Water cells
+            parent[i] = i;
+        }
+    }
+
+    int find_root(int node)
+    {
+        while (node != parent[node])
+        {
+            /* Reverse Ackerman function */
+            parent[node] = parent[parent[node]];
+
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    bool union_components(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        if (root_1 == root_2)
+            return false;
+
+        if (rank[root_1] < rank[root_2])
+            swap(root_1, root_2);
+
+        parent[root_2] = root_1;
+        rank[root_1]  += rank[root_2];
+
+        components--;
+
+        return true;
+    }
+
+    int number_of_components()
+    {
+        return components;
+    }
+
+    int max_rank()
+    {
+        return *max_element(rank.begin(), rank.end());
+    }
+
+    void activate(int idx)
+    {
+        rank[idx] = 1;
+    }
+};
+
+class Solution_DSU {
+public:
+    int maxAreaOfIsland(vector<vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        DSU dsu(ROWS, COLS);
+
+        auto index = [COLS](int row, int col) { return row * COLS + col; };
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                if (grid[row][col] == 1)
+                {
+                    dsu.activate(index(row, col));
+
+                    if (row-1 >= 0 && grid[row-1][col  ] == 1)
+                    {
+                        dsu.union_components(index(row  , col),
+                                             index(row-1, col));
+                    }
+
+                    if (col-1 >= 0 && grid[row  ][col-1] == 1)
+                    {
+                        dsu.union_components(index(row  , col  ),
+                                             index(row  , col-1));
+                    }
+                }
+            }
+        }
+
+        return dsu.max_rank();
     }
 };
