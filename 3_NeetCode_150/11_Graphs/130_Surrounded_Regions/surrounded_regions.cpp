@@ -282,3 +282,165 @@ private:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a bit unusual DSU because it takes advantage of a "dummy node".
+
+    The technique of using a "dummy node" is usually associated with Linked
+    List problems, however it's VERY beneficial to understand this one as well.
+
+    It is just an additional node that we've invented "out of the blue" and are
+    using to see if 'O' nodes are connected to it or not.
+
+    If they ARE, then that means they're the 'O's that are connected to the
+    edge.
+
+    Otherwise they're no and we shall capture them later.
+
+
+    Also, it's important to note that this DSU Solution is using a technique
+    called:
+
+        "1D Flatteing technique"
+
+    which treats the grid as if it's a one continuous row.
+
+    In order to get to some [row][col] you index it like this:
+
+            [row * COLS + col]
+
+    We're using a lambda function to calculate the proper index based on the
+    provided "row" and "col".
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  35.37% */
+
+/* Time  Complexity: O(ROWS * COLS * alpha(ROWS * COLS)) */
+/* Space Complexity: O(ROWS * COLS)                      */
+class DSU {
+private:
+    vector<int> rank;
+    vector<int> parent;
+
+public:
+    DSU(int n)
+    {
+        // +1 because of the DUMMY node, connected to the border
+        rank.resize(n + 1);
+        parent.resize(n + 1);
+
+        for (int i = 0; i < n+1; i++) // n+1 and not just "n" because of dummy
+        {
+            rank[i]   = 1;
+            parent[i] = i;
+        }
+    }
+
+    int find_root(int node)
+    {
+        while (node != parent[node])
+        {
+            /* Reverse Ackerman function */
+            parent[node] = parent[parent[node]];
+
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    bool union_components(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        if (root_1 == root_2)
+            return false;
+
+        if (rank[root_1] < rank[root_2])
+            swap(root_1, root_2);
+
+        parent[root_2] = root_1;
+        rank[root_1]  += rank[root_2];
+
+        return true;
+    }
+
+    bool connected(int node_1, int node_2)
+    {
+        return find_root(node_1) == find_root(node_2);
+    }
+};
+
+class Solution_DSU_Dummy_Node {
+public:
+    void solve(vector<vector<char>>& board)
+    {
+        const int ROWS = board.size();
+        const int COLS = board[0].size();
+
+        vector<pair<int,int>> directions = {{-1,0}, {1,0}, {0,-1}, {0,1}};
+
+        /* Lambda */
+        auto index = [COLS](int row, int col) { return row * COLS + col; };
+
+        DSU dsu(ROWS * COLS);
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                if (board[row][col] != 'O')
+                    continue;
+
+                if (row == 0 || col == 0 || row == ROWS-1 || col == COLS-1)
+                {
+                    int curr_node = index(row , col);
+                    int edge_node = index(ROWS, 0  ); // Dummy node
+
+                    dsu.union_components(curr_node, edge_node);
+                }
+                else
+                {
+                    for (const auto& dir : directions)
+                    {
+                        int new_row = row + dir.first;
+                        int new_col = col + dir.second;
+
+                        // Here it's IMPOSSIBLE to be Out-of-Bounds
+
+                        if (board[new_row][new_col] != 'O')
+                            continue;
+
+                        int curr_node = index(row    , col    );
+                        int next_node = index(new_row, new_col);
+
+                        dsu.union_components(curr_node, next_node);
+                    }
+                }
+            }
+        }
+
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                int curr_node = index(row , col);
+                int edge_node = index(ROWS, 0  ); // Dummy node
+
+                if ( ! dsu.connected(curr_node, edge_node))
+                    board[row][col] = 'X';
+            }
+        }
+    }
+};
