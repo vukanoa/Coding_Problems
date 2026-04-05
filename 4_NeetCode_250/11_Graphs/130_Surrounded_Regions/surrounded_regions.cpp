@@ -66,6 +66,7 @@
 
 */
 
+#include <queue>
 #include <vector>
 using namespace std;
 
@@ -192,5 +193,92 @@ private:
         dfs(row+1, col  , board); // Down
         dfs(row  , col-1, board); // Left
         dfs(row  , col+1, board); // Right
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Just a BFS Implementation.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  46.65% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
+class Solution_BFS_Surrounding {
+public:
+    void solve(vector<vector<char>>& board)
+    {
+        const int ROWS = board.size();
+        const int COLS = board[0].size();
+
+        // First and last ROW
+        for (int col = 0; col < COLS; col++)
+        {
+            if (board[0     ][col] == 'O') bfs(0,      col, board);
+            if (board[ROWS-1][col] == 'O') bfs(ROWS-1, col, board);
+        }
+
+        // First and last COLUMN
+        for (int row = 0; row < ROWS; row++)
+        {
+            if (board[row][0     ] == 'O') bfs(row, 0     , board);
+            if (board[row][COLS-1] == 'O') bfs(row, COLS-1, board);
+        }
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                if (board[row][col] == '#')
+                    board[row][col] = 'O';
+                else
+                    board[row][col] = 'X';
+            }
+        }
+    }
+
+private:
+    void bfs(int row, int col, vector<vector<char>>& board)
+    {
+        const int ROWS = board.size();
+        const int COLS = board[0].size();
+
+        queue<pair<int,int>> queue;
+        queue.push( {row, col} );
+
+        board[row][col] = '#';
+
+        vector<pair<int,int>> directions = {{-1,0}, {1,0}, {0,-1}, {0,1}};
+
+        /* BFS */
+        while ( ! queue.empty())
+        {
+            auto [curr_row, curr_col] = queue.front();
+            queue.pop();
+
+            for (const auto& dir : directions)
+            {
+                int new_row = curr_row + dir.first;
+                int new_col = curr_col + dir.second;
+
+                if (new_row < 0 || new_col < 0 || new_row >= ROWS || new_col >= COLS)
+                    continue;
+
+                if (board[new_row][new_col] != 'O')
+                    continue;
+
+                board[new_row][new_col] = '#';
+                queue.push( {new_row, new_col} );
+            }
+        }
     }
 };
