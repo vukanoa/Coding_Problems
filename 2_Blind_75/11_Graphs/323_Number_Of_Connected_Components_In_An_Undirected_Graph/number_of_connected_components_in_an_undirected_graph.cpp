@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_set>
-
 /*
     ==============
     === MEDIUM ===
@@ -45,81 +41,84 @@
     <Unknown>
 */
 
+#include <numeric>
+#include <vector>
+#include <unordered_set>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Make an adjacency list which then makes it easy to do a DFS search on the
-    entire Graph.
+    Create an adjacency List.
 
-    Go through every single node, starting at 0, then do a DFS Search from it.
-    Since that is the node we're starting the DFS from, we're going to mark it
-    as "beginning" node, i.e. we'll pass the bool value of "true" to the DFS
-    function.
+    Try traversing the Graph by starting from each of the nodes. However we
+    want to visit each node exactly once, therefore we'll use a "visited" set
+    and mark which ones are already visited.
 
-    Then do a DFS to all the directly connected nodes to our "beginning" node
-    and do that recursively until you traverse all of them.
+    If some node is alread visited, we're NOT going to do a DFS on it since the
+    component it is a part of is ALREADY counted.
 
-    While you're traversing, be sure to always check if that node was already
-    visited. If it was, just return from that function call.
-
-    If it's not, then mark it as visited right now by inserting it in a Set.
-
-    After you're done with all the calls from the "beginning" node, return and
-    make the next node as a "beginning" one.
-
-    Note that the number of components only gets updated(incremented) if the
-    beginning node wasn't visited. That's the only case.
-
-    At the end, return variable count.
+    The number of times we actually call a DFS is the exact number of connected
+    components.
 
 */
 
-/* Time  Complexity: O(e + v) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V + E) */
 class Solution {
 public:
-    int countComponents(int n, std::vector<std::pair<int, int>>& edges)
+    int countComponents(int n, vector<vector<int>>& edges)
     {
         // Empty
         if (n == 0)
             return 0;
 
-        std::vector<std::vector<int>> map(n);
+        const int V = n;
+        const int E = edges.size();
 
-        // Represent Graph using adjacency list
-        for (int i = 0; i < edges.size(); i++)
+        vector<vector<int>> adj_list(n);
+
+        /* Create an Adjacency List */
+        for (const auto& edge : edges)
         {
-            std::pair<int, int> edge = edges[i];
+            const int& u = edge[0];
+            const int& v = edge[1];
 
-            // Because it's an UNDIRECTED Graph
-            map[edge.first].push_back(edge.second);
-            map[edge.second].push_back(edge.first);
+            adj_list[u].push_back(v);
+            adj_list[v].push_back(u);
         }
 
-        std::unordered_set<int> uset;
+
+        unordered_set<int> visited;
         int count = 0;
 
-        for (int i = 0; i < n; i++)
-            dfs(map, i, uset, count, true);
+        for (int node = 0; node < V; node++)
+        {
+            if (visited.count(node)) // Component which this not is a part of is already counted
+                continue;
+
+            count += dfs(node, -1, visited, adj_list);
+        }
 
         return count;
     }
 
 private:
-    void dfs(std::vector<std::vector<int>>& map, int i, std::unordered_set<int>& uset, int& count, bool beginning)
+    int dfs(int node, int prev, unordered_set<int>& visited, vector<vector<int>>& adj_list)
     {
-        if (uset.find(i) != uset.end())
-            return;
+        if (visited.count(node))
+            return 0;
 
-        if (beginning)
-            count++;
+        visited.insert(node);
 
-        uset.insert(i);
+        for (const int& neighbor : adj_list[node])
+        {
+            dfs(neighbor, node, visited, adj_list);
+        }
 
-        for (int x = 0; x < map[i].size(); x++)
-            dfs(map, map[i][x], uset, count, false);
+        return 1;
     }
 };
 
@@ -352,22 +351,22 @@ private:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution_Union_&_Find {
+class Solution_Union_and_Find {
 public:
-    int countComponents(int n, std::vector<std::pair<int, int>>& edges)
+    int countComponents(int n, vector<pair<int, int>>& edges)
     {
-        std::vector<int> parents(n);
-        std::vector<int> ranks(n, 1);
+        vector<int> parents(n);
+        vector<int> ranks(n, 1);
 
         // Vector parent = [0, 1, 2, ..., n-1]
-        std::iota(parents.begin(), parents.end(), 0);
+        iota(parents.begin(), parents.end(), 0);
 
         // Iota equivalent to this
         // for (int i = 0; i < n; i++)
         //     parent.push_back(i);
 
         int components = n;
-        for (std::pair<int, int> edge : edges)
+        for (pair<int, int> edge : edges)
         {
             int node_1 = edge.first;
             int node_2 = edge.second;
@@ -380,7 +379,7 @@ public:
     }
 
 private:
-    int Find(int node, std::vector<int>& parents)
+    int Find(int node, vector<int>& parents)
     {
         // Get root parent
         while (node != parents[node])
@@ -395,7 +394,7 @@ private:
         return node;
     }
 
-    bool Union(int node_1, int node_2, std::vector<int>& parents, std::vector<int>& ranks)
+    bool Union(int node_1, int node_2, vector<int>& parents, vector<int>& ranks)
     {
         // Parent 1 & Parent 2
         int p1 = Find(node_1, parents);
