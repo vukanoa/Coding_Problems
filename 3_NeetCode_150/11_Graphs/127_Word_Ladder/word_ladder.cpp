@@ -173,3 +173,128 @@ private:
         return diff == 1;
     }
 };
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Instead of creating an Adjacency list between every two pairs, we can
+    instead build an Adjancency List from every pattern to list of words.
+
+    What is a pattern?
+
+    Since we can "jump" from one word to another if they differ by exactly one
+    letter, then we can generate each of the WORD_SIZE patterns for each word.
+
+    A pattern for, say word "hit" is:
+
+        1)  * i t
+        2)  h * t
+        3)  h i *
+
+    Therefore, for all 3 of these patterns we're going to append the word to it
+    and that way we'll a vector of words that can jump between each other
+    because they all differ on the character were the '*' is.
+
+    This is MUCH more optimal given the Constraints.
+
+    WORD_SIZE is said to be: [1, 10], wheereas
+    M         is said to be: [1, 5000]
+
+    Therefore, we've reduced the Time Complexity from:
+
+        O(M^2 * WORD_SIZE) ----> O(M * WORD_SIZE)
+
+*/
+
+/* Time  Beats: 41.81% */
+/* Space Beats:  6.42% */
+
+/* Time  Complexity: O(M * WORD_SIZE^2) */
+/* Space Complexity: O(M * WORD_SIZE^2) */
+class Solution_Optimal {
+public:
+    int ladderLength(string beginWord, string endWord, vector<string>& wordList)
+    {
+        const int WORD_SIZE = beginWord.size();
+        const int M         = wordList.size();
+        int result = 1; // Shortest sequence length, including beginWord itself
+
+        wordList.push_back(beginWord); // Add starting word
+
+        /* O(M * WORD_SIZE^2) (entire block) */
+        unordered_map<string, vector<string>> adj_list;
+        for (const string& word : wordList) // O(M)
+        {
+            string pattern;
+
+            /* O(WORD_SIZE^2) (entire block) */
+            for (int i = 0; i < WORD_SIZE; i++) // O(WORD_SIZE)
+            {
+                pattern = word; // O(WORD_SIZE)
+                pattern[i] = '*';
+
+                adj_list[pattern].push_back(word);
+            }
+        }
+
+        unordered_set<string> visited;
+        visited.insert(beginWord);
+
+        queue<string> queue;
+        queue.push(beginWord);
+
+        /*******/
+        /* BFS */
+        /*******/
+        /* O(WORD_SIZE^2 + M * WORD_SIZE) (entire block)*/
+        while ( ! queue.empty())
+        {
+            int size = queue.size();
+
+            while (size > 0)
+            {
+                string word = queue.front(); // O(1)
+                queue.pop();                 // O(1)
+
+                string pattern;
+
+                /* O(WORD_SIZE^2 + M * WORD_SIZE) */
+                for (int i = 0; i < WORD_SIZE; i++) // O(WORD_SIZE)
+                {
+                    pattern = word;   // O(WORD_SIZE)
+                    pattern[i] = '*';
+
+
+                    /*
+                        Accessing adj_list[patternn] involves Hashing that takes O(WORD_SIZE)
+                        And there can be at most M "neighbor_word"s within the list
+                        
+                        Therefore: O(WORD_SIZE + M) (entire block)
+                    */
+                    for (const string& neighbor_word : adj_list[pattern]) // O(WORD_SIZE + M)
+                    {
+                        if (visited.count(neighbor_word)) // O(1)
+                            continue;
+
+                        if (neighbor_word == endWord)
+                            return result + 1;
+
+                        visited.insert(neighbor_word); // O(1)
+                        queue.push(neighbor_word);     // O(1)
+                    }
+                }
+
+                // Decrement
+                size--;
+            }
+
+            result++;
+        }
+
+        return 0;
+    }
+};
