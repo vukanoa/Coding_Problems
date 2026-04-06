@@ -41,7 +41,6 @@
     <Unknown>
 */
 
-#include <numeric>
 #include <vector>
 #include <unordered_set>
 using namespace std;
@@ -131,8 +130,7 @@ private:
     ------------
 
     First of all - What is a connected component in a graph?
-    You probably already know, but it's an individual portion of the graph
-    that's all contiguous.
+    It's a connected group of nodes(a single node is a component as well)
 
     Let's consider this first example:
 
@@ -140,12 +138,6 @@ private:
                   |        |
                   |        |
                   2        4
-
-    These two connected components are not conneted to each other, but each of
-    the nodes separately is connected within the component.
-
-    Note that one node by itself, that has no edges, does count as a connected
-    component.
 
     If we were given n nodes where none of them have any edges, then we would
     return n as a result since that's how many connected components there are.
@@ -155,12 +147,13 @@ private:
     1. To solve it as we've solve it above - Make an adjacency list which then
        makes it easy to do a DFS search on the entire Graph.
 
-    2. Union & Find(this solution). If you know this algorithm you probably
-       know that this algorithm is literally made for this type of problem.
+    2. Disjoint-Set Union(aka "Union and Find"). If you know this algorithm you
+       probably know that this algorithm is literally made for this type of
+       problem.
 
-    ************************
-    ***** Union & Find *****
-    ************************
+    **********************************************
+    ***** Disjoint-Set Union(Union and Find) *****
+    **********************************************
 
     Example 1:
 
@@ -183,18 +176,21 @@ private:
                                                 0  1  2  3  4
 
     Each index represents the corresponding node.
-    Index 0 represents the 0 node.
-    Index 1 represents the 1 node.
-    Index 2 represents the 2 node.
-    Index 3 represents the 3 node.
-    Index 4 represents the 4 node.
+
+        Index 0 represents node 0.
+        Index 1 represents node 1.
+        Index 2 represents node 2.
+        Index 3 represents node 3.
+        Index 4 represents node 4.
+
 
     And the value in every single node clearly matches that initially.
     What that basically means is that - Each node is the parent of itself.
 
-    So the way the Union & Find works is basically a forest of trees, so we're
-    going to have multiple trees initially. We'll have n trees.
-    One for every single node, initially.
+    So the way Disjoint-Set Union(aka "Union & Find") works is basically a
+    forest of trees, so we're going to have multiple trees initially.
+
+    We'll have n trees. One for every single node, initially.
 
     And as we go through every single edge in list of edges:
         edges = [[0, 1], [1, 2], [3, 4]]
@@ -203,17 +199,13 @@ private:
 
     What we're going to do is - We'll say:"Okay 0 is going to be the parent. So
     0 is the parent of itself, but what we're going to do to 1 is say that 1's
-    parent now is going to be 0.
+    parent is now going to be 0.
 
-    Basically what we're doing is just connecting the two nodes.
+    What we're doing is connecting the two nodes.
 
-    And since we know that we'just made the single connection, what we can say
-    now is that:"Okay, we've started out with 5 different connected components
-    and we just merged two of them."
-
-    Every time we perform a merge, we're basically taking the number of
-    connected components we have, decrementing it by 1. So that's how we can
-    keep track of the connected components.
+    Every time we perform a merge(i.e. we connect two yet unconnected nodes),
+    we're taking the number of connected components we have, decrementing it by
+    1 so that's how we can keep track of the connected components.
 
     And there is one slight non-required optimization that drastically makes
     the code faster. (It is commented above the line that does the
@@ -223,43 +215,52 @@ private:
     ~~~~~~~~~
     ~~~ 2 ~~~
     ~~~~~~~~~
-    We're going to maintiang the rank of every single component. Basically for
-    every single node, we're going to maintain what's the size of it.
+    We're going to maintain the rank for every single component.
+    For every single node, we're going to maintain what's the size of it.
 
-    If say, 2 is the parent in this Graph:
+    Initially it's going to be 1 for every node.
+
+        rank = [1, 1, 1, 1, 1]
+
+    But since we've just made the merge(merged 1 and 0, i.e. connected 1 to 0)
+    we leave the rank of 1 as it is because it's not the parent, but for the
+    parent node(0 in this example), we are going to add the size of the other
+    component we're merging at the moment.
+
+    Since both components were individual nodes, i.e. both components' size was
+    exactly 1, now the size of the PARENT node 0 is going to be: 1 + 1 = 2.
 
             0 <-- 1        3
 
 
                   2        4
 
-    What's the size of its connected components? It's 1 initially and it's 1
-    in this case, as well.
 
-    Initially it's going to be 1 for every node.
+        rank = [2, 1, 1, 1, 1]
+                0  1  2  3  4
 
-    rank = [1, 1, 1, 1, 1]
 
-    But since we've just made the merge(merged 1 and 0, i.e. connected 1 to 0)
-    we leave the rank of 1 as it is because it's not the parent, but for the
-    parent node(0 in this example), we can say:"Okay the rank is now 2. We're
-    just talking about the size.
+    The reason we're maintaining this vector rank is purely because it's going
+    to be an optimization.
 
-    The reason we're maintaining this vector rank is basically just an
-    optimization.
+    Let's focus on the (0 -- 1) and (2) components.
+    If we're merging these two:
 
-    Let's focus on the (0 -- 1) and (2) component. If we're merging these two:
-    Would we want to merge (0 -- 1) as a child of (2) or would we want to merge
-    (2) as a child of (0 -- 1).
+    Would we want to merge:
+        a)    (0 -- 1) as a child of (2)     , or
+        b)    (2)      as a child of (0 -- 1).
 
-    If we did the former, we'd get a Linked List:
+    If we did the former(i.e. option "a)" ), we'd get a Graph that looks like
+    this:
 
             0 <-- 1        3
             |
             |
             ----> 2        4
 
-    If we did the latter, we'd merge the smaller component under the bigger:
+
+    If we did the latter(i.e. option "b)"), we'd merge the smaller component
+    TOWARDS the bigger:
 
             0 <-- 1        3
             ^
@@ -267,11 +268,12 @@ private:
             ----- 2        4
 
     Now if we consider this a tree, which it is, then the height of the tree
-    is minimized. Now it's a binary tree if you adjust your head to 90 degrees.
+    is MINIMIZED if we do the latter(i.e. "b)" option).
+
+    Now it's a binary tree if you adjust your head to 90 degrees.
+
 
     So let's do an entire simulation:
-
-
 
     ##################
     ### SIMULATION ###
@@ -280,31 +282,40 @@ private:
     Example 1:
 
     I)
-
             0     1        3               parent = [0, 1, 2, 3, 4]
+                                                     0  1  2  3  4
 
-                                           rank = [1, 1, 1, 1, 1]
-                  2        4
+                                           rank =   [1, 1, 1, 1, 1]
+                  2        4                         0  1  2  3  4
 
-        edges = [[0, 1], [1, 2], [3, 4]]    count = 5
+
+        edges = [[0, 1], [1, 2], [3, 4]]    components = 4
                   ^^^^
 
 
 
 
     II)
-                                                    change
+                                                      change
+                                                        |
                                                         |
                                                         v
             0 <-- 1        3               parent = [0, 0, 2, 3, 4]
+                                                     0  1  2  3  4
 
-                                           rank = [2, 1, 1, 1, 1]
-                  2        4                       ^
-                                                   | (incremented)
-                                                change
-                                                    | (decremented)
-                                                    v
-        edges = [[0, 1], [1, 2], [3, 4]]    count = 4
+                                           rank =   [2, 1, 1, 1, 1]
+                  2        4                         0  1  2  3  4
+                                                     ^
+                                                     |
+                                                     | (incremented)
+                                                     |
+                                                  change
+                                                    |
+                                                    |  (decremented)
+                                                    |_____
+                                                         |
+                                                         v
+        edges = [[0, 1], [1, 2], [3, 4]]    components = 4
                           ^^^^
 
 
@@ -313,17 +324,25 @@ private:
     III)
                                                        change
                                                            |
+                                                           |
                                                            v
             0 <-- 1        3               parent = [0, 0, 0, 3, 4]
-            ^
-            |                              rank = [3, 1, 1, 1, 1]
-            ----- 2        4                       ^
-                                                   | (incremented)
-                                                change
-                                                    | (decremented)
-                                                    v
-        edges = [[0, 1], [1, 2], [3, 4]]    count = 3
-                                  ^^^^
+            ^                                        0  1  2  3  4
+            |
+            |                              rank =   [3, 1, 1, 1, 1]
+            ----- 2        4                         0  1  2  3  4
+                                                     ^
+                                                     |
+                                                     | (incremented)
+                                                     |
+                                                  change
+                                                    |
+                                                    |  (decremented)
+                                                    |_____
+                                                         |
+                                                         v
+        edges = [[0, 1], [1, 2], [3, 4]]    components = 4
+                                  ^^^^^
 
 
 
@@ -334,86 +353,92 @@ private:
                                                                  v
             0 <-- 1        3               parent = [0, 0, 0, 3, 3]
             ^              ^
-            |              |               rank = [3, 1, 1, 2, 1]
-            ----- 2        4                                ^
+            |              |               rank =   [3, 1, 1, 2, 1]
+            |              |                         0  1  2  3  4
+            ----- 2        4                                  ^
+                                                            __|
+                                                            |
                                                             | (incremented)
+                                                            |
                                                          change
-                                                             | (decremented)
-                                                    ----------
-                                                    |
-                                                    v
-                                            count = 2
-
-    // count = 2
-    return count;
-
+                                                            |
+                                                            |  (decremented)
+                                                            |_____
+                                                                 |
+                                                                 v
+                                                    components = 2
 */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_Union_and_Find {
+/* Time  Complexity: O(V + E * alpha(V)) */
+/* Space Complexity: O(V)                */
+class DSU {
+private:
+    vector<int> rank;
+    vector<int> parent;
+    int components;
+
 public:
-    int countComponents(int n, vector<pair<int, int>>& edges)
+    DSU (int n)
     {
-        vector<int> parents(n);
-        vector<int> ranks(n, 1);
+        components = n;
 
-        // Vector parent = [0, 1, 2, ..., n-1]
-        iota(parents.begin(), parents.end(), 0);
+        rank.resize(n);
+        parent.resize(n);
 
-        // Iota equivalent to this
-        // for (int i = 0; i < n; i++)
-        //     parent.push_back(i);
-
-        int components = n;
-        for (pair<int, int> edge : edges)
+        for (int i = 0; i < n; i++)
         {
-            int node_1 = edge.first;
-            int node_2 = edge.second;
-
-            if (Union(node_1, node_2, parents, ranks))
-                components--;
+            rank[i]   = 1;
+            parent[i] = i; // Or i+1, depends on the problem
         }
-
-        return components;
     }
 
-private:
-    int Find(int node, vector<int>& parents)
+    int find_root(int node)
     {
-        // Get root parent
-        while (node != parents[node])
+        while (node != parent[node])
         {
-            // Huge Optimization (From O(n) to Amortized O(1) Time Complexity)
-            // If there is no grandparent, nothing will happen
-            parents[node] = parents[parents[node]];
+            /* Reverse Ackerman function */
+            parent[node] = parent[parent[node]];
 
-            node = parents[node];
+            node = parent[node];
         }
 
         return node;
     }
 
-    bool Union(int node_1, int node_2, vector<int>& parents, vector<int>& ranks)
+    bool union_components(int node_1, int node_2)
     {
-        // Parent 1 & Parent 2
-        int p1 = Find(node_1, parents);
-        int p2 = Find(node_2, parents);
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
 
-        if (p1 == p2)
+        if (root_1 == root_2)
             return false;
 
-        if (ranks[p2] > ranks[p1])
-        {
-            parents[p1] = p2;
-            ranks[p2] += ranks[p1];
-        }
-        else // ranks[p1] > ranks[p2]
-        {
-            parents[p2] = p1;
-            ranks[p1] += ranks[p2];
-        }
+        if (rank[root_1] < rank[root_2])
+            swap(root_1, root_2);
+
+        parent[root_2] = root_1;
+        rank[root_1]  += rank[root_2];
+
+        components--;
 
         return true;
+    }
+
+    int number_of_components()
+    {
+        return components;
+    }
+};
+
+class Solution_DSU {
+public:
+    int countComponents(int n, vector<vector<int>>& edges)
+    {
+        DSU dsu(n);
+
+        for (const auto& edge : edges)
+            dsu.union_components(edge[0], edge[1]);
+
+        return dsu.number_of_components();
     }
 };
