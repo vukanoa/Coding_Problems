@@ -60,7 +60,7 @@
 
 */
 
-#include <unordered_set>
+#include <queue>
 #include <vector>
 using namespace std;
 
@@ -69,7 +69,11 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    Basic Topological Sort using DFS.
+    Basic Topological Sort using DFS, however it's important to note that
+    writing a "Topological Sort" is an UNUSUAUL way.
+
+    Much more natural for Topological Sort is to use a Multi-Source BFS.
+    That solution, i.e. "Multi-Source BFS" is the 2nd one in this file.
 
     Consider this Example:
     (Outer Edges represent Dependencies. i.e 1 depends on 3)
@@ -112,7 +116,7 @@ using namespace std;
 
 /* Time  Complexity: O(V + E) */
 /* Space Complexity: O(V + E) */
-class Solution {
+class Solution_Topological_Sort_DFS { // Unusual way of writing Topological
 public:
     vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites)
     {
@@ -182,73 +186,94 @@ private:
     --- IDEA ---
     ------------
 
-    It's the equivalent IDEA, however this one is much more reminiscent of the
-    original problem "Course Schedule".
+    The IDEA is reversed here. Instead of having an Adjacency List where each
+    course(i.e. node) points to all the courses it is dependent on, here we do
+    the exact opposite---We create an Adjacency List where each dependency
+    points to the courses that depend on it.
 
-    For some reason, I prefer implementing it this way.
+    This is done so that we can immediately tell which courses can be
+    immediately completed.
+
+    Such courses have an initial indegree(i.e. the number of nodes that are
+    incoming into it) equal to 0.
+
+    Iniially we push all of those nodes in a Queue and then we simply perform
+    a Multi-Source BFS Solution.
 
 */
 
-/* Time  Beats: 86.19% */
-/* Space Beats: 18.45% */
+/* Time  Beats: 56.11% */
+/* Space Beats: 57.18% */
 
-/*
-    Time  Complexity: O(E + V)
-    where 'E' are Edges, and V are Vecrtices, i.e. Nodes.
-
-    'E' are prerequisites and 'V' are numCourses.
-*/
-/* Space Complexity: O(V) */
-class Solution_Topological {
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V + E) */
+class Solution_Topological_Sort_BFS { // Standard way of writing Topological
 public:
     vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites)
     {
-        vector<int> results;
+        const int V = numCourses;
+        const int E = prerequisites.size();
 
-        unordered_set<int> done;
-        vector<bool> path(numCourses, false);
-        vector<vector<int>> adj_list(numCourses);
+        vector<vector<int>> adj_list(numCourses); // Space: O(V + E)
+        vector<int> indegree(numCourses);         // Space: O(V)
 
-        // Make an Adjacency List
-        for (auto& edge : prerequisites)
-            adj_list[edge[0]].push_back(edge[1]);
+        vector<int> result;
+        result.reserve(numCourses); // This prevent potential reallocations
 
-        for (int i = 0; i < numCourses; i++)
+        /* Create an Adjacency List */
+        // Time: O(E) (entire block)
+        for (const auto& edge : prerequisites)
         {
-            if (!topological_sort(adj_list, i, path, done, results))
-                return {};
+            const int& dst = edge[0];
+            const int& src = edge[1];
+
+            adj_list[src].push_back(dst);
+            indegree[dst]++;
         }
 
-        if (done.size() < numCourses)
-            return {};
+        /* Mark already completed courses, i.e. ones with NO prerequisites */
+        vector<bool> completed(numCourses, false); // Space: O(V)
+        queue<int> queue;                          // Space: O(V)
 
-        return results;
-    }
-
-private:
-    bool topological_sort(vector<vector<int>>& adj_list,
-                     int curr,
-                     vector<bool>& path,
-                     unordered_set<int>& done,
-                     vector<int>& results)
-    {
-        if (done.find(curr) != done.end()) // Already finished
-            return true;
-
-        path[curr] = true;
-        for (int i = 0; i < adj_list[curr].size(); i++)
+        // Time: O(V) (entire block)
+        for (int course = 0; course < numCourses; course++)
         {
-            if (path[adj_list[curr][i]] == true) // Cycle detected
-                return false;
+            if (indegree[course] == 0)
+            {
+                queue.push(course);
+                completed[course] = true;
 
-            if (!topological_sort(adj_list, adj_list[curr][i], path, done, results))
-                return false;
+                result.push_back(course);
+            }
         }
-        path[curr] = false;
 
-        done.insert(curr);
-        results.push_back(curr);
+        /* Multi-source BFS */
+        // Time: O(V + E) (entire block)
+        while ( ! queue.empty())
+        {
+            int course = queue.front();
+            queue.pop();
 
-        return true;
+            for (const int& neighbor : adj_list[course])
+            {
+                if (completed[neighbor])
+                    continue;
+
+                indegree[neighbor]--;
+
+                if (indegree[neighbor] == 0)
+                {
+                    queue.push(neighbor);
+                    completed[neighbor] = true;
+
+                    result.push_back(neighbor);
+                }
+            }
+        }
+
+        if (result.size() == numCourses) 
+            return result;
+
+        return {};
     }
 };
