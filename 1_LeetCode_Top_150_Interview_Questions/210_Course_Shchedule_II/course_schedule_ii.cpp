@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -63,6 +60,9 @@
 
 */
 
+#include <unordered_set>
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -74,95 +74,103 @@
     Consider this Example:
     (Outer Edges represent Dependencies. i.e 1 depends on 3)
 
-    5 ----     ----> 1 -----> 3
-          \   /               |
-           v /                |
-    4 ---> 0 ---------> 2 <----
 
-    we bulld a Hash Map:
+                5 ----     ----> 1 -----> 3
+                      \   /               |
+                       v /                |
+                4 ---> 0 ---------> 2 <----
 
-      Course : Dependencies
-    +--------+--------------+
-    |   0    |   1,2        |
-    +--------+--------------+
-    |   1    |   3          |
-    +--------+--------------+
-    |   2    |              |
-    +--------+--------------+
-    |   3    |   2          |
-    +--------+--------------+
-    |   4    |   0          |
-    +--------+--------------+
-    |   5    |   0          |
-    +--------+--------------+
 
-    We just do a basic DFS where we memorize the path in set called "cycle" and
-    if we find the cycle, immately return false and return an empty vector.
+    we bulld an Adjacency List:
 
-    Upon fully finishing a certain course, i.e. doing a successfull DFS on it,
-    mark it as visited in set "visit" so that we don't have to check it
-    anymore.
+                  Course : [list of courses that MUST be done BEFORE this one]
+                  Course : Dependencies
+                +--------+--------------+
+                |   0    |   1,2        |
+                +--------+--------------+
+                |   1    |   3          |
+                +--------+--------------+
+                |   2    |              |
+                +--------+--------------+
+                |   3    |   2          |
+                +--------+--------------+
+                |   4    |   0          |
+                +--------+--------------+
+                |   5    |   0          |
+                +--------+--------------+
 
-    That's it.
+    Do a simple DFS. If we every stumble on some cycle, mark it and return an
+    empty list.
+
+    Otherwise, push all of the vertices(i.e. courses) we've successfully
+    completed.
 
 */
 
-using namespace std;
+/* Time  Beats: 76.50% */
+/* Space Beats: 52.03% */
 
-/* Time  Beats: 98.67% */
-/* Space Beats: 47.32% */
-
-/*
-    Time  Complexity: O(E + V)
-    where 'E' are Edges, and V are Vecrtices, i.e. Nodes.
-
-    'E' are prerequisites and 'V' are numCourses.
-*/
-/* Space Complexity: O(V) */
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V + E) */
 class Solution {
 public:
     vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites)
     {
-        std::vector<std::vector<int>> map(numCourses, std::vector<int>());
-        std::vector<bool>            cycle (numCourses, 0);
-        std::vector<bool>            visit (numCourses, 0);
+        const int V = numCourses;
+        const int E = prerequisites.size();
 
-        std::vector<int> result;
+        /* "I 'src' depend on 'dst' course" */
+        vector<vector<int>> adj_list(V); // Space: O(V + E)
 
-        // Fill the Hash map
-        for (int i = 0; i < prerequisites.size(); i++)
-            map[prerequisites[i][0]].push_back(prerequisites[i][1]);
+        vector<bool> completed(V, false); // Space: O(V)
+        vector<bool> path(V, false);      // Space: O(V)
 
-        for (int i = 0; i < numCourses; i++)
+        vector<int> result;
+        result.reserve(V);
+
+        /* Create an Adjacency List */
+        for (const auto& edge : prerequisites)
         {
-            if (!dfs(map, cycle, visit, result, i))
-                return {};
+            const int& src = edge[0];
+            const int& dst = edge[1]; // This one needs to be completed FIRST
+
+            adj_list[src].push_back(dst);
+        }
+
+        /* DFS with cycle detection */
+        for (int course = 0; course < V; course++)
+        {
+            if ( ! completed[course])
+            {
+                if (dfs_is_cyclic(course, completed, path, result, adj_list))
+                    return {};
+            }
         }
 
         return result;
     }
 
 private:
-    bool dfs(vector<vector<int>>& map, vector<bool>& cycle, vector<bool>& visit, vector<int>& result, int course)
+    bool dfs_is_cyclic(int course, vector<bool>& completed, vector<bool>& path, vector<int>& result, vector<vector<int>>& adj_list)
     {
-        if (cycle[course])
-            return false;
-
-        if (visit[course])
+        if (path[course]) // Present in the current path---Cycle!
             return true;
 
-        cycle[course] = true;
-        for (const auto& c : map[course])
-        {
-            if (!dfs(map, cycle, visit, result, c))
-                return false;
-        }
-        cycle[course] = false;
-        visit[course] = true;
+        if (completed[course])
+            return false;
 
+        path[course] = true;  // Mark
+        for (const int& neighbor : adj_list[course])
+        {
+            if (dfs_is_cyclic(neighbor, completed, path, result, adj_list))
+                return true;
+        }
+        path[course] = false; // Unmark
+
+        completed[course] = true;
         result.push_back(course);
 
-        return true;
+        return false;
     }
 };
 
@@ -193,13 +201,13 @@ private:
 /* Space Complexity: O(V) */
 class Solution_Topological {
 public:
-    std::vector<int> findOrder(int numCourses, std::vector<std::vector<int>>& prerequisites)
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites)
     {
-        std::vector<int> results;
+        vector<int> results;
 
-        std::unordered_set<int> done;
-        std::vector<bool> path(numCourses, false);
-        std::vector<std::vector<int>> adj_list(numCourses);
+        unordered_set<int> done;
+        vector<bool> path(numCourses, false);
+        vector<vector<int>> adj_list(numCourses);
 
         // Make an Adjacency List
         for (auto& edge : prerequisites)
@@ -218,11 +226,11 @@ public:
     }
 
 private:
-    bool topological_sort(std::vector<std::vector<int>>& adj_list,
+    bool topological_sort(vector<vector<int>>& adj_list,
                      int curr,
-                     std::vector<bool>& path,
-                     std::unordered_set<int>& done,
-                     std::vector<int>& results)
+                     vector<bool>& path,
+                     unordered_set<int>& done,
+                     vector<int>& results)
     {
         if (done.find(curr) != done.end()) // Already finished
             return true;
