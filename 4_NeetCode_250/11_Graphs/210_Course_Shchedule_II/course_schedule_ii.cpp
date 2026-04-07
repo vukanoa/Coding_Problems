@@ -69,12 +69,6 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    Basic Topological Sort using DFS, however it's important to note that
-    writing a "Topological Sort" is an UNUSUAUL way.
-
-    Much more natural for Topological Sort is to use a Multi-Source BFS.
-    That solution, i.e. "Multi-Source BFS" is the 2nd one in this file.
-
     Consider this Example:
     (Outer Edges represent Dependencies. i.e 1 depends on 3)
 
@@ -116,7 +110,7 @@ using namespace std;
 
 /* Time  Complexity: O(V + E) */
 /* Space Complexity: O(V + E) */
-class Solution_Topological_Sort_DFS { // Unusual way of writing Topological
+class Solution_Cycle_Detection {
 public:
     vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites)
     {
@@ -220,7 +214,7 @@ public:
         vector<int> result;
         result.reserve(numCourses); // This prevent potential reallocations
 
-        /* Create an Adjacency List */
+        /* Create an Adjacency List and populate indegree */
         // Time: O(E) (entire block)
         for (const auto& edge : prerequisites)
         {
@@ -275,5 +269,79 @@ public:
             return result;
 
         return {};
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Basic Topological Sort using DFS, however it's important to note that
+    writing a "Topological Sort" is an UNUSUAUL way.
+
+    Much more natural for Topological Sort is to use a Multi-Source BFS.
+    That solution, i.e. "Multi-Source BFS" is the 2nd one in this file(above).
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  52.03% */
+
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V + E) */
+class Solution_Topological_Sort_DFS { // Unusual way of writing Topological
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites)
+    {
+        const int V = numCourses;
+        const int E = prerequisites.size();
+
+        vector<vector<int>> adj_list(V);   // Space: O(V + E)
+        vector<int> indegree(V, 0);        // Space: O(V)
+        vector<bool> completed(V, false);  // Space: O(V)
+
+        vector<int> result;
+        result.reserve(V);
+
+        /* Create an Adjacency List and populate indegree */
+        for (const auto& edge : prerequisites)
+        {
+            const int& dst = edge[0];
+            const int& src = edge[1];
+
+            adj_list[src].push_back(dst);
+            indegree[dst]++;
+        }
+
+        /* Start DFS from all zero-indegree nodes */
+        for (int course = 0; course < numCourses; course++)
+        {
+            if (indegree[course] == 0 && ! completed[course])
+                dfs(course, adj_list, indegree, completed, result);
+        }
+
+        if (result.size() != numCourses)
+            return {};
+
+        return result;
+    }
+
+private:
+    void dfs(int course, vector<vector<int>>& adj_list, vector<int>& indegree, vector<bool>& completed, vector<int>& result)
+    {
+        result.push_back(course);
+        completed[course] = true;
+
+        for (const int& neighbor : adj_list[course])
+        {
+            indegree[neighbor]--;
+
+            if (indegree[neighbor] == 0 && !completed[neighbor])
+                dfs(neighbor, adj_list, indegree, completed, result);
+        }
     }
 };
