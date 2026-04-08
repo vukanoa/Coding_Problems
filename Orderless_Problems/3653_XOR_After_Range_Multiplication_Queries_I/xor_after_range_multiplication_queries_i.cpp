@@ -75,8 +75,8 @@ using namespace std;
 /* Time  Beats: 53.85% */
 /* Space Beats: 53.85% */
 
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
+/* Time  Complexity: O(N * Q) */
+/* Space Complexity: O(N)     */
 class Solution {
 public:
     int xorAfterQueries(vector<int>& nums, vector<vector<int>>& queries)
@@ -103,5 +103,56 @@ public:
             result ^= nums_ll[i];
 
         return static_cast<int>(result);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This way we improve both Space and Time Complexity because we're NOT
+    creating an additional array.
+
+    The only Overflow that happens is happening in this temporary value:
+
+        nums[idx] * v
+
+    Therefore, just convert that temporary value to "unsigned long long" by
+    multiplying with 1, then simply convert it back to "int" and assign it to
+    nums[idx].
+
+*/
+
+/* Time  Beats:  54.07% */
+/* Space Beats: 100.00% */
+
+/* Time  Complexity: O(N * Q) */
+/* Space Complexity: O(1)     */
+class Solution_Efficient {
+public:
+    int xorAfterQueries(vector<int>& nums, vector<vector<int>>& queries)
+    {
+        const int MOD = 1e9 + 7;
+
+        for (const auto& query : queries)
+        {
+            const int& l = query[0];
+            const int& r = query[1];
+            const int& k = query[2];
+            const int& v = query[3];
+
+            for (int idx = l; idx <= r; idx += k)
+                nums[idx] = static_cast<int>((1ULL * nums[idx] * v) % MOD);
+        }
+
+        int result = 0;
+        for (const int& num : nums)
+            result ^= num;
+
+        return result;
     }
 };
