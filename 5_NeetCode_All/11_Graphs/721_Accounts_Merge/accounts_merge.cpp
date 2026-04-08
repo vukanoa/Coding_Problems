@@ -61,6 +61,7 @@
 
 */
 
+#include <functional>
 #include <vector>
 #include <string>
 #include <unordered_map>
@@ -256,6 +257,123 @@ public:
             vector<string> final_account;
             final_account.push_back(name);
             final_account.insert(final_account.end(), emails.begin(), emails.end()); // O(M)
+
+            /* Sort only emails */
+            sort(final_account.begin() + 1, final_account.end()); // O(M * logM)
+
+            results.push_back(final_account);
+        }
+
+        return results;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 33.30% */
+/* Space Beats: 20.76% */
+
+// E: Total number of email connections
+// N: Total accounts
+// M: Total emails per merged account
+/* Time  Complexity: O(E + N  M*logM) */
+/* Space Complexity: O(E + N + M)     */
+class Solution_dfsss {
+public:
+    vector<vector<string>> accountsMerge(vector<vector<string>>& accounts)
+    {
+        const int N = accounts.size();
+        unsigned email_idx = 0;
+
+        vector<string> all_emails;
+        unordered_map<int, int>    email_idx__to__account_idx;
+        unordered_map<string, int> email__to__email_idx;
+
+        for (int account_idx = 0; account_idx < N; account_idx++)
+        {
+            for (unsigned i = 1; i < accounts[account_idx].size(); i++)
+            {
+                string& curr_email = accounts[account_idx][i];
+
+                if (email__to__email_idx.count(curr_email))
+                    continue;
+
+                all_emails.push_back(curr_email);
+
+                email__to__email_idx.insert( {curr_email, email_idx} );
+                email_idx__to__account_idx.insert( {email_idx, account_idx} );
+                email_idx++;
+            }
+        }
+
+
+
+        /* Create an Adjacency List */
+        vector<vector<int>> adj_list(all_emails.size());
+        for (int account_idx = 0; account_idx < N; account_idx++)
+        {
+            for (unsigned i = 2; i < accounts[account_idx].size(); i++)
+            {
+                string& prev_email = accounts[account_idx][i-1];
+                string& curr_email = accounts[account_idx][i  ];
+
+                int& prev_email_idx = email__to__email_idx[prev_email];
+                int& curr_email_idx = email__to__email_idx[curr_email];
+
+                adj_list[prev_email_idx].push_back(curr_email_idx);
+                adj_list[curr_email_idx].push_back(prev_email_idx);
+            }
+        }
+
+
+        unordered_map<int, vector<string>> account_idx__to__emails;
+        vector<bool> visited(all_emails.size());
+
+        /***********/
+        /*** DFS ***/
+        /***********/
+        function<void(int,int&)> dfs = [&](int email_idx, int& account_idx)
+        {
+            visited[email_idx] = true;
+            account_idx__to__emails[account_idx].push_back(all_emails[email_idx]);
+
+            for (const int& neighbor_email_idx : adj_list[email_idx])
+            {
+                if (visited[neighbor_email_idx])
+                    continue;
+
+                dfs(neighbor_email_idx, account_idx);
+            }
+        };
+
+        for (int email_idx = 0; email_idx < all_emails.size(); email_idx++)
+        {
+            if (visited[email_idx])
+                continue;
+
+            int account_idx = email_idx__to__account_idx[email_idx];
+            dfs(email_idx, account_idx);
+        }
+
+
+        vector<vector<string>> results;
+        for (auto& [account_idx, group_of_emails] : account_idx__to__emails)
+        {
+            string& name = accounts[account_idx][0];
+
+            vector<string> final_account;
+            final_account.push_back(name);
+            final_account.insert(final_account.end(), group_of_emails.begin(), group_of_emails.end()); // O(M)
 
             /* Sort only emails */
             sort(final_account.begin() + 1, final_account.end()); // O(M * logM)
