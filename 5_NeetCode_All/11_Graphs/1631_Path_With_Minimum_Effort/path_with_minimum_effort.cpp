@@ -106,63 +106,70 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    BST with Priorities ==> A variation of Dijkstra.
+    TODO
+    (DIjkstra on a 2D Grid)
 
 */
 
-/* Time  Beats: 10.36% */
-/* Space Beats: 15.84% */
+/* Time  Beats:  8.52% */
+/* Space Beats: 11.42% */
 
-/* Time  Complexity: O((M * N)^2 * log(M * N)) */
-/* Space Complexity: O((M * N))                */
+/* Time  Complexity: O((ROWS * COLS) * log(ROWS * COLS)) */
+/* Space Complexity: O((ROWS * COLS)                   ) */
 class Solution {
 public:
-    int minimumEffortPath(std::vector<std::vector<int>>& heights)
+    int minimumEffortPath(vector<vector<int>>& heights)
     {
         const int ROWS = heights.size();
         const int COLS = heights[0].size();
 
-        std::priority_queue<std::vector<int>, std::vector<std::vector<int>>, std::greater<std::vector<int>>> min_heap;
-        min_heap.push({0, 0, 0}); // [diff, row, col]
+        // min-Heap: {abs_diff, row, col}
+        priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>> min_heap;
+        min_heap.push( {0, 0, 0} );
 
-        std::vector<std::vector<bool>> visited(ROWS, std::vector<bool>(COLS, false));
+        // 1D flattening technique
+        bool visited[10001] = {false};
 
         /* Signing Cross */
-        std::vector<std::pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        vector<pair<int,int>> directions = {{-1,0}, {1,0}, {0,-1}, {0,1}};
 
-        while (!min_heap.empty())
+        /* Dijkstra's Algorithm */
+        while ( ! min_heap.empty())
         {
             auto top = min_heap.top();
             min_heap.pop();
 
-            int diff = top[0];
-            int row  = top[1];
-            int col  = top[2];
+            int min_effort_to_here = top[0];
+            int row                = top[1];
+            int col                = top[2];
 
-            if (visited[row][col])
-                continue;
+            if (visited[row * COLS + col])
+                continue; // We've already been here with some SMALLER effort
 
-            visited[row][col] = true;
+            visited[row * COLS + col] = true;
 
+            // If we've reached the bottom-right cell
             if (row == ROWS-1 && col == COLS-1)
-                return diff;
+                return min_effort_to_here;
 
-            for (auto& dir : directions)
+            /* Signign Cross directions: Up, Down, Left, Right */
+            for (const auto& dir : directions)
             {
-                int neighbor_row = row + dir.first;
-                int neighbor_col = col + dir.second;
+                int new_row = row + dir.first;
+                int new_col = col + dir.second;
 
-                if (neighbor_row < 0 || neighbor_row == ROWS ||
-                    neighbor_col < 0 || neighbor_col == COLS ||
-                    visited[neighbor_row][neighbor_col])
-                {
+                /* Out-of-Bounds */
+                if (new_row < 0 || new_col < 0 || new_row >= ROWS || new_col >= COLS)
                     continue;
-                }
 
-                int abs_diff = std::abs(heights[row][col] - heights[neighbor_row][neighbor_col]);
-                int new_diff = std::max(diff, abs_diff);
+                /* Already processed */
+                if (visited[new_row * COLS + new_col])
+                    continue;
 
-                min_heap.push({new_diff, neighbor_row, neighbor_col});
+                int next_abs_diff  = abs(heights[row][col] - heights[new_row][new_col]);
+                int new_min_effort = max(min_effort_to_here, next_abs_diff);
+
+                min_heap.push( {new_min_effort, new_row, new_col} );
             }
         }
 
