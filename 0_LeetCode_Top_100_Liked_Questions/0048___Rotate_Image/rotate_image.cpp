@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
 /*
     ==============
     === MEDIUM ===
@@ -23,7 +19,7 @@
     rotation.
 
     =============================================================
-    FUNCTION: void rotate(std::vector<std::vector<int>>& matrix);
+    FUNCTION: void rotate(vector<vector<int>>& matrix);
     =============================================================
 
     ==========================================================================
@@ -44,6 +40,9 @@
     -1000 <= matrix[i][j] <= 1000
 */
 
+#include <vector>
+#include <algorithm>
+using namespace std;
 
 /*
     ------------
@@ -103,55 +102,6 @@
 
 */
 
-
-/* Time  Beats: 100% */
-/* Space Beats: 94.26% */
-
-/* Time  Complexity: O(n^2) */
-/* Space Complexity: O(1) */
-class Solution{
-public:
-    void rotate(std::vector<std::vector<int>>& matrix)
-    {
-        int n = matrix.size();
-        int i = 0;
-
-        while (i < n/2)
-        {
-            int x = i;
-            int y = i;
-
-            while (y < (n - 1 - i))
-            {
-                int counter = 3; // Because it's always a square
-
-                while (counter--)
-                {
-                    switch(counter)
-                    {
-                        case 2:
-                            std::swap(matrix[x][y], matrix[y][n - 1 - x]);
-                            break;
-
-                        case 1:
-                            std::swap(matrix[x][y], matrix[n - 1 - x][n - 1 - y]);
-                            break;
-
-                        case 0:
-                            std::swap(matrix[x][y], matrix[n - 1 - y][x]);
-                            break;
-                    }
-                }
-                y++;
-            }
-            i++;
-        }
-    }
-};
-
-
-
-
 /*
     ------------
     --- IDEA ---
@@ -169,7 +119,7 @@ public:
 /* Space Complexity: O(1) */
 class Solution_L_R_T_B {
 public:
-    void rotate(std::vector<std::vector<int>>& matrix)
+    void rotate(vector<vector<int>>& matrix)
     {
         int n = matrix.size();
 
@@ -186,10 +136,10 @@ public:
             {
                 tmp = matrix[top][left + i];
 
-                std::swap(tmp, matrix[top + i   ][right    ]);
-                std::swap(tmp, matrix[bottom    ][right - i]);
-                std::swap(tmp, matrix[bottom - i][left     ]);
-                std::swap(tmp, matrix[top       ][left + i ]);
+                swap(tmp, matrix[top + i   ][right    ]);
+                swap(tmp, matrix[bottom    ][right - i]);
+                swap(tmp, matrix[bottom - i][left     ]);
+                swap(tmp, matrix[top       ][left + i ]);
             }
 
             left++;
@@ -219,71 +169,17 @@ public:
 /* Space Complexity: O(1) */
 class Solution_Transpose_Reverse {
 public:
-    void rotate(std::vector<std::vector<int>>& matrix)
+    void rotate(vector<vector<int>>& matrix)
     {
         int rows = matrix.size();
 
-        for(int i = 0; i < rows; i++)
+        for (int row = 0; row < rows; row++)
         {
-            for(int j = 0; j < i; j++)
-                std::swap(matrix[i][j], matrix[j][i]);
+            for (int col = 0; col < row; col++)
+                swap(matrix[row][col], matrix[col][row]);
         }
 
-        for(int i = 0; i < rows; i++)
-            std::reverse(matrix[i].begin(), matrix[i].end());
+        for (int row = 0; row < rows; row++)
+            reverse(matrix[row].begin(), matrix[row].end());
     }
 };
-
-
-void
-print_matrix(std::vector<std::vector<int>>& matrix)
-{
-    for (int i = 0; i < matrix.size(); i++)
-    {
-        std::cout << "\n\t\t";
-
-        for (int j = 0; j < matrix.size(); j++)
-            printf("%2d ", matrix[i][j]);
-    }
-    std::cout << "\n\n";
-}
-
-
-int
-main()
-{
-    Solution                   sol;
-    Solution_L_R_T_B           sol_l_r_t_b;
-    Solution_Transpose_Reverse sol_transpose_reverse;
-
-    /* Example 1 */
-    std::vector<std::vector<int>> matrix = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-
-    /* Example 2 */
-    // std::vector<std::vector<int>> matrix = {{5, 1, 9, 11}, {2, 4, 8, 10}, {13, 3, 6, 7}, {15, 14, 12, 16}};
-
-    /* Example 3 */
-    // std::vector<std::vector<int>> matrix = {{1, 2, 3, 4}, {4, 6, 7, 8}, {9, 10, 11, 12}, {13, 14, 15, 16}};
-
-    std::cout << "\n\t====================";
-    std::cout << "\n\t=== ROTATE IMAGE ===";
-    std::cout << "\n\t====================\n";
-
-
-    /* Write Input */
-    std::cout << "\n\tOriginal Matrix:";
-    print_matrix(matrix);
-
-
-    /* Solution */
-    // sol.rotate(matrix);
-    // sol_l_r_t_b.rotate(matrix);
-    sol_transpose_reverse.rotate(matrix);
-
-
-    /* Write Output */
-    std::cout << "\n\tRotated Matrix:";
-    print_matrix(matrix);
-
-    return 0;
-}
