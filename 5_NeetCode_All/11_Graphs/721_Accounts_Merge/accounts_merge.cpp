@@ -288,7 +288,7 @@ public:
 // M: Total emails per merged account
 /* Time  Complexity: O(E + N  M*logM) */
 /* Space Complexity: O(E + N + M)     */
-class Solution_dfsss {
+class Solution_DFS {
 public:
     vector<vector<string>> accountsMerge(vector<vector<string>>& accounts)
     {
