@@ -116,7 +116,7 @@ using namespace std;
 
 /* Time  Complexity: O((ROWS * COLS) * log(ROWS * COLS)) */
 /* Space Complexity: O((ROWS * COLS)                   ) */
-class Solution {
+class Solution_Dijkstra {
 public:
     int minimumEffortPath(vector<vector<int>>& heights)
     {
@@ -174,5 +174,85 @@ public:
         }
 
         return 0;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 5.00% */
+/* Space Beats: 5.05% */
+
+/* Time  Complexity: O(ROWS * COLS * log(MAX_HEIGHT)) */
+/* Space Complexity: O(ROWS * COLS)                   */
+class Solution_Binary_Search_and_DFS {
+public:
+    int minimumEffortPath(vector<vector<int>>& heights)
+    {
+        const int ROWS = heights.size();
+        const int COLS = heights[0].size();
+        const int MAX_HEIGHT = 1e6;
+
+        bool visited[10001] = {false};
+
+        int low  = 0;
+        int high = MAX_HEIGHT;
+
+        while (low < high)
+        {
+            int mid = low + (high - low) / 2; // Left-leaning mid
+
+            memset(visited, false, sizeof(visited));
+
+            if ( ! dfs_reached_last_cell(0, 0, mid, visited, heights))
+                low = mid + 1;
+            else
+                high = mid;
+        }
+
+        return low;
+    }
+
+private:
+    bool dfs_reached_last_cell(int row, int col, int limit, bool (& visited)[10001], vector<vector<int>>& heights)
+    {
+        const int ROWS = heights.size();
+        const int COLS = heights[0].size();
+
+        if (row == ROWS-1 && col == COLS-1)
+            return true;
+
+        visited[row * COLS + col] = true;
+
+        vector<pair<int,int>> directions = {{-1,0}, {1,0}, {0,-1}, {0,1}};
+        for (const auto& dir : directions)
+        {
+            int new_row = row + dir.first;
+            int new_col = col + dir.second;
+
+            if (new_row < 0 || new_col < 0 || new_row >= ROWS || new_col >= COLS)
+                continue;
+
+            if (visited[new_row * COLS + new_col])
+                continue;
+
+            int next_abs_diff = abs(heights[new_row][new_col] - heights[row][col]);
+            if (next_abs_diff > limit)
+                continue;
+
+            if (dfs_reached_last_cell(new_row, new_col, limit, visited, heights))
+                return true;
+        }
+
+        return false;
     }
 };
