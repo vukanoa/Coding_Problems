@@ -402,3 +402,123 @@ public:
         return 0; // Unreachable
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 20.57% */
+/* Space Beats:  8.57% */
+
+/* Time  Complexity: O(E * logE) */ // Where E is the total amount of EDGES
+/* Space Complexity: O(E + V)    */ // Where V is the total amount of VERTICES
+class DSU_2 {
+private:
+    vector<int> rank;
+    vector<int> parent;
+
+public:
+    DSU_2 (int N)
+    {
+        rank.resize(N);
+        parent.resize(N);
+
+        for (int i = 0; i < N; i++)
+        {
+            rank[i]   = 1;
+            parent[i] = i;
+        }
+    }
+
+    int find_root(int node)
+    {
+        while (node != parent[node])
+        {
+            /* Reverse Ackerman function */
+            parent[node] = parent[parent[node]];
+
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    bool union_components(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        if (root_1 == root_2)
+            return false; // Already the same component
+
+        if (rank[root_1] < rank[root_2])
+            swap(root_1, root_2);
+
+        parent[root_2] = root_1;
+        rank[root_1]  += rank[root_2];
+
+        return true;
+    }
+};
+
+class Solution_Better_Kruskal_Algorithm {
+public:
+    int minimumEffortPath(vector<vector<int>>& heights)
+    {
+        const int ROWS = heights.size();
+        const int COLS = heights[0].size();
+
+        DSU_2 dsu(ROWS * COLS);
+
+        auto index = [&](int row, int col)
+        {
+            return row * COLS + col;
+        };
+
+        vector<vector<int>> edges;
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                if (col+1 < COLS) // Right
+                {
+                    int right = abs(heights[row  ][col+1] - heights[row][col]);
+                    edges.push_back( {right, index(row, col), index(row, col+1)} );
+                }
+
+                if (row+1 < ROWS) // Down
+                {
+                    int down  = abs(heights[row+1][col  ] - heights[row][col]);
+                    edges.push_back( {down, index(row, col), index(row+1, col)} );
+                }
+            }
+        }
+
+        /* Kruskal's Algorithm */
+        sort(edges.begin(), edges.end()); // ASCENDING order by diff
+        for (const auto& edge : edges)
+        {
+            const int& weight = edge[0];
+            const int& u      = edge[1];
+            const int& v      = edge[2];
+
+            dsu.union_components(u, v);
+
+            int start_node = index(0, 0);
+            int goal_node  = index(ROWS-1, COLS-1);
+
+            if (dsu.find_root(start_node) == dsu.find_root(goal_node))
+                return weight;
+        }
+
+        return 0; // Unreachable
+    }
+};
