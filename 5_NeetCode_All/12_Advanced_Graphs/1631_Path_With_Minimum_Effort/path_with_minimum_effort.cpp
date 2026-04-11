@@ -256,3 +256,149 @@ private:
         return false;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 7.18% */
+/* Space Beats: 5.03% */
+
+/* Time  Complexity: O(E * logE) */ // Where E is the total amount of EDGES
+/* Space Complexity: O(E + V)    */ // Where V is the total amount of VERTICES
+class DSU {
+private:
+    vector<int> rank;
+    vector<int> parent;
+    vector<int> max_weight;
+
+public:
+    DSU (int N)
+    {
+        rank.resize(N);
+        parent.resize(N);
+
+        max_weight.resize(N);
+
+        for (int i = 0; i < N; i++)
+        {
+            rank[i]   = 1;
+            parent[i] = i;
+
+            max_weight[i] = 0;
+        }
+    }
+
+    int find_root(int node)
+    {
+        while (node != parent[node])
+        {
+            /* Reverse Ackerman function */
+            parent[node] = parent[parent[node]];
+
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    bool union_components(int node_1, int node_2, int diff)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        if (root_1 == root_2)
+            return false; // Already the same component
+
+        if (rank[root_1] < rank[root_2])
+            swap(root_1, root_2);
+
+        parent[root_2] = root_1;
+        rank[root_1]  += rank[root_2];
+
+        max_weight[root_1] = max( {max_weight[root_1], max_weight[root_2], diff} );
+
+        return true;
+    }
+
+    int get_max_weight(int node_1)
+    {
+        int root_1 = find_root(node_1);
+
+        return max_weight[root_1];
+    }
+};
+
+class Solution_Kruskal_Algorithm {
+public:
+    int minimumEffortPath(vector<vector<int>>& heights)
+    {
+        const int ROWS = heights.size();
+        const int COLS = heights[0].size();
+
+        DSU dsu(ROWS * COLS);
+
+        priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>> min_heap;
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                if (col+1 < COLS) // Right
+                {
+                    int right = abs(heights[row  ][col+1] - heights[row][col]);
+                    min_heap.push( {right, row, col, row,   col+1} );
+                }
+
+                if (row+1 < ROWS) // Down
+                {
+                    int down  = abs(heights[row+1][col  ] - heights[row][col]);
+                    min_heap.push( {down , row, col, row+1, col  } );
+                }
+            }
+        }
+
+        /* Kruskal's Algorithm */
+        while ( ! min_heap.empty())
+        {
+            auto top = min_heap.top();
+            min_heap.pop();
+
+            int diff  = top[0];
+
+            int u_row = top[1];
+            int u_col = top[2];
+
+            int v_row = top[3];
+            int v_col = top[4];
+
+            /* 1D Flatteninc technique */
+            int node_1 = u_row * COLS + u_col;
+            int node_2 = v_row * COLS + v_col;
+
+            /* Potential Union */
+            dsu.union_components(node_1, node_2, diff);
+
+
+            /* Check if the Starting and Goal node are connected now */
+            int start_node = 0        * COLS + 0;
+            int goal_node  = (ROWS-1) * COLS + (COLS-1);
+
+            int start_root = dsu.find_root(start_node);
+            int goal_root = dsu.find_root(goal_node);
+
+            if (start_root == goal_root)
+                return dsu.get_max_weight(start_root);
+        }
+
+        return 0; // Unreachable
+    }
+};
