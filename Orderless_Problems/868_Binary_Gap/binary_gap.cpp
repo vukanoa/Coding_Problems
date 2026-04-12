@@ -94,3 +94,52 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way to solve it. It's ALWAYS beneficial to be aware of multiple
+    different solutions with Bit-Manipulation because sometimes one is by far
+    the most superior way of solving it.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  36.56% */
+
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(1)    */
+class Solution_2 {
+public:
+    int binaryGap(int n)
+    {
+        int result = 0;
+        n >>= __builtin_ctz(n); // CTZ <==> Count Trailing Zeroes
+
+        if (n == 1)
+            return 0;
+
+        int consecutive_zeroes = 0;
+        while (n)
+        {
+            if (n & 1)
+            {
+                result = max(result, consecutive_zeroes);
+                consecutive_zeroes = 0;
+            }
+            else
+            {
+                consecutive_zeroes++;
+            }
+
+            n >>= 1;
+        }
+
+        return result + 1;
+    }
+};
