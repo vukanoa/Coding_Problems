@@ -522,3 +522,85 @@ public:
         return 0; // Unreachable
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 28.19% */
+/* Space Beats: 28.72% */
+
+/* Time  Complexity: O(V * E)       */ // (V * E) is approx. (ROWS * COLS)^2
+/* Space Complexity: O(ROWS * COLS) */
+class Solution_Shortest_Path_Fast_Algorithm {
+public:
+    int minimumEffortPath(vector<vector<int>>& heights)
+    {
+        const int ROWS = heights.size();
+        const int COLS = heights[0].size();
+
+        /* distance <==> min_effort_on_path_to */
+        vector<int> distance(ROWS * COLS, INT_MAX);
+        distance[0] = 0;
+
+        vector<bool> in_queue(ROWS * COLS, false);
+        in_queue[0] = true;
+
+        queue<int> queue;
+        queue.push(0);
+
+        vector<pair<int, int>> directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+        /* Lambda: 1D flattening technique */
+        auto index = [&](int row, int col) -> int
+        {
+            return row * COLS + col;
+        };
+
+        while ( ! queue.empty())
+        {
+            int node = queue.front();
+            queue.pop();
+
+            in_queue[node] = false;
+
+            int row = node / COLS;
+            int col = node % COLS;
+
+            for (const auto& dir : directions)
+            {
+                int new_row = row + dir.first;
+                int new_col = col + dir.second;
+
+                if (new_row < 0 || new_col < 0 || new_row >= ROWS || new_col >= COLS)
+                    continue;
+
+                int neighbor = index(new_row, new_col);
+
+                int height_diff  = abs(heights[row][col] - heights[new_row][new_col]);
+                int new_distance = max(distance[node], height_diff);
+
+                if (new_distance < distance[neighbor])
+                {
+                    distance[neighbor] = new_distance;
+
+                    if ( ! in_queue[neighbor])
+                    {
+                        queue.push(neighbor);
+                        in_queue[neighbor] = true;
+                    }
+                }
+            }
+        }
+
+        return distance[(ROWS-1) * COLS + (COLS-1)];
+    }
+};
