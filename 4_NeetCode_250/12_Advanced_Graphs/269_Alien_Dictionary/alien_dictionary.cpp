@@ -195,7 +195,7 @@ using namespace std;
     the relative order of those characters to build the graph, this problem
     becomes doable.
 
-    Now we just have to traverse this Graphs. However, in this example it's
+    Now we just have to traverse this Graph. However, in this example it's
     pretty straightforward, but that doesn't have to be the case.
 
     There are a lot of different ways that this Graph can be represented and
@@ -232,11 +232,12 @@ using namespace std;
     Do you see how that's a contradiction?
     We can't have opposite rules. It's basically as if we had an input list of
     words that was something like this:
+
         ["we", "ee", "we"]
     
     How could we say that the list above is sorted then? We can't. That's
     invalid. In that case we should return an empty string "",  because there
-    is not real solution.
+    is no real solution.
 
 
     Let's look at another variation of our original Example. What is we didn't
@@ -264,11 +265,12 @@ using namespace std;
 
     
     So at this point you might say:"Let's just start at the beginning of each
-    of these components and then just go through them, say:
+    of these components and then just go through them", say:
+
         w -> e -> r -> t -> f
     
     and just build an output string like that, but I'll show you one reason
-    why that's actually not going to work.
+    why that's actually NOT going to work.
 
     Example:
         words = ["a",
@@ -285,13 +287,15 @@ using namespace std;
     
     This is a perfectly valid Graph.
     What's one valid order of this Graph?
+
         "abc"
-    
+
     Let's do a DFS on this.
 
     First, we visit 'a', then let's say we went to 'c' first, then we a 'c' in
     our output, then we go back to 'a' and we continue through 'b', so then
     we got this:
+
         "acb"
     
     which is NOT valid.
@@ -299,7 +303,7 @@ using namespace std;
     So if we are doing a DFS from the beginning how should we know which path
     should we traverse first?
 
-    The answer is - We don't really have a good way of knowing that if we're
+    The answer is - We DON'T really have a good way of knowing that if we're
     doing this with DFS.
 
     But, there is a workaround solution to that - The Solution is Postorder DFS
@@ -308,13 +312,14 @@ using namespace std;
     keep adding it to our output yet. We're going to be adding 'a' at last.
 
     Let's traverse it again:
+
     We go from 'a' to 'c' again, then 'c' being the last one should be put
-    into our output string, then we go back to 'a', then continu through 'b'
+    into our output string, then we go back to 'a', then continue through 'b'
     and then go to 'c' where we can see that we've visited the 'c' again(we'll
-    develop a way of knowing that by using an hash map) so we put 'b' and then
+    develop a way of knowing that by using a HashSet) so we put 'b' and then
     get back to 'a' to print that.
 
-    So our output string now looks like: "cba". So that is not what we need,
+    So our output string now looks like: "cba". So that is NOT what we need,
     therefore we should reverse the string and then return it.
 
     That way it's completely valid.
@@ -330,33 +335,40 @@ using namespace std;
     So we have to keep track of 2 things:
         1. Visited
         2. Current traverse path
-    
-    We're going to do that using a hash map.
 
-    Everytime we visit a node, we're going to say it's added to the map, but
-    we're going to give it a "false" value in the map and once it's in the
-    current path, then we're going to give it a value of "true".
+    Before we finish traversing some node, we' going to pop it from the "path"
+    HashSet. However, if we every find node ALREADY present in "path, then that
+    indicates we've found a loop and thus we'll return "true", meaning: it IS
+    cyclic INDEED.
 
 */
 
-/* Time  Complexity: O(total num of letters in words) */
-/* Space Complexity: O(total num of letters in words) */
-class Solution {
+/* Time  Complexity: O(TOTAL_LETTERS + V + E) */ // V: Number of UNIQUE letters
+/* Space Complexity: O(V + E)                 */
+class Solution_Postorder_DFS {
+private:
+    unordered_map<char, unordered_set<char>> adj_list;
+    unordered_set<char> visited;
+
 public:
-    string alienOrder(vector<string> &words)
+    string alienOrder(vector<string>& words)
     {
-        // Initialize the Hash Map
-        unordered_map<char, unordered_set<char>> adj_list;
-        for (string& word : words)
+        const int N = words.size();
+        string result;
+
+        // We MUST populate Adjacency List like this because some nodes may
+        // NOT have outgoing edges. We must include them as well.
+        for (const auto& word : words)
         {
-            for (char& c : word)
-                adj_list[c] = unordered_set<char>();
+            const int WORD_SIZE = word.size();
+            for (int i = 0; i < WORD_SIZE; i++)
+                adj_list[word[i]] = unordered_set<char>();
         }
 
         // Construct the Graph (Adjacency List)
-        for (int i = 0; i < words.size() - 1; i++)
+        for (int i = 0; i < N-1; i++)
         {
-            string word_1 = words[i];
+            string word_1 = words[i    ];
             string word_2 = words[i + 1];
 
             int min_len = min(word_1.size(), word_2.size());
@@ -375,43 +387,44 @@ public:
             }
         }
 
-        unordered_map<char, bool> visited;
-        string result;
 
-        // Call Postorder DFS on every letter
-        for (auto& entry : adj_list)
+        /* Post-order DFS */
+        for (const auto& [letter, dependents] : adj_list)
         {
-            // If we find a loop - Input is invalid, return an empty string
-            if (postorder_dfs(entry.first, adj_list, visited, result))
+            unordered_set<char> path;
+
+            // If we find a cycle---Input is invalid, return an empty string
+            if (is_cyclic_postorder_dfs(letter, path, result))
                 return "";
         }
 
+        /* Reverse */
         reverse(result.begin(), result.end());
 
         return result;
     }
 
 private:
-    bool
-    postorder_dfs(char c,
-                  unordered_map<char, unordered_set<char>>& adj_list,
-                  unordered_map<char, bool>& visited,
-                  string& result)
+    bool is_cyclic_postorder_dfs(char letter, unordered_set<char>& path, string& result)
     {
-        if (visited.find(c) != visited.end())
-            return visited[c];
+        if (path.count(letter))
+            return true; // Cycle is found
 
-        visited[c] = true;
+        if (visited.count(letter))
+            return false; // Already processed
 
-        for (char neighbor : adj_list[c])
+        visited.insert(letter); // Visited
+
+        path.insert(letter);
+        for (const char& dependent_letter : adj_list[letter])
         {
-            if (postorder_dfs(neighbor, adj_list, visited, result))
+            if (is_cyclic_postorder_dfs(dependent_letter, path, result))
                 return true;
         }
+        path.erase(letter);
 
-        visited[c] = false;
-        result.push_back(c);
+        result.push_back(letter); // Post-order appending
 
-        return false;
+        return false; // No cycle found
     }
 };
