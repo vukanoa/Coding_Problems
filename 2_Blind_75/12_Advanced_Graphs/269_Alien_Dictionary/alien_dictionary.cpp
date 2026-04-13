@@ -48,6 +48,7 @@
 
 */
 
+#include <queue>
 #include <unordered_set>
 #include <vector>
 #include <unordered_map>
@@ -426,5 +427,109 @@ private:
         result.push_back(letter); // Post-order appending
 
         return false; // No cycle found
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Topological Sort(Kahn's Algorithm) using BFS.
+
+*/
+
+/* Time  Complexity: O(N * M + V + E) */ // N - num of words, M avg len of word
+/* Space Complexity: O(N * M)         */
+class Solution_Topological_Sort_Using_BFS {
+public:
+    string alienOrder(vector<string>& words)
+    {
+        const int N = words.size();
+        const int ENGLISH_ALPHABET_SIZE = 26;
+
+
+        string result;
+        result.reserve(ENGLISH_ALPHABET_SIZE);
+
+        unordered_map<char, unordered_set<char>> adj_list;
+        unordered_map<char,int> indegree;
+
+        // We MUST populate Adjacency List like this because some nodes may
+        // NOT have outgoing edges. We must include them as well.
+        // O(N * M) (entire block) where M is the avg word
+        for (const auto& word : words)
+        {
+            const int WORD_SIZE = word.size();
+            for (int i = 0; i < WORD_SIZE; i++)
+            {
+                char letter = word[i];
+
+                adj_list[letter] = unordered_set<char>();
+                indegree[letter] = 0;
+            }
+        }
+
+        // Construct the Graph (Adjacency List)
+        for (int i = 0; i < N-1; i++)
+        {
+            string word_1 = words[i    ];
+            string word_2 = words[i + 1];
+
+            int min_len = min(word_1.size(), word_2.size());
+
+            // Invalid case
+            if (word_1.size() > word_2.size() && word_1.substr(0, min_len) == word_2.substr(0, min_len))
+                return "";
+
+            for (int j = 0; j < min_len; j++)
+            {
+                char letter_L = word_1[j];
+                char letter_R = word_2[j];
+
+                if (letter_L != letter_R)
+                {
+                    // If this difference(edge) does not YET exist
+                    if (adj_list[letter_L].insert(letter_R).second)
+                        indegree[letter_R]++;
+
+                    break;
+                }
+            }
+        }
+
+        queue<char> queue;
+
+        /* Initialize the Queue with the nodes that do NOT depend on others */
+        for (const auto& [letter, indegree_count] : indegree)
+        {
+            if (indegree_count == 0) // i.e. letter does NOT depend on others
+                queue.push(letter);
+        }
+
+        /* Topological Sort(Kahn's Algorithm) */
+        while ( ! queue.empty())
+        {
+            char letter = queue.front();
+            queue.pop();
+
+            result += letter;
+
+            for (const char& dependent_letter : adj_list[letter])
+            {
+                indegree[dependent_letter]--;
+
+                if (indegree[dependent_letter] == 0)
+                    queue.push(dependent_letter);
+            }
+        }
+
+        if (result.size() != indegree.size())
+            return "";
+
+        return result;
     }
 };
