@@ -21,7 +21,7 @@
     n nodes to receive the signal, return -1.
 
     =========================================================================
-    FUNCTION: int networkDelayTime(vector<vector<int>>& times, int n, int k); 
+    FUNCTION: int networkDelayTime(vector<vector<int>>& times, int n, int k);
     =========================================================================
 
     ==========================================================================
@@ -69,6 +69,7 @@
 */
 
 #include <bitset>
+#include <climits>
 #include <vector>
 #include <unordered_map>
 #include <queue>
@@ -80,6 +81,8 @@ using namespace std;
     ------------
 
     TODO
+    There is a better way to implement Dijkstra's Algorithm for this Solution.
+    Check out the other "Optimal_Dijkstra" Solution down below in this file.
 
 */
 
@@ -88,7 +91,7 @@ using namespace std;
 
 /* Time  Complexity: O(E * logE) */
 /* Space Complexity: O(E + V)    */ // Where V <==> n
-class Solution {
+class Solution_Dijkstra {
 public:
     int networkDelayTime(vector<vector<int>>& times, int n, int k)
     {
@@ -151,5 +154,91 @@ public:
         }
 
         return -1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a better implementation and a more optimal way of writing Dijkstra
+    for this problem.
+
+    It's always beneficial to see multiple different implementations of the
+    same technique. It makes you appreciate the subtleties that are actually
+    important and vastly improve the efficiency of the program.
+
+*/
+
+/* Time  Beats: 48.41% */
+/* Space Beats: 68.88% */
+
+/* Time  Complexity: O(E * logV) */
+/* Space Complexity: O(E + V)    */
+class Solution_Optimal_Dijkstra {
+public:
+    int networkDelayTime(vector<vector<int>>& times, int n, int k)
+    {
+        const int E = times.size();
+
+        unordered_map<int, vector<pair<int,int>>> adj_list;
+
+        /* Create an Adjacency List */
+        for (const auto& edge : times)
+        {
+            const int& u = edge[0];
+            const int& v = edge[1];
+            const int& t = edge[2];
+
+            adj_list[u].push_back({v, t});
+        }
+
+        vector<int> dist(n + 1, INT_MAX);
+        dist[k] = 0;
+
+        priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> min_heap;
+        min_heap.push( {0, k} );
+
+        /* Dijkstra's Algorithm */
+        while ( ! min_heap.empty())
+        {
+            auto top = min_heap.top();
+            min_heap.pop();
+
+            const int& curr_time = top.first;
+            const int& curr_node = top.second;
+
+            if (curr_time > dist[curr_node])
+                continue;
+
+            for (const auto& neighbor : adj_list[curr_node])
+            {
+                const int& neighbor_node = neighbor.first;
+                const int& neighbor_time = neighbor.second;
+
+                int new_time = curr_time + neighbor_time;
+
+                if (new_time < dist[neighbor_node])
+                {
+                    dist[neighbor_node] = new_time;
+                    min_heap.push({new_time, neighbor_node});
+                }
+            }
+        }
+
+        int result = 0;
+        for (int i = 1; i < n+1; i++)
+        {
+            if (dist[i] == INT_MAX) // We have NOT found a path from k to i
+                return -1;
+
+            result = max(result, dist[i]);
+        }
+
+        return result;
     }
 };
