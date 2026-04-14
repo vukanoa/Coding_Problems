@@ -81,8 +81,26 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    TODO
     (Brute Force)
+
+    We need to calculate how long does it take for a signal to reach each node
+    stratin from the node k.
+
+    Here we're using a DFS and we simply try all of the possible paths from k
+    and we keep track of the best(i.e. MINIMUM) time needed to reach that node.
+
+    If we reach some node and the current time is BETTER(i.e. smaller) than the
+    current minimum---We update it.
+
+    If the current time is already worse or requal than a current minimium, we
+    stop going down this path, i.e. we're doing "prunning".
+
+    After we go through each and every path(i.e. each and every EDGE) the
+    result is the maximum among all nodes, i.e. the last one to receive the
+    signal.
+
+    However it can happen that some(or more than one) node is unreachable, i.e.
+    its "best" time is INT_MAX. If that's the case, we simply return -1.
 
 */
 
@@ -132,6 +150,90 @@ private:
         }
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+
+    We need to calculate how long does it take for a signal to reach each node
+    stratin from the node k.
+
+
+    Bellman ford is:
+
+        Shortest path from ONE node to ALL nodes, where NEGATIVE edges ARE
+        INDEED allowed.
+
+        (In this problem there are no negative edges, but in general, Bellman
+        Ford works with negative edges as well)
+
+
+    How does it work?
+    The point is in "Relaxation".
+
+    What's that?
+    It's updating the current best time(i.e. min time) in "dist" vector.
+
+    We're "relaxing" EDGES, not nodes. And we do that repeatedly.
+    Each "relaxation" tries to improve the shortest distance(i.e. minimum time)
+    to some node by using an additional edge, through node 'u'.
+
+    After n-1 "rounds", all shortest paths(i.e. minimum times) are GUARANTEED
+    to be found because the longest simple path has AT MOST n-1 edges.
+
+    After we're done with that, the result is the maximum among all nodes, i.e.
+    the last one to receive the signal.
+
+    However it can happen that some(or more than one) node is unreachable, i.e.
+    its "best" time is INT_MAX. If that's the case, we simply return -1.
+
+*/
+
+/* Time  Beats: 14.63% */
+/* Space Beats: 97.81% */
+
+/* Time  Complexity: O(V * E) */
+/* Space Complexity: O(V)     */
+class Solution_Bellman_Ford {
+public:
+    int networkDelayTime(vector<vector<int>>& times, int n, int k)
+    {
+        vector<int> dist(n + 1, INT_MAX);
+        dist[k] = 0;
+
+        // O(V * E) (entire block)
+        for (int i = 1; i < n; i++) // O(V)
+        {
+            for (const auto& edge : times) // O(E)
+            {
+                const int& src = edge[0];
+                const int& dst = edge[1];
+                const int& w   = edge[2];
+
+                if (dist[src] != INT_MAX && (dist[src] + w) < dist[dst])
+                    dist[dst] = dist[src] + w;
+            }
+        }
+
+        int result = 0;
+        for (int i = 1; i < n+1; i++)
+        {
+            if (dist[i] == INT_MAX)
+                return -1;
+
+            result = max(result, dist[i]);
+        }
+
+        return result;
+    }
+};
+
+
 
 
 
