@@ -68,12 +68,73 @@
 
 */
 
+#include <algorithm>
 #include <bitset>
 #include <climits>
 #include <vector>
 #include <unordered_map>
 #include <queue>
 using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    (Brute Force)
+
+*/
+
+/* Time  Beats:  5.02% */
+/* Space Beats: 68.88% */
+
+/* Time  Complexity: O(V * E) */
+/* Space Complexity: O(V + E) */
+class Solution_DFS {
+public:
+    int networkDelayTime(vector<vector<int>>& times, int n, int k)
+    {
+        unordered_map<int, vector<pair<int, int>>> adj_list;
+
+        /* Create an Adjacency List */
+        for (const auto& edge : times)
+        {
+            const int& u = edge[0];
+            const int& v = edge[1];
+            const int& t = edge[2];
+
+            adj_list[u].push_back( {v, t} );
+        }
+
+        vector<int> dist(n + 1, INT_MAX);
+
+        /* DFS */
+        dfs(k, 0, dist, adj_list);
+
+        // +1 because nodes are from [1, n], inclusivelly
+        int result = *max_element(dist.begin() + 1, dist.end());
+
+        return result == INT_MAX ? -1 : result;
+    }
+
+private:
+    void dfs(int node, int time, vector<int>& dist, unordered_map<int, vector<pair<int, int>>>& adj_list)
+    {
+        if (time >= dist[node])
+            return;
+
+        dist[node] = time;
+
+        for (const auto& [neighbor, w] : adj_list[node])
+        {
+            dfs(neighbor, time + w, dist, adj_list);
+        }
+    }
+};
+
+
+
 
 /*
     ------------
