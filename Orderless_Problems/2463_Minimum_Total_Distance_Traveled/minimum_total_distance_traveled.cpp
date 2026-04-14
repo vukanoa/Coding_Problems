@@ -1,9 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <queue>
-#include <cmath>
-
 /*
     ============
     === HARD ===
@@ -93,6 +87,10 @@
 
 */
 
+#include <vector>
+#include <algorithm>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -102,56 +100,58 @@
 
 */
 
-/* Time  Beats: 100.00% */
-/* Space Beats:  53.75% */
+/* Time  Beats: 76.03% */
+/* Space Beats: 69.18% */
 
-/* Time  Complexity: O(m * n) */
-/* Space Complexity: O(m * n) */
-class Solution {
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(N * M) */
+class Solution_Botom_Up {
 public:
     long long minimumTotalDistance(vector<int>& robot, vector<vector<int>>& factory)
     {
-        int m = robot.size();
-        int n = factory.size();
-
         sort(robot.begin(), robot.end());
         sort(factory.begin(), factory.end());
 
-        // dp[i][j] is minimum total distance for robots[i] using factories[j]
-        vector<vector<long long>> dp(m + 1, vector<long long>(n + 1, LLONG_MAX));
+        const int N = robot.size();
+        const int M = factory.size();
 
-        for (int j = n-1; j >= 0; j--)
+        const long long INF = 1e18;
+
+        // dp[i][j] <==> Min cost to fix first i robots using first j factories
+        vector<vector<long long>> dp(N + 1, vector<long long>(M + 1, INF));
+
+        // Base case: 0 robots --> 0 cost
+        for (int j = 0; j <= M; j++)
+            dp[0][j] = 0LL;
+
+        for (int j = 1; j <= M; j++)
         {
-            // Track cumulative distance from current factory to robots
-            long long prefix = 0;
+            int factory_idx   = factory[j - 1][0]; // j-1 because its 0-indexed
+            int factory_limit = factory[j - 1][1]; // j-1 because its 0-indexed
 
-            // Deque stores pairs of (robot index, minimum distance)
-            deque<pair<int, long long>> deque;
-            deque.push_back({m, 0});
-
-            for (int i = m-1; i >= 0; i--)
+            for (int i = 0; i <= N; i++)
             {
-                // Add distance from current robot to current factory
-                prefix += abs(robot[i] - factory[j][0]);
+                long long skip = dp[i][j - 1];
+                long long take = INF;
 
-                // Remove entries that exceed factory capacity
-                while ( ! deque.empty() && deque.front().first > i + factory[j][1])
-                    deque.pop_front();
+                long long distance = 0;
 
-                // Maintain monotonic property of deque
-                while ( ! deque.empty() && deque.back().second >= dp[i][j + 1] - prefix)
-                    deque.pop_back();
+                int k = 1;
+                while (k <= factory_limit && i - k >= 0)
+                {
+                    distance += abs(robot[i - k] - factory_idx);
 
-                // Add current state to deque
-                deque.push_back({i, dp[i][j + 1] - prefix});
+                    take = min(take, dp[i - k][j - 1] + distance);
 
-                // Calculate minimum distance for current state
-                dp[i][j] = deque.front().second + prefix;
+                    // Increment
+                    k++;
+                }
+
+                dp[i][j] = min(take, skip);
             }
         }
 
-        // Return minimum total distance starting from first robot and first factory
-        return dp[0][0];
+        return dp[N][M];
     }
 };
 
@@ -170,56 +170,55 @@ public:
 /* Time  Beats: 82.76% */
 /* Space Beats: 84.38% */
 
-/* Time  Complexity: O(m * n) */
-/* Space Complexity: O(m * n) */
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(N * M) */
 class Solution_Memoization {
 public:
     long long minimumTotalDistance(vector<int>& robot, vector<vector<int>>& factory)
     {
-        int m = robot.size();
-        int n = factory.size();
+        const int N = robot.size();
+        const int M = factory.size();
 
+        /* Sort */
         sort(robot.begin(), robot.end());
-        sort(factory.begin(), factory.end(), [](const vector<int>& a, const vector<int>& b) {
-            return a[0] < b[0];
-        });
+        sort(factory.begin(), factory.end());
 
-        // Memoization table
-        vector<vector<long long>> memo(m, vector<long long>(n, -1));
+        // Initialize "memo"
+        vector<vector<long long>> memo(N, vector<long long>(M, -1));
 
-        return dfs(robot, factory, memo, 0, 0);
+        return solve(robot, factory, memo, 0, 0);
     }
 
 private:
-    long long dfs(vector<int>& robot,
+    long long solve(vector<int>& robot,
                   vector<vector<int>>& factory,
                   vector<vector<long long>>& memo,
                   int i,
                   int j)
     {
-        int m = robot.size();
-        int n = factory.size();
+        const int N = robot.size();
+        const int M = factory.size();
 
         long long infinity = 1e13;
 
-        if (i == m)
+        if (i == N)
             return 0;
 
-        if (j == n)
+        if (j == M)
             return infinity;
 
         if (memo[i][j] != -1)
             return memo[i][j];
 
         // Skip the current factory
-        long long result = dfs(robot, factory, memo, i, j+1);
+        long long result = solve(robot, factory, memo, i, j+1);
         long long sum = 0;
 
         // Attempt to assign robots to the current factory
-        for (int k = i; k < m && k-i+1 <= factory[j][1]; k++)
+        for (int k = i; k < N && k-i+1 <= factory[j][1]; k++)
         {
-            sum += std::abs(robot[k] - factory[j][0]);
-            result = min(result, sum + dfs(robot, factory, memo, k+1, j+1));
+            sum += abs(robot[k] - factory[j][0]);
+            result = min(result, sum + solve(robot, factory, memo, k+1, j+1));
         }
 
         memo[i][j] = result;
