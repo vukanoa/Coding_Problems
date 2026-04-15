@@ -159,6 +159,99 @@ private:
     --- IDEA ---
     ------------
 
+    Floyd-Warshall is an APSP(All-Pairs Shortest Path) algorithm that
+    repeatedly tries to improve the shortest path between every (i, j) by
+    allowing an intermediate node "mid".
+
+    After we're done processing ALL of the intermediate nodes, we are
+    guaranteed that dist[i][j] holds the Shortest time from node i to j.
+
+
+    So the point is that we're going through EVERY pair of (i, j) and we're
+    checking if there's a SHORTER path from i to j if we take the route via
+    "mid" node.
+
+    Since Floyd-Warshall's TC is O(V^3) it's good for graphs that are no larger
+    than a couple hundred nodes. This is exactly the case in this problem.
+
+    Floyd-Warshal can also detect "negative cycles", i.e. cycles which have a
+    a total weight < 0.
+
+    That's done like this:
+
+        for (int i = 0; i < n; i++)
+        {
+            if (dist[i][j] < 0)
+                return -1; // We've detected a NEGATIVE CYCLE!
+        }
+
+    But there's no need for that in this problem since we're guaranteed all of
+    the weights are NON-NEGATIVE:
+
+        0 <= wi <= 100
+
+*/
+
+/* Time  Beats: 42.60% */
+/* Space Beats: 95.63% */
+
+/* Time  Complexity: O(V^3) */ // Where V <==> n
+/* Space Complexity: O(V^2) */
+class Solution_Floyd_Warshall {
+public:
+    int networkDelayTime(vector<vector<int>>& times, int n, int k)
+    {
+        vector<vector<int>> dist(n+1, vector<int>(n+1, INT_MAX / 2));
+
+        /* Initialize the main Diagonal with 0s */
+        for (int i = 1; i < n+1; i++)
+            dist[i][i] = 0;
+
+        /* Create an Adjacency List */
+        for (const auto& edge : times)
+        {
+            const int& u = edge[0];
+            const int& v = edge[1];
+            const int& t = edge[2];
+
+            dist[u][v] = t;
+        }
+
+        // O(V^3) (entire block)
+        for (int mid = 1; mid < n+1; mid++)
+        {
+            for (int i = 1; i < n+1; i++)
+            {
+                for (int j = 1; j < n+1; j++)
+                {
+                    dist[i][j] = min(dist[i][j],
+                                     dist[i][mid] + dist[mid][j]);
+                }
+            }
+        }
+
+
+        int result = 0;
+        for (int i = 1; i < n+1; i++)
+        {
+            if (dist[k][i] == (INT_MAX / 2))
+                return -1;
+
+            result = max(result, dist[k][i]);
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
 
     We need to calculate how long does it take for a signal to reach each node
     stratin from the node k.
@@ -357,7 +450,7 @@ public:
             const int& v = edge[1];
             const int& t = edge[2];
 
-            adj_list[u].push_back({v, t});
+            adj_list[u].push_back( {v, t} );
         }
 
         vector<int> dist(n + 1, INT_MAX);
