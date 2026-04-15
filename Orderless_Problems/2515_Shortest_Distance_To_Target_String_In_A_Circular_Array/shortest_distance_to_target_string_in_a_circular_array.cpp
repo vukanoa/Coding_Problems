@@ -80,7 +80,7 @@ using namespace std;
 */
 
 /* Time  Beats: 100.00% */
-/* Space Beats:  33.74% */
+/* Space Beats:  68.33% */
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
@@ -93,30 +93,21 @@ public:
         if (words[startIndex] == target)
             return 0;
 
-        int L_dist = 1;
-        int R_dist = 1;
-
-        int L = ((startIndex - 1) + N) % N;
-        int R =  (startIndex + 1)      % N;
-
-        while (true)
+        int steps = 1;
+        for (;;)
         {
-            if (words[L] == target)
-                return L_dist;
+            int L_idx = (startIndex - steps + N) % N;
+            int R_idx = (startIndex + steps)     % N;
 
-            if (words[R] == target)
-                return R_dist;
+            if (L_idx == startIndex && R_idx == startIndex)
+                break;
 
-            if (L == R) // If they're at the same index and we' still haven't
-                break;  // found "target", then break and return -1.
+            if (words[L_idx] == target) return steps;
+            if (words[R_idx] == target) return steps;
 
-            L_dist++;
-            R_dist++;
-
-            L = ((L - 1) + N) % N;
-            R =  (R + 1)      % N;
+            // Increment
+            steps++;
         }
-
 
         return -1;
     }
