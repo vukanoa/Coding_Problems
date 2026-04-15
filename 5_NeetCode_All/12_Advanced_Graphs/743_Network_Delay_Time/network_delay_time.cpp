@@ -329,6 +329,88 @@ public:
 
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is an optimization of Bellman-Ford algorithm.
+
+    Instead of "relaxing" all of the edges EVERY SINGLE TIME, we only
+    re-process nodes whose distance was actually improved and then we use a
+    queue to propagate distance update efficiently.
+
+    Every time a node's SHORTEST time decreases(i.e. a better path is found),
+    it's neighbor MIGHT also get a shorter path. Therefore, we push that
+    neighbor to the queue.
+
+*/
+
+/* Time  Beats: 90.27% */
+/* Space Beats: 82.06% */
+
+/* Time  Complexity: O(V + E) avg. and O(V * E) in worst-case */
+/* Space Complexity: O(V + E)                                 */
+class Solution_Shortest_Path_Faster_Algorithm__SPFA {
+public:
+    int networkDelayTime(vector<vector<int>>& times, int n, int k)
+    {
+        unordered_map<int, vector<pair<int,int>>> adj_list;
+
+        /* Build adjacency list */
+        for (const auto& edge : times)
+        {
+            const int& u = edge[0];
+            const int& v = edge[1];
+            const int& w = edge[2];
+
+            adj_list[u].push_back({v, w});
+        }
+
+        vector<int> dist(n + 1, INT_MAX);
+        dist[k] = 0;
+
+        queue<pair<int,int>> q;
+        q.push({k, 0});
+
+        while ( ! q.empty())
+        {
+            auto [curr_node, curr_time] = q.front();
+            q.pop();
+
+            /* Already found a shorter path */
+            if (dist[curr_node] < curr_time)
+                continue;
+
+            for (const auto& neighbor : adj_list[curr_node])
+            {
+                const int& neighbor_node = neighbor.first;
+                const int& weight = neighbor.second;
+
+                int new_time = curr_time + weight;
+
+                if (new_time < dist[neighbor_node])
+                {
+                    dist[neighbor_node] = new_time;
+                    q.push({neighbor_node, new_time});
+                }
+            }
+        }
+
+        int result = 0;
+        for (int i = 1; i < n+1; i++)
+        {
+            if (dist[i] == INT_MAX)
+                return -1;
+
+            result = max(result, dist[i]);
+        }
+
+        return result;
+    }
+};
+
+
 
 
 /*
