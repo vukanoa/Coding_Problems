@@ -1,8 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_set>
-#include <queue>
-
 /*
     ==============
     === MEDIUM ===
@@ -86,6 +81,11 @@
     All pairs (xi, yi) are distinct.
 
 */
+
+#include <cstdlib>
+#include <unordered_set>
+#include <queue>
+using namespace std;
 
 /*
     ------------
@@ -185,10 +185,10 @@
 /* Space Complexity: O(n^2) */
 class Solution {
 public:
-    int minCostConnectPoints(std::vector<std::vector<int>>& points)
+    int minCostConnectPoints(vector<vector<int>>& points)
     {
         const int N = points.size();
-        std::vector<std::vector<std::pair<int,int>>> adj_list(N, std::vector<std::pair<int,int>>());
+        vector<vector<pair<int,int>>> adj_list(N, vector<pair<int,int>>());
 
         // Create an Adjacency List
         for (int i = 0; i < N-1; i++)
@@ -201,19 +201,19 @@ public:
                 int x2 = points[j][0];
                 int y2 = points[j][1];
 
-                int distance = std::abs(x1 - x2) + std::abs(y1 - y2);
+                int distance = abs(x1 - x2) + abs(y1 - y2);
 
                 adj_list[i].push_back( {distance, j} );
                 adj_list[j].push_back( {distance, i} );
             }
         }
 
-        /*** Prim's Algorithm ***/
-        std::unordered_set<int> visited;
+        /* Prim's Algorithm */
+        unordered_set<int> visited;
 
-        std::priority_queue<std::pair<int, int>,
-            std::vector<std::pair<int, int>>,
-            std::greater<std::pair<int, int>>> min_heap;
+        priority_queue<pair<int, int>,
+            vector<pair<int, int>>,
+            greater<pair<int, int>>> min_heap;
 
 
         // Initial state before starting Prim's Algorithm
@@ -242,5 +242,124 @@ public:
         }
 
         return cost;
+    }
+};
+
+
+
+
+///////////////////////////
+/// Kruskal's Algorithm ///
+///////////////////////////
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 5.05% */
+/* Space Beats: 6.65% */
+
+/* Time  Complexity: O(V^2 * log(V^2)) */ // V <==> n
+/* Space Complexity: O(V)              */
+class DSU {
+private:
+    vector<int> rank;
+    vector<int> parent;
+
+public:
+    DSU (int n)
+    {
+        rank.reserve(n);
+        parent.reserve(n);
+
+        for (int i = 0; i < n; i++)
+        {
+            rank[i]   = 1;
+            parent[i] = i;
+        }
+    }
+
+    int find_root(int node)
+    {
+        while (node != parent[node])
+        {
+            /* Reverse Ackerman function, practically O(1) */
+            parent[node] = parent[parent[node]];
+
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    bool union_components(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        if (root_1 == root_2)
+            return false; // We did NOT perform a UNION
+
+        if (rank[root_1] < rank[root_2])
+            swap(root_1, root_2);
+
+        parent[root_2] = root_1;
+        rank[root_1]  += rank[root_2];
+
+        return true; // We have MERGED(unioned) two components
+    }
+};
+
+class Solution_Kruskal {
+public:
+    int minCostConnectPoints(vector<vector<int>>& points)
+    {
+        const int N = points.size();
+        int result = 0;
+
+        vector<vector<vector<int>>> edges(N);
+        priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>> min_heap;
+
+        // O(V^2 * log(V^2)) (entire block)
+        for (int i = 0; i < N; i++)
+        {
+            const int xi = points[i][0];
+            const int yi = points[i][1];
+
+            for (int j = i+1; j < N; j++)
+            {
+                const int xj = points[j][0];
+                const int yj = points[j][1];
+
+                int distance = abs(xi - xj) + abs(yi - yj);
+
+                min_heap.push( {distance, i, j} ); // O(log(V^2))
+            }
+        }
+
+        DSU dsu(N);
+
+        /* Kruskal's Algorithm */
+        while ( ! min_heap.empty())
+        {
+            auto top = min_heap.top();
+            min_heap.pop();
+
+            const int& distance = top[0];
+            const int& i        = top[1];
+            const int& j        = top[2];
+
+            if ( ! dsu.union_components(i, j))
+                continue;
+
+            result += distance;
+        }
+
+        return result;
     }
 };
