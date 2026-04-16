@@ -83,6 +83,7 @@
 */
 
 #include <cstdlib>
+#include <unordered_map>
 #include <unordered_set>
 #include <queue>
 using namespace std;
@@ -99,20 +100,20 @@ using namespace std;
     Convert "points" to adj_list:
 
 
-         Hash Map
+             Hash Map
 
-    |  Key  :             Values             | // Values = {cost, node}
-    +----------------------------------------+
-    |   0   :  {4,1}, {13,2},  {7,3},  {7,4} |
-    +----------------------------------------+
-    |   1   :  {4,0},  {9,2},  {3,3},  {7,4} |
-    +----------------------------------------+
-    |   2   : {13,0},  {9,1}, {10,3}, {14,4} |
-    +----------------------------------------+
-    |   3   :  {7,0},  {3,1}, {10,2},  {4,4} |
-    +----------------------------------------+
-    |   4   :  {7,0},  {7,1}, {14,2},  {4,3} |
-    +----------------------------------------+
+        |  Key  :             Values             | // Values = {cost, node}
+        +----------------------------------------+
+        |   0   :  {4,1}, {13,2},  {7,3},  {7,4} |
+        +----------------------------------------+
+        |   1   :  {4,0},  {9,2},  {3,3},  {7,4} |
+        +----------------------------------------+
+        |   2   : {13,0},  {9,1}, {10,3}, {14,4} |
+        +----------------------------------------+
+        |   3   :  {7,0},  {3,1}, {10,2},  {4,4} |
+        +----------------------------------------+
+        |   4   :  {7,0},  {7,1}, {14,2},  {4,3} |
+        +----------------------------------------+
 
     After that, do a TEXTBOOK Prims' Algorithm.
     There isn't much explanation other than that.
@@ -128,14 +129,15 @@ using namespace std;
         1. An Unordered Set called "visited"
         2. A Min Heap
 
-    The use of an Unordered Set "visited" is to prevent cycles in our graph
-    connecting endeavor.
+    The use of an Unordered Set "visited" is to prevent cycles while we connect
+    the edges.
 
     They have explicitly told us:
         "Return the minimum cost to make all points connected. All points are
          connected if there is exactly one simple path between any two points."
 
     That means that there are NO CYCLES in that one single path.
+
     No cycles and one path indicates that this will be a:
         MST - Minimum Spanning Tree
 
@@ -146,102 +148,103 @@ using namespace std;
     Prim's Algorithm.
 
     Prim's Algorithm works as following:
-        1. Before we begin, pick any node and insert it in "visited".
-        2. Also push all of the edges of that picked node to min_heap as pair:
-           {distance, node_it_connects}
+        1. Initially we'll push node 0 with distance 0 in our min_heap.
 
            Now we begin the main part of Prim's Algorithm
 
-        3. Since pairs are "sorted" in min_heap by the first value(i.e. dist),
+        2. Since pairs are "sorted" in min_heap by the first value(i.e. dist),
            at each iteration, we are popping the top pair from that min_heap
-           and we check if the "node_it_connects" is present in Set "visited".
+           and we check if the neighbor node it is connectedd to is present in
+           Set "visited".
 
            If it is present, then we don't want to create that edge since we
            are NOT allowed to have cycles. Pop that one out and try with the
            new pair at the top of the min_heap.
 
-           Do that until you find one "node_it_connects"(i.e. second value)
-           that ISN'T present in the min_heap.
+           Do that until you find a neighbor node that is NOT preset in
+           min_heap.
 
-        4. At that "node_it_connects"(i.e. second value from the pair) and
-           insert it in a Set "visited".
+        3. Insert that neighbor node(i.e. second value from the pair) in our
+           "visited" Hash Set.
 
-        5. Add the "dist"(i.e. manhattan distance, i.e. first value from the
-           pair) to our final result called "cost".
+        4. Add the "dist"(i.e. manhattan distance, i.e. first value from the
+           pair) to our final result.
 
-        6. Push all the edges of the "node_it_connect"(aka the "node" in the
-           while loop) that DO connect all the nodes that are NOT yet visited.
+        5. Push all the edges of the neighbor node that are connected will all
+           the nodes that are NOT yet visited.
 
-        7. Do steps from [3, 6] inclusively, until visited.size() becomes N.
+        6. Do steps from [2, 5] inclusively, until we've added N-1 edges.
 
-        8. At the end just return "cost".
+    Return "result".
 
 */
 
-/* Time  Beats: 73.46% */
-/* Space Beats: 36.85% */
+/* Time  Beats: 5.01% */
+/* Space Beats: 5.01% */
 
-/* Time  Complexity: O(n^2 * logn) */
-/* Space Complexity: O(n^2) */
-class Solution {
+/* Time  Complexity: O(V^2 * logV) */ // V <==> N
+/* Space Complexity: O(V^2)        */
+class Solution_Lazy_Prim_Algorithm {
 public:
     int minCostConnectPoints(vector<vector<int>>& points)
     {
         const int N = points.size();
-        vector<vector<pair<int,int>>> adj_list(N, vector<pair<int,int>>());
+        int result = 0;
 
-        // Create an Adjacency List
-        for (int i = 0; i < N-1; i++)
+        unordered_map<int, vector<vector<int>>> adj_list;
+
+        for (int i = 0; i < N; i++)
         {
-            int x1 = points[i][0];
-            int y1 = points[i][1];
+            int xi = points[i][0];
+            int yi = points[i][1];
 
             for (int j = i+1; j < N; j++)
             {
-                int x2 = points[j][0];
-                int y2 = points[j][1];
+                int xj = points[j][0];
+                int yj = points[j][1];
 
-                int distance = abs(x1 - x2) + abs(y1 - y2);
+                int distance = abs(xi - xj) + abs(yi - yj);
 
-                adj_list[i].push_back( {distance, j} );
-                adj_list[j].push_back( {distance, i} );
+                adj_list[i].push_back( {j, distance} );
+                adj_list[j].push_back( {i, distance} );
             }
         }
 
-        /* Prim's Algorithm */
+        int start_node = 0;
+
+        priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>> min_heap;
+        min_heap.push( {0, 0} ); // {distance, neighbor_node}
+
         unordered_set<int> visited;
 
-        priority_queue<pair<int, int>,
-            vector<pair<int, int>>,
-            greater<pair<int, int>>> min_heap;
-
-
-        // Initial state before starting Prim's Algorithm
-        visited.insert(0);
-        for (int i = 0; i < adj_list[0].size(); i++)
-            min_heap.push(adj_list[0][i]);
-
-        int cost = 0;
-        while (visited.size() < N)
+        while ( ! min_heap.empty())
         {
-            int dist = min_heap.top().first;
-            int node = min_heap.top().second;
-            min_heap.pop(); // O(logn)
+            auto top = min_heap.top();
+            min_heap.pop();
 
-            if (visited.count(node)) // If "node" is already visited
+            const int& distance  = top[0];
+            const int& curr_node = top[1];
+
+            if (visited.count(curr_node))
                 continue;
 
-            visited.insert(node);
-            cost += dist;
+            visited.insert(curr_node);
+            result += distance;
 
-            for (int i = 0; i < adj_list[node].size(); i++)
+            for (const auto& neighbor : adj_list[curr_node])
             {
-                if (visited.count(adj_list[node][i].second) == 0)
-                    min_heap.push(adj_list[node][i]);
+                /* Careful with the ordering! */
+                const int& neighbor_node = neighbor[0];
+                const int& neighbor_dist = neighbor[1];
+
+                if (visited.count(neighbor_node))
+                    continue;
+
+                min_heap.push( {neighbor_dist, neighbor_node} );
             }
         }
 
-        return cost;
+        return result;
     }
 };
 
