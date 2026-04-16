@@ -65,6 +65,7 @@
 */
 
 #include <climits>
+#include <cstdlib>
 #include <unordered_map>
 #include <vector>
 using namespace std;
@@ -78,71 +79,67 @@ using namespace std;
 
 */
 
-/* Time  Beats: 100.00% */
-/* Space Beats: 100.00% */
+/* Time  Beats: 51.47% */
+/* Space Beats: 58.71% */
 
-/* Time  Complexity: O(N + M * logN) */
-/* Space Complexity: O(N)            */
+/* Time  Complexity: O(N  +  Q * logN) */
+/* Space Complexity: O(N  +  Q)        */
 class Solution {
 public:
     vector<int> solveQueries(vector<int>& nums, vector<int>& queries)
     {
         const int N = nums.size();
-        const int M = queries.size();
-        vector<int> answer(M, -1);
+        const int Q = queries.size();
+        vector<int> answer;
+        answer.reserve(Q);
 
+        // O(N) (entire block)
         unordered_map<int, vector<int>> umap;
         for (int i = 0; i < N; i++)
             umap[nums[i]].push_back(i);
 
-        for (int i = 0; i < M; i++)
+        // O(Q * logN)
+        for (int i = 0; i < Q; i++)
         {
-            int idx  = queries[i];
-            int elem = nums[idx];
+            int j    = queries[i];
+            int elem = nums[j];
 
-            if (umap[elem].size() == 1)
+            const int SIZE = umap[elem].size();
+            if (SIZE == 1)
             {
-                answer[i] = -1;
+                answer.push_back(-1);
+                continue;
             }
+
+            // O(logN)
+            auto it = lower_bound(umap[elem].begin(), umap[elem].end(), j);
+            int umap_idx_of_j = distance(umap[elem].begin(), it);
+
+            int umap_idx_of_prev = (umap_idx_of_j - 1 + SIZE) % SIZE;
+            int umap_idx_of_next = (umap_idx_of_j + 1)        % SIZE;
+
+            int diff_prev = INT_MAX;
+            if (umap_idx_of_prev != umap_idx_of_j)
+            {
+                diff_prev = abs(umap[elem][umap_idx_of_j] - umap[elem][umap_idx_of_prev]);
+
+                /* Because the array is CIRCULAR */
+                diff_prev = min(diff_prev, N - diff_prev);
+            }
+
+            int diff_next = INT_MAX;
+            if (umap_idx_of_next != umap_idx_of_j)
+            {
+                diff_next = abs(umap[elem][umap_idx_of_j] - umap[elem][umap_idx_of_next]);
+
+                /* Because the array is CIRCULAR */
+                diff_next = min(diff_next, N - diff_next);
+            }
+
+            if (diff_prev == INT_MAX && diff_next == INT_MAX)
+                answer.push_back(-1);
             else
-            {
-                auto iter = lower_bound(umap[elem].begin(), umap[elem].end(), idx);
-                int iter_idx = iter - umap[elem].begin();
-
-                int size = umap[elem].size();
-                int min_dist = INT_MAX;
-
-                int prev_idx = iter_idx == 0      ? size-1 : iter_idx - 1;
-                int next_idx = iter_idx == size-1 ?   0    : iter_idx + 1;
-
-                int curr = umap[elem][iter_idx];
-                int prev = umap[elem][prev_idx];
-                int next = umap[elem][next_idx];
-
-                if (prev < curr)
-                {
-                    min_dist = min(min_dist,     curr - prev);
-                    min_dist = min(min_dist, N - curr + prev);
-                }
-                else
-                {
-                    min_dist = min(min_dist,     prev - curr);
-                    min_dist = min(min_dist, N - prev + curr);
-                }
-
-                if (curr < next)
-                {
-                    min_dist = min(min_dist,     next - curr);
-                    min_dist = min(min_dist, N - next + curr);
-                }
-                else
-                {
-                    min_dist = min(min_dist,     curr - next);
-                    min_dist = min(min_dist, N - curr + next);
-                }
-
-                answer[i] = min_dist;
-            }
+                answer.push_back(min(diff_prev, diff_next));
         }
 
         return answer;
