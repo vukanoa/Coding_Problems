@@ -82,6 +82,7 @@
 
 */
 
+#include <climits>
 #include <cstdlib>
 #include <unordered_map>
 #include <unordered_set>
@@ -242,6 +243,69 @@ public:
 
                 min_heap.push( {neighbor_dist, neighbor_node} );
             }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    
+
+*/
+
+/* Time  Beats: 99.59% */
+/* Space Beats: 94.81% */
+
+/* Time  Complexity: O(V^2) */
+/* Space Complexity: O(V)    */
+class Solution_On_The_Fly_Prim_Algorithm {
+public:
+    int minCostConnectPoints(vector<vector<int>>& points)
+    {
+        const int N = points.size();
+        int result = 0;
+
+        vector<int> dist(N, INT_MAX);
+        vector<bool> visit(N, false);
+        int edges = 0;
+
+        int curr_node = 0;
+        while (edges < N - 1) // There are exactly N-1 edges in a MST
+        {
+            visit[curr_node] = true;
+
+            int xi = points[curr_node][0];
+            int yi = points[curr_node][1];
+
+            int next_node = -1;
+            for (int j = 0; j < N; j++)
+            {
+                if (visit[j])
+                    continue;
+
+                int xj = points[j][0];
+                int yj = points[j][1];
+
+                int distance = abs(xi - xj) + abs(yi - yj);
+
+                dist[j] = min(dist[j], distance);
+
+                if (next_node == -1 || dist[j] < dist[next_node])
+                    next_node = j;
+            }
+
+            result += dist[next_node];
+
+            curr_node = next_node;
+            edges++;
         }
 
         return result;
