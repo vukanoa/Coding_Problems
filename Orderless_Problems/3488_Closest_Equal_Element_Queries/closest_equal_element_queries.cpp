@@ -145,3 +145,69 @@ public:
         return answer;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 45.77% */
+/* Space Beats: 30.35% */
+
+/* Time  Complexity: O(N + Q) */
+/* Space Complexity: O(N + Q) */
+class Solution_Linear {
+public:
+    vector<int> solveQueries(vector<int>& nums, vector<int>& queries)
+    {
+        const int N = nums.size();
+        const int Q = queries.size();
+
+        vector<int> answer;
+        answer.reserve(Q);
+
+        unordered_map<int, vector<int>> umap; // num -> sorted indices
+        vector<int> indices(N);               // i -> index in indices[nums[i]]
+
+        for (int i = 0; i < N; i++)
+        {
+            indices[i] = umap[nums[i]].size();
+            umap[nums[i]].push_back(i);
+        }
+
+        for (int i = 0; i < Q; i++)
+        {
+            int query = queries[i];
+            int elem  = nums[query];
+
+            vector<int>& query_indices = umap[elem];
+            const int SIZE = query_indices.size();
+
+            if (SIZE == 1)
+            {
+                answer.push_back(-1);
+                continue;
+            }
+
+            int j    = indices[query];
+            int curr = query_indices[j];
+
+            int prev = query_indices[(j - 1 + SIZE) % SIZE];
+            int next = query_indices[(j + 1)        % SIZE];
+
+            int diff_next = (next - curr + N) % N;
+            int diff_prev = (curr - prev + N) % N;
+
+            answer.push_back(min(diff_next, diff_prev));
+        }
+
+        return answer;
+    }
+};
