@@ -63,6 +63,7 @@
 
 /* Time  Complexity: O(1) */
 /* Space Complexity: O(1) */
+#include <cstdint>
 class Solution {
 public:
     int reverseBits(int n)
@@ -80,5 +81,46 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 29.20% */
+/* Space Beats: 72.86% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    int reverseBits(int n)
+    {
+        return my_reversal(n, 32);
+    }
+
+private:
+    uint32_t my_reversal(int n, int bits)
+    {
+        if (bits == 1)
+            return n & 1U;
+
+        int half = bits >> 1;
+
+        uint32_t mask = (1U << half) - 1U;
+
+        uint32_t low  = n & mask;
+        uint32_t high = n >> half;
+
+        return (my_reversal(low, half) << half) | my_reversal(high, half);
     }
 };
