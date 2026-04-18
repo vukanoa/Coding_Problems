@@ -78,80 +78,6 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    Classic BFS.
-
-*/
-
-/* Time  Beats: 69.94% */
-/* Space Beats: 16.85% */
-
-/* Time  Complexity: O(E * K)     */
-/* Space Complexity: O(E + V * K) */
-class Solution_BFS {
-public:
-    int findCheapestPrice(int n, vector<vector<int>>& flights, int src, int dst, int k)
-    {
-        const int V = n;
-        const int E = flights.size();
-
-        vector<vector<vector<int>>> adj_list(V);
-
-        /* Create an Adjacency List */
-        for (const auto& flight : flights)
-        {
-            const int& from  = flight[0];
-            const int& to    = flight[1];
-            const int& price = flight[2];
-
-            adj_list[from].push_back( {to, price} );
-        }
-
-        queue<vector<int>> queue;
-        queue.push( {0, 0, src} ); // {cost, stops, node}
-
-        vector<int> cost(V, INT_MAX);
-        cost[src] = 0;
-
-        /* BFS */
-        while ( ! queue.empty())
-        {
-            vector<int> front = queue.front();
-            queue.pop();
-
-            int curr_cost  = front[0];
-            int curr_stops = front[1];
-            int curr_node  = front[2];
-
-            if (curr_stops > k)
-                continue;
-
-            for (const auto& neighbor : adj_list[curr_node])
-            {
-                int neighbor_node  = neighbor[0];
-                int neighbor_price = neighbor[1];
-
-                int new_cost = curr_cost + neighbor_price;
-
-                if (new_cost < cost[neighbor_node])
-                {
-                    queue.push( {new_cost, curr_stops+1, neighbor_node} );
-                    cost[neighbor_node] = new_cost;
-                }
-            }
-        }
-
-        return cost[dst] == INT_MAX ? -1 : cost[dst];
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
     TODO
     (Bellman-Ford Algorithm)
 
@@ -173,11 +99,11 @@ public:
         {
             vector<int> new_cost = cost;
 
-            for (auto& entry : flights)
+            for (auto& flights : flights)
             {
-                int from  = entry[0];
-                int to    = entry[1];
-                int price = entry[2];
+                int from  = flights[0];
+                int to    = flights[1];
+                int price = flights[2];
 
                 if (cost[from] == INT_MAX)
                     continue;
@@ -267,5 +193,72 @@ public:
         int result = *min_element(cost[dst].begin(), cost[dst].end());
 
         return result == INT_MAX ? -1 : result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    Shortest Path Faster Algorithm
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  19.12% */
+
+/* Time  Complexity: O(E * K)     */
+/* Space Complexity: O(E + V * K) */
+class Solution_Shortest_Path_Faster_Algorithm {
+public:
+    int findCheapestPrice(int n, vector<vector<int>>& flights, int src, int dst, int k)
+    {
+        vector<int> cost(n, INT_MAX);
+        cost[src] = 0;
+
+        vector<vector<vector<int>>> adj_list(n);
+
+        /* Create an Adjacency List */
+        for (const auto& flight : flights)
+        {
+            const int& from  = flight[0];
+            const int& to    = flight[1];
+            const int& price = flight[2];
+
+            adj_list[from].push_back( {to, price} );
+        }
+
+        queue<tuple<int, int, int>> queue;
+        queue.push( {0, 0, src} );
+
+        while ( ! queue.empty())
+        {
+            auto [curr_price, curr_stops, curr_node] = queue.front();
+            queue.pop();
+
+            if (curr_stops > k)
+                continue;
+
+            for (const auto& neighbor : adj_list[curr_node])
+            {
+                int neighbor_node  = neighbor[0];
+                int neighbor_price = neighbor[1];
+
+                int new_cost = curr_price + neighbor_price;
+
+                if (new_cost < cost[neighbor_node])
+                {
+                    cost[neighbor_node] = new_cost;
+                    queue.push( {new_cost, curr_stops+1, neighbor_node} );
+                }
+            }
+        }
+
+        return cost[dst] == INT_MAX ? -1 : cost[dst];
     }
 };
