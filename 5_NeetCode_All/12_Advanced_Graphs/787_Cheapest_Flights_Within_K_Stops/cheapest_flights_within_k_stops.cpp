@@ -78,16 +78,47 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    TODO
-    (Bellman-Ford Algorithm)
+    Here we are NOT solving general "Shortest Path in a graph", instead we are
+    solving "Shortest path with at most k stops". That's a crucial difference.
+
+    This changes the Bellman-Ford variant.
+
+    Classic Bellman-Ford does V-1 iterations because ANY shortest pat in a
+    Graph without negative cycles as AT MOST V-1 edges.
+
+    After "i" iterations, we are guaranteed correct shortest paths that use AT
+    MOST "i" edges.
+
+
+    Here, the Constraint is different: AT MOST k stops means at most k+1 edges.
+
+    Therefore, we only care about paths with: 
+
+        <= k+1 edges
+
+    not ALL possible paths. That is why we run the "relaxation" loop exactly
+    k+1 times.
+
+    Key invariant here:
+
+        After iteration "i", cost[x] stores the minimum cost to reach "x" using
+        at most "i" edges.
+
+        Because we copy into new_cost, each iteration only extends paths BY ONE
+        edge.
+
+            i = 0   ---> paths with    0   edges(i.e. just "src")
+            i = 1   ---> paths with <= 1   edge
+            ...
+            i = k+1 ---> paths with <= k+1 edges
 
 */
 
 /* Time  Beats: 52.88% */
 /* Space Beats: 91.64% */
 
-/* Time  Complexity: O(E * K) */
-/* Space Complexity: O(n)     */
+/* Time  Complexity: O(n + E * K) */
+/* Space Complexity: O(n)         */
 class Solution_Bellman_Ford_Algorithm {
 public:
     int findCheapestPrice(int n, vector<vector<int>>& flights, int src, int dst, int k)
