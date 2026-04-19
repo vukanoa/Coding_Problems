@@ -102,3 +102,86 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Linear. Use the sorted property of BOTH vectors. Previously we've only used
+    the sortedness from the SECOND vector, but not from the first one as well.
+
+    Here we take advantage of both.
+
+*/
+
+/* Time  Beats: 49.20% */
+/* Space Beats: 47.28% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Linear_1 {
+public:
+    int maxDistance(vector<int>& nums1, vector<int>& nums2)
+    {
+        const int N = nums1.size();
+        const int M = nums2.size();
+        int result = 0;
+
+        int j = M-1;
+        for (int i = N-1; i >= 0; i--)
+        {
+            while (j >= 0 && nums1[i] > nums2[j])
+                j--;
+
+            result = max(result, j - i);
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    Same as above, written in a different way. It's always beneficial to be
+    aware of more than one implementation as sometimes this can be the only
+    way to implement.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  74.44% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Linear_2 {
+public:
+    int maxDistance(vector<int>& nums1, vector<int>& nums2)
+    {
+        const int N = nums1.size();
+        const int M = nums2.size();
+
+        int i = 0;
+        int j = 0;
+
+        while (i < N && j < M)
+        {
+            i += nums1[i] > nums2[j]; // ? 1 : 0;
+
+            // Increment
+            j++;
+        }
+
+        return max(0, j - i - 1);
+    }
+};
