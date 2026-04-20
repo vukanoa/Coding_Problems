@@ -87,6 +87,7 @@
 
 */
 
+#include <cstring>
 #include <vector>
 #include <algorithm>
 using namespace std;
@@ -167,12 +168,18 @@ public:
 
 */
 
-/* Time  Beats: 82.76% */
-/* Space Beats: 84.38% */
+/* Time  Beats: 33.56% */
+/* Space Beats: 40.41% */
 
-/* Time  Complexity: O(N * M) */
-/* Space Complexity: O(N * M) */
-class Solution_Memoization {
+/* Time  Complexity: O(N * M^2) */
+/* Space Complexity: O(N * M^2) */
+class Solution_memo {
+private:
+    static constexpr int TOTAL_SLOTS = 101 * (101 + 1);
+    long long memo[101][TOTAL_SLOTS];
+
+    const long long INF = 1e18;
+
 public:
     long long minimumTotalDistance(vector<int>& robot, vector<vector<int>>& factory)
     {
@@ -183,46 +190,49 @@ public:
         sort(robot.begin(), robot.end());
         sort(factory.begin(), factory.end());
 
-        // Initialize "memo"
-        vector<vector<long long>> memo(N, vector<long long>(M, -1));
+        vector<int> slot;
+        slot.reserve(TOTAL_SLOTS);
 
-        return solve(robot, factory, memo, 0, 0);
+        for (int j = 0; j < M; j++)
+        {
+            int factory_idx   = factory[j][0];
+            int factory_limit = factory[j][1];
+
+            while (factory_limit > 0)
+            {
+                slot.push_back(factory_idx);
+
+                // Decrement
+                factory_limit--;
+            }
+        }
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo)); // 0xff <==> -1 in 2's complement
+
+        return solve(0, 0, robot, slot);
     }
 
 private:
-    long long solve(vector<int>& robot,
-                  vector<vector<int>>& factory,
-                  vector<vector<long long>>& memo,
-                  int i,
-                  int j)
+    long long solve(int i, int j, vector<int>& robot, vector<int>& slot)
     {
         const int N = robot.size();
-        const int M = factory.size();
+        const int M = slot.size();
 
-        long long infinity = 1e13;
-
-        if (i == N)
+        // We have INDEED used all of the robots
+        if (i >= N)
             return 0;
 
-        if (j == M)
-            return infinity;
+        // We have NOT used all of the robots, but we have NO slots left
+        if (j >= M)
+            return INF;
 
         if (memo[i][j] != -1)
             return memo[i][j];
 
-        // Skip the current factory
-        long long result = solve(robot, factory, memo, i, j+1);
-        long long sum = 0;
+        long long take = abs(robot[i] - slot[j]) + solve(i+1, j+1, robot, slot);
+        long long skip = 0                       + solve(i  , j+1, robot, slot);
 
-        // Attempt to assign robots to the current factory
-        for (int k = i; k < N && k-i+1 <= factory[j][1]; k++)
-        {
-            sum += abs(robot[k] - factory[j][0]);
-            result = min(result, sum + solve(robot, factory, memo, k+1, j+1));
-        }
-
-        memo[i][j] = result;
-
-        return result;
+        return memo[i][j] = min(take, skip);
     }
 };
