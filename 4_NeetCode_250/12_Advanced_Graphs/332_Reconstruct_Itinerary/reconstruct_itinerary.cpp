@@ -58,6 +58,7 @@
 
 #include <functional>
 #include <queue>
+#include <stack>
 #include <unordered_set>
 #include <vector>
 #include <string>
@@ -144,7 +145,7 @@ private:
 
 /* Time  Complexity: O(E * logE   +   V + E) ---> O(E * logE) */
 /* Space Complexity: O(E)                                     */
-class Solution_Hierholzer_Algorithm {
+class Solution_Hierholzer_Algorithm_Recursive {
 public:
     vector<string> findItinerary(vector<vector<string>>& tickets)
     {
@@ -271,5 +272,86 @@ private:
 
         /* Postorder push */
         result.push_back(node);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Iterative way of implementing the same "Hierholzer's Algorithm", however
+    here we do NOT use the "general Hierholzer's Algorithm" check-ups, instead
+    we do only what's necessary.
+
+*/
+
+/* Time  Beats:  8.49% */
+/* Space Beats: 14.16% */
+
+/* Time  Complexity: O(E * logE   +   V + E) ---> O(E * logE) */
+/* Space Complexity: O(E)                                     */
+class Solution_Hierholzer_Algorithm_Iterative {
+public:
+    vector<string> findItinerary(vector<vector<string>>& tickets)
+    {
+        const int E = tickets.size();
+
+        /* Sort REVERSE-lexicographically */
+        sort(tickets.rbegin(), tickets.rend()); // O(E * logE)
+
+        // Worst case for a simple directed graph without self-loops:
+        // E <= V * (V-1)
+        //
+        // With self-loops ALLOWED:
+        // E <= V * V
+        vector<string> result;
+        result.reserve(E + 1);
+
+        unordered_map<string, vector<string>> adj_list;
+
+        // O(E) (entire block)
+        for (const auto& ticket : tickets)
+        {
+            const string& from = ticket[0];
+            const string& to   = ticket[1];
+
+            adj_list[from].push_back(to); // O(1) Amortized
+        }
+
+        // O(E * logE) (entire block)
+        for (auto& [src, destinations] : adj_list)
+            sort(destinations.rbegin(), destinations.rend()); // REVERSE-lexic.
+
+        stack<string> stack;
+        stack.push("JFK");
+
+        while ( ! stack.empty())
+        {
+            string node = stack.top();
+
+            if (adj_list[node].empty())
+            {
+                result.push_back(node);
+
+                stack.pop();
+            }
+            else
+            {
+                string neighbor = adj_list[node].back();
+                adj_list[node].pop_back();
+
+                stack.push(neighbor);
+            }
+        }
+
+        /* Reverse the result since we've done a POSTORDER dfs */
+        // O(E + 1) --> O(E)
+        reverse(result.begin(), result.end());
+
+        return result;
     }
 };
