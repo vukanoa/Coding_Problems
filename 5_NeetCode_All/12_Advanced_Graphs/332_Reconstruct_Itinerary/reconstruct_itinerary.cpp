@@ -58,6 +58,7 @@
 
 #include <functional>
 #include <queue>
+#include <unordered_set>
 #include <vector>
 #include <string>
 #include <unordered_map>
@@ -122,6 +123,153 @@ private:
         }
 
         /* Postorder DFS */
+        result.push_back(node);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 79.29% */
+/* Space Beats:  5.04% */
+
+/* Time  Complexity: O(E * logE   +   V + E) ---> O(E * logE) */
+/* Space Complexity: O(E)                                     */
+class Solution_Hierholzer_Algorithm {
+public:
+    vector<string> findItinerary(vector<vector<string>>& tickets)
+    {
+        const int E = tickets.size();
+
+        /* Sort REVERSE-lexicographically */
+        sort(tickets.rbegin(), tickets.rend()); // O(E * logE)
+
+        // Worst case for a simple directed graph without self-loops:
+        // E <= V * (V-1)
+        //
+        // With self-loops ALLOWED:
+        // E <= V * V
+        vector<string> result;
+        result.reserve(E + 1);
+
+        unordered_map<string, vector<string>> adj_list;
+        unordered_map<string, int> indegree;
+        unordered_map<string, int> outdegree;
+
+        unordered_set<string> cities;
+
+        // O(E) (entire block)
+        for (const auto& ticket : tickets)
+        {
+            const string& from = ticket[0];
+            const string& to   = ticket[1];
+
+            cities.insert(from); // O(1)
+            cities.insert(to);   // O(1)
+
+            adj_list[from].push_back(to); // O(1) Amortized
+
+            outdegree[from]++;
+            indegree[to]++;
+        }
+
+        /*
+           In this problem I check if "Eulerian Path" exist which is logically
+           correct, however it it completely necessary.
+
+           Why?
+
+           Because the problem GUARANTEES a VALID itinerary(i.e. route/journey)
+           from "JFK", therefore this whole block below can be removed without
+           affecting correctness.
+
+           However in general "Hierholzer's Algorithm", this is a NECESSARY
+           check-up.
+
+           So I'll leave it here for didactic purposes.
+
+
+
+           ***************************************
+           *** For an Eulearian Path to exist: ***
+           ***************************************
+
+           AT MOST ONE node can have: (starting node)
+
+                outdegree[city] - indegree[city] = 1
+
+           and AT MOST ONE node can have: (ending node)
+
+                indegree[city] - outdegree[city] = 1
+
+           and ALL the other nodes MUST have:
+
+                indegree[city] == outdegree[city]
+        */
+        const int CITIES = cities.size();
+        int valid_starting_nodes = 0;
+        int valid_ending_nodes   = 0;
+        int equal = 0;
+
+        // O(V)
+        for (const auto& city : cities)
+        {
+            if (outdegree[city] - indegree[city] == 1)
+                valid_starting_nodes++;
+
+            if (indegree[city] - outdegree[city] == 1)
+                valid_ending_nodes++;
+
+            if (indegree[city] == outdegree[city])
+                equal++;
+        }
+
+        if (valid_starting_nodes > 1 || valid_ending_nodes > 1)
+            return {};
+
+        if (valid_starting_nodes + valid_ending_nodes + equal < CITIES)
+            return {};
+
+
+
+        /* Postorder DFS */
+        // O(E)
+        postorder_dfs("JFK", outdegree, result, adj_list);
+
+        /* Reverse the result since we've done a POSTORDER dfs */
+        // O(E + 1) --> O(E)
+        reverse(result.begin(), result.end());
+
+        return result;
+    }
+
+private:
+    // O(E) (entire block), in general it's O(V + E)
+    //                      but for Hierholzer it's O(E)
+    void postorder_dfs(string node,
+                       unordered_map<string, int>& outdegree,
+                       vector<string>& result,
+                       unordered_map<string, vector<string>>& adj_list)
+    {
+        while (outdegree[node] > 0)
+        {
+            string neighbor = adj_list[node][outdegree[node] - 1];
+
+            outdegree[node]--;
+
+            postorder_dfs(neighbor, outdegree, result, adj_list);
+        }
+
+        /* Postorder push */
         result.push_back(node);
     }
 };
