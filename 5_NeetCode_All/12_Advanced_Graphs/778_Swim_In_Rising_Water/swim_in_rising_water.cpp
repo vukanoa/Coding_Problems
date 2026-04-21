@@ -76,7 +76,7 @@ using namespace std;
 
 /* Time  Complexity: O(N^2 * logN) */
 /* Space Complexity: O(N^2) */
-class Solution {
+class Solution_Dijkstra {
 public:
     int swimInWater(vector<vector<int>>& grid)
     {
@@ -120,6 +120,143 @@ public:
                 int new_min_height = max(min_height_so_far, grid[new_row][new_col]);
                 min_heap.push( {new_min_height, new_row, new_col} );
             }
+        }
+
+        return 0; // Unreachable
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Essentially what they are asking us to do is find a:
+
+        MST - Minimum Spanning Tree
+
+    There is an Algorithm for finding MST---Kruskal's Algorithm.
+
+*/
+
+/* Time  Beats: 79.52% */
+/* Space Beats: 73.64% */
+
+/* Time  Complexity: O(N^2 * logN) */
+/* Space Complexity: O(N^2)        */
+class DSU {
+private:
+    vector<int> rank;
+    vector<int> parent;
+
+public:
+    DSU (int n)
+    {
+        rank.resize(n);
+        parent.resize(n);
+
+        for (int i = 0; i < n; i++)
+        {
+            rank[i]   = 1;
+            parent[i] = i;
+        }
+    }
+
+    int find_root(int node)
+    {
+        while (node != parent[node])
+        {
+            /* Inverse Ackerman function */
+            parent[node] = parent[parent[node]];
+
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    bool union_components(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        if (root_1 == root_2)
+            return false; // We have NOT done a UNION
+
+        if (rank[root_1] < rank[root_2])
+            swap(root_1, root_2);
+
+        parent[root_2] = root_1;
+        rank[root_1]  += rank[root_2];
+
+        return true; // We have INDEED performed a UNION
+    }
+
+    bool connected(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        return root_1 == root_2;
+    }
+};
+
+class Solution_Kruskal {
+public:
+    int swimInWater(vector<vector<int>>& grid)
+    {
+        const int N = grid.size();
+
+        DSU dsu(N * N);
+
+        vector<pair<int,int>> directions = { {-1,0}, {1,0}, {0,-1}, {0,1} };
+
+        vector<tuple<int,int,int>> positions;
+        positions.reserve(N*N);
+
+        /* 1D flattening techniqeu */
+        for (int row = 0; row < N; row++)
+        {
+            for (int col = 0; col < N; col++)
+            {
+                positions.push_back( {grid[row][col], row, col} );
+            }
+        }
+
+        /* Sort */
+        sort(positions.begin(), positions.end()); // TC: O(N^2 * logN)
+
+        /* Lambda */
+        auto index = [&](int row, int col) -> int {
+            return row * N + col;
+        };
+
+        int starting_position = index(0  , 0  );
+        int ending_position   = index(N-1, N-1);
+
+        /* Kruskal's Algorithm: Creation of Minimum-Spanning-Tree */
+        for (const auto& [min_height_so_far, row, col] : positions)
+        {
+            for (const auto& dir : directions)
+            {
+                int new_row = row + dir.first;
+                int new_col = col + dir.second;
+
+                if (new_row < 0 || new_col < 0 || new_row >= N || new_col >= N)
+                    continue;
+
+                if (grid[new_row][new_col] > min_height_so_far)
+                    continue;
+
+                dsu.union_components(index(row    , col    ),
+                                     index(new_row, new_col));
+            }
+
+            if (dsu.connected(starting_position, ending_position))
+                return min_height_so_far;
         }
 
         return 0; // Unreachable
