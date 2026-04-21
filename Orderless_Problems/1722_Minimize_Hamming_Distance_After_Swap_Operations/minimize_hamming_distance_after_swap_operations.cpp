@@ -133,7 +133,7 @@ public:
 
 /* Time  Complexity: O(E * alpha(V)  +   V * alpha(V)) */
 /* Space Complexity: O(V)                              */
-class Solution_2 {
+class Solution_1 {
 public:
     int minimumHammingDistance(vector<int>& source, vector<int>& target, vector<vector<int>>& allowedSwaps)
     {
@@ -184,6 +184,68 @@ public:
                 if (freq_source > freq_target)
                     result += freq_source - freq_target;
             }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, however this counts the differences in a different way. It's
+    always beneficial to be aware of both Solutions.
+
+*/
+
+/* Time  Beats: 79.58% */
+/* Space Beats: 44.50% */
+
+/* Time  Complexity: O(E * alpha(V)  +   V * alpha(V)) */
+/* Space Complexity: O(V)                              */
+class Solution_2 {
+public:
+    int minimumHammingDistance(vector<int>& source, vector<int>& target, vector<vector<int>>& allowedSwaps)
+    {
+        const int V = source.size();       // Vertices
+        const int E = allowedSwaps.size(); // Edges
+        int result = 0;
+
+        DSU dsu(V);
+
+        // O(E * alpha(V)) (entire block)
+        for (const auto& swaps : allowedSwaps)
+        {
+            const int& u = swaps[0];
+            const int& v = swaps[1];
+
+            dsu.union_components(u, v); // alpha(V)
+        }
+
+        unordered_map<int, unordered_map<int, int>> root__to__value_freq;
+
+        // O(V * alpha(V)) (entire block)
+        for (int vertex = 0; vertex < V; vertex++)
+        {
+            int root = dsu.find_root(vertex); // alpha(V)
+
+            root__to__value_freq[root][source[vertex]]++;
+        }
+
+        // O((V * alpha(V))
+        for (int vertex = 0; vertex < V; vertex++)
+        {
+            int root = dsu.find_root(vertex); // O(alpha(V)), Inverse Ackerman
+
+            if (root__to__value_freq[root][target[vertex]] > 0)
+                root__to__value_freq[root][target[vertex]]--;
+            else
+                result++;
         }
 
         return result;
