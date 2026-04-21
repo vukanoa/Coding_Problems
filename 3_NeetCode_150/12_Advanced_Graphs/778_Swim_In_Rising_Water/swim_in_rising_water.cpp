@@ -1,9 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <set>
-#include <algorithm>
-
 /*
     ============
     === HARD ===
@@ -63,6 +57,9 @@
 
 */
 
+#include <vector>
+#include <queue>
+#include <algorithm>
 using namespace std;
 
 /*
@@ -74,49 +71,57 @@ using namespace std;
 
 */
 
-/* Time  Beats: 12.40% */
-/* Space Beats: 12.34% */
+/* Time  Beats: 10.50% */
+/* Space Beats: 10.63% */
 
-/* Time  Complexity: O(n^2 * logn) */
-/* Space Complexity: O(n^2)        */
+/* Time  Complexity: O(N^2 * logN) */
+/* Space Complexity: O(N^2) */
 class Solution {
 public:
     int swimInWater(vector<vector<int>>& grid)
     {
-        int N = grid.size();
+        const int N = grid.size();
 
-        set<pair<int, int>> visit;
+        priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>> min_heap;
+        min_heap.push( {grid[0][0], 0, 0} );
 
-        priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>> min_heap;  // (time/max-height, r, c)
-        vector<vector<int>> directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+        vector<vector<bool>> visited(N, vector<bool>(N, false));
+        vector<pair<int,int>> directions = { {-1,0}, {1,0}, {0,-1}, {0,1} };
 
-        visit.insert({0, 0});
-        min_heap.push({grid[0][0], 0, 0});
-
+        /* Dijkstra-like */
         while ( ! min_heap.empty())
         {
-            vector<int> cur = min_heap.top();
+            auto top = min_heap.top();
             min_heap.pop();
 
-            int time = cur[0];
-            int row  = cur[1];
-            int col  = cur[2];
+            int min_height_so_far = top[0];
+            int row               = top[1];
+            int col               = top[2];
+
+            if (visited[row][col])
+                continue;
 
             if (row == N-1 && col == N-1)
-                return time;
+                return min_height_so_far;
 
-            for (auto& dir : directions)
+            visited[row][col] = true;
+
+            for (const auto& dir: directions)
             {
-                int neighbor_row = row + dir[0], neighbor_col = col + dir[1];
+                int new_row = row + dir.first;
+                int new_col = col + dir.second;
 
-                if (neighbor_row < 0 || neighbor_col < 0 || neighbor_row >= N || neighbor_col >= N || visit.count({neighbor_row, neighbor_col}))
+                if (new_row < 0 || new_col < 0 || new_row >= N || new_col >= N)
                     continue;
 
-                visit.insert({neighbor_row, neighbor_col});
-                min_heap.push({max(time, grid[neighbor_row][neighbor_col]), neighbor_row, neighbor_col});
+                if (visited[new_row][new_col])
+                    continue;
+
+                int new_min_height = max(min_height_so_far, grid[new_row][new_col]);
+                min_heap.push( {new_min_height, new_row, new_col} );
             }
         }
 
-        return -1;  // This should never be reached if the input grid is valid
+        return 0; // Unreachable
     }
 };
