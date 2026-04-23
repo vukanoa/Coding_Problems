@@ -82,8 +82,8 @@ using namespace std;
 
 */
 
-/* Time  Beats: 85.31% */
-/* Space Beats: 42.19% */
+/* Time  Beats: 95.34% */
+/* Space Beats: 38.81% */
 
 /* Time  Complexity: O(E^2 * alpha(V)) */// E^2 dominates over O(E * logE)
 /* Space Complexity: O(V + E)          */// O(V) for DSU, O(E) for sorted_edges
@@ -92,9 +92,13 @@ private:
     vector<int> rank;
     vector<int> parent;
 
+    int total_components;
+
 public:
     DSU (int n)
     {
+        total_components = n;
+
         rank.resize(n);
         parent.resize(n);
 
@@ -132,10 +136,12 @@ public:
         parent[root_2] = root_1;
         rank[root_1]  += rank[root_2];
 
+        total_components--;
+
         return true;
     }
 
-    bool connected(int node_1, int node_2)
+    bool nodes_connected(int node_1, int node_2)
     {
         int root_1 = find_root(node_1);
         int root_2 = find_root(node_2);
@@ -143,9 +149,9 @@ public:
         return root_1 == root_2;
     }
 
-    int max_component_size()
+    int graph_fully_connected()
     {
-        return *max_element(rank.begin(), rank.end());
+        return total_components == 1;
     }
 };
 
@@ -221,8 +227,7 @@ public:
                     local_MST_weight += edge_w;
             }
 
-            bool graph_fully_connected = dsu_without_candidate.max_component_size() == V;
-            if ( ! graph_fully_connected || local_MST_weight > global_MST_weight)
+            if ( ! dsu_without_candidate.graph_fully_connected() || local_MST_weight > global_MST_weight)
             {
                 critical.push_back(candidate_idx);
                 continue;
