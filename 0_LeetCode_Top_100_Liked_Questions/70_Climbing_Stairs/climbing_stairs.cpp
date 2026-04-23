@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === EASY ===
@@ -90,19 +87,18 @@
     --- IDEA ---
     ------------
 
-    Fibonacci sequence using memoization. This is the most fundamental "Dynamic
-    Programming" technique that exists.
+    This is the most fundamental "Dynamic Programming" technique that exists.
 
     If you want to master "Dynamic Programming", this is the necessary first
     step.
 
 */
 
-/* Time  Beats: 100%   */
-/* Space Beats: 77.44% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  77.44% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution {
 public:
     int climbStairs(int n)
@@ -112,8 +108,8 @@ public:
         dp[1] = 1;
 
         /* Fibonacci */
-        for (int i = 2; i < n + 1; i++)
-            dp[i] = dp[i - 1] + dp[i - 2];
+        for (int i = 2; i < n+1; i++)
+            dp[i] = dp[i-2] + dp[i-1];
 
         return dp[n];
     }
@@ -127,106 +123,37 @@ public:
     --- IDEA ---
     ------------
 
-    Same idea as above, though this one doesn't use any extra space. Sinc we
-    don't need more than last two elements of array "dp", then instead of
-    keeping track of the array, we keep track only of the last two elements.
+    Instead of using entire "dp" vector, instead we can use only last two
+    dp states since that's all we need. Thus we will use only 2 variables
+    instead of an entire "dp" vector.
+
+    Reducing Space Complexity from O(N) down to O(1).
 
 */
 
 /* Time  Beats: 100.00% */
-/* Space Beats:  97.58% */
+/* Space Beats:  85.53% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution_Efficient {
 public:
     int climbStairs(int n)
     {
-        int dp_2 = 0;
-        int dp_1 = 1;
+        if (n == 1)
+            return 1;
 
-        for (int i = 2; i <= n; i++)
+        int prev_prev = 1;
+        int prev      = 1;
+
+        for (int i = 3; i < n+1; i++)
         {
-            int tmp = dp_1;
-            dp_1 = dp_2 + dp_1;
-            dp_2 = tmp;
+            int curr = prev_prev + prev;
+
+            prev_prev = prev;
+            prev      = curr;
         }
 
-        return dp_2 + dp_1;
+        return prev_prev + prev;
     }
 };
-
-
-void
-print_stairs(int n)
-{
-    std::cout << "\n\tStairs:\n";
-    for (int i = n-1; i >= 0; i--)
-    {
-        // Horizontal part
-        std::cout << "\t";
-        int tmp = i;
-        while (tmp--)
-            std::cout << "   ";
-
-        std::cout << "---\n";
-
-        // Vertical part
-        std::cout << "\t";
-        tmp = i;
-        while (tmp--)
-            std::cout << "   ";
-
-        std::cout << "|\n";
-    }
-    std::cout << "\n";
-}
-
-
-int
-main()
-{
-    Solution           sol;
-    Solution_Efficient sol_eff;
-
-    /* Example 1 */
-    // int n = 2;
-
-    /* Example 2 */
-    int n = 3;
-
-    /* Example 3 */
-    // int n = 4;
-
-    /* Example 4 */
-    // int n = 5;
-
-    /* Example 5 */
-    // int n = 6;
-
-    /* Example 6 */
-    // int n = 1;
-
-    /* Example 7 */
-    // int n = 45;
-
-    std::cout << "\n\t=======================";
-    std::cout << "\n\t=== CLIMBING STAIRS ===";
-    std::cout << "\n\t=======================\n";
-
-    /* Write Input */
-    std::cout << "\n\tN = " << n << "\n";
-    print_stairs(n);
-
-
-    /* Solution */
-    // int ways = sol.climbStairs(n);
-    int ways = sol.climbStairs(n);
-
-
-    /* Write Output */
-    std::cout << "\n\tTotal ways: " << ways << "\n\n";
-
-
-    return 0;
-}
