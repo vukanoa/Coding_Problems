@@ -99,6 +99,7 @@
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
+#include <cstring>
 class Solution {
 public:
     int climbStairs(int n)
@@ -112,6 +113,51 @@ public:
             dp[i] = dp[i-2] + dp[i-1];
 
         return dp[n];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is written in a specific "Memoization" form. It's important to be
+    aware of this "form" if you plan to learn true Memoization technique.
+
+*/
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solutionm_Memoization {
+private:
+    int memo[46];
+
+public:
+    int climbStairs(int n)
+    {
+        /* Memset */
+        memset(memo, -1, sizeof(memo));
+
+        return solve(n); // n <==> highest, top, stair-level
+    }
+
+private:
+    int solve(int n)
+    {
+        if (n == 0) return 0;
+        if (n == 1) return 1;
+        if (n == 2) return 2;
+        
+        if (memo[n] != -1)
+            return memo[n];
+        
+        int step_down_1_step  = solve(n-1);
+        int step_down_2_steps = solve(n-2);
+
+        return memo[n] = step_down_1_step + step_down_2_steps;
     }
 };
 
