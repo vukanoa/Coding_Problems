@@ -95,92 +95,125 @@
 #include <vector>
 using namespace std;
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
 
+    TODO
+
+*/
 
 /* Time  Beats: 96.75% */
 /* Space Beats: 80.85% */
 
-/* Time  Complexity: O(max(k^2, N)) */
-/* Space Complexity: O(max(k^2, N)) */
-class Solution_DFS {
+/* Time  Complexity: O(k^2 + N + M) */
+/* Space Complexity: O(k^2 + N + M) */
+class Solution_postorder_DFS {
 public:
     vector<vector<int>> buildMatrix(int k, vector<vector<int>>& rowConditions, vector<vector<int>>& colConditions)
     {
-        vector<int> order_rows = topological_sort(rowConditions, k);
-        vector<int> order_cols = topological_sort(colConditions, k);
+        const int N = rowConditions.size();
+        const int M = colConditions.size();
 
-        if (order_rows.empty() || order_cols.empty())
-            return {};
+        // O(k^2)
+        vector<vector<int>> result(k, vector<int>(k, 0));
 
-        vector<vector<int>> matrix(k, vector<int>(k, 0));
-        for (int i = 0; i < k; i++)
+        // O(k + N) + O(k + M) ---> O(k + (N + M)) ---> O(k + E)
+        vector<int> row_topo_order = topological_order(rowConditions, k);
+        vector<int> col_topo_order = topological_order(colConditions, k);
+
+        /* Check if there are cycles in either of the given conditions */
+        if (row_topo_order.empty()) return {};
+        if (col_topo_order.empty()) return {};
+
+        /* Convert orders to HashMaps */
+        unordered_map<int,int> row_val__to__idx;
+        unordered_map<int,int> col_val__to__idx;
+
+        // Row
+        // O(k) (entire block)
+        for (int idx = 0; idx < k; idx++)
+            row_val__to__idx[row_topo_order[idx]] = idx;
+
+        // Col
+        // O(k) (entire block)
+        for (int idx = 0; idx < k; idx++)
+            col_val__to__idx[col_topo_order[idx]] = idx;
+
+        /* Populate the result */
+        // O(k) (entire block)
+        for (int val = 1; val < k+1; val++)
         {
-            for (int j = 0; j < k; j++)
-            {
-                if (order_rows[i] == order_cols[j])
-                    matrix[i][j] = order_rows[i];
-            }
+            int row = row_val__to__idx[val];
+            int col = col_val__to__idx[val];
+
+            result[row][col] = val;
         }
 
-        return matrix;
+        return result;
     }
 
 private:
-    vector<int> topological_sort(vector<vector<int>>& edges, const int& k)
+    // O(k + E) (entire block)
+    vector<int> topological_order(vector<vector<int>> edges, int k)
     {
-        vector<vector<int>> adj_list(k + 1);
         vector<int> order;
 
-        // Legend:
-        // 0: not visited
-        // 1: visiting
-        // 2: visited
-        vector<int> visited(k + 1, 0);
-        bool has_cycle = false;
-
-        // Build an adjacency list
-        for (const auto& e : edges)
-            adj_list[e[0]].push_back(e[1]);
-
-        for (int i = 1; i <= k; i++)
+        /* Create an Adjacency List */
+        // O(E) (entire block)
+        vector<vector<int>> adj_list(k+1);
+        for (const auto& edge : edges)
         {
-            if (visited[i] == 0)
-            {
-                dfs(i, adj_list, visited, order, has_cycle);
+            const int& src = edge[0];
+            const int& dst = edge[1];
 
-                if (has_cycle)
-                    return {};
-            }
+            adj_list[src].push_back(dst);
+        }
+        
+        // O(k)
+        vector<bool> visited(k+1, false);
+        vector<bool> path   (k+1, false);
+
+        // O(k + E) (entire block)
+        for (int node = 1; node < k+1; node++)
+        {
+            if (visited[node])
+                continue;
+
+            if ( ! postorder_DFS(node, visited, path, order, adj_list))
+                return {}; // We have found a CYCLE
         }
 
-        // Reverse to get the correct order
+        /* Reverse */
+        // O(k)
         reverse(order.begin(), order.end());
 
         return order;
     }
 
-    void dfs(int node, vector<vector<int>>& adj_list, vector<int>& visited, vector<int>& order, bool& has_cycle)
+    // O(k + E) (entire block)
+    bool postorder_DFS(int node, vector<bool>& visited, vector<bool>& path, vector<int>& order, vector<vector<int>>& adj_list)
     {
-        visited[node] = 1; // Visiting
+        if (path[node])
+            return false; // We've found a CYCLE
 
-        for (int neighbor : adj_list[node])
+        if (visited[node])
+            return true; // We have already processed from here onwards
+
+        path[node] = true;
+        for (const auto& neighbor : adj_list[node])
         {
-            if (visited[neighbor] == 0)
-            {
-                dfs(neighbor, adj_list, visited, order, has_cycle);
-
-                if (has_cycle)
-                    return;
-            }
-            else if (visited[neighbor] == 1)
-            {
-                has_cycle = true;
-                return;
-            }
+            if ( ! postorder_DFS(neighbor, visited, path, order, adj_list))
+                return false;
         }
+        path[node] = false;
 
-        visited[node] = 2; // Visited
+        // Mark as successfully processed
+        visited[node] = true;
         order.push_back(node);
+
+        return true;
     }
 };
 
@@ -199,8 +232,8 @@ private:
 /* Time  Beats: 59.57% */
 /* Space Beats: 96.86% */
 
-/* Time  Complexity: O(k + N + M) */
-/* Space Complexity: O(k + N + M) */
+/* Time  Complexity: O(k^2 + N + M) */
+/* Space Complexity: O(k^2 + N + M) */
 class Solution_Kahn_Algorithm__BFS {
 public:
     vector<vector<int>> buildMatrix(int k, vector<vector<int>>& rowConditions, vector<vector<int>>& colConditions)
@@ -208,9 +241,10 @@ public:
         const int N = rowConditions.size();
         const int M = colConditions.size();
 
+        // O(k^2)
         vector<vector<int>> result(k, vector<int>(k, 0));
 
-        // O(N) + O(M) --> O(N + M)
+        // O(k + N) + O(k + M) ---> O(k + (N + M)) ---> O(k + E)
         vector<int> row_topo_order = topological_order(rowConditions, k);
         vector<int> col_topo_order = topological_order(colConditions, k);
 
@@ -223,14 +257,17 @@ public:
         unordered_map<int,int> col_val__to__idx;
 
         // Row
+        // O(k) (entire block)
         for (int idx = 0; idx < k; idx++)
             row_val__to__idx[row_topo_order[idx]] = idx;
 
         // Col
+        // O(k) (entire block)
         for (int idx = 0; idx < k; idx++)
             col_val__to__idx[col_topo_order[idx]] = idx;
 
         /* Populate the result */
+        // O(k) (entire block)
         for (int val = 1; val < k+1; val++)
         {
             int row = row_val__to__idx[val];
@@ -243,11 +280,14 @@ public:
     }
 
 private:
+    // O(k + E) (entire block)
     vector<int> topological_order(vector<vector<int>> edges, int k)
     {
         vector<vector<int>> adj_list(k+1);
         vector<int> indegree(k+1, 0);
 
+        /* Create an Adjacency List */
+        // O(E) (entire block)
         for (const auto& edge : edges)
         {
             const int& src = edge[0];
@@ -257,6 +297,7 @@ private:
             indegree[dst]++;
         }
 
+        // O(k) (entire block)
         queue<int> queue;
         for (int vertex = 1; vertex < k+1; vertex++)
         {
@@ -265,7 +306,9 @@ private:
         }
 
         vector<int> order;
+
         /* Topological Sort(Kahn's Algorithm) */
+        // O(k + E)
         while ( ! queue.empty())
         {
             int node = queue.front();
