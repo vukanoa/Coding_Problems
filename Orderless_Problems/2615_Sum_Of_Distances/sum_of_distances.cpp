@@ -108,3 +108,69 @@ public:
         return arr;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Linear Solution.
+
+    This shows the general idea that you don't need to calculate both prefix
+    and suffix, instead you can use calculate "suffix" while iterating through
+    the prefix.
+
+    This also makes the Soltion Linear, as we don't have a need to lower_bound
+    (i.e. Binary Serach) as in the above Solution.
+
+*/
+
+/* Time  Beats: 91.75% */
+/* Space Beats: 72.25% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solutionwer {
+public:
+    vector<long long> distance(vector<int>& nums)
+    {
+        const int N = nums.size();
+        vector<long long> arr(N, 0LL);
+
+        unordered_map<int, vector<long long>> num__to__indices;
+        for (int i = 0; i < N; i++) // O(N)
+            num__to__indices[nums[i]].push_back(i);
+
+        // O(N) (entire block)
+        for (auto& [num, indices] : num__to__indices)
+        {
+            const int SIZE = indices.size();
+
+            if (SIZE == 1)
+                continue;
+
+            // prefix_sum[x] is the sum of all values BEFORE 'x' NON-inclusive
+            vector<long long> prefix_sum(SIZE + 1, 0LL);
+
+            for (int i = 0; i < SIZE; i++)
+                prefix_sum[i+1] = prefix_sum[i] + indices[i];
+
+            // O(SIZE) per group ---> overall O(N)
+            for (int i = 0; i < SIZE; i++)
+            {
+                long long prefix = prefix_sum[i];
+                long long suffix = prefix_sum[SIZE] - prefix_sum[i];
+
+                long long L = abs(prefix - indices[i] * i         );
+                long long R = abs(suffix - indices[i] * (SIZE - i));
+
+                arr[indices[i]] = L + R;
+            }
+        }
+
+        return arr;
+    }
+};
