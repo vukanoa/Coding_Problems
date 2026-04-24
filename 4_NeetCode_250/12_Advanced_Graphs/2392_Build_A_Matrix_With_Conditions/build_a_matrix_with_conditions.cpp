@@ -91,6 +91,7 @@
 
 #include <algorithm>
 #include <queue>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -198,73 +199,92 @@ private:
 /* Time  Beats: 59.57% */
 /* Space Beats: 96.86% */
 
-/* Time  Complexity: O(max(k^2, N)) */
-/* Space Complexity: O(max(k^2, N)) */
-class Solution {
+/* Time  Complexity: O(k + N + M) */
+/* Space Complexity: O(k + N + M) */
+class Solution_Kahn_Algorithm__BFS {
 public:
     vector<vector<int>> buildMatrix(int k, vector<vector<int>>& rowConditions, vector<vector<int>>& colConditions)
     {
-        vector<int> order_rows = topological_sort(rowConditions, k);
-        vector<int> order_cols = topological_sort(colConditions, k);
+        const int N = rowConditions.size();
+        const int M = colConditions.size();
 
-        if (order_rows.empty() || order_cols.empty())
-            return {};
+        vector<vector<int>> result(k, vector<int>(k, 0));
 
-        vector<vector<int>> matrix(k, vector<int>(k, 0));
-        for (int i = 0; i < k; i++)
+        // O(N) + O(M) --> O(N + M)
+        vector<int> row_topo_order = topological_order(rowConditions, k);
+        vector<int> col_topo_order = topological_order(colConditions, k);
+
+        /* Check if there are cycles in either of the given conditions */
+        if (row_topo_order.size() != k) return {};
+        if (col_topo_order.size() != k) return {};
+
+        /* Convert orders to HashMaps */
+        unordered_map<int,int> row_val__to__idx;
+        unordered_map<int,int> col_val__to__idx;
+
+        // Row
+        for (int idx = 0; idx < k; idx++)
+            row_val__to__idx[row_topo_order[idx]] = idx;
+
+        // Col
+        for (int idx = 0; idx < k; idx++)
+            col_val__to__idx[col_topo_order[idx]] = idx;
+
+        /* Populate the result */
+        for (int val = 1; val < k+1; val++)
         {
-            for (int j = 0; j < k; j++)
-            {
-                if (order_rows[i] == order_cols[j])
-                    matrix[i][j] = order_rows[i];
-            }
+            int row = row_val__to__idx[val];
+            int col = col_val__to__idx[val];
+
+            result[row][col] = val;
         }
 
-        return matrix;
+        return result;
     }
 
 private:
-    // Find topological sequence using Kahn's algorithm
-    vector<int> topological_sort(vector<vector<int>>& edges, int k)
+    vector<int> topological_order(vector<vector<int>> edges, int k)
     {
-        vector<vector<int>> adj_list(k + 1);
-        vector<int> degree(k + 1);
-        vector<int> order;
+        vector<vector<int>> adj_list(k+1);
+        vector<int> indegree(k+1, 0);
 
-        for (const auto& e : edges)
+        for (const auto& edge : edges)
         {
-            adj_list[e[0]].push_back(e[1]);
-            degree[e[1]]++;
+            const int& src = edge[0];
+            const int& dst = edge[1];
+
+            adj_list[src].push_back(dst);
+            indegree[dst]++;
         }
 
         queue<int> queue;
-
-        // Push all integers with in-degree 0 in the queue.
-        for (int i = 1; i <= k; i++)
+        for (int vertex = 1; vertex < k+1; vertex++)
         {
-            if (degree[i] == 0)
-                queue.push(i);
+            if (indegree[vertex] == 0)
+                queue.push(vertex);
         }
 
+        vector<int> order;
+        /* Topological Sort(Kahn's Algorithm) */
         while ( ! queue.empty())
         {
-            int front = queue.front();
+            int node = queue.front();
             queue.pop();
 
-            order.push_back(front);
-            k--;
+            order.push_back(node);
 
-            for (const auto& neighbor : adj_list[front])
+            for (const int& neighbor : adj_list[node])
             {
-                if (--degree[neighbor] == 0)
+                indegree[neighbor]--;
+
+                if (indegree[neighbor] == 0)
                     queue.push(neighbor);
             }
         }
 
-        // If we have NOT visited all integers, return empty array.
-        if (k != 0)
-            return {};
-
+        // If there was a cycle, then the "order" would NOT end up having all
+        // the N nodes in it. Therefore, if that's the case---We've found a
+        // cycle.
         return order;
     }
 };
