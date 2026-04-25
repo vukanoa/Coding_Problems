@@ -73,20 +73,6 @@
 #include <unordered_map>
 using namespace std;
 
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    TODO
-
-*/
-
-/* Time  Beats: 5.17% */
-/* Space Beats: 5.17% */
-
-/* Time  Complexity: O(N * sqrt(max(nums))) */
-/* Space Complexity: O(N * sqrt(max(nums))) */
 class DSU {
 private:
     vector<int> rank;
@@ -145,7 +131,26 @@ public:
     }
 };
 
-class Solution_DSU_1 {
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    In practice this one is LESS optimal, but for didactic purposes it is
+    beneficial to read this Solution first as it shows by-the-book
+    implementation of prime-factoriazation and it's more explicit.
+
+*/
+
+/* Time  Beats: 5.17% */
+/* Space Beats: 5.17% */
+
+/* Time  Complexity: O(N * sqrt(max(nums))) */
+/* Space Complexity: O(N * sqrt(max(nums))) */
+class Solution_DSU_Explicit {
 public:
     bool canTraverseAllPairs(vector<int>& nums)
     {
@@ -182,6 +187,72 @@ public:
             {
                 dsu.union_components(*indices.begin(), *iter);
                 iter++;
+            }
+        }
+
+        return dsu.number_of_components() == 1;
+    }
+};
+
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one does "Union" part on-the-fly, i.e. it does it in a Single-Pass.
+
+    In practice this one is more optimal, but for didactic purposes, it is
+    beneficial to read the above Solution first as it shows by-the-book
+    implementation of prime-factoriazation.
+
+*/
+
+/* Time  Beats: 43.10% */
+/* Space Beats: 51.38% */
+
+/* Time  Complexity: O(N * sqrt(max(nums))) */
+/* Space Complexity: O(N * sqrt(max(nums))) */
+class Solution_DSU_Optimized {
+public:
+    bool canTraverseAllPairs(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        // O(N)
+        DSU dsu(N);
+        unordered_map<int, int> factor__to__root_idx;
+
+        for (int i = 0; i < N; i++)
+        {
+            int num = nums[i];
+
+            for (int f = 1; f * f <= num; f++)
+            {
+                if (num % f != 0)
+                    continue;
+
+                int f1 = f;
+                int f2 = num / f;
+
+                if (f1 > 1)
+                {
+                    if (factor__to__root_idx.count(f1))
+                        dsu.union_components(i, factor__to__root_idx[f1]);
+                    else
+                        factor__to__root_idx[f1] = i;
+                }
+
+                if (f2 > 1)
+                {
+                    if (factor__to__root_idx.count(f2))
+                        dsu.union_components(i, factor__to__root_idx[f2]);
+                    else
+                        factor__to__root_idx[f2] = i;
+                }
             }
         }
 
