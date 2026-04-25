@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-
 /*
     ============
     === HARD ===
@@ -72,6 +68,9 @@
 
 */
 
+#include <unordered_set>
+#include <vector>
+#include <unordered_map>
 using namespace std;
 
 /*
@@ -83,76 +82,109 @@ using namespace std;
 
 */
 
-/* Time  Beats: 23.55% */
-/* Space Beats: 27.35% */
+/* Time  Beats: 5.17% */
+/* Space Beats: 5.17% */
 
-/* Time  Complexity: O(n * sqrt(m)) */
-/* Space Complexity: O(n + k)       */
-class Solution {
+/* Time  Complexity: O(N * sqrt(max(nums))) */
+/* Space Complexity: O(N * sqrt(max(nums))) */
+class DSU {
+private:
+    vector<int> rank;
+    vector<int> parent;
+    int components;
+
 public:
-    unordered_map<int, vector<int>> prime2index;
-    unordered_map<int, vector<int>> index2prime;
-
-    bool canTraverseAllPairs(vector<int>& nums)
+    DSU (int n)
     {
-        for (int i = 0; i < nums.size(); i++)
+        components = n;
+
+        rank.resize(n);
+        parent.resize(n);
+
+        for (int i = 0; i < n; i++)
         {
-            int temp = nums[i];
+            rank[i]   = 1;
+            parent[i] = i;
+        }
+    }
 
-            for (int j = 2; j*j <= nums[i]; j++)
-            {
-                if (temp % j == 0)
-                {
-                    prime2index[j].push_back(i);
-                    index2prime[i].push_back(j);
-
-                    while (temp % j == 0)
-                      temp /= j;
-                }
-            }
-
-            if (temp > 1)
-            {
-                prime2index[temp].push_back(i);
-                index2prime[i].push_back(temp);
-            }
+    int find_root(int node)
+    {
+        while (node != parent[node])
+        {
+            /* Inverse Ackerman */
+            parent[node] = parent[parent[node]];
+            node = parent[node];
         }
 
-        vector<int> visitedIndex(nums.size(),0);
-        unordered_map<int,bool> visited_prime;
-        dfs(0, visitedIndex, visited_prime);
+        return node;
+    }
 
-        for (int i = 0; i<visitedIndex.size(); i++)
-        {
-            if (visitedIndex[i] == false)
-                return false;
-        }
+    bool union_components(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        if (root_1 == root_2)
+            return false;
+
+        if (rank[root_1] < rank[root_2])
+            swap(root_1, root_2);
+
+        components--;
+
+        parent[root_2] = root_1;
+        rank[root_1]  += rank[root_2];
 
         return true;
     }
 
-private:
-    void dfs(int index, vector<int>& visitedIndex, unordered_map<int,bool>& visited_prime)
+    int number_of_components()
     {
-        if (visitedIndex[index] == true)
-            return;
+        return components;
+    }
+};
 
-        visitedIndex[index] = true;
+class Solution_DSU_1 {
+public:
+    bool canTraverseAllPairs(vector<int>& nums)
+    {
+        const int N = nums.size();
 
-        for (auto &prime : index2prime[index])
+        unordered_map<int, unordered_set<int>> factors_to_indices;
+        // O(N * sqrt(max(nums))) (entire block)
+        for (int i = 0; i < N; i++) // O(N)
         {
-            if (visited_prime[prime] == true)
-                continue;
-
-            visited_prime[prime] = true;
-
-            for (auto &index1 : prime2index[prime])
+            for (int f = 1; f * f <= nums[i]; f++) // O(sqrt(max(nums)))
             {
-                if (visitedIndex[index1] == true)
-                    continue;
-
-                dfs(index1, visitedIndex, visited_prime);
+                // We do NOT have to worry about (f * f == nums[i]) case
+                // because we're working with a HashSet.
+                if (nums[i] % f == 0)
+                {
+                    factors_to_indices[f].insert(i);
+                    factors_to_indices[nums[i] / f].insert(i);
+                }
             }
         }
+
+        // O(N)
+        DSU dsu(N);
+
+        // O(N * sqrt(max(nums)))
+        for (const auto& [factor, indices]: factors_to_indices)
+        {
+            if (factor == 1)
+                continue;
+
+            auto iter = next(indices.begin());
+
+            while (iter != indices.end())
+            {
+                dsu.union_components(*indices.begin(), *iter);
+                iter++;
+            }
+        }
+
+        return dsu.number_of_components() == 1;
     }
 };
