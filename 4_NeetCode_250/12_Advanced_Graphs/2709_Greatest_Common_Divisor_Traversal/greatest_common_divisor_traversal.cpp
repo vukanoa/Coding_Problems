@@ -68,6 +68,7 @@
 
 */
 
+#include <algorithm>
 #include <unordered_set>
 #include <vector>
 #include <unordered_map>
@@ -252,6 +253,80 @@ public:
                         dsu.union_components(i, factor__to__root_idx[f2]);
                     else
                         factor__to__root_idx[f2] = i;
+                }
+            }
+        }
+
+        return dsu.number_of_components() == 1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Sieve of Eratosthenes + DSU.
+
+    Basic use of both. If you know both of them by heart, this should've been
+    an easy one.
+
+*/
+
+/* Time  Beats: 82.41% */
+/* Space Beats: 64.14% */
+
+/* Time  Complexity: O(M * loglogM  +  N * logM) */
+/* Space Complexity: O(M + N)                    */
+class Solution_Sieve {
+public:
+    bool canTraverseAllPairs(vector<int>& nums)
+    {
+        const int N = nums.size();
+        if (N == 1)
+            return true;
+
+        for (const int& num : nums)
+        {
+            if (num == 1)
+                return false;
+        }
+
+        DSU dsu(N);
+
+        int max_value = *max_element(nums.begin(), nums.end());
+        vector<int> sieve(max_value + 1, 0);
+
+        for (int f = 2; f * f <= max_value; f++)
+        {
+            if (sieve[f] == 0)
+            {
+                for (int composite = f * f; composite <= max_value; composite += f)
+                    sieve[composite] = f;
+            }
+        }
+
+        unordered_map<int, int> factor__to__root_idx;
+
+        for (int i = 0; i < N; i++)
+        {
+            int num = nums[i];
+
+            while (num > 1)
+            {
+                int prime = (sieve[num] != 0 ? sieve[num] : num);
+
+                if (factor__to__root_idx.count(prime))
+                    dsu.union_components(i, factor__to__root_idx[prime]);
+                else
+                    factor__to__root_idx[prime] = i;
+
+                while (num % prime == 0)
+                {
+                    num /= prime;
                 }
             }
         }
