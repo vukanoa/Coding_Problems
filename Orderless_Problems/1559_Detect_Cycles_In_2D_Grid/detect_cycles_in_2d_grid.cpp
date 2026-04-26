@@ -25,7 +25,7 @@
 
     Return true if any cycle of the same value exists in grid, otherwise,
     return false.
-   
+
     =========================================================
     FUNCTION: bool containsCycle(vector<vector<char>>& grid);
     =========================================================
@@ -78,7 +78,7 @@ using namespace std;
 
 /* Time  Complexity: O(ROWS * COLS) */
 /* Space Complexity: O(ROWS * COLS) */
-class Solution {
+class Solution_DFS_Cycle_Detection {
 public:
     bool containsCycle(vector<vector<char>>& grid)
     {
@@ -132,6 +132,147 @@ public:
 
         path[row][col] = false;
         failed[row][col] = true;
+
+        return false;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a fundamental DSU problem for cycle-detection.
+
+    First, you must understand DSU by heart, then come here to read this.
+    It's a really fundamental technique with DSU, however it requires that you
+    already have a solid understanding of DSU.
+
+*/
+
+/* Time  Beats: 97.00% */
+/* Space Beats: 96.61% */
+
+/* Time  Complexity: O(ROWS * COLS * alpha(ROWS * COLS)) */
+/* Space Complexity: O(ROWS * COLS)                      */
+class DSU {
+private:
+    vector<int> rank;
+    vector<int> parent;
+    int components;
+
+public:
+    DSU (int n)
+    {
+        components = n;
+
+        rank.resize(n);
+        parent.resize(n);
+
+        for (int i = 0; i < n; i++)
+        {
+            rank[i]   = 1;
+            parent[i] = i;
+        }
+    }
+
+    int find_root(int node)
+    {
+        while (node != parent[node])
+        {
+            /* Inverse Ackerman function */
+            parent[node] = parent[parent[node]];
+
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    bool union_components(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        if (root_1 == root_2)
+            return false;
+
+        if (rank[root_1] < rank[root_2])
+            swap(root_1, root_2);
+
+        parent[root_2] = root_1;
+        rank[root_1]  += rank[root_2];
+
+        components--;
+
+        return true;
+    }
+
+    int number_of_components()
+    {
+        return components;
+    }
+
+    bool are_connected(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        return root_1 == root_2;
+    }
+};
+
+class Solution_DSU_Cycle_Detection {
+public:
+    bool containsCycle(vector<vector<char>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        DSU dsu(ROWS * COLS);
+
+        auto node_1D_idx = [&] (int row, int col) -> int{
+            return row * COLS + col;
+        };
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                /********/
+                /** UP **/
+                /********/
+                // If UP is NOT Out-of_Bounds AND current chr == the above chr
+                if (row-1 >= 0 && grid[row][col] == grid[row-1][col])
+                {
+                    // If these 2 components are NOT Unioned(i.e. merged) here,
+                    // that means they're ALREADY connected---There is a CYCLE!
+                    if ( ! dsu.union_components(node_1D_idx(row,   col  ),
+                                                node_1D_idx(row-1, col  )))
+                    {
+                        return true;
+                    }
+                }
+
+                /**********/
+                /** LEFT **/
+                /**********/
+                // If UP is NOT Out-of_Bounds AND current chr == the above chr
+                if (col-1 >= 0 && grid[row][col] == grid[row][col-1])
+                {
+                    // If these 2 components are NOT Unioned(i.e. merged) here,
+                    // that means they're ALREADY connected---There is a CYCLE!
+                    if ( ! dsu.union_components(node_1D_idx(row,   col  ),
+                                                node_1D_idx(row  , col-1)))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
 
         return false;
     }
