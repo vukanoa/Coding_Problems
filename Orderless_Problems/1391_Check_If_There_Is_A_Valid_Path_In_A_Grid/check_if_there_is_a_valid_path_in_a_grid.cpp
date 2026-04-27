@@ -391,3 +391,143 @@ public:
         return false;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Classic DSU(i.e. "Disjoint-Set Union") Solution.
+
+    Wherenever we are asked to check the "connectedness" of two nodes/cells,
+    we can most certainly use "DSU" to solve it.
+
+    It's usually a much more elegant Solution than the alternatives, as you can
+    see yourself.
+
+*/
+
+/* Time  Beats: 79.03% */
+/* Space Beats: 49.60% */
+
+/* Time  Complexity: O(ROWS * COLS * alpha(ROWS * COLS)) */
+/* Space Complexity: O(ROWS * COLS)                      */
+class DSU {
+private:
+    vector<int> rank;
+    vector<int> parent;
+    int components;
+
+public:
+    DSU(int n)
+    {
+        rank.resize(n);
+        parent.resize(n);
+
+        components = n;
+
+        for (int i = 0; i < n; i++)
+        {
+            rank[i]   = 1;
+            parent[i] = i;
+        }
+    }
+
+    int find_root(int node)
+    {
+        while (node != parent[node])
+        {
+            /* Inverse Ackerman function */
+            parent[node] = parent[parent[node]];
+
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    bool union_components(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        if (root_1 == root_2)
+            return false;
+
+        if (rank[root_1] < rank[root_2])
+            swap(root_1, root_2);
+
+        parent[root_2] = root_1;
+        rank[root_1]  += rank[root_2];
+
+        components--;
+
+        return true;
+    }
+
+    int number_of_components()
+    {
+        return components;
+    }
+
+    bool connected_components(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        return root_1 == root_2;
+    }
+};
+
+class Solution_dsu {
+public:
+    bool hasValidPath(vector<vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        // Can't go OUT from cell (0,0) or can't go IN cell (ROWS-1, COLS-1)
+        if (grid[0][0] == 5 || grid[ROWS-1][COLS-1] == 4)
+            return false;
+
+        int up    = (1 << 2) | (1 << 3) | (1 << 4); // Up
+        int down  = (1 << 2) | (1 << 5) | (1 << 6); // Down
+        int left  = (1 << 1) | (1 << 4) | (1 << 6); // Left
+        int right = (1 << 1) | (1 << 3) | (1 << 5); // Right
+
+        DSU dsu(ROWS * COLS);
+
+        auto index = [&](int row, int col) -> int {
+            return row * COLS + col;
+        };
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                // LEFT
+                if (col-1 >= 0 && (left & (1 << grid[row][col-1])) && (right & (1 << grid[row][col])))
+                {
+                    dsu.union_components(index(row  , col-1),  // Left
+                                         index(row  , col  )); // Current
+                }
+
+                // UP
+                if (row-1 >= 0 && (up & (1 << grid[row-1][col])) && (down & (1 << grid[row][col])))
+                {
+                    dsu.union_components(index(row-1, col  ),  // Up
+                                         index(row  , col  )); // Current
+
+                }
+            }
+        }
+
+        /* Check if Starting and Ending cells are connected */
+        return dsu.connected_components(index(0     , 0     ), 
+                                        index(ROWS-1, COLS-1));
+    }
+
+};
