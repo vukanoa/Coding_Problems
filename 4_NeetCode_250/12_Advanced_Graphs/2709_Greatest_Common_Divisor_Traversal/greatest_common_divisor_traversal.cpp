@@ -264,24 +264,83 @@ public:
 
 
 
+/* Time  Beats: 90.75% */
+/* Space Beats: 52.74% */
+
+/* Time  Complexity: O() */
+/* Space Complexity: O(N + max_value(nums)) */
+class Sieve_DSU {
+private:
+    vector<int> rank;
+    vector<int> parent;
+
+public:
+    Sieve_DSU (const int& N, int max_value)
+    {
+        const int SIZE = N + max_value + 1;
+
+        rank.resize(SIZE);
+        parent.resize(SIZE);
+
+        for (int i = 0; i < SIZE; i++)
+        {
+            rank[i]   = 1;
+            parent[i] = i;
+        }
+    }
+
+    int find_root(int node)
+    {
+        while (node != parent[node])
+        {
+            /* Inverse Ackerman */
+            parent[node] = parent[parent[node]];
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    bool union_components(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        if (root_1 == root_2)
+            return false;
+
+        if (rank[root_1] < rank[root_2])
+            swap(root_1, root_2);
+
+        parent[root_2] = root_1;
+        rank[root_1]  += rank[root_2];
+
+        return true;
+    }
+};
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Sieve of Eratosthenes + DSU.
+    SPF(i.e. "Smallest Prime Factor") using Sieve of Eratosthenes + DSU.
 
-    Basic use of both. If you know both of them by heart, this should've been
-    an easy one.
+    (Not very difficult if you know SPF_using_Sieve and if you know DSU)
+
+    However, you really need to comfortable with both in order to write this
+    bug-free. But it's not too bad.
+
+    TODO detailed explanation.
 
 */
 
 /* Time  Beats: 82.41% */
 /* Space Beats: 64.14% */
 
-/* Time  Complexity: O(M * loglogM  +  N * logM) */
-/* Space Complexity: O(M + N)                    */
-class Solution_Sieve {
+/* Time  Complexity: O(M * loglogM  +  N * logM * alpha(N + M)) */
+/* Space Complexity: O(N + M)                                   */
+class Solution {
 public:
     bool canTraverseAllPairs(vector<int>& nums)
     {
@@ -295,42 +354,88 @@ public:
                 return false;
         }
 
-        DSU dsu(N);
+        /*
+            The inner for-loop runs ONLY when f is PRIME.
 
+            Therefore, instead of thinking "every f"(and there are sqrt(M) of
+            them), think:
+                "for every prime p <= sqrt(M), mark its multiples"
+
+            Now count total work.
+
+            For a fixed prime p, the inner loop runs about:
+                M / p times (we jump by p each inner iteration).
+
+            So total work is:
+                M/2 + M/3 + M/5 + M/7 + ... over all primes p
+
+            Factor out M:
+                M * (1/2 + 1/3 + 1/5 + 1/7 + ...)
+
+            A fact from Number Theory:
+                Sum over primes of (1/p) = log log M + O(1)
+
+            So total work becomes:
+                Time Complexity: O(M * log log M)
+        */
         int max_value = *max_element(nums.begin(), nums.end());
-        vector<int> sieve(max_value + 1, 0);
+        vector<int> sieve_SPF(max_value + 1, 0); // SPF - Smallest Prime Factor
 
         for (int f = 2; f * f <= max_value; f++)
         {
-            if (sieve[f] == 0)
+            if (sieve_SPF[f] == 0)
             {
                 for (int composite = f * f; composite <= max_value; composite += f)
-                    sieve[composite] = f;
+                {
+                    if (sieve_SPF[composite] == 0)
+                        sieve_SPF[composite] = f; // Assign first prime factor
+                }
             }
         }
 
-        unordered_map<int, int> factor__to__root_idx;
+        auto is_prime = [&](int num) -> bool {
+            return sieve_SPF[num] == 0;
+        };
 
-        for (int i = 0; i < N; i++)
+        Sieve_DSU dsu(N, max_value);
+
+        // O(N * logM * alpha(N + M)) (enire block)
+        for (int i = 0; i < N; i++) // O(N)
         {
             int num = nums[i];
 
             while (num > 1)
             {
-                int prime = (sieve[num] != 0 ? sieve[num] : num);
+                int prime_factor = (is_prime(num) ? num : sieve_SPF[num]);
 
-                if (factor__to__root_idx.count(prime))
-                    dsu.union_components(i, factor__to__root_idx[prime]);
-                else
-                    factor__to__root_idx[prime] = i;
+                // Union node 'i'(i.e. the INDEX of a number in "nums") with
+                // its SMALLEST PRIME FACTOR
+                //
+                //
+                // DSU nodes [0..N-1] represent nums indices.
+                //
+                // DSU nodes [N + p]  represent:
+                //    (N + 0) idx represents "prime factor 0", which we ignore
+                //    (N + 1) idx represents "prime factor 1", which we ignore
+                //    (N + 2) idx represents  prime factor 2
+                //     ...
+                dsu.union_components(i, N + prime_factor); // O(alpha(N + M))
 
-                while (num % prime == 0)
-                {
-                    num /= prime;
-                }
+                // Remove ALL occurrences of this prime_factor from num so that
+                // each distinct prime is processed ONLY ONCE
+                // O(logM)
+                while (num % prime_factor == 0)
+                    num /= prime_factor;
             }
         }
 
-        return dsu.number_of_components() == 1;
+        int root = dsu.find_root(0);
+        for (int i = 1; i < N; i++)
+        {
+            if (dsu.find_root(i) != root)
+                return false;
+        }
+
+        return true;
     }
 };
