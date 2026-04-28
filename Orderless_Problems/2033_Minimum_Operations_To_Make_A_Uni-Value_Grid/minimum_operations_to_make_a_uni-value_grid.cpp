@@ -57,6 +57,7 @@
 */
 
 #include <algorithm>
+#include <climits>
 #include <vector>
 using namespace std;
 
@@ -69,26 +70,29 @@ using namespace std;
 
 */
 
-/* Time  Beats: 16.41% */
-/* Space Beats: 34.95% */
+/* Time  Beats: 62.14% */
+/* Space Beats: 79.84% */
 
-/* Time  Complexity: O((N * M) * log(N * M)) */
-/* Space Complexity: O(N * M)                */
+/* Time  Complexity: O(N * logN) */ // Where N <==> ROWS * COLS
+/* Time  Complexity: O(N)        */
 class Solution {
 public:
     int minOperations(vector<vector<int>>& grid, int x)
     {
-        const int N = grid.size();
-        const int M = grid[0].size();
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
 
+        const int N = ROWS * COLS;
         int result = 0;
 
         vector<int> nums;
-        for (int i = 0; i < N; i++)
+        nums.reserve(N); // To prevent reallocations
+
+        for (int row = 0; row < ROWS; row++)
         {
-            for (int j = 0; j < M; j++)
+            for (int col = 0; col < COLS; col++)
             {
-                nums.push_back(grid[i][j]);
+                nums.push_back(grid[row][col]);
             }
         }
 
@@ -96,19 +100,112 @@ public:
         sort(nums.begin(), nums.end());
 
         int L = 0;
-        int R = nums.size() - 1;
+        int R = N - 1;
 
         int mid = L + (R - L + 1) / 2; // upper-mid
 
         int target = nums[mid];
 
-        for (int i = 0; i < nums.size(); i++)
+        for (int i = 0; i < N; i++)
         {
-            if ((target - nums[i]) % x != 0)
+            int diff = abs(target - nums[i]);
+
+            if (diff % x != 0)
                 return -1;
 
-            result += abs(target - nums[i]) / x;
+            result += diff / x;
         }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Instead of findiming Median, we can use "Dynamic Programming" to obtain:
+        1. The least amount of steps needed for all the number to the RIGHT of
+           the current number to be subtracted to the current number.
+
+           and
+
+        2. the least amount of steps needed for all the numbers to the LEFT of
+           the current number to be added up to the current number.
+
+    The simply go from [0, N-1] and see which sum(dp_prefix + dp_suffix) is the
+    smallest.
+
+*/
+
+/* Time  Complexity: O(N * logN) */ // Where N <==> ROWS * COLS
+/* Space Complexity: O(N)        */
+class Solution_1D_DP__Prefix_Suffix {
+public:
+    int minOperations(vector<vector<int>>& grid, int x)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        const int N = ROWS * COLS;
+        int result = INT_MAX;
+
+        vector<int> nums;
+        nums.reserve(N); // To prevent reallocations
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                nums.push_back(grid[row][col]);
+            }
+        }
+
+        /* Sort */
+        sort(nums.begin(), nums.end());
+        
+        /* Check if it's impossible */
+        for (int i = 1; i < N; i++)
+        {
+            if ((nums[i] - nums[i-1]) % x != 0)
+                return -1;
+        }
+
+        vector<int> dp_suffix(N, 0);
+        vector<int> dp_prefix(N, 0);
+
+        for (int i = N-2; i >= 0; i--)
+        {
+            if (nums[i] == nums[i+1])
+            {
+                dp_suffix[i] = dp_suffix[i+1];
+                continue;
+            }
+
+            int diff = (nums[i+1] - nums[i]);
+
+            dp_suffix[i] = diff/x * (N - (i+1)) + dp_suffix[i+1];
+        }
+
+        for (int i = 1; i < N; i++)
+        {
+            if (nums[i-1] == nums[i])
+            {
+                dp_prefix[i] = dp_prefix[i-1];
+                continue;
+            }
+
+            int diff = ( nums[i] - nums[i-1]);
+
+            dp_prefix[i] = diff/x * i + dp_prefix[i-1];
+        }
+
+        for (int i = 0; i < N; i++)
+            result = min(result, dp_prefix[i] + dp_suffix[i]);
 
         return result;
     }
