@@ -128,6 +128,101 @@ public:
     --- IDEA ---
     ------------
 
+    Insted of Sorting and taking the Middle element in order to "Find Median",
+    what we can do instead is perform a "Quick Select" algorithm.
+
+    "Quick Select" is a part of the "Quick Sort" Algorithm.
+
+    It is important to say that on average the Time Complexity for "Quick
+    Select" is O(N), however in the WORST case it's O(N^2).
+
+    The WORST case happens if, for example, "nums" is sorted in non-increasing
+    order.
+
+*/
+
+/* Time  Beats:  6.17% */
+/* Space Beats: 81.48% */
+
+/* Time  Complexity: O(N^2), but average O(N) */ // Where N <==> ROWS * COLS
+/* Space Complexity: O(N)                     */
+class Solution_Find_Median_Using_Quick_Select {
+public:
+    int minOperations(vector<vector<int>>& grid, int x)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        const int N = ROWS * COLS;
+        int result = 0;
+
+        vector<int> nums;
+        nums.reserve(N); // To prevent reallocations
+
+        // O(N) (entire block)
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                nums.push_back(grid[row][col]);
+            }
+        }
+
+        int median = quick_select(nums, 0, N-1); // Worst: O(N^2), Average O(N)
+
+        // O(N) (entire block)
+        for (int i = 0; i < N; i++)
+        {
+            int diff = abs(median - nums[i]);
+
+            if (diff % x != 0)
+                return -1;
+
+            result += diff / x;
+        }
+
+        return result;
+    }
+
+private:
+    // Worst: O(N^2), Average: O(N) (entire run), where N <==> ROWS * COLS
+    int quick_select(vector<int>& nums, int start, int end)
+    {
+        const int N = nums.size();
+        int median_idx = N / 2;
+
+        int pivot_idx = end;
+
+        int i = start - 1;
+        for (int j = start; j < pivot_idx; j++)
+        {
+            if (nums[j] >= nums[pivot_idx])
+                continue; // Do nothing
+
+            i++;
+            swap(nums[i], nums[j]);
+        }
+
+        swap(nums[i+1], nums[pivot_idx]);
+
+        if (i+1 < median_idx)
+            return quick_select(nums, i+2  , end);
+
+        if (i+1 > median_idx)
+            return quick_select(nums, start,  i  );
+
+        return nums[median_idx];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     Instead of findiming Median, we can use "Dynamic Programming" to obtain:
         1. The least amount of steps needed for all the number to the RIGHT of
            the current number to be subtracted to the current number.
