@@ -69,6 +69,7 @@
 */
 
 #include <algorithm>
+#include <queue>
 #include <unordered_set>
 #include <vector>
 #include <unordered_map>
@@ -461,7 +462,7 @@ public:
 /* Space Beats: 25.58% */
 
 /* Time  Complexity: O(M * loglogM  +  N * logM) */ // M <==> max_value(nums)
-/* Space Complexity: O(N + M)                    */
+/* Space Complexity: O(N + M + E)                */ // E <==> N * logM
 class Solution_Sieve_of_Eratosthenes__plus__DFS {
 public:
     bool canTraverseAllPairs(vector<int>& nums)
@@ -546,7 +547,9 @@ public:
         }
 
         unordered_set<int> visited;
+        /*******/
         /* DFS */
+        /*******/
         // M  = max_value(nums)
         // P <= number of distinct primes up to M
         // V  = N + P
@@ -575,5 +578,143 @@ private:
             if ( ! visited.count(neighbor))
                 dfs(neighbor, visited, adj_list);
         }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, but instead of DFS, we're using BFS to mark as visited.
+
+*/
+
+/* Time  Beats: 41.20% */
+/* Space Beats: 25.58% */
+
+/* Time  Complexity: O(M * loglogM  +  N * logM) */ // M <==> max_value(nums)
+/* Space Complexity: O(N + M + E)                */ // E <==> N * logM
+class Solution_Sieve_of_Eratosthenes__plus__BFS {
+public:
+    bool canTraverseAllPairs(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        if (N == 1)
+            return true;
+
+        for (const int& num : nums)
+        {
+            if (num == 1)
+                return false;
+        }
+
+        /*
+            The inner for-loop runs ONLY when f is PRIME.
+
+            Therefore, instead of thinking "every f"(and there are sqrt(M) of
+            them), think:
+                "for every prime p <= sqrt(M), mark its multiples"
+
+            Now count total work.
+
+            For a fixed prime p, the inner loop runs about:
+                M / p times (we jump by p each inner iteration).
+
+            So total work is:
+                M/2 + M/3 + M/5 + M/7 + ... over all primes p
+
+            Factor out M:
+                M * (1/2 + 1/3 + 1/5 + 1/7 + ...)
+
+            A fact from Number Theory:
+                Sum over primes of (1/p) = log log M + O(1)
+
+            So total work becomes:
+                Time Complexity: O(M * log log M)
+        */
+        int max_value = *max_element(nums.begin(), nums.end());
+        vector<int> sieve_SPF(max_value + 1, 0); // SPF - Smallest Prime Factor
+
+        for (int f = 2; f * f <= max_value; f++)
+        {
+            if (sieve_SPF[f] == 0)
+            {
+                for (int composite = f * f; composite <= max_value; composite += f)
+                {
+                    if (sieve_SPF[composite] == 0)
+                        sieve_SPF[composite] = f; // Assign first prime factor
+                }
+            }
+        }
+
+        auto is_prime = [&](int num) -> bool {
+            return sieve_SPF[num] == 0;
+        };
+
+        // O(N * logM) (enire block)
+        unordered_map<int, vector<int>> adj_list;
+        for (int i = 0; i < N; i++)
+        {
+            int num = nums[i];
+
+            while (num > 1)
+            {
+                int prime_factor = (is_prime(num) ? num : sieve_SPF[num]);
+
+                int curr_node  = i;
+                int prime_node = N + prime_factor;
+
+                /* Undirected edge */
+                adj_list[curr_node].push_back(prime_node);
+                adj_list[prime_node].push_back(curr_node);
+
+                // Remove ALL occurrences of this prime_factor from num so that
+                // each distinct prime is processed ONLY ONCE
+                // O(logM)
+                while (num % prime_factor == 0)
+                    num /= prime_factor;
+            }
+        }
+
+        unordered_set<int> visited;
+        queue<int> queue;
+        queue.push(0);
+        visited.insert(0);
+
+        /*******/
+        /* BFS */
+        /*******/
+        // M  = max_value(nums)
+        // P <= number of distinct primes up to M
+        // V  = N + P
+        // E  = N * logM
+        // O(V + E) --> O(N + P  +  N * logM) ---> O(N * logM)
+        while ( ! queue.empty())
+        {
+            int node = queue.front();
+            queue.pop();
+
+            for (const int& neighbor : adj_list[node])
+            {
+                if (visited.count(neighbor))
+                    continue;
+
+                queue.push(neighbor);
+                visited.insert(neighbor);
+            }
+        }
+
+        for (int i = 0; i < N; i++)
+        {
+            if ( ! visited.count(i))
+                return false; // All must've been visited by BFS starting at 0
+        }
+
+        return true;
     }
 };
