@@ -46,6 +46,59 @@
 #include <cstring>
 #include <vector>
 using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Top-Down Dynamic-Programming, It's called "Memoization".
+    (and NOT memoRization!)
+
+    It's a fundamental "Take-Skip Memoization" technique.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  72.27% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Memoization {
+private:
+    int memo[101];
+
+public:
+    int rob(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        return solve(0, nums);
+    }
+
+    int solve(int i, vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        if (i >= N)
+            return 0;
+
+        if (memo[i] != -1)
+            return memo[i];
+
+        int take = nums[i] + solve(i+2, nums);
+        int skip = 0       + solve(i+1, nums);
+
+        return memo[i] = max(take, skip);
+    }
+};
+
+
+
+
 /*
     ------------
     --- IDEA ---
@@ -101,52 +154,80 @@ public:
 
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same idea as above, however we can notice that we ONLY ever need at most
+    next 2 states from "dp".
+
+    So why keep an entire vector "dp" we can keep track of ONLY 2 VARIABLES?
+
+    This reduces the Space Complexity from O(N) down to O(1).
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  75.27% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Bottom_Up_Optimized_From_the_Back {
+public:
+    int rob(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        int next_next = 0;
+        int next      = nums[N-1];
+
+        for (int i = N-2; i >= 0; i--)
+        {
+            int curr = max(next, nums[i] + next_next);
+
+            next_next = next;
+            next      = curr;
+        }
+
+        return next;
+    }
+};
+
+
+
 
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Same idea, however written Top-Down. It's called "Memoization".
-    (and NOT memoRization!)
-
-    It's a fundamental "Take-Skip Memoization" technique.
+    Same as above, we just go left-to-right.
 
 */
 
 /* Time  Beats: 100.00% */
-/* Space Beats:  72.27% */
+/* Space Beats:  75.27% */
 
 /* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
-class Solution_Memoization {
-private:
-    int memo[101];
-
+/* Space Complexity: O(1) */
+class Solution_Bottom_Up_Optimized_From_the_Front {
 public:
     int rob(vector<int>& nums)
     {
         const int N = nums.size();
 
-        /* Memset */
-        memset(memo, 0xff, sizeof(memo));
+        int prev_prev = 0;
+        int prev      = nums[0];
 
-        return solve(0, nums);
-    }
+        for (int i = 1; i < N; i++)
+        {
+            int curr = max(nums[i] + prev_prev, prev);
 
-    int solve(int i, vector<int>& nums)
-    {
-        const int N = nums.size();
+            prev_prev = prev;
+            prev      = curr;
+        }
 
-        if (i >= N)
-            return 0;
-
-        if (memo[i] != -1)
-            return memo[i];
-
-        int take = nums[i] + solve(i+2, nums);
-        int skip = 0       + solve(i+1, nums);
-
-        return memo[i] = max(take, skip);
+        return prev;
     }
 };
