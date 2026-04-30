@@ -43,6 +43,7 @@
 
 */
 
+#include <cstring>
 #include <vector>
 using namespace std;
 /*
@@ -78,11 +79,11 @@ using namespace std;
 */
 
 /* Time  Beats: 100.00% */
-/* Space Beats:  11.31% */
+/* Space Beats:  59.47% */
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution_From_The_Back {
+class Solution_Tabulation {
 public:
     int rob(vector<int>& nums)
     {
@@ -91,8 +92,61 @@ public:
         vector<int> dp(N+2, 0);
 
         for (int i = N-1; i >= 0; i--)
-            dp[i] = max(nums[i] + dp[i+2], dp[i+1]);
+            dp[i] = max(dp[i+1], nums[i] + dp[i+2]);
 
         return dp[0];
+    }
+};
+
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same idea, however written Top-Down. It's called "Memoization".
+    (and NOT memoRization!)
+
+    It's a fundamental "Take-Skip Memoization" technique.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  72.27% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Memoization {
+private:
+    int memo[101];
+
+public:
+    int rob(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        return solve(0, nums);
+    }
+
+    int solve(int i, vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        if (i >= N)
+            return 0;
+
+        if (memo[i] != -1)
+            return memo[i];
+
+        int take = nums[i] + solve(i+2, nums);
+        int skip = 0       + solve(i+1, nums);
+
+        return memo[i] = max(take, skip);
     }
 };
