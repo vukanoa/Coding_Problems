@@ -27,23 +27,128 @@
 using namespace std;
 
 /*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a standard way to solve this popular "LPS" problem.
+
+    The idea is the realize we have two kinds of palindromes:
+
+        1. Palindromes of ODD  length
+        2. Palindromes of EVEN length
+
+    For each type, we consider each index as a starting point and then we're
+    extending the palindrome as far as we can go, thus having an O(N^2).
+
+    However, it's important to note that EVEN palindromes CANNOT start at index
+    N-1, because its next counter-part would be Out-of-Bounds.
+
+    Other than that it's straightforward.
+
+*/
+
+/* Time  Beats: 68.34% */
+/* Space Beats: 92.84% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(1)   */ // Final result is not considered EXTRA space
+class Solution_LPS{
+public:
+    string longestPalindrome(string s)
+    {
+        const int N = s.size();
+
+        int result_len = 0;
+        int start = -1;
+        int end   = -1;
+
+        /* Odd */
+        for (int mid = 0; mid < N; mid++)
+        {
+            int L = mid;
+            int R = mid;
+
+            int curr_substr_len = 1; // Starts with length 1(ONE)
+            while (L >= 0 && R < N)
+            {
+                if (s[L] != s[R])
+                    break;
+
+                if (result_len < curr_substr_len)
+                {
+                    result_len = curr_substr_len;
+                    start = L;
+                    end   = R;
+                }
+
+                L--; // Decrement
+                R++; // Increment
+
+                curr_substr_len += 2;
+            }
+        }
+
+        /* Even palindromes */
+        for (int mid = 0; mid < N-1; mid++) // mid must stop at N-2 because:
+        {
+            int L = mid;
+            int R = mid+1; // If mid = N-1, then R = N (null terminator, valid)
+                           // However, after R++, R becomes N+1, causing
+                           // undefined behavior (possible segfault or garbage
+                           // access). That's why it's important for mid to go:
+                           //
+                           // [0...N-2] and not [0...N-1]
+
+            int curr_substr_len = 2; // Starts with length 2(TWO)
+            while (L >= 0 && R < N)
+            {
+                if (s[L] != s[R])
+                    break;
+
+                if (result_len < curr_substr_len)
+                {
+                    result_len = curr_substr_len;
+                    start = L;
+                    end   = R;
+                }
+
+                L--; // Decrement
+                R++; // Increment
+
+                curr_substr_len += 2;
+            }
+        }
+
+        return s.substr(start, end - start + 1);
+    }
+};
+
+
+
+
+/*
     ============================
     === Manacher's Algorithm ===
     ============================
 */
-
 /*
+    ------------
+    --- IDEA ---
+    ------------
+
     Note: 'Position' pertains to expanded string. The one where separator
           character is added between every character in the original string
           plus two more(one at the very beginning and one at the very end)
 
           'Index', on the other hand, pertains to the original string.
 
-             a b a a b
-Indices ->   0 1 2 3 4
+                     a b a a b
+        Indices ->   0 1 2 3 4
 
-             $ a $ b $ a $ a $ b $
-Positions -> 0 1 2 3 4 5 6 7 8 9 10
+                     $ a $ b $ a $ a $ b $
+        Positions -> 0 1 2 3 4 5 6 7 8 9 10
+    
 
 */
 
