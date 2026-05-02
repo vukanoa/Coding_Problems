@@ -48,6 +48,7 @@
 
 */
 
+#include <cstring>
 #include <vector>
 #include <algorithm>
 using namespace std;
@@ -252,5 +253,72 @@ public:
         }
 
         return dp[amount] == UNATTAINABLE ? -1 : dp[amount];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same idea, however this is implemented using a Top-Down "Memoization"
+    technique.
+
+    Bottom-Up "Tabulation" technique is a MUCH more natural here, however you
+    really MUST be equally good with both "Tabulation" and "Memoization" as one
+    is usualy a much better choice in most DP problems.
+
+*/
+
+/* Time  Beats: 58.91% */
+/* Space Beats: 96.61% */
+
+/* Time  Complexity: O(N * amount) */
+/* Space Complexity: O(amount)     */
+class Solution_Memoization {
+private:
+    /* These two have EQUIVALENT values but they're SEMANTICALLY different */
+    static constexpr int MEMO_SIZE    = 1e4 + 1;
+    static constexpr int UNATTAINABLE = 1e4 + 1;
+
+    int memo[MEMO_SIZE];
+
+public:
+    int coinChange(vector<int>& coins, int amount)
+    {
+        const int N = coins.size();
+
+        /* Sort */
+        sort(coins.begin(), coins.end());
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        int result = solve(amount, coins);
+        return result == UNATTAINABLE ? -1 : result;
+    }
+
+private:
+    int solve(int curr_amount, vector<int>& coins)
+    {
+        if (curr_amount == 0)
+            return 0;
+
+        if (memo[curr_amount] != -1)
+            return memo[curr_amount];
+
+        int min_coins = UNATTAINABLE;
+        for (const int& coin : coins)
+        {
+            if (curr_amount - coin < 0)
+                break;
+
+            min_coins = min(min_coins, 1 + solve(curr_amount - coin, coins));
+        }
+
+        return memo[curr_amount] = min_coins;
     }
 };
