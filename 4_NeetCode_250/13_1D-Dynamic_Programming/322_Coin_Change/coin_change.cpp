@@ -49,6 +49,7 @@
 */
 
 #include <cstring>
+#include <queue>
 #include <vector>
 #include <algorithm>
 using namespace std;
@@ -225,7 +226,7 @@ using namespace std;
 
 /* Time  Complexity: O(N * amount) */
 /* Space Complexity: O(amount)     */
-class Solution_Bottom_Up {
+class Solution_Bottom_Up___Tabulation {
 public:
     int coinChange(vector<int>& coins, int amount)
     {
@@ -278,7 +279,7 @@ public:
 
 /* Time  Complexity: O(N * amount) */
 /* Space Complexity: O(amount)     */
-class Solution_Memoization {
+class Solution_Top_Down___Memoization {
 private:
     /* These two have EQUIVALENT values but they're SEMANTICALLY different */
     static constexpr int MEMO_SIZE    = 1e4 + 1;
@@ -320,5 +321,105 @@ private:
         }
 
         return memo[curr_amount] = min_coins;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This can be thought of as a standard Graph-problem where we are trying to
+    find an "Unweighted Shortest Path".
+
+    That is also known as "BFS", but "Unweighted Shortest Path" is a bit more
+    accurate semantically.
+
+    In this Graph, each state is a node(amount) and each coin transition is an
+    edge of cost 1(since all "costs" are 1 we can consider this UNWEIGHTED
+    Shortest Path).
+
+    The "seen" array is a visited_state pruning to avoid recomputation.
+
+    We want to find out what is the MINIMAL number of coins, transitions of
+    cost 1, to reach "amount", which means we're trying to find:
+
+        Shortest Path from 0 to amount.
+
+    For a curr_amount, we can "jump" in cost of 1, to:
+
+        next_amount = curr_amount + coins[0]
+        next_amount = curr_amount + coins[1]
+        next_amount = curr_amount + coins[2]
+        next_amount = ...
+        next_amount = curr_amount + coins[N-1]
+
+    Each "next_amount" that is not reached before is CERTAINLY not going to use
+    LESS coins than the amount of coins we needed once we reached it the first
+    time.
+
+    That's why at each LEVEL we're incrementing "used_coins" variable to
+    indicate how many coins have we used.
+
+    If at ANY point we reach a sum of "amount", we stop and immediately return
+    "used_coins".
+
+*/
+
+/* Time  Beats: 53.31% */
+/* Space Beats: 94.94% */
+
+/* Time  Complexity: O(N * amount) */
+/* Space Complexity: O(amount)     */
+class Solution_BFS___UNWEIGHTED_Shortest_Path {
+public:
+    int coinChange(vector<int>& coins, int amount)
+    {
+        const int N = coins.size();
+        int used_coins = 0;
+
+        if (amount == 0)
+            return 0;
+
+        queue<int> queue;
+        queue.push(0); // Start with "0 amount".
+
+        vector<bool> seen(amount + 1, false);
+        seen[0] = true;
+
+        /* BFS */
+        while ( ! queue.empty())
+        {
+            used_coins++;
+
+            int size = queue.size();
+            while (size > 0)
+            {
+                int curr_amount = queue.front();
+                queue.pop();
+
+                for (const int& coin : coins)
+                {
+                    int next_amount = curr_amount + coin;
+
+                    if (next_amount == amount)
+                        return used_coins;
+
+                    if (next_amount > amount || seen[next_amount])
+                        continue;
+
+                    seen[next_amount] = true;
+                    queue.push(next_amount);
+                }
+
+                // Decrement
+                size--;
+            }
+        }
+
+        return -1; // Impossible to sum up to
     }
 };
