@@ -194,7 +194,7 @@ public:
 */
 
 /* Time  Beats: 100.00% */
-/* Space Beats:  46.47% */
+/* Space Beats:  83.60% */
 
 /* Time  Complexity: O(logN) */
 /* Space Complexity: O(logN) */
@@ -246,6 +246,82 @@ private:
             else // Neutral digit, i.e. {0, 1, 8}
             {
                 result += solve(i+1, is_prefix_num_good, next_is_tight, str);
+            }
+        }
+
+        return memo[i][is_prefix_num_good][is_tight] = result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, however this one does NOT use Bitmasking. Maybe this one is
+    a bit easier if you're just getting in to "Digit DP", but if you're trying
+    to do "Digit DP" without knowing basic "Bitmasking", then I'd highly advise
+    you first go and fill that gap and only then come back here.
+
+    However, it's usually beneficial to see multiple variants.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  65.78% */
+
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(logN) */
+class Solution_Digit_DP_without_Bitmasking {
+private:
+    const int MAX_DIGITS = 6; // 1e5 contains 6 digits
+    int memo[7][2][2];
+
+public:
+    int rotatedDigits(int n)
+    {
+        string str = to_string(n);
+        str = string(MAX_DIGITS - str.size(), '0') + str;
+
+        /* Memset */
+        memset(memo, -1, sizeof(memo));
+
+        return solve(0, false, true, str);
+    }
+
+private:
+    int solve (int i, bool is_prefix_num_good, bool is_tight, string& str)
+    {
+        const int N = str.size();
+
+        if (i == N)
+            return is_prefix_num_good;
+
+        if (memo[i][is_prefix_num_good][is_tight] != -1)
+            return memo[i][is_prefix_num_good][is_tight];
+
+        int result = 0;
+        int limit = is_tight ? (str[i] - '0') : 9;
+
+        for (int d = 0; d <= limit; d++)
+        {
+            bool next_is_tight = is_tight & (d == limit);
+
+            switch (d)
+            {
+                case 3: case 4: case 7:
+                    continue;
+
+                case 2: case 5: case 6: case 9:
+                    result += solve(i + 1, true              , next_is_tight, str);
+                    break;
+
+                case 0: case 1: case 8:
+                    result += solve(i + 1, is_prefix_num_good, next_is_tight, str);
+                    break;
             }
         }
 
