@@ -191,6 +191,8 @@ public:
     int maxProduct(vector<int>& nums)
     {
         const int N = nums.size();
+        if (N == 1)
+            return nums[0];
 
         vector<int> dp_max(N, 0);
         vector<int> dp_min(N, 0);
@@ -208,5 +210,77 @@ public:
         }
 
         return *max_element(dp_max.begin(), dp_max.end());
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, however we can notice that in EACH iteration we ONLY ever
+    use the previous "dp_min" and previous "dp_max".
+
+    Therefore, why don't we simply keep only 2 variables instead keeping an
+    entire vector?
+
+    That's exactly what we do here.
+
+    This algorithm is called "Kadane's Algorithm".
+    Althought "Kadane's Algorithm" is usually used for finding a "subarray with
+    maximum SUM", we can utilize similar approach in order to find a "subarray
+    with maximum PRODUCT", but having two "dp" variables, instead of 1.
+
+    Here's one example to refresh the memory, however "dp_min" and "dp_max"
+    are NOT vectors here! Instead, they're only two variables that we update at
+    each iteration.
+
+          nums = [  2,   8,  -2,  -1,  -3,   0,   7,   4]
+                    0    1    2    3    4    5    6    7
+
+        dp_min = [  2,   8, -32,  -1, -96,   1,   7,  28]
+        dp_max = [  2,  16,  -2,  32,   3,   1,   7,  28]
+
+*/
+/* Time  Beats: 100% */
+/* Space Beats: 86.21% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Kadane {
+public:
+    int maxProduct(vector<int>& nums)
+    {
+        const int N = nums.size();
+        if (N == 1)
+            return nums[0];
+
+        int result = max(0, nums[0]);
+
+        int dp_min = nums[0];
+        int dp_max = nums[0];
+
+        for (int i = 1; i < N; i++)
+        {
+            if (nums[i] == 0)
+            {
+                dp_min = 1; // 1 is the neutral element for multiplication
+                dp_max = 1; // 1 is the neutral element for multiplication
+                continue;
+            }
+
+            int new_min = min( {nums[i], nums[i] * dp_min, nums[i] * dp_max} );
+            int new_max = max( {nums[i], nums[i] * dp_min, nums[i] * dp_max} );
+
+            result = max(result, new_max);
+
+            dp_min = new_min;
+            dp_max = new_max;
+        }
+
+        return result;
     }
 };
