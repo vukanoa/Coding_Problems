@@ -60,187 +60,132 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    --- Brute force(Using recursion) ---
+    --- Example 1 ---
 
-    It starts with an index = 0;
-    Then tries to find the substring of a string s that is present in the
-    wordDict. As soon as it finds, it calls recursion again but now with:
-        i + 1 as a starting index
-    Essentially - Do the same thing but for a subproblem.
-
-    Algorithm goes something like this:
-        1. "l"
-            doesn't exist in wordDict.
-        2. "le"
-            doesn't exist in wordDict.
-        3. "lee"
-            doesn't exist in wordDict.
-        4. "leet"
-            does indeed exist in wordDict => Enter recursion with (4, s, wordDict);
-            1. "c"
-                doesn't exist in wordDict.
-            2. "co"
-                doesn't exist in wordDict.
-            3. "cod"
-                doesn't exist in wordDict.
-            4. "code"
-                does indeed exist in wordDict => Enter recursion with (8, s, wordDict);
-                8 == s.length() => Return true
-
-    At first glance, this will seem more efficient than the Memoization
-    solution explained below, but consider this example:
-
-    string s = "aaaaaaaaaaaaaaaaaaaab";
-    vector<string> wordDict = {"a","aa","aaa","aaaa","aaaaa","aaaaaa","aaaaaaa","aaaaaaaa","aaaaaaaaa"};
-
-    If you try to simulate this program, you'll find that it will have an
-    enormous amount of inefficient, unnecessary attempts in finding if this
-    substring is able to be assembled from the words in wordDict.
-
-    This Algorithm causes TLE(Time Limit Exceeded). Now consider this:
+    Input:  s = "leetcode", wordDict = ["leet", "code"]
+    Output: true
 
 
-    --- Memoization ---
-
-    We can notice that we're doing a lot of unnecessary attepmts, thus we can
-    try and remember some of the previous results so that we don't have to
-    spend our precious time down the recursion we knew were going to fail.
-
-    So what is the idea?
-
-    Since we're only asked to return if it is possible or not that means
-    we only need to say either "true" or "false".
-
-    Therefore, we're going to make a vector of booleans called dp
-    (Dynamic Programming).
-
-    So how are we going to utilize this vector? We're going to change the way
-    we're traversing the string s. We're going to try and go backwards.
-    And any time we get that a certain word is able to be found in the wordDict
-    we're going to say:
-        If we found that the prefix of this word is possible to be assembled
-        then the rest(meaning this word we've just found) is also possible
-        to assemble thus the whole word is possible to be assembled => return
-        "true"
-
-    We're going to do that essentially for every letter in string s, thus that
-    makes it O(n^2), but every time we do that, we're using a function
-    "s.substr(index, i - index + 1) which is always going to be O(n), thus,
-    the Time Complexity of the whole algorithm is:
-        O(n^2 * n) => O(n^3)
-
-    On the fist example, Algorithm works like this:
-
-    String s = "leetcode"
-    wordDict["leet", "code"];
+    1) 'e' // start: 7
+                                      0  1  2  3  4  5  6  7  8  9
+        j = 7   "e"             dp = [_  _  _  _  _  _  _  _  _  T]
 
 
-    1.
-        'e' // start: 7
-    i = 7   "e"
 
-    2.
-        'd' // start: 6
-    i = 6   "d"
-    i = 7   "de"
+    2) 'd' // start: 6
+                                      0  1  2  3  4  5  6  7  8  9
+        j = 6   "d"             dp = [_  _  _  _  _  _  _  _  _  T]
+        j = 7   "de"            dp = [_  _  _  _  _  _  _  _  _  T]
 
-    3.
-        'o' // start: 5
-    i = 5   "o"
-    i = 6   "od"
-    i = 7   "ode"
 
-    4.
-        'c' //start: 4       start --------
-    i = 4   "c"                           |
-    i = 5   "co"                          |
-    i = 6   "cod"                         v
-    i = 7   "code" && dp[8] == true => dp[4] = true
-                         ^
-                         |
-        i + 1 ------------
+
+    3) 'o' // start: 5
+                                     0  1  2  3  4  5  6  7  8  9
+        j = 5   "o"            dp = [_  _  _  _  _  _  _  _  _  T]
+        j = 6   "od"           dp = [_  _  _  _  _  _  _  _  _  T]
+        j = 7   "ode"          dp = [_  _  _  _  _  _  _  _  _  T]
+
+
+
+    4) 'c' // start: 4
+                                     0  1  2  3  4  5  6  7  8  9
+        j = 4   "c"            dp = [_  _  _  _  _  _  _  _  _  T]
+        j = 5   "co"           dp = [_  _  _  _  _  _  _  _  _  T]
+        j = 6   "cod"          dp = [_  _  _  _  _  _  _  _  _  T]
+        j = 7   "code"         dp = [_  _  _  _  T  _  _  _  _  T]
+                                                 ^
+                                                 |
+                                              changed
 
 
     5. 't' // start: 3
-    i = 3   "t"
-    i = 4   "tc"
-    i = 5   "tco"
-    i = 6   "tcod"
-    i = 7   "tcode"
+                                     0  1  2  3  4  5  6  7  8  9
+    j = 3   "t"                dp = [_  _  _  _  T  _  _  _  _  T] 
+    j = 4   "tc"               dp = [_  _  _  _  T  _  _  _  _  T]
+    j = 5   "tco"              dp = [_  _  _  _  T  _  _  _  _  T]
+    j = 6   "tcod"             dp = [_  _  _  _  T  _  _  _  _  T]
+    j = 7   "tcode"            break because it's LONGER than longest_word_len
+
+
 
     6. 'e' // start: 2
-    i = 2   "e"
-    i = 3   "et"
-    i = 4   "etc"
-    i = 5   "etco"
-    i = 6   "etcod"
-    i = 7   "etcode"
+                                     0  1  2  3  4  5  6  7  8  9
+    j = 2   "e"                dp = [_  _  _  _  T  _  _  _  _  T]
+    j = 3   "et"               dp = [_  _  _  _  T  _  _  _  _  T]
+    j = 4   "etc"              dp = [_  _  _  _  T  _  _  _  _  T]
+    j = 5   "etco"             dp = [_  _  _  _  T  _  _  _  _  T]
+    j = 6   "etcod"            break because it's LONGER than longest_word_len
+    j = 7   "etcode"           break because it's LONGER than longest_word_len
+
+
 
     7. 'e' // start: 1
-    i = 1   "e"
-    i = 2   "ee"
-    i = 3   "eet"
-    i = 4   "eetc"
-    i = 5   "eetco"
-    i = 6   "eetcod"
-    i = 7   "eetcode"
-
-    8. 'l' // start: 0       start --------
-    i = 0   "l"                           |
-    i = 1   "le"                          |
-    i = 2   "lee"                         v
-    i = 3   "leet" && dp[4] == true => dp[0] = true
-                         ^
-                         |
-        i + 1 ------------
-
-    9. Exit the for loop
-
-    10. return dp[0]; // Which in this case is "true".
-
-
-    dp of index 'i' tells us that the subproblem, string s starting from the
-    index 'i', is able to be solved. That's why we're going backwards and that
-    is why, at the very end, we're returning "dp[0]".
+                                     0  1  2  3  4  5  6  7  8  9
+    j = 1   "e"               dp = [_  _  _  _  T  _  _  _  _  T]
+    j = 2   "ee"              dp = [_  _  _  _  T  _  _  _  _  T]
+    j = 3   "eet"             dp = [_  _  _  _  T  _  _  _  _  T]
+    j = 4   "eetc"            dp = [_  _  _  _  T  _  _  _  _  T]
+    j = 5   "eetco"           break because it's LONGER than longest_word_len
+    j = 6   "eetcod"          break because it's LONGER than longest_word_len
+    j = 7   "eetcode"         break because it's LONGER than longest_word_len
 
 
 
-    TODO:
-        1. BFS
-        2. DFS + Trie
+    8. 'l' // start: 0
+                                     0  1  2  3  4  5  6  7  8  9
+    j = 0   "l"                dp = [_  _  _  _  T  _  _  _  _  T]
+    j = 1   "le"               dp = [_  _  _  _  T  _  _  _  _  T]
+    j = 2   "lee"              dp = [_  _  _  _  T  _  _  _  _  T]
+    j = 3   "leet"             dp = [T  _  _  _  T  _  _  _  _  T]
+                                     ^
+                                     |
+                                  changed
+
+    At the end simply return dp[0].
 
 */
 
-/* Time  Beats: 64.74% */
-/* Space Beats: 34.50% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  78.21% */
 
-/*
-    Time  Complexity: O(n^2 * n) => O(n^3)
-
-*/
-/*
-    Space Complexity: O(n)
-*/
-class Solution_DP {
+/* Time  Complexity: O(N^3)                    */
+/* Space Complexity: O(N + total_dict_chars)   */
+class Solution_Bottom_Up___Tabulation {
 public:
     bool wordBreak(string s, vector<string>& wordDict)
     {
-        const int N = s.length();
+        const int N = s.size();
+        const int D = wordDict.size();
 
+        /* Bottom-Up DP vector */
+        vector<bool> dp(N+1, false);
+        dp[N] = true; // Empty string can ALWAYS be matched
+
+        /* Transform to HashSet */
         unordered_set<string> uset(wordDict.begin(), wordDict.end());
-        vector<bool> dp(N + 1, false);
 
-        dp[N] = true;
+        /* Find Length of the LONGEST word in wordDict */
+        unsigned long longest_word_len = 0;
+        for (const string& word : wordDict)
+            longest_word_len = max(longest_word_len, word.size());
 
-        for (int start = N-1; start >= 0; start--)
+        // O(N^3) (entire block)
+        for (int start = N-1; start >= 0; start--) // O(N)
         {
-            for (int i = start; i < N; i++)
-            {
-                string curr_substr     = s.substr(start, i - start + 1);
-                int    curr_substr_len = curr_substr.length();
+            int substr_size = 0;
+            string substr;
+            substr.reserve(N - start); // To prevent reallocations
 
-                // uset.count(curr_substr) takes O(N) because of Hashing
-                if (uset.count(curr_substr) && dp[i + 1])
+            for (int j = start; j < N; j++) // O(N)
+            {
+                substr += s[j];
+                substr_size++;
+
+                if (substr_size > longest_word_len)
+                    break;
+
+                // uset.count(substr) takes O(N) because of Hashing
+                if (uset.count(substr) && dp[start + substr_size])
                 {
                     dp[start] = true;
                     break;
@@ -270,7 +215,7 @@ public:
 
 /* Time  Complexity: O(N^3)   */
 /* Space Complexity: O(N + M) */
-class Solution_Memoization {
+class Solution_Top_Down___Memoization {
 private:
     int memo[301];
 
