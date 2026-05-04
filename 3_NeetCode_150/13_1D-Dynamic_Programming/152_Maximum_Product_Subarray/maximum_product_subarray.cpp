@@ -182,7 +182,7 @@ using namespace std;
 */
 
 /* Time  Beats: 100.00% */
-/* Space Beats:  5.06% */
+/* Space Beats:   5.06% */
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
@@ -245,10 +245,11 @@ public:
         dp_max = [  2,  16,  -2,  32,   3,   1,   7,  28]
 
 */
-/* Time  Beats: 100% */
-/* Space Beats: 86.21% */
 
-/* Time  Complexity: O(n) */
+/* Time  Beats: 100.00% */
+/* Space Beats:  86.21% */
+
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution_Kadane {
 public:
@@ -279,6 +280,45 @@ public:
 
             dp_min = new_min;
             dp_max = new_max;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  22.23% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Prefix_Suffix {
+public:
+    int maxProduct(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = nums[0];
+
+        int prefix = 0;
+        int suffix = 0;
+
+        for (int i = 0; i < N; i++)
+        {
+            prefix = nums[i      ] * (prefix == 0 ? 1 : prefix);
+            suffix = nums[N-1 - i] * (suffix == 0 ? 1 : suffix);
+
+            result = max(result, max(prefix, suffix));
         }
 
         return result;
