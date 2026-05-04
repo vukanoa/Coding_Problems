@@ -55,45 +55,6 @@
 #include <vector>
 using namespace std;
 
-
-
-/* TLE (Time Limit Exceeded) */
-
-/* Time  Complexity: O(2^n) */
-/* Space Complexity: O(n) */
-class Solution_Brute {
-private:
-    bool backtracking(string& s, unordered_set<string>& dict_uset, int start)
-    {
-        if (start == s.length())
-            return true;
-
-        for (int i = start; i < s.length(); i++)
-        {
-            string current_str = s.substr(start, i - start + 1);
-
-            if (dict_uset.find(current_str) != dict_uset.end())
-            {
-                if (backtracking( s, dict_uset, i + 1))
-                    return true;
-            }
-        }
-
-        return false;
-    }
-
-public:
-    bool wordBreak(string s, vector<string>& wordDict)
-    {
-        unordered_set<string> dict_uset(wordDict.begin(), wordDict.end());
-
-        return backtracking(s, dict_uset, 0);
-    }
-};
-
-
-
-
 /*
     ------------
     --- IDEA ---
@@ -278,8 +239,8 @@ public:
                 string curr_substr     = s.substr(start, i - start + 1);
                 int    curr_substr_len = curr_substr.length();
 
-                // if (uset.find(curr_substr) != uset.end() && dp[start + curr_substr_len])
-                if (uset.find(curr_substr) != uset.end() && dp[i + 1])
+                // uset.count(curr_substr) takes O(N) because of Hashing
+                if (uset.count(curr_substr) && dp[i + 1])
                 {
                     dp[start] = true;
                     break;
@@ -299,203 +260,18 @@ public:
     --- IDEA ---
     ------------
 
-    Virtually the same as above, but implemented in conceptually a different
-    way.
-
-    It's always beneficial to look at multiple solutions in these fundamental
-    problems. Especially if you're a beginner.
+    Classic Memoization approach.
+    Can be considered a simpler one since it's only 1D.
 
 */
 
-/* Time  Beats: 50.18% */
-/* Space Beats: 24.30% */
+/* Time  Beats: 76.16% */
+/* Space Beats: 74.07% */
 
-/* Time  Complexity: O(N^2)   */
+/* Time  Complexity: O(N^3)   */
 /* Space Complexity: O(N + M) */
-class Solution_Another_Bottom_Up {
-public:
-    bool wordBreak(string s, vector<string>& wordDict)
-    {
-        const int N = s.length();
-
-        vector<bool> dp(N + 1, false);
-        dp[N] = true;
-
-        unordered_set<string> words(wordDict.begin(), wordDict.end());
-
-        for (int i = N-1; i >= 0; i--)
-        {
-            for (int x = i; x < N; x++)
-            {
-                string substring  = s.substr(i, x - i + 1);
-                int substring_len = substring.length();
-
-                if (words.find(substring) != words.end()) // It DOES exist
-                {
-                    dp[i] = dp[i] | dp[i + substring_len];
-                }
-            }
-        }
-
-        return dp[0];
-    }
-};
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Almost equivalent IDEA to the the one above. The only difference is that
-    we're iterating through wordDict instead of every possible substring.
-
-*/
-
-/* Time  Beats:   100% */
-/* Space Beats: 89.60% */
-
-/*
-    Time  Complexity: O(n * m * n) => O(n^2 * m)
-    Where 'm' is the size of wordDict.
-
-    I'm confused why is this faster if in the Description it says:
-        *** Constraints ***
-        1 <= s.length <= 300
-        1 <= wordDict.length <= 1000
-
-    Since wordDict.length is greater than s.length, i.e. m > n, then:
-        O(n^3) should preffered over O(n^2 * m)
-    although that is the exact opposite of what I find.
-*/
-/*
-    Space Complexity: O(n)
-*/
-class Solution_DP_Neat {
-public:
-    bool wordBreak(string& s, vector<string> wordDict)
-    {
-        const int N = s.length();
-        const int M = wordDict.size();
-
-        vector<bool> dp(N + 1, false);
-        dp[N] = true; // Empty String is always possible to make
-
-        for (int i = N-1; i >= 0; i--)
-        {
-            for (int j = 0; j < M; j++)
-            {
-                int substr_len = wordDict[j].length();
-
-                if (i + substr_len <= N
-                    &&
-                    s.substr(i, substr_len) == wordDict[j] // O(n)
-                    &&
-                    dp[i + substr_len] == true)
-                {
-                    dp[i] = true;
-                    break;
-                }
-            }
-        }
-
-        return dp[0];
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    A very unnatural Memoization. Bottom-Up DP feels much more natural.
-
-*/
-
-/* Time  Beats: 48.93% */
-/* Space Beats: 36.66% */
-
-/* Time  Complexity: O(N^2)   */
-/* Space Complexity: O(N + M) */
-class Solution_Unusual_Memoization {
+class Solution_Memoization {
 private:
-    bool memo[301];
-
-public:
-    bool wordBreak(string s, vector<string>& wordDict)
-    {
-        const int N = s.length();
-
-        unordered_set<string> uset(wordDict.begin(), wordDict.end());
-
-        /* Allocate on the Stack */
-        memset(memo, false, sizeof(memo));
-        memo[N] = true;
-
-        for (int i = N-1; i >= 0; i--)
-        {
-            solve(i, s, uset, N);
-        }
-
-        return memo[0];
-    }
-
-private:
-    void solve(int idx, string& s, unordered_set<string>& uset, const int& N)
-    {
-        if (idx == N)
-            return;
-
-        for (int j = idx; j < N; j++)
-        {
-            string substr = s.substr(idx, j - idx + 1);
-
-            if (uset.count(substr) && memo[j+1])
-            {
-                memo[idx] = true;
-                return;
-            }
-        }
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    This is a much more usual version of Memoizaiton.
-
-    The key point is this -- If you've calculated whether it's possible from
-    index "idx", return that!
-
-    That's why with "memoset" we're setting every byte to -1, i.e 0x7f.
-
-    Then if we've tried to go deep down the rabbit hole from say index 8 and
-    we've concluded that it's NOT possible to match it until the end, then
-    we assign 0 to that index in memo[8], indicating that:
-
-        1. We've already calculated it(i.e. it's different than 0x7f)
-        2. It's NOT possible, so return immediately
-
-
-    This now becomes a classic Memoization Solution.
-
-*/
-
-/* Time  Beats: 33.56% */
-/* Space Beats: 34.39% */
-
-/* Time  Complexity: O(N^2)   */
-/* Space Complexity: O(N + M) */
-class Solution_Real_Memo {
     int memo[301];
 
 public:
@@ -509,31 +285,34 @@ public:
     }
 
 private:
-    bool solve(int idx, string& s, unordered_set<string>& uset)
+    bool solve(int start, string& s, unordered_set<string>& uset)
     {
         const int N = s.length();
 
-        if (idx == N)
-            return 1; // True
+        if (start == N)
+            return true;
 
-        if (memo[idx] != -1)
-            return memo[idx];
+        if (memo[start] != -1)
+            return memo[start];
 
-        int result = 0;
-        for (int i = idx; i < N; i++)
+        bool can_match_from_here = false;
+
+        string substr;
+        substr.reserve(N - start); // To prevent reallocations
+
+        for (int i = start; i < N; i++)
         {
-            string substr  = s.substr(idx, i - idx + 1);
-            int substr_len = substr.length();
+            substr += s[i];
 
-            if (uset.count(substr))
+            if (uset.count(substr)) // O(N) because of Hashing
             {
-                result = solve(idx + substr_len, s, uset);;
+                can_match_from_here = solve(i + 1, s, uset);;
 
-                if (result == 1)
+                if (can_match_from_here)
                     break;
             }
         }
 
-        return memo[idx] = max(memo[idx], result); // If it was EVER true, keep
+        return memo[start] = can_match_from_here;
     }
 };
