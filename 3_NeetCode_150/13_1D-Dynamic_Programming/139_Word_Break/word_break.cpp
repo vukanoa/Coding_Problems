@@ -261,3 +261,143 @@ private:
         return memo[start] = can_match_from_here;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 76.15% */
+/* Space Beats: 64.39% */
+
+/* Time  Complexity: O(N^3)                  */
+/* Space Complexity: O(N + total_dict_chars) */
+struct TrieNode {
+    TrieNode* letter[26] = {nullptr};
+    bool is_end;
+
+    TrieNode()
+        : is_end(false)
+    {}
+
+    ~TrieNode()
+    {
+        for (int i = 0; i < 26; i++)
+            delete letter[i];
+    }
+};
+
+class Trie {
+private:
+    TrieNode* root;
+
+public:
+    Trie()
+    {
+        root = new TrieNode();
+    }
+
+    ~Trie()
+    {
+        delete root;
+    }
+
+    void insert(const string& word)
+    {
+        TrieNode* node = root;
+
+        for (const char& chr : word)
+        {
+            if ( ! node->letter[chr - 'a'])
+                node->letter[chr - 'a'] = new TrieNode();
+
+            node = node->letter[chr - 'a'];
+        }
+
+        node->is_end = true;
+    }
+
+    bool search(const string& word, bool find_prefix=false)
+    {
+        TrieNode* node = root;
+
+        for (const char& chr : word)
+        {
+            if ( ! node->letter[chr - 'a'])
+                return false;
+
+            node = node->letter[chr - 'a'];
+        }
+
+        return find_prefix ? true : node->is_end;
+    }
+
+    bool starts_with(const string& prefix)
+    {
+        return search(prefix, true);
+    }
+
+    bool search_range(const string& word, int i, int j)
+    {
+        TrieNode* node = root;
+
+        for (int idx = i; idx <= j; idx++)
+        {
+            char chr = word[idx];
+
+            if ( ! node->letter[chr - 'a'])
+                return false;
+
+            node = node->letter[chr - 'a'];
+        }
+
+        return node->is_end;
+    }
+};
+
+class Solution_Bottom_Up_Tabulation_using_Trie {
+public:
+    bool wordBreak(string s, vector<string>& wordDict)
+    {
+        const int N = s.size();
+        const int D = wordDict.size();
+
+        vector<bool> dp(N + 1, false);
+        dp[N] = true;
+
+        Trie trie;
+
+        unsigned long longest_word_len = 0;
+        for (const string& word : wordDict)
+        {
+            trie.insert(word);
+            longest_word_len = max(longest_word_len, word.size());
+        }
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            for (int j = i; j < N; j++)
+            {
+                int curr_substr_len = j - i + 1;
+
+                if (curr_substr_len > longest_word_len)
+                    continue;
+
+                if (trie.search_range(s, i, j) && dp[j + 1])
+                {
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+
+        return dp[0];
+    }
+};
