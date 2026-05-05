@@ -271,6 +271,22 @@ private:
     ------------
 
     TODO
+    This one is EQUIVALENT in terms of Time and Space Complexities to our above
+    "Bottom Up Tabulation" Solution that uses simple Hashing instead of the
+    Trie.
+
+    So then, why are we using the Trie after all?
+
+    You'll have to look at BOTH Solution below this explanation.
+    The first one is NOT optimal use of the Trie, while the second really does
+    optimize it further.
+
+    Reducing the Time Complexity:
+
+        from O(N^3) down to O(N * K + total_dict_chars)
+
+    Make sure you understand WHY the other implementation is that much better
+    than the this one even if they BOTH use the Trie.
 
 */
 
@@ -307,6 +323,11 @@ public:
     ~Trie()
     {
         delete root;
+    }
+
+    TrieNode* get_root()
+    {
+        return root;
     }
 
     void insert(const string& word)
@@ -391,6 +412,82 @@ public:
                     continue;
 
                 if (trie.search_range(s, i, j) && dp[j + 1])
+                {
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+
+        return dp[0];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Now this is the OPTIMAL way of using a Trie for this Problem. This reduces
+    the Time Complexity:
+
+        from O(N^3) down to O(N * K + total_dict_chars)
+
+    which is HUGE!
+
+    Make sure you understand WHY this implementation is this much better than
+    the one above even if they BOTH use the Trie.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  64.39% */
+
+/* Time  Complexity: O(N * K + total_dict_char) */ // K = max(wordDict[i].len)
+/* Space Complexity: O(N     + total_dict_char) */
+class Solution_Optimal_use_of_Trie {
+public:
+    bool wordBreak(string s, vector<string>& wordDict)
+    {
+        int N = s.size();
+
+        vector<bool> dp(N + 1, false);
+        dp[N] = true;
+
+        Trie trie;
+
+        unsigned long longest_word_len = 0;
+        for (const string& word : wordDict)
+        {
+            trie.insert(word);
+
+            longest_word_len = max(longest_word_len, word.size());
+        }
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            TrieNode* node = trie.get_root();
+
+            for (int j = i; j < N; j++)
+            {
+                int curr_substr_len = j - i + 1;
+
+                // This reduces this inner-loop from O(N) down to O(K)
+                // where "K" is max(wordDict[i].length)
+                if (curr_substr_len > longest_word_len)
+                    break;
+
+                char chr = s[j];
+
+                if ( ! node->letter[chr - 'a'])
+                    break;
+
+                node = node->letter[chr - 'a'];
+
+                if (node->is_end && dp[j + 1])
                 {
                     dp[i] = true;
                     break;
