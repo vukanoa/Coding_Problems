@@ -1,8 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <unordered_map> // TLE Solution
-
 /*
     ==============
     === MEDIUM ===
@@ -50,50 +45,9 @@
 
 */
 
-
-class Solution_TLE {
-public:
-    int lengthOfLIS(std::vector<int>& nums)
-    {
-        int n = nums.size();
-        std::unordered_map<int, std::vector<int>> umap;
-        int max = 1;
-
-        for (int i = 0; i <= n; i++)
-            umap[i] = {};
-
-        for (int i = 0; i < nums.size(); i++)
-        {
-            umap[1].push_back(nums[i]);
-
-            for (int j = i; j > 0; j--)
-            {
-                if (umap[j].empty())
-                    continue;
-
-                bool exist = false;
-                for (int k = 0; k < umap[j].size(); k++)
-                {
-                    if (umap[j][k] < nums[i])
-                    {
-                        umap[j + 1].push_back(nums[i]);
-
-                        if (j + 1 > max)
-                            exist = true;
-                    }
-                }
-
-                if (exist)
-                    max++;
-            }
-        }
-
-        return max;
-    }
-};
-
-
-
+#include <vector>
+#include <algorithm>
+using namespace std;
 
 /*
     ------------
@@ -107,6 +61,7 @@ public:
     Let's draw a decision tree.
 
     Consider this example:
+
         nums = [1, 2, 4, 3]
                 0  1  2  3
                                               START
@@ -130,201 +85,29 @@ public:
            X         X
 
 
-    We can see, for example, that going all the way to the left, after we
-    include 4(index 2) we aren't able to increase our subsequence any further.
-    Thus, if we go any other route, if we choose 4(index 2), it's immediately
-    terminated sinsce we've already calculated that we can't increase our
-    subsequence from that point onwards.
+    TODO
 
-    So in order to remove repeated calculations, we'll have a "cache", i.e. our
-    LIS(Longest Increasing Subsequence) vector which represents our DP array
-    where we store our calculated sequences.
-
-    Since LIS[2] represents how many elements, or how big is going to be our
-    subsequence if we include number at index 2, until the end of the array is
-    increasing, we can see that we have to start from the back.
-
-    In our Example:
-        nums = [1, 2, 4, 3]
-                0  1  2  3
-
-    LIS[3] will always be 1, because 3 == n-1
-
-    Then when we're calculating LIS[2] we can either have:
-        1. 1 or
-        2. 1 + LIS[3]   if (nums[2] < nums[3])
-
-    However, we can only take the latter if nums[2] < nums[3].
-
-    When we're calculating LIS[1], we can either have:
-        1. 1 or
-        2. 1 + LIS[2]  if(nums[1] < nums[2]) or
-        3. 1 + LIS[3]  if(nums[1] < nums[3])
-
-    You can see that we're iterating through the array for every element, thus
-    it's a O(n^2) Time Complexity.
 */
 
 /* Time  Beats: 62.94% */
 /* Space Beats: 71.42% */
 class Solution_DFS_with_Cache_DP {
 public:
-    int lengthOfLIS(std::vector<int>& nums)
+    int lengthOfLIS(vector<int>& nums)
     {
         int n = nums.size();
-        std::vector<int> LIS (n, 1);
+        vector<int> LIS (n, 1);
 
         for (int i = n-1; i >= 0; i--)
         {
             for (int j = i+1; j < n; j++)
             {
                 if (nums[i] < nums[j])
-                    LIS[i] = std::max(LIS[i], 1 + LIS[j]);
+                    LIS[i] = max(LIS[i], 1 + LIS[j]);
             }
         }
 
-        return *std::max_element(LIS.begin(), LIS.end());
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Same as above, however it's a bit faster if we find "result" while we are
-    doing the problem. That way we don't have to go through the array once more
-    to find the maximum element.
-
-*/
-
-/* Time  Beats: 61.69% */
-/* Space Beats: 63.09% */
-
-/* Time  Complexity: O(n^2) */
-/* Space Complexity: O(n) */
-class Solution_DP_2 {
-public:
-    int lengthOfLIS(vector<int>& nums)
-    {
-        const int n = nums.size();
-        std::vector<int> LIS(n, 1);
-
-        int result = 1;
-
-        for (int i = n; i >= 0; i--)
-        {
-            for (int j = i+1; j < n; j++)
-            {
-                if (nums[i] < nums[j])
-                {
-                    LIS[i] = std::max(LIS[i], 1 + LIS[j]);
-                    result = std::max(result, LIS[i]);
-                }
-            }
-        }
-
-        return result;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    This is a classic Dynamic Programming problem.
-
-    Let dp[i] be the longest increase subsequence of nums[0..i] where nums[i]
-    is the last element of the subsequence.
-
-    It's pretty much self-explanatory. Just simulate one example by going
-    through the code and it will be clear.
-
-*/
-
-/* Time  Beats: 64.76% */
-/* Space Beats: 69.51% */
-
-/* Time  Complexity: O(n^2) */
-/* Space Complexity: O(n) */
-class Solution_DP{
-public:
-    int lengthOfLIS(std::vector<int>& nums)
-    {
-        int n = nums.size();
-        std::vector<int> dp(n, 1);
-
-        for (int i = 0; i < n; i++)
-        {
-            for (int j = 0; j < i; j++)
-            {
-                if (nums[i] > nums[j] && dp[i] < dp[j] + 1)
-                    dp[i] = dp[j] + 1;
-            }
-        }
-
-        return *std::max_element(dp.begin(), dp.end());
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Almost equivalent IDEA to the one above, but implemented in a way that's
-    easier to undersand.
-
-    This is a good example to simulate:
-
-    nums = [3,  4, -1,  0,  6,  2,  3]
-            0   1   2   3   4   5   6
-
-    dp   = [1,  2,  1,  2,  3,  3,  4]
-            0   1   2   3   4   5   6
-
-*/
-
-/* Time  Beats: 60.30% */
-/* Space Beats: 39.14% */
-
-/* Time  Complexity: O(n^2) */
-/* Space Complexity: O(n) */
-class Solution_Touche {
-public:
-    int lengthOfLIS(std::vector<int> &nums)
-    {
-        int n = nums.size();
-        std::vector<int> dp(n, 1);
-
-        int left  = 0;
-        int right = 1;
-        while (right < n)
-        {
-            if (left == right)
-            {
-                left = 0;
-                right++;
-
-                continue;
-            }
-            else if (nums[left] < nums[right])
-                dp[right] = std::max(dp[right], dp[left] + 1);
-
-            left++;
-        }
-
-        return *max_element(dp.begin(), dp.end());
+        return *max_element(LIS.begin(), LIS.end());
     }
 };
 
@@ -463,9 +246,9 @@ public:
 */
 class Solution_Greedy_Binary {
 public:
-    int lengthOfLIS(std::vector<int> &nums)
+    int lengthOfLIS(vector<int> &nums)
     {
-        std::vector<int> sub;
+        vector<int> sub;
         sub.push_back(nums[0]);
 
         for (int i = 1; i < nums.size(); i++)
@@ -477,7 +260,7 @@ public:
             else
             {
                 // Search for first element e such that: nums[i] <= e
-                auto it = std::lower_bound(sub.begin(), sub.end(), nums[i]);
+                auto it = lower_bound(sub.begin(), sub.end(), nums[i]);
                 *it = nums[i];
             }
         }
@@ -517,9 +300,9 @@ public:
 /* Space Complexity: O(n) */
 class Solution_Patience_Sort {
 public:
-    int lengthOfLIS(std::vector<int>& nums)
+    int lengthOfLIS(vector<int>& nums)
     {
-        std::vector<int> piles;
+        vector<int> piles;
         piles.push_back(nums[0]);
 
         for (int i = 1; i < nums.size(); i++)
@@ -528,7 +311,7 @@ public:
                 piles.push_back(nums[i]);
             else
             {
-                auto upper = std::lower_bound(piles.begin(), piles.end(), nums[i]);
+                auto upper = lower_bound(piles.begin(), piles.end(), nums[i]);
                 *upper = nums[i];
             }
         }
@@ -558,12 +341,12 @@ public:
 /* Space Complexity: O(n) */
 class Solution_My_Binary {
 public:
-    int lengthOfLIS(std::vector<int> &nums)
+    int lengthOfLIS(vector<int> &nums)
     {
         if (nums.size() == 1)
             return 1;
 
-        std::vector<int> subseq;
+        vector<int> subseq;
         subseq.push_back(nums[0]);
 
         for (int i = 1; i < nums.size(); i++)
@@ -578,7 +361,7 @@ public:
     }
 
 private:
-    void binary_search_emplace(std::vector<int>& subseq, int num)
+    void binary_search_emplace(vector<int>& subseq, int num)
     {
         // [1, 4, 7, 8, 10], num=3, num=9, num=4
 
@@ -643,7 +426,7 @@ private:
 */
 class MaxBIT {
 private:
-    std::vector<int> bit;
+    vector<int> bit;
 
 public:
     MaxBIT(int size)
@@ -655,7 +438,7 @@ public:
     {
         int ans = 0;
         for (; idx > 0; idx -= idx & -idx)
-            ans = std::max(ans, bit[idx]);
+            ans = max(ans, bit[idx]);
 
         return ans;
     }
@@ -663,14 +446,14 @@ public:
     void update(int idx, int val)
     {
         for(; idx < bit.size(); idx += idx & -idx)
-            bit[idx] = std::max(bit[idx], val);
+            bit[idx] = max(bit[idx], val);
     }
 
 };
 
 class Solution_BIT {
 public:
-    int lengthOfLIS(std::vector<int>& nums)
+    int lengthOfLIS(vector<int>& nums)
     {
         int base = 10001;
         MaxBIT bit(20001);
@@ -726,7 +509,7 @@ public:
 /* Space Complexity: O(n) */
 class Solution_BIT_Compress {
 public:
-    int lengthOfLIS(std::vector<int>& nums)
+    int lengthOfLIS(vector<int>& nums)
     {
         int nUnique = compress(nums);
         MaxBIT bit(nUnique);
@@ -740,10 +523,10 @@ public:
         return bit.get(nUnique);
     }
 
-    int compress(std::vector<int>& arr)
+    int compress(vector<int>& arr)
     {
-        std::vector<int> uniqueSorted(arr);
-        std::sort(uniqueSorted.begin(), uniqueSorted.end());
+        vector<int> uniqueSorted(arr);
+        sort(uniqueSorted.begin(), uniqueSorted.end());
         uniqueSorted.erase(unique(uniqueSorted.begin(), uniqueSorted.end()), uniqueSorted.end()); // Remove duplicated values
 
         for (int& x: arr)
@@ -752,60 +535,3 @@ public:
         return uniqueSorted.size();
     }
 };
-
-int
-main()
-{
-    Solution_DFS_with_Cache_DP sol_dfs_cache_dp;
-    Solution_DP                sol_dp;
-    Solution_Greedy_Binary     sol_grd_bin; // Efficient!
-    Solution_Patience_Sort     sol_patience; // Efficient!
-    Solution_My_Binary         sol_my_bin;  // Efficient!
-    Solution_BIT               sol_bit;
-    Solution_BIT_Compress      sol_bit_com;
-    Solution_Touche            sol_touche;
-
-
-    /* Example 1 */
-    std::vector<int> nums = {10, 9, 2, 5, 3, 7, 101, 18};
-
-    /* Example 2 */
-    // std::vector<int> nums = {0, 1, 0, 3, 2, 3};
-
-    /* Example 3 */
-    // std::vector<int> nums = {7, 7, 7, 7, 7, 7, 7};
-
-    std::cout << "\n\t======================================";
-    std::cout << "\n\t=== LONGEST INCREASING SUBSEQUENCE ===";
-    std::cout << "\n\t======================================\n";
-
-
-    /* Write Input */
-    bool first = true;
-    std::cout << "\n\tArray: [";
-    for (auto x: nums)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        std::cout << x;
-        first = false;
-    }
-    std::cout << "]\n";
-
-
-    /* Solution */
-    // int longest = sol_dfs_cache_dp.lengthOfLIS(nums);
-    // int longest = sol_dp.lengthOfLIS(nums);
-    // int longest = sol_grd_bin.lengthOfLIS(nums);
-    int longest = sol_patience.lengthOfLIS(nums);
-    // int longest = sol_my_bin.lengthOfLIS(nums);
-    // int longest = sol_bit.lengthOfLIS(nums);
-    // int longest = sol_bit_com.lengthOfLIS(nums);
-    // int longest = sol_touche.lengthOfLIS(nums);
-
-
-    std::cout << "\n\tLongest Increasing Subsequence: " << longest << "\n\n";
-
-    return 0;
-}
