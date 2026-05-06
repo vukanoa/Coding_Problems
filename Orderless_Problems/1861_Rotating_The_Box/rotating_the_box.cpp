@@ -99,7 +99,7 @@ using namespace std;
 
 /* Time  Complexity: O(ROWS * COLS) */
 /* Space Complexity: O(ROWS * COLS) */
-class Solution {
+class Solution_Simulate_to_the_Right {
 public:
     vector<vector<char>> rotateTheBox(vector<vector<char>>& boxGrid)
     {
@@ -124,7 +124,7 @@ public:
                 }
             }
         }
-        
+
         /* Rotate */
         vector<vector<char>> result(COLS, vector<char>(ROWS));
         for (int row = 0; row < ROWS; row++)
@@ -132,7 +132,74 @@ public:
             for (int col = 0; col < COLS; col++)
                 result[col][ROWS-1 - row] = boxGrid[row][col];
         }
-                
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    If it's FORBIDDEN to modify "boxGrid" which is passed by reference, then
+    we MUST do it this way. In other words we MUST first rotate and only
+    then simulate the fall, but this time the fall is "fall downwards" and NOT
+    "to the right".
+
+*/
+
+/* Time  Beats: 65.85% */
+/* Space Beats: 15.72% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
+class Solution_Simulate_Downwards {
+public:
+    vector<vector<char>> rotateTheBox(vector<vector<char>>& boxGrid)
+    {
+        const int ROWS = boxGrid.size();
+        const int COLS = boxGrid[0].size();
+
+        vector<vector<char>> result(COLS, vector<char>(ROWS, '.'));
+
+        /* First Rotate immediately */
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                result[col][ROWS-1 - row] = boxGrid[row][col];
+            }
+        }
+
+        /* Now Simulate "fall downwards" */
+        const int NEW_ROWS = result.size();
+        const int NEW_COLS = result[0].size();
+
+        for (int col = 0; col < NEW_COLS; col++)
+        {
+            int empty_row = NEW_ROWS-1;
+
+            for (int row = NEW_ROWS-1; row >= 0; row--)
+            {
+                if (result[row][col] == '.') // Empty cell
+                    continue;
+
+                if (result[row][col] == '*') // Obstacle
+                {
+                    empty_row = row - 1;
+                    continue;
+                }
+
+                /* Stone */
+                swap(result[empty_row][col], result[row][col]);
+                empty_row--;
+            }
+        }
+
         return result;
     }
 };
