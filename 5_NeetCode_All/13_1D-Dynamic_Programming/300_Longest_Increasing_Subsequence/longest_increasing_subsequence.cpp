@@ -91,23 +91,26 @@ using namespace std;
 
 /* Time  Beats: 62.94% */
 /* Space Beats: 71.42% */
-class Solution_DFS_with_Cache_DP {
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N)   */
+class Solution_Squared {
 public:
     int lengthOfLIS(vector<int>& nums)
     {
-        int n = nums.size();
-        vector<int> LIS (n, 1);
+        const int N = nums.size();
 
-        for (int i = n-1; i >= 0; i--)
+        vector<int> dp(N, 1);
+        for (int i = N-2; i >= 0; i--)
         {
-            for (int j = i+1; j < n; j++)
+            for (int j = i+1; j < N; j++)
             {
                 if (nums[i] < nums[j])
-                    LIS[i] = max(LIS[i], 1 + LIS[j]);
+                    dp[i] = max(dp[i], 1 + dp[j]);
             }
         }
 
-        return *max_element(LIS.begin(), LIS.end());
+        return *max_element(dp.begin(), dp.end());
     }
 };
 
@@ -119,166 +122,8 @@ public:
     --- IDEA ---
     ------------
 
-    Greedy with Binary Search
-
-    Let's construct the idea from following example.
-
-        nums = [2, 6, 8, 3, 4, 5, 1],
-
-    let's try to build the increasing subsequences starting with an empty one
-
-        sub1 = [].
-
-    1. Let pick the first element, sub1 = [2]
-
-
-    2. 6 is greater than the previous number.
-
-           sub1 = [2, 6]
-
-
-    3. 8 is greater than previous number.
-
-           sub1 = [2, 6, 8]
-
-
-    4. 3 is less than previous number, therefore we can't extend the
-       subsequence sub1, but we must keep 3 because in the future the longest
-       subsequence may start with [2, 3]. Now we have:
-
-        sub1 = [2, 6, 8],
-        sub2 = [2, 3]
-
-
-    5. With 4, we can't extend sub1, but we can extend sub2, so:
-
-           sub1 = [2, 6, 8],
-           sub2 = [2, 3, 4]
-
-    6. With 5, we can't extend sub1, but we can extend sub2, so:
-
-           sub1 = [2, 6, 8],
-           sub2 = [2, 3, 4, 5]
-
-
-    7. With 1, we can't extend neither sub1 nor sub2, but we need to keep 1,
-       so:
-           sub1 = [2, 6, 8],
-           sub2 = [2, 3, 4, 5],
-           sub3 = [1]
-
-
-    8. Finally, length of the longest increase subsequence = len(sub2) = 4
-
-
-    ~~~~~~~~~~~~
-    ~~~ Note ~~~
-    ~~~~~~~~~~~~
-    Now this optimization is not intuitive to me AT ALL. If you find it hard
-    to grasp, it's okay.
-
-    In the above steps, we need to keep different "sub" arrays
-
-        (sub1, sub2, sub3, ..., subk)
-
-    which causes poor performance. But we are noticing that we can just keep
-    one "sub" array, when new number 'x' is not greater than the last element
-    of the subsequence "sub" we do a binary search to find the smallest
-    element >= x in "sub", and replace with number x.
-
-
-    Let's run that example again:
-
-        nums = [2, 6, 8, 3, 4, 5, 1] again:
-
-    1. Let's pick the first element,
-
-           sub = [2]
-
-
-    2. 6 is greater than the previous number,
-
-           sub = [2, 6]
-
-
-    3. 8 is greater than the previous number,
-
-           sub = [2, 6, 8]
-
-
-    4. 3 is less than the previous number, so we can't extend the subsequence
-       sub. We need to find the smallest number that is >= 3 in "sub", it's 6.
-       Then we overwrite it, now:
-
-           sub = [2, 3, 8].
-
-
-    5. 4 is less than previous number so we can't extend the subsequence sub.
-       We overwrite 8 by 4, so:
-
-           sub = [2, 3, 4]
-
-
-    6. 5 is greater than the previous number:
-
-           sub = [2, 3, 4, 5]
-
-
-    7. 1 is less than previous number, so we can't extend the subsequence sub,
-       We overwrite 2 by 1, so:
-
-           sub = [1, 3, 4, 5].
-
-
-    8. Finally, length of the longest increase subsequence = len(sub) = 4
-
-*/
-
-/* Time  Beats:   100% */
-/* Space Beats: 87.72% */
-
-/*    Time  Complexity: O(n * logn) */
-/*
-    Space Complexity: O(n)
-    We can achieve O(1) in space by overwriting values of "sub" into original
-    "nums" array. But in order to do that we'd have to be sure that is
-    permitted.
-*/
-class Solution_Greedy_Binary {
-public:
-    int lengthOfLIS(vector<int> &nums)
-    {
-        vector<int> sub;
-        sub.push_back(nums[0]);
-
-        for (int i = 1; i < nums.size(); i++)
-        {
-            if (sub[sub.size() - 1] < nums[i])
-            {
-                sub.push_back(nums[i]);
-            }
-            else
-            {
-                // Search for first element e such that: nums[i] <= e
-                auto it = lower_bound(sub.begin(), sub.end(), nums[i]);
-                *it = nums[i];
-            }
-        }
-
-        return sub.size();
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    The above and below Solutions are similar, however it's more difficult to
-    grasp if you hear the right name of the approach - Patience Sort.
+    This is also known as "Patience Sort" as it optimally solves the game of
+    patience.
 
     That name comes from the playing card game called "Patience" in which the
     goal is to have the lesat amount of piles that are all in decreasing
@@ -291,35 +136,102 @@ public:
     The goal in that problem is the return the minimum number of piles needed,
     where every pile MUST be a decreasing subsequence.
 
+
+    Vector "top_of_pile" is in singular as top_of_pile[i] represents the top
+    card at pile 'i'.
+
+    The LENGTH of "top_of_pile" is the NUMBER OF DIFFERENT PILES.
+    Cards in EACH pile is sorted in DECREASING order, however we ONLY keep
+    track of the SMALLEST card that is on the TOP of that pile[i].
+
+
+    Let's construct the idea from following example.
+
+        nums = [2, 6, 8, 3, 4, 5, 1]
+
+
+    1. Let's pick the first element,
+
+           top_of_pile = [2]
+
+
+    2. 6 is greater than the previous number, create a NEW pile with 6 on top
+       of that new pile.
+
+           top_of_pile = [2, 6]
+
+
+    3. 8 is greater than the previous number, create a NEW pile with 8 on top
+       of that new pile.
+
+           top_of_pile = [2, 6, 8]
+
+
+    4. 3 is less than the previous number, so we can't extend the subsequence
+       top_of_pile(which contains a bunch of piles, each sorted in DECREASING
+       order, however we ONLY keep track of the smallest card in each pile that
+       is at the very top).
+       We need to find the smallest number that is >= 3 in "top_of_pile", and
+       replace that pile's top with 3.
+
+       In our example, it's 6, thus we overwrite 6 with our current card=3.
+
+           top_of_pile = [2, 3, 8].
+
+
+    5. 4 is smaller than 8, thus we replace 8 with 4.
+
+           top_of_pile = [2, 3, 4]
+
+
+    6. 5 is greater than the rightmost top card, thus we create a NEW pile with
+       5 on top of that new pile.
+
+           top_of_pile = [2, 3, 4, 5]
+
+
+    7. For card=1, this smallest top_card is 2, thus we overwrite 2 by 1, so:
+
+           top_of_pile = [1, 3, 4, 5].
+
+
+    8. Finally, the total number of piles is = len(top_of_pile) = 4
+
 */
 
-/* Time  Beats:   100% */
-/* Space Beats: 80.57% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  67.15% */
 
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
 class Solution_Patience_Sort {
 public:
     int lengthOfLIS(vector<int>& nums)
     {
-        vector<int> piles;
-        piles.push_back(nums[0]);
+        const int N = nums.size();
 
-        for (int i = 1; i < nums.size(); i++)
+        vector<int> top_of_pile;
+        top_of_pile.reserve(N); // To prevent reallocations
+
+        /* Initially only 1 pile exists with nums[0] at the top of that pile */
+        top_of_pile.push_back(nums[0]);
+
+        for (int i = 1; i < N; i++)
         {
-            if (piles[piles.size() - 1] < nums[i])
-                piles.push_back(nums[i]);
+            if (top_of_pile.back() < nums[i])
+            {
+                top_of_pile.push_back(nums[i]);
+            }
             else
             {
-                auto upper = lower_bound(piles.begin(), piles.end(), nums[i]);
-                *upper = nums[i];
+                auto pile = lower_bound(top_of_pile.begin(), top_of_pile.end(), nums[i]);
+                *pile = nums[i];
             }
         }
 
-        return piles.size();
+        return top_of_pile.size();
     }
 };
-
 
 
 
@@ -329,56 +241,60 @@ public:
     --- IDEA ---
     ------------
 
-    It's absolutely equivalent to the Solution above(Solution_Greedy_Binary),
-    however, this one uses my own Binary Search "lower_bound" function.
+    It's absolutely equivalent to the above Solution, however this one uses my
+    own "lower bound" Binary Search implementation instead.
 
 */
 
-/* Time  Beats:  100% */
-/* Space Beats: 48.99% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  67.08% */
 
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(n) */
-class Solution_My_Binary {
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Patience_Sort_using_My_Binary_Search_Implementation {
 public:
-    int lengthOfLIS(vector<int> &nums)
+    int lengthOfLIS(vector<int>& nums)
     {
-        if (nums.size() == 1)
-            return 1;
+        const int N = nums.size();
 
-        vector<int> subseq;
-        subseq.push_back(nums[0]);
+        vector<int> top_of_pile;
+        top_of_pile.reserve(N); // To prevent reallocations
 
-        for (int i = 1; i < nums.size(); i++)
+        /* Initially only 1 pile exists with nums[0] at the top of that pile */
+        top_of_pile.push_back(nums[0]);
+
+        for (int i = 1; i < N; i++)
         {
-            if (subseq[subseq.size() - 1] < nums[i])
-                subseq.push_back(nums[i]);
+            if (top_of_pile.back() < nums[i])
+            {
+                top_of_pile.push_back(nums[i]);
+            }
             else
-                binary_search_emplace(subseq, nums[i]);
+            {
+                const int PILES = top_of_pile.size();
+                int pile_idx = my_lower_bound(0, PILES-1, nums[i], top_of_pile);
+
+                top_of_pile[pile_idx] = nums[i];
+            }
         }
 
-        return subseq.size();
+        return top_of_pile.size();
     }
 
 private:
-    void binary_search_emplace(vector<int>& subseq, int num)
+    int my_lower_bound(int low, int high, int target, vector<int>& top_of_pile)
     {
-        // [1, 4, 7, 8, 10], num=3, num=9, num=4
-
-        int left  = 0;
-        int right = subseq.size() - 1;
-
-        while (left < right)
+        while (low < high)
         {
-            int mid = left + (right - left) / 2;
+            int mid = low + (high - low) / 2; // Low-leaning
 
-            if (subseq[mid] >= num)
-                right = mid;
-            else // subseq[mid] < num
-                left = mid + 1;
+            if (target > top_of_pile[mid])
+                low = mid + 1;
+            else
+                high = mid;
         }
 
-        subseq[left] = num;
+        return low; // or "high", it does NOT matter
     }
 };
 
@@ -417,7 +333,7 @@ private:
 /* Space Beats: 29.4% */
 
 /*
-    Time  Complexity: O(n * logMAX)
+    Time  Complexity: O(N * logMAX)
     where MAX <= 20000 is the difference between minimum and maximum elements
     in nums, N <= 2500 is the number of elements in array nums.
 */
@@ -505,8 +421,8 @@ public:
 /* Time  Beats: 75.39% */
 /* Space Beats: 37.24% */
 
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
 class Solution_BIT_Compress {
 public:
     int lengthOfLIS(vector<int>& nums)
@@ -523,15 +439,18 @@ public:
         return bit.get(nUnique);
     }
 
-    int compress(vector<int>& arr)
+    int compress(vector<int>& nums)
     {
-        vector<int> uniqueSorted(arr);
-        sort(uniqueSorted.begin(), uniqueSorted.end());
-        uniqueSorted.erase(unique(uniqueSorted.begin(), uniqueSorted.end()), uniqueSorted.end()); // Remove duplicated values
+        vector<int> unique_sorted(nums);
 
-        for (int& x: arr)
-            x = lower_bound(uniqueSorted.begin(), uniqueSorted.end(), x) - uniqueSorted.begin() + 1;
+        /* Sort */
+        sort(unique_sorted.begin(), unique_sorted.end());
 
-        return uniqueSorted.size();
+        unique_sorted.erase(unique(unique_sorted.begin(), unique_sorted.end()), unique_sorted.end()); // Remove duplicated values
+
+        for (int& x : nums)
+            x = lower_bound(unique_sorted.begin(), unique_sorted.end(), x) - unique_sorted.begin() + 1;
+
+        return unique_sorted.size();
     }
 };
