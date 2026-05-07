@@ -59,7 +59,7 @@ using namespace std;
 
 /* Time  Complexity: O(N^2) */
 /* Space Complexity: O(N)   */
-class Solution {
+class Solution_Brute_Force {
 public:
     bool rotateString(string s, string goal)
     {
@@ -128,6 +128,17 @@ public:
 
     which is huge.
 
+    The "find" function does NOT necessarily use KMP, it uses a mix of:
+
+        + memchr/memcmp optimized scanning
+        + Two-Way string matching algorithm
+        + Boyer-Moore
+        + Boyer-Moore-Horspool
+        + SIMD/vectorized byte comparisons
+        + Small-string specialized loops
+
+    depending on the Input.
+
 */
 
 /* Time  Beats: 100.00% */
@@ -143,5 +154,108 @@ public:
             return false;
 
         return (s + s).find(goal) != string::npos;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one uses a KMP algorithm for string matching, thus reducing the
+    Time Complexity from O(N * M) down to O(N + M), which is huge.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  24.54% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(M)     */
+class KMP {
+public:
+    bool kmp_algo(string s, string pattern)
+    {
+        const int N = s.size();
+        const int M = pattern.size();
+
+        /* Populate LPS */
+        vector<int> LPS = calculate_LPS(pattern);
+
+        int i = 0;
+        int j = 0;
+
+        while (i < N && j < M)
+        {
+            if (s[i] == pattern[j])
+            {
+                i++;
+                j++;
+            }
+            else
+            {
+                if (j > 0)
+                    j = LPS[j - 1];
+                else
+                    i++;
+            }
+        }
+
+        return j == M;
+    }
+
+private:
+    //       a b c d a b c y
+    //       0 1 2 3 4 5 6 7
+    // LPS = 0 0 0 0 1 2 3 0
+    //
+    vector<int> calculate_LPS(string& pattern)
+    {
+        const int M = pattern.size();
+
+        /* Initialize with zeroes */
+        vector<int> LPS(M, 0);
+
+        int prefix_len = 0;
+        int i          = 1;
+        while (i < M)
+        {
+            if (pattern[prefix_len] != pattern[i])
+            {
+                if (prefix_len > 0)
+                    prefix_len = LPS[prefix_len - 1];
+                else
+                    i++;
+            }
+            else
+            {
+                LPS[i] = prefix_len + 1;
+                prefix_len++;
+
+                i++;
+            }
+        }
+
+        return LPS;
+    }
+};
+
+class Solution {
+public:
+    bool rotateString(string s, string goal)
+    {
+        const int N = s.size();
+        const int M = goal.size();
+
+        if (N != M)
+            return false;
+
+        s += s; // Append s to itself
+        KMP kmp;
+
+        return kmp.kmp_algo(s, goal);
     }
 };
