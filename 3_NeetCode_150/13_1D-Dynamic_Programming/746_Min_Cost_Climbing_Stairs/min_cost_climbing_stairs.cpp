@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === EASY ===
@@ -56,6 +53,10 @@
 
 */
 
+#include <climits>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -69,22 +70,27 @@
 /* Time  Beats: 100.00% */
 /* Space Beats:  61.06% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution {
 public:
     int minCostClimbingStairs(vector<int>& cost)
     {
-        const int n = cost.size();
-        std::vector<int> dp(n, 0);
+        const int N = cost.size();
 
+        if (N == 2)
+            return min(cost[0], cost[1]);
+
+        vector<int> dp(N+1, INT_MAX);
         dp[0] = cost[0];
         dp[1] = cost[1];
 
-        for (int i = 2; i < n; i++)
-            dp[i] = cost[i] + std::min(dp[i-2], dp[i-1]);
+        for (int i = 2; i <= N; i++)
+        {
+            dp[i] = min(dp[i-2], dp[i-1])  +  (i == N ? 0 : cost[i]);
+        }
 
-        return std::min(dp[n-2], dp[n-1]);
+        return dp[N];
     }
 };
 
@@ -97,35 +103,38 @@ public:
     ------------
 
     Same as above, however this one is more Space efficient since it doesn't
-    use an entire vector, but only last two elements in every iteration.
+    use an entire "dp" vector, but only last two elements.
 
-    Therefore Space Complexity comes down from O(n) to O(1), which can be huge
-    depending on the size of n.
+    Therefore Space Complexity reduces from O(N) to O(1), which can be huge
+    depending on the magnitude of N.
 
 */
 
 /* Time  Beats: 100.00% */
 /* Space Beats:  83.58% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution_Efficient {
+class Solution_Space_Optimized {
 public:
     int minCostClimbingStairs(vector<int>& cost)
     {
-        const int n = cost.size();
+        const int N = cost.size();
 
-        int dp_2 = cost[0];
-        int dp_1 = cost[1];
+        if (N == 2)
+            return min(cost[0], cost[1]);
 
-        for (int i = 2; i < n; i++)
+        int prev_prev = cost[0];
+        int prev      = cost[1];
+
+        for (int i = 2; i <= N; i++)
         {
-            int curr = cost[i] + std::min(dp_2, dp_1);
+            int curr = min(prev_prev, prev)  +  (i == N ? 0 : cost[i]);
 
-            dp_2 = dp_1;
-            dp_1 = curr;
+            prev_prev = prev;
+            prev      = curr;
         }
 
-        return std::min(dp_2, dp_1);
+        return prev;
     }
 };
