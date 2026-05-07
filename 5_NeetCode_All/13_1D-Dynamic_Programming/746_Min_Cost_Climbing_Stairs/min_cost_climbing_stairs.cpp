@@ -54,6 +54,7 @@
 */
 
 #include <climits>
+#include <cstring>
 #include <vector>
 using namespace std;
 
@@ -62,17 +63,16 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    Typical, foundational "Bottom up Dynammic Programming" technique.
+    Foundational "Bottom up, Tabulation Dynammic Programming" technique.
 
 */
-
 
 /* Time  Beats: 100.00% */
 /* Space Beats:  61.06% */
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution {
+class Solution_Bottom_Up__Tabulation {
 public:
     int minCostClimbingStairs(vector<int>& cost)
     {
@@ -115,7 +115,7 @@ public:
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution_Space_Optimized {
+class Solution_Bottom_Up__Tabulation_Optimized {
 public:
     int minCostClimbingStairs(vector<int>& cost)
     {
@@ -136,5 +136,115 @@ public:
         }
 
         return prev;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Classic Top-Down Memoization Solution.
+
+*/
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Top_Down__Memoization_1 {
+private:
+    int memo[1002];
+
+public:
+    int minCostClimbingStairs(vector<int>& cost)
+    {
+        const int N = cost.size();
+
+        if (N == 2)
+            return min(cost[0], cost[1]);
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        return min(solve(0, cost),
+                   solve(1, cost));
+    }
+
+private:
+    int solve(int idx, vector<int>& cost)
+    {
+        const int N = cost.size();
+
+        if (idx >= N)
+            return 0;
+
+        if (memo[idx] != -1)
+            return memo[idx];
+
+        int take_one = cost[idx] + solve(idx + 1, cost);
+        int take_two = cost[idx] + solve(idx + 2, cost);
+
+        return memo[idx] = min(take_one, take_two);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, implemented in a different way. It really depends on how you
+    think about it.
+
+    It's always beneficial to see multiple implementations of Memoization
+    Solutions.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  70.82% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Top_Down__Memoization_2 {
+private:
+    int memo[1002];
+
+public:
+    int minCostClimbingStairs(vector<int>& cost)
+    {
+        const int N = cost.size();
+
+        if (N == 2)
+            return min(cost[0], cost[1]);
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        return solve(N, cost);
+    }
+
+private:
+    int solve(int idx, vector<int>& cost)
+    {
+        const int N = cost.size();
+
+        if (idx == 0 || idx == 1)
+            return cost[idx];
+
+        if (memo[idx] != -1)
+            return memo[idx];
+
+        int curr_cost = idx == N ? 0 : cost[idx];
+
+        int take_one = solve(idx - 1, cost) + curr_cost;
+        int take_two = solve(idx - 2, cost) + curr_cost;
+
+        return memo[idx] = min(take_one, take_two);
     }
 };
