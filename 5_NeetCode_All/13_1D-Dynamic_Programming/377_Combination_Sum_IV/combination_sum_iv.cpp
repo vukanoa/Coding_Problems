@@ -46,8 +46,8 @@
 
 */
 
+#include <cstring>
 #include <vector>
-#include <unordered_map>
 #include <algorithm>
 using namespace std;
 
@@ -63,8 +63,8 @@ using namespace std;
 /* Time  Beats: 37.16% */
 /* Space Beats: 18.15% */
 
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
+/* Time  Complexity: O(N * target) */
+/* Space Complexity: O(N)          */
 class Solution_Bottom_Up__Tabulation {
 public:
     int combinationSum4(vector<int>& nums, int target)
@@ -105,50 +105,44 @@ public:
 */
 
 /* Time  Beats: 100.00% */
-/* Space Beats:   5.97% */
+/* Space Beats:  91.42% */
 
-/* Time  Complexity: O(target * n) */
-/* Space Complexity: O(target)     */
-class Solution_Memoization {
+/* Time  Complexity: O(N * target) */
+/* Space Complexity: O(N)          */
+class Solution_Top_Down__General_Memoization {
+private:
+    int memo[1001];
+
 public:
-    int combinationSum4(std::vector<int>& nums, int target)
+    int combinationSum4(vector<int>& nums, int target)
     {
-        std::sort(nums.begin(), nums.end());
+        const int N = nums.size();
 
-        // Memoization map for caching results
-        std::unordered_map<int, int> memo;
+        /* Sort */
+        sort(nums.begin(), nums.end());
 
-        return helper(nums, target, memo);
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        return solve(target, nums);
     }
 
 private:
-    int helper(const std::vector<int>& nums, int target, std::unordered_map<int, int>& memo)
+    int solve(int target, vector<int>& nums)
     {
-        // Check if result is already computed
-        if (memo.find(target) != memo.end())
-            return memo[target];
-
-        // Base cases
         if (target == 0)
             return 1;
 
-        if (target < nums[0])
+        if (target < 0)
             return 0;
 
-        int count = 0;
+        if (memo[target] != -1)
+            return memo[target];
 
-        // Recursively compute combination sums
-        for (int num : nums)
-        {
-            if (target - num < 0)
-                break;
+        int result = 0;
+        for (const int& num : nums)
+            result += solve(target - num, nums);
 
-            count += helper(nums, target - num, memo);
-        }
-
-        // Cache the result
-        memo[target] = count;
-
-        return count;
+        return memo[target] = result;
     }
 };
