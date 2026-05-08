@@ -1,8 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-#include <algorithm>
-
 /*
     ==============
     === MEDIUM ===
@@ -51,35 +46,45 @@
 
 */
 
+#include <vector>
+#include <unordered_map>
+#include <algorithm>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    TODO
+    Similar to coin-change.
 
 */
 
-/* Time  Beats: 100.00% */
-/* Space Beats:  20.17% */
+/* Time  Beats: 37.16% */
+/* Space Beats: 18.15% */
 
-/* Time  Complexity: O(target * n) */
-/* Space Complexity: O(target)     */
-class Solution_Bottom-Up {
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Bottom_Up__Tabulation {
 public:
-    int combinationSum4(std::vector<int>& nums, int target)
+    int combinationSum4(vector<int>& nums, int target)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        const int N = nums.size();
 
-        vector<unsigned int> dp(target + 1, 0);
+        vector<unsigned> dp(target+1, 0);
         dp[0] = 1;
 
-        for (int i = 1; i <= target; i++)
+        /* Sort */
+        sort(nums.begin(), nums.end());
+
+        for (int curr_target = 0; curr_target <= target; curr_target++)
         {
-            for (int num : nums)
+            for (const int& num : nums)
             {
-                if (i - num >= 0)
-                    dp[i] += dp[i - num];
+                if (curr_target - num < 0)
+                    break;
+
+                dp[curr_target] += dp[curr_target - num];
             }
         }
 
@@ -108,8 +113,6 @@ class Solution_Memoization {
 public:
     int combinationSum4(std::vector<int>& nums, int target)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-
         std::sort(nums.begin(), nums.end());
 
         // Memoization map for caching results
