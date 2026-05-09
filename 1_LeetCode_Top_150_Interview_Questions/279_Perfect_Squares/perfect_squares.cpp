@@ -46,6 +46,7 @@
 #include <climits>
 #include <cmath>
 #include <cstring>
+#include <queue>
 #include <vector>
 using namespace std;
 
@@ -65,7 +66,8 @@ using namespace std;
 
 
     From this point on, the problem becomes EQUIVALENT to Problem:
-        322. "Coin Change"
+
+        LeetCode 322: "Coin Change"
 
     "perfect_squares" are "coins", however they are already sorted, so we don't
     have to worry about that.
@@ -169,5 +171,73 @@ private:
         }
 
         return memo[target] = result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Usually when we're looking for "miminum jumps/steps", a BFS approach can
+    be used. Not always though.
+
+*/
+
+/* Time  Beats: 90.61% */
+/* Space Beats: 17.58% */
+
+/* Time  Complexity: O(N * sqrt(N)) */
+/* Space Complexity: O(N)           */
+class Solution_BFS {
+public:
+    int numSquares(int n)
+    {
+        vector<int> dp(n+1, n+1);
+        dp[0] = 0;
+
+        vector<int> perfect_squares;
+        for (int i = 1; i <= n; i++)
+        {
+            int root = sqrt(i);
+
+            if (root * root == i)
+                perfect_squares.push_back(i);
+        }
+
+        queue<int> queue;
+        queue.push(0);
+
+        int level = 1;
+        while ( ! queue.empty())
+        {
+            int size = queue.size();
+            while (size-- > 0)
+            {
+                int node = queue.front();
+                queue.pop();
+
+                for (const int& num : perfect_squares)
+                {
+                    if (node + num > n)
+                        break;
+
+                    if (node + num == n)
+                        return level;
+
+                    if (dp[node + num] == n+1)
+                        queue.push(node + num);
+
+                    dp[node + num] = min(dp[node + num], level);
+                }
+            }
+
+            level++;
+        }
+
+        return 0;
     }
 };
