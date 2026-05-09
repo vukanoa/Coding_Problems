@@ -43,7 +43,9 @@
 
 */
 
+#include <climits>
 #include <cmath>
+#include <cstring>
 #include <vector>
 using namespace std;
 
@@ -75,7 +77,7 @@ using namespace std;
 
 /* Time  Complexity: O(N * sqrt(N)) */
 /* Space Complexity: O(N)           */
-class Solution_Tabulation {
+class Solution_Bottom_Up__Tabulation {
 public:
     int numSquares(int n)
     {
@@ -106,5 +108,66 @@ public:
         }
 
         return dp[n];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above; implemented using Top-Down Memoization technique.
+
+*/
+
+/* Time  Beats: 25.18% */
+/* Space Beats: 87.90% */
+
+/* Time  Complexity: O(N * sqrt(N)) */
+/* Space Complexity: O(N)           */
+class Solution_Top_Down__Memoization {
+private:
+    int memo[10001];
+
+public:
+    int numSquares(int n)
+    {
+        vector<int> perfect_squares;
+        for (int i = 1; i <= n; i++)
+        {
+            int root = sqrt(i);
+
+            if (root * root == i)
+                perfect_squares.push_back(i);
+        }
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        return solve(n, perfect_squares);
+    }
+
+private:
+    int solve(int target, vector<int>& perfect_squares)
+    {
+        if (target == 0)
+            return 0;
+
+        if (memo[target] != -1)
+            return memo[target];
+
+        int result = INT_MAX;
+        for (const int& num : perfect_squares)
+        {
+            if (target - num < 0)
+                break;
+
+            result = min(result, 1 + solve(target - num, perfect_squares));
+        }
+
+        return memo[target] = result;
     }
 };
