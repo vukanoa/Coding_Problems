@@ -1,0 +1,110 @@
+/*
+    ==============
+    === MEDIUM ===
+    ==============
+
+    ===========================
+    279) Perfect Squares
+    ===========================
+
+    ============
+    Description:
+    ============
+
+    Given an integer n, return the least number of perfect square numbers that
+    sum to n.
+
+    A perfect square is an integer that is the square of an integer; in other
+    words, it is the product of some integer with itself. For example:
+        1, 4, 9, and 16 are perfect squares while 3 and 11 are not.
+
+    ================================
+    FUNCTION: int numSquares(int n);
+    ================================
+
+    ==========================================================================
+    ================================ EXAMPLES ================================
+    ==========================================================================
+
+    --- Example 1 ---
+    Input: n = 12
+    Output: 3
+    Explanation: 12 = 4 + 4 + 4.
+
+
+    --- Example 2 ---
+    Input: n = 13
+    Output: 2
+    Explanation: 13 = 4 + 9.
+
+
+    *** Constraints ***
+    1 <= n <= 10^4
+
+*/
+
+#include <cmath>
+#include <vector>
+using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    First find all the perfect squares in first n numbers using the most simple
+    method:
+
+        1. Do a sqrt on number 'i', but make sure you store it in an integer.
+
+        2. Now multiply that integer by itself and if you get number 'i' again,
+           then that means it's a perfect square number.
+           In that case, push it in vector "perfect_squares".
+
+
+    From this point on, the problem becomes EQUIVALENT to Problem:
+        322. "Coin Change"
+
+    "perfect_squares" are "coins", however they are already sorted, so we don't
+    have to worry about that.
+
+*/
+
+/* Time  Beats: 47.04% */
+/* Space Beats: 38.84% */
+
+/* Time  Complexity: O(N * sqrt(N)) */
+/* Space Complexity: O(N)           */
+class Solution_Tabulation {
+public:
+    int numSquares(int n)
+    {
+        const int INFINITE = n+1; // Effectivelly infinite
+
+        /* Generate Perfect-Squares */
+        vector<int> perfect_squares;
+        for (int i = 1; i <= n; i++)
+        {
+            int root = sqrt(i);
+
+            if (root * root == i)
+                perfect_squares.push_back(i);
+        }
+
+        vector<int> dp(n+1, INFINITE);
+        dp[0] = 0;
+
+        for (int i = 1; i <= n; i++)
+        {
+            for (const int& num : perfect_squares)
+            {
+                if (i - num < 0)
+                    break;
+
+                dp[i] = min(dp[i], 1 + dp[i - num]);
+            }
+        }
+
+        return dp[n];
+    }
+};
