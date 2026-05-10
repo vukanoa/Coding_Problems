@@ -178,3 +178,58 @@ public:
         return dp[0] > 0 ? "Alice" : "Bob";
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Standard way of turning a O(N) Space 1D-DP to O(1) Space.
+
+*/
+
+/* Time  Beats: 61.47% */
+/* Space Beats: 94.80% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Bottom_Up__Tabulation__Space_Optimized {
+public:
+    string stoneGameIII(vector<int>& stoneValue)
+    {
+        const int N = stoneValue.size();
+
+        /* PUSH, to prevent special cases */
+        stoneValue.push_back(0);
+        stoneValue.push_back(0);
+
+        int next_next_next = 0;
+        int next_next      = 0;
+        int next           = stoneValue[N-1];
+
+        for (int i = N-2; i >= 0; i--)
+        {
+            int take_first_one   = stoneValue[i + 0]                                         - next;
+            int take_first_two   = stoneValue[i + 0] + stoneValue[i + 1]                     - next_next;
+            int take_first_three = stoneValue[i + 0] + stoneValue[i + 1] + stoneValue[i + 2] - next_next_next;
+
+            int curr = max( {take_first_one, take_first_two, take_first_three} );
+
+            next_next_next = next_next;
+            next_next      = next;
+            next           = curr;
+        }
+
+        /* POP, to restore original Input state */
+        stoneValue.pop_back();
+        stoneValue.pop_back();
+
+        if (next == 0)
+            return "Tie";
+
+        return next > 0 ? "Alice" : "Bob";
+    }
+};
