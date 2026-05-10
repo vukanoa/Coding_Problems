@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === HARD ===
@@ -78,6 +75,62 @@
 
 */
 
+#include <climits>
+#include <string>
+#include <vector>
+#include <algorithm> // To prevent my LSP complaining about initializer_list
+using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Classic "Bottom-Up Tabulation" Dynamic Programming technique.
+
+*/
+
+/* Time  Beats: 66.21% */
+/* Space Beats: 80.45% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Bottom_Up__Tabulation {
+public:
+    string stoneGameIII(vector<int>& stoneValue)
+    {
+        const int N = stoneValue.size();
+
+        vector<int> dp(N+2, INT_MIN);
+        dp[N+1] = 0;
+        dp[N  ] = 0;
+        dp[N-1] = stoneValue[N-1];
+
+        for (int i = N-2; i >= 0; i--)
+        {
+            int curr_sum = 0;
+
+            // j = 0   (Take first                      stone starting at index i)
+            // j = 1   (Take first and second           stone starting at index i)
+            // j = 2   (Take first and second and third stone starting at index i)
+            for (int j = 0; j < 3; j++)
+            {
+                curr_sum += (i + j >= N) ? 0 : stoneValue[i + j];
+
+                dp[i] = max(dp[i], curr_sum - dp[i + j + 1]);
+            }
+        }
+
+        if (dp[0] == 0)
+            return "Tie";
+
+        return dp[0] > 0 ? "Alice" : "Bob";
+    }
+};
+
+
+
+
 /*
     ------------
     --- IDEA ---
@@ -90,31 +143,38 @@
 /* Time  Beats: 98.18% */
 /* Space Beats: 97.23% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Bottom_Up__Tabulation__Fancy_Space_Optimized {
 public:
     string stoneGameIII(vector<int>& stoneValue)
     {
-        vector<int> buffer(4);
+        vector<int> dp(4);
         const int N = stoneValue.size();
 
         // Apend two zeros at the end to avoid boundary check on every loop.
         stoneValue.push_back(0);
         stoneValue.push_back(0);
-        for (int i = N - 1; i >= 0; --i)
-        {
-            int one = stoneValue[i];
-            int two = one + stoneValue[i + 1];
-            int three = two + stoneValue[i + 2];
 
-            buffer[i & 3] = std::max({
-                                one - buffer[(i + 1) & 3],
-                                two - buffer[(i + 2) & 3],
-                                three - buffer[(i + 3) & 3]
-                            });
+        for (int i = N-1; i >= 0; i--)
+        {
+            int one   = stoneValue[i];
+            int two   = stoneValue[i] + stoneValue[i + 1];
+            int three = stoneValue[i] + stoneValue[i + 1] + stoneValue[i + 2];
+
+            dp[i & 3] = max( {one   - dp[(i + 1) & 3],
+                              two   - dp[(i + 2) & 3],
+                              three - dp[(i + 3) & 3]
+                             });
         }
 
-        return buffer[0] > 0 ? "Alice" : buffer[0] == 0 ? "Tie" : "Bob";
+        // Restore original Input
+        stoneValue.pop_back();
+        stoneValue.pop_back();
+
+        if (dp[0] == 0)
+            return "Tie";
+
+        return dp[0] > 0 ? "Alice" : "Bob";
     }
 };
