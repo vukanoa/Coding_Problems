@@ -167,3 +167,42 @@ public:
         return dp[n-1];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Complexity: O(min(m, n)) */
+/* Space Complexity: O(1)         */
+class Solution_Math {
+public:
+    int uniquePaths(int m, int n)
+    {
+        if (m == 1 || n == 1)
+            return 1;
+
+        if (m < n)
+            swap(m, n);
+
+        int result = 1;
+
+        int divisor_idx = 1;
+        for (int numerator_idx = m; numerator_idx < (m + n - 1); numerator_idx++)
+        {
+            result *= numerator_idx;
+            result /= divisor_idx;
+
+            divisor_idx++;
+        }
+
+        return result;
+    }
+};
