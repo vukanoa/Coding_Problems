@@ -233,3 +233,247 @@ public:
         return next > 0 ? "Alice" : "Bob";
     }
 };
+
+
+
+
+/*
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------   DISCLAIMER   --------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+
+    There are 4 "Memoization" Solutions down below.
+
+    First  two Solutions will give TLE(Time Limit Exceeded) on LeetCode.
+    Second two Solutions will pass.
+
+    All 4 of them use CORRECT Memoization technique, however the reason I am
+    including all 4 of them is to emphasize the sheer nuance that'll make a
+    Memoization Solution work or give a TLE.
+
+    It will also solidify your knowledge of Time Complexity and "what counts"
+    as an "expensive" computation.
+
+    It is beneficial to read all of them in order.
+
+*/
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_TLE__Top_Down__Memoization { // Give TLE
+private:
+    static constexpr int MAX_SIZE = 5 * 1e5;
+    int memo[MAX_SIZE + 4];
+
+public:
+    string stoneGameIII(vector<int>& stoneValue)
+    {
+        const int N = stoneValue.size();
+
+        /* Initialize */
+        fill(begin(memo), end(memo), INT_MIN);
+
+        /* PUSH, to prevent special cases */
+        stoneValue.push_back(0);
+        stoneValue.push_back(0);
+
+        /* Solve */
+        int result = solve(0, stoneValue, N);
+
+        /* POP, to restore original Input state */
+        stoneValue.pop_back();
+        stoneValue.pop_back();
+
+        if (result == 0)
+            return "Tie";
+
+        return result > 0 ? "Alice" : "Bob";
+    }
+
+private:
+    int solve(int idx, vector<int>& stoneValue, const int& N)
+    {
+        if (idx >= N)
+            return 0;
+
+        if (idx == N-1)
+            return stoneValue[N-1];
+
+        if (memo[idx] != INT_MIN)
+            return memo[idx];
+
+        int take_one   = stoneValue[idx]                                             - solve(idx + 1, stoneValue, N);
+        int take_two   = stoneValue[idx] + stoneValue[idx + 1]                       - solve(idx + 2, stoneValue, N);
+        int take_three = stoneValue[idx] + stoneValue[idx + 1] + stoneValue[idx + 2] - solve(idx + 3, stoneValue, N);
+
+        return memo[idx] = max( {take_one, take_two, take_three} );
+    }
+};
+
+
+
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_TLE__Top_Down__Memoization_2 { // Gives TLE
+private:
+    static constexpr int MAX_SIZE = 5 * 1e5;
+    int memo[MAX_SIZE + 4];
+
+public:
+    string stoneGameIII(vector<int>& stoneValue)
+    {
+        const int N = stoneValue.size();
+
+        /* Initialize */
+        fill(begin(memo), end(memo), INT_MIN);
+
+        /* Solve */
+        int result = solve(0, stoneValue, N);
+
+        if (result == 0)
+            return "Tie";
+
+        return result > 0 ? "Alice" : "Bob";
+    }
+
+private:
+    int solve(int idx, vector<int>& stoneValue, const int& N)
+    {
+        if (idx >= N)
+            return 0;
+
+        if (idx == N-1)
+            return stoneValue[N-1];
+
+        if (memo[idx] != INT_MIN)
+            return memo[idx];
+
+        int first_one   = stoneValue[idx];
+        int first_two   = first_one + ((idx + 1 >= N) ? 0 : stoneValue[idx + 1]);
+        int first_three = first_two + ((idx + 2 >= N) ? 0 : stoneValue[idx + 2]);
+
+        int take_one   = first_one   - solve(idx + 1, stoneValue, N);
+        int take_two   = first_two   - solve(idx + 2, stoneValue, N);
+        int take_three = first_three - solve(idx + 3, stoneValue, N);
+
+        return memo[idx] = max( {take_one, take_two, take_three} );
+    }
+};
+
+
+
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Working__Top_down_Memoization_1 { // Works
+private:
+    static constexpr int MAX_SIZE = 5 * 1e5;
+    int memo[MAX_SIZE + 4];
+
+public:
+    string stoneGameIII(vector<int>& stoneValue)
+    {
+        const int N = stoneValue.size();
+
+        /* Initialize */
+        fill(begin(memo), end(memo), INT_MIN);
+
+        /* Solve */
+        int result = solve(0, stoneValue, N);
+
+        if (result == 0)
+            return "Tie";
+
+        return result > 0 ? "Alice" : "Bob";
+    }
+
+private:
+    int solve(int idx, vector<int>& stoneValue, const int& N)
+    {
+        if (idx >= N)
+            return 0;
+
+        if (idx == N-1)
+            return stoneValue[N-1];
+
+        if (memo[idx] != INT_MIN)
+            return memo[idx];
+
+        int result = INT_MIN;
+
+        int curr_sum = 0;
+        curr_sum += idx + 0 >= N ? 0 : stoneValue[idx];
+        result = max(result, curr_sum - solve(idx + 1, stoneValue, N));
+
+        curr_sum += idx + 1 >= N ? 0 : stoneValue[idx + 1];
+        result = max(result, curr_sum - solve(idx + 2, stoneValue, N));
+
+        curr_sum += idx + 2 >= N ? 0 : stoneValue[idx + 2];
+        result = max(result, curr_sum - solve(idx + 3, stoneValue, N));
+
+        return memo[idx] = result;
+    }
+};
+
+
+
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Working__Top_Down__Memoization_2 { // Works
+private:
+    static constexpr int MAX = 5 * 1e5;
+    int memo[MAX + 4];
+
+public:
+    string stoneGameIII(vector<int>& stoneValue)
+    {
+        const int N = stoneValue.size();
+
+        /* Initialize */
+        fill(begin(memo), end(memo), INT_MIN);
+
+        /* Solve */
+        int result = solve(0, stoneValue);
+
+        if (result == 0)
+            return "Tie";
+
+        return result > 0 ? "Alice" : "Bob";
+    }
+
+private:
+    int solve(int idx, vector<int>& stoneValue)
+    {
+        const int N = stoneValue.size();
+
+        if (idx >= N)
+            return 0;
+
+        if (idx == N-1)
+            return stoneValue[N-1];
+
+        if (memo[idx] != INT_MIN)
+            return memo[idx];
+
+        int result = INT_MIN;
+        int curr_sum = 0;
+
+        // j = 0   (Take first                      stone starting at index i)
+        // j = 1   (Take first and second           stone starting at index i)
+        // j = 2   (Take first and second and third stone starting at index i)
+        for (int j = 0; j < 3; j++)
+        {
+            curr_sum += (idx + j >= N) ? 0 : stoneValue[idx + j];
+
+            result = max(result, curr_sum - solve(idx + j + 1, stoneValue));
+        }
+
+        return memo[idx] = result;
+    }
+};
