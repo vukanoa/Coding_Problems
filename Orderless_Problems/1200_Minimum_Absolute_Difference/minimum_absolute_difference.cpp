@@ -56,6 +56,7 @@
 
 #include <algorithm>
 #include <climits>
+#include <cstdint>
 #include <vector>
 using namespace std;
 
@@ -98,6 +99,86 @@ public:
             if (curr_diff == min_diff)
             {
                 result.push_back( {arr[i], arr[i+1]} );
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Complexity: O(N + RANGE) */
+/* Space Complexity: O(RANGE / 8) */
+class Solution_Bitwise {
+public:
+    vector<vector<int>> minimumAbsDifference(vector<int>& arr)
+    {
+        static constexpr int ONE_MILLION = 1'000'000; // -1e6 <= arr[i] <= 1e6
+        static constexpr int RANGE       = ONE_MILLION * 2 + 1;
+        static constexpr int BYTE_COUNT  = (RANGE + 7) / 8;
+
+        uint8_t bitset[BYTE_COUNT] = {0};
+
+        for (const int& num : arr)
+        {
+            int shifted = num + ONE_MILLION;
+
+            int idx = shifted / 8;
+            int bit = shifted % 8;
+
+            bitset[idx] |= (1 << (7 - bit));
+        }
+
+        bool have_prev = false;
+
+        int min_diff  = INT_MAX;
+        int prev_elem = 0;
+
+        for (int curr_shifted_elem = 0; curr_shifted_elem < RANGE; curr_shifted_elem++)
+        {
+            int idx = curr_shifted_elem / 8;
+            int bit = curr_shifted_elem % 8;
+
+            if (bitset[idx] & (1 << (7 - bit)))
+            {
+                int curr_elem = curr_shifted_elem - ONE_MILLION;
+
+                if (have_prev)
+                    min_diff = min(min_diff, curr_elem - prev_elem);
+
+                prev_elem = curr_elem;
+                have_prev = true;
+            }
+        }
+
+        vector<vector<int>> result;
+        have_prev = false;
+
+        for (int curr_shifted_elem = 0; curr_shifted_elem < RANGE; curr_shifted_elem++)
+        {
+            int idx = curr_shifted_elem / 8;
+            int bit = curr_shifted_elem % 8;
+
+            if (bitset[idx] & (1 << (7 - bit)))
+            {
+                int curr_elem = curr_shifted_elem - ONE_MILLION;
+
+                if (have_prev && curr_elem - prev_elem == min_diff)
+                    result.push_back({prev_elem, curr_elem});
+
+                prev_elem = curr_elem;
+                have_prev = true;
             }
         }
 
