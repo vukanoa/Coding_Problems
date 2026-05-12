@@ -398,8 +398,68 @@ public:
     --- IDEA ---
     ------------
 
-    Same idea as above, however instead of using "Bottom Up Tabulation"
+    If you look closely at the Solution above, you'll realize that we ONLY ever
+    work with the current and one row below the current one.
+
+    Therefore, instead of keep an entire 2D matrix, we can keep only last two
+    rows with all of the columns, thus reducing the Space Complexity from O(N *
+    M) down to O(M).
+
+*/
+
+/* Time  Beats: 85.71% */
+/* Space Beats: 93.38% */
+
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(M)     */ // Space Optimized
+class Solution_Bottom_Up__Tabulation__Space_Optimized {
+public:
+    int longestCommonSubsequence(string text1, string text2)
+    {
+        const int N = text1.size();
+        const int M = text2.size();
+
+        vector<vector<int>> dp(2, vector<int>(M+1, 0));
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            for (int j = M-1; j >= 0; j--)
+            {
+                if (text1[i] == text2[j])
+                    dp[i % 2][j] = 1 + dp[(i+1) % 2][j+1]; // Diagonal
+                else
+                    dp[i % 2][j] = max(dp[(i+1) % 2][j  ],  // Down
+                                       dp[ i    % 2][j+1]); // Right
+            }
+        }
+
+        return dp[0][0];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same idea as the first "Bottom Up Tabulation" Solution in this file,
+    however instead of using the aforementioned "Bottom Up Tabulation"
     technique, here we use "Top Down Memoization" technique.
+
+    Also, note that the Memoization Solution CANNOT be Space-optimized to have:
+
+        int memo[2][1001].
+
+    That is very important to understand.
+
+    However, if you can solve a problem using "Bottom-Up Tabulation", then you
+    can also solve it using "Top-Down Memoization technique. And vice-verca.
+
+    That's also very important to understand, as sometimes one technqiue is
+    infinitely times more natural than the other.
 
 */
 
