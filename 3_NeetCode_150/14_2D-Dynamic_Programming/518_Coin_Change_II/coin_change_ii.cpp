@@ -174,3 +174,58 @@ public:
         return dp[N-1][amount];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, though we do NOT need to use a 2D matrix, instead we can
+    use only a 1D DP to obtain the same information.
+
+*/
+
+/* Time  Beats: 75.45% */
+/* Space Beats: 77.70% */
+
+/* Time  Complexity: O(N * amount) */
+/* Space Complexity: O(amount)     */
+class Solution_Bottom_Up__Tabulation__Space_Optimized {
+public:
+    int change(int amount, vector<int>& coins)
+    {
+        const int N = coins.size();
+
+        /* Sort */
+        sort(coins.begin(), coins.end());
+
+        vector<unsigned long long> dp(amount+1, 0ULL);
+        dp[0] = 1ULL;
+
+        /* Initialize 0th row, i.e. num of combinations if use ONLY coins[0] */
+        for (int a = 1; a <= amount; a++)
+        {
+            if ((a - coins[0]) < 0)
+                continue;
+
+            dp[a] = dp[a - coins[0]];
+        }
+
+        /* Solve */
+        for (int i = 1; i < N; i++)
+        {
+            for (int a = 1; a <= amount; a++)
+            {
+                if ((a - coins[i]) < 0)
+                    dp[a] = dp[a];
+                else
+                    dp[a] = dp[a] + dp[a - coins[i]];
+            }
+        }
+
+        return dp[amount];
+    }
+};
