@@ -116,3 +116,61 @@ private:
         return memo[idx][amount] = result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 48.52% */
+/* Space Beats: 13.41% */
+
+/* Time  Complexity: O(N * amount) */
+/* Space Complexity: O(N * amount) */
+class Solution_Bottom_Up__Tabulation {
+public:
+    int change(int amount, vector<int>& coins)
+    {
+        const int N = coins.size();
+
+        /* Sort */
+        sort(coins.begin(), coins.end());
+        
+        vector<vector<unsigned long long>> dp(N, vector<unsigned long long>(amount+1, 0ULL));
+        dp[0][0] = 1ULL;
+
+        /* Initialize 0th row, i.e. num of combinations if use ONLY coins[0] */
+        for (int a = 1; a <= amount; a++)
+        {
+            if ((a - coins[0]) < 0)
+                continue;
+
+            dp[0][a] = dp[0][a - coins[0]];
+        }
+
+        /* Initialize 0th column, i.e. amount=0 */
+        for (int i = 0; i < N; i++)
+            dp[i][0] = 1ULL;
+
+        /* Solve */
+        for (int i = 1; i < N; i++)
+        {
+            for (int a = 1; a <= amount; a++)
+            {
+                if ((a - coins[i]) < 0)
+                    dp[i][a] = dp[i - 1][a];
+                else
+                    dp[i][a] = dp[i - 1][a] + dp[i][a - coins[i]];
+            }
+        }
+
+        return dp[N-1][amount];
+    }
+};
