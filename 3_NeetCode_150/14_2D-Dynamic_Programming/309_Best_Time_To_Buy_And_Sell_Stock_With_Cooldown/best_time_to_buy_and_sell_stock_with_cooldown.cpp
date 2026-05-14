@@ -127,3 +127,56 @@ private:
         return memo[idx][prev_action] = max(skip, take);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as idea above, however this one uses Bottom-Up Tabulation technique
+    instead.
+
+    The logic is, thus, "inverted" in a way.
+
+    Usually, either Top-Down Memoization or Bottom-Up Tabulation is MUCH easier
+    to write.
+
+    For this problem--at least for me--it's MUCH easier to write Memoization.
+    However, it's always beneficial to write both, in order to practice.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  47.76% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Bottom_Up_Tabulation {
+public:
+    int maxProfit(vector<int>& prices)
+    {
+        const int N = prices.size();
+        vector<vector<int>> dp(N+2, vector<int>(3, INT_MIN));
+
+        /* Base case */
+        dp[N][0] = 0;
+        dp[N][1] = 0;
+        dp[N][2] = 0;
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            dp[i][0] = max(    0      + dp[i+1][0],  // Skip
+                           -prices[i] + dp[i+1][1]); // Buy  on this day
+
+            dp[i][1] = max(    0      + dp[i+1][1],  // Skip
+                            prices[i] + dp[i+1][2]); // Sell on this day
+
+            dp[i][2] = dp[i+1][0]; // Today is a cooldown day;
+        }
+
+        return dp[0][0];
+    }
+};
