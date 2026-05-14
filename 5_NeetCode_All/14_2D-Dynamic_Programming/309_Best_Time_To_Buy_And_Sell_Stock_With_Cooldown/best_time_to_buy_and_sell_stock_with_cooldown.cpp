@@ -180,3 +180,49 @@ public:
         return dp[0][0];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  97.72% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Bottom_Up__Tabulation_Space_Optimized {
+public:
+    int maxProfit(vector<int>& prices)
+    {
+        const int N = prices.size();
+
+        int state_neutral   = 0;
+        int state_holding   = 0;
+        int state_cooldown  = 0;
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            int next_neutral    = max(     0   + state_neutral,
+                                    -prices[i] + state_holding);
+
+            int next_holding  = max(     0     + state_holding,
+                                     prices[i] + state_cooldown);
+
+            int next_cooldown = state_neutral;
+
+            state_neutral    = next_neutral;
+            state_holding  = next_holding;
+            state_cooldown = next_cooldown;
+        }
+
+        return state_neutral;
+    }
+};
