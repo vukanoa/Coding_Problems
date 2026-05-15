@@ -75,8 +75,8 @@ using namespace std;
 /* Time  Beats: 59.99% */
 /* Space Beats: 73.56% */
 
-/* Time  Complexity: O(N * abs(target)) */
-/* Space Complexity: O(N * abs(target)) */
+/* Time  Complexity: O(N * sum(target)) */
+/* Space Complexity: O(N * sum(target)) */
 class Solution_Top_Down__Memoization {
 private:
     int memo[21][4001];
@@ -108,5 +108,47 @@ private:
         int take_negative = solve(idx + 1, target + nums[idx], nums);
 
         return memo[idx][target + 2000] = take_positive + take_negative;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is one of those problems where Top-Down Memoization is a MUCH more
+    natural way of solving this problem.
+
+    However, you should ALWAYS do both(as it's ALWAYS possible) to further
+    hone in on your "DP" skills.
+
+*/
+
+/* Time  Beats: 38.71% */
+/* Space Beats:  7.82% */
+
+/* Time  Complexity: O(N * sum(target)) */
+/* Space Complexity: O(N * sum(target)) */
+class Solution_Bottom_Up__Tabulation {
+public:
+    int findTargetSumWays(vector<int>& nums, int target)
+    {
+        const int N = nums.size();
+        vector<vector<int>> dp(N+1, vector<int>(4001, 0));
+        dp[N][0 + 2000] = 1;
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            for (int j = nums[i]; j < 4001; j++)
+                dp[i][j] += dp[i+1][j - nums[i]];
+
+            for (int j = (4001 - 1) - nums[i]; j >= 0; j--)
+                dp[i][j] += dp[i+1][j + nums[i]];
+        }
+
+        return dp[0][target + 2000];
     }
 };
