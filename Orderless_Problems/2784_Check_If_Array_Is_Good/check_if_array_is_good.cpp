@@ -165,6 +165,55 @@ public:
 */
 
 /* Time  Beats: 100.00% */
+/* Space Beats:  49.61% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(M) */ // M <==> Maximum Possible Value in nums
+class Solution_Elegant {
+public:
+    bool isGood(vector<int>& nums)
+    {
+        const int SIZE = nums.size();
+        const int n    = SIZE-1;
+
+        int count = 0;
+        int last_element_count = 0;
+
+        bool arr[201] = {false};
+
+        for (const int& num : nums)
+        {
+            if (num > n)
+                return false;
+
+            if (num == n)
+            {
+                last_element_count++;
+            }
+            else if (arr[num] == false)
+            {
+                arr[num] = true;
+                count++;
+            }
+        }
+
+        return count == SIZE-2 && last_element_count == 2;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
 /* Space Beats:  70.98% */
 
 /* Time  Complexity: O(N) */
