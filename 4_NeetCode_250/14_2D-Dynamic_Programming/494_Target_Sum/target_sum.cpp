@@ -143,12 +143,112 @@ public:
         for (int i = N-1; i >= 0; i--)
         {
             for (int j = nums[i]; j < 4001; j++)
+            {
                 dp[i][j] += dp[i+1][j - nums[i]];
+            }
 
             for (int j = (4001 - 1) - nums[i]; j >= 0; j--)
+            {
                 dp[i][j] += dp[i+1][j + nums[i]];
+            }
         }
 
         return dp[0][target + 2000];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    In the above "Tabulation' Solution we can notice that we're ONLY using the
+    very next dp row, i.e. {i+1), therefore we can optimize Space Complexity
+    from:
+
+        O(N * sum(nums)) --->  O(sum(nums))
+
+    There are multiple ways of impementing this optimization. Here I'm using
+    two arrays that I've allocated on the stack.
+
+    However this first one is much easier to read, but it's a bit less
+    efficient than the 2nd Optimized Solution down below.
+
+    Make sure to read both and understand where does the extra efficacy comes
+    from.
+
+*/
+
+/* Time  Complexity: O(N * sum(nums())) */
+/* Space Complexity: O(sum(nums))       */
+class Solution_Bottom_Up__Tabulation__Space_Optimized_1 {
+public:
+    int findTargetSumWays(vector<int>& nums, int target)
+    {
+        const int N = nums.size();
+
+        int next[4001] = {0};
+        next[0 + 2000] = 1;
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            int curr[4001] = {0};
+
+            for (int j = nums[i]; j < 4001; j++)
+            {
+                curr[j] += next[j - nums[i]];
+            }
+
+            for (int j = (4001 - 1) - nums[i]; j >= 0; j--)
+            {
+                curr[j] += next[j + nums[i]];
+            }
+
+            //    (dst,   src, how_many_bytes)
+            memcpy(next, curr, sizeof(curr));
+        }
+
+        return next[target + 2000];
+    }
+};
+
+/* Time  Complexity: O(N * sum(nums())) */
+/* Space Complexity: O(sum(nums))       */
+class Solution_Bottom_Up__Tabulation__Space_Optimized_2 {
+public:
+    int findTargetSumWays(vector<int>& nums, int target)
+    {
+        const int N = nums.size();
+
+        int dp_next[4001] = {0};
+        int dp_curr[4001] = {0};
+
+        int* next = dp_next;
+        int* curr = dp_curr;
+
+        next[0 + 2000] = 1;
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            /* Memset */
+            memset(curr, 0, sizeof(dp_curr));
+
+            for (int j = nums[i]; j < 4001; j++)
+            {
+                curr[j] += next[j - nums[i]];
+            }
+
+            for (int j = (4001 - 1) - nums[i]; j >= 0; j--)
+            {
+                curr[j] += next[j + nums[i]];
+            }
+
+            swap(curr, next);
+        }
+
+        return next[target + 2000];
     }
 };
