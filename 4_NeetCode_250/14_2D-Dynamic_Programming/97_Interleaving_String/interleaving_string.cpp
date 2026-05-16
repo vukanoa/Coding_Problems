@@ -150,57 +150,60 @@ private:
     ------------
 
     It is very similar to problems such as:
+
         1. Longest Common Subsequence.
         2. Distinct Subsequences
         3. Edit Distance
 
     Here is how the matrix "dp" looks like:
 
-             0      1     2     3     4     5
-            'a'   'a'   'b'   'c'   'c'    ''
+             0     1     2     3     4      5
+            'd'   'b'   'b'   'c'   'a'    ''
           +-----+-----+-----+-----+-----++-----+
-    0 'd' |  T  |  T  |  T  |  F  |  F  ||  F  |
+    0 'a' |  1  |  0  |  0  |  0  |  0  ||  0  |
           +-----+-----+-----+-----+-----++-----+
-    1 'b' |  F  |  F  |  T  |  T  |  F  ||  F  |
+    1 'a' |  1  |  0  |  0  |  0  |  0  ||  0  |
           +-----+-----+-----+-----+-----++-----+
-    2 'b' |  F  |  F  |  T  |  T  |  T  ||  F  |
+    2 'b' |  1  |  1  |  1  |  1  |  1  ||  0  |
           +-----+-----+-----+-----+-----++-----+
-    3 'c' |  F  |  F  |  T  |  F  |  T  ||  F  |
+    3 'c' |  0  |  1  |  1  |  0  |  1  ||  0  |
           +-----+-----+-----+-----+-----++-----+
-    4 'a' |  F  |  F  |  T  |  T  |  T  ||  F  |
+    4 'c' |  0  |  0  |  1  |  1  |  1  ||  1  |
           +=====+=====+=====+=====+=====++=====+
-    6  '' |  F  |  F  |  F  |  F  |  T  ||  T  | <--------
+    6  '' |  0  |  0  |  0  |  0  |  0  ||  1  | <--------
           +-----+-----+-----+-----+-----++-----+         |
                                             ^            |
                                             |            |
                                             ---------  This ONE is ALWAYS true!
 
 
-    Or let me use these:
-        O ==> true
+    For the ease of readiblity:
+
+        X ==> true
         - ==> false
 
     so that it's easier to distinguish one from another.
 
 
-             0      1     2     3     4     5
-            'a'   'a'   'b'   'c'   'c'    ''
+             -     1     2     3     4      5
+            'd'   'b'   'b'   'c'   'a'    ''
           +-----+-----+-----+-----+-----++-----+
-    0 'd' |  O  |  O  |  O  |  -  |  -  ||  -  |
+    - 'a' |  X  |  -  |  -  |  -  |  -  ||  -  |
           +-----+-----+-----+-----+-----++-----+
-    1 'b' |  -  |  -  |  O  |  O  |  -  ||  -  |
+    X 'a' |  X  |  -  |  -  |  -  |  -  ||  -  |
           +-----+-----+-----+-----+-----++-----+
-    2 'b' |  -  |  -  |  O  |  O  |  O  ||  -  |
+    2 'b' |  X  |  X  |  X  |  X  |  X  ||  -  |
           +-----+-----+-----+-----+-----++-----+
-    3 'c' |  -  |  -  |  O  |  -  |  O  ||  -  |
+    3 'c' |  -  |  X  |  X  |  -  |  X  ||  -  |
           +-----+-----+-----+-----+-----++-----+
-    4 'a' |  -  |  -  |  O  |  O  |  O  ||  -  |
+    4 'c' |  -  |  -  |  X  |  X  |  X  ||  X  |
           +=====+=====+=====+=====+=====++=====+
-    6  '' |  -  |  -  |  -  |  -  |  O  ||  O  | <--------
+    6  '' |  -  |  -  |  -  |  -  |  -  ||  X  | <--------
           +-----+-----+-----+-----+-----++-----+         |
                                             ^            |
                                             |            |
                                             ---------  This ONE is ALWAYS true!
+
 
 */
 
@@ -209,65 +212,66 @@ private:
 
 /* Time  Complexity: O(M * N) */
 /* Space Complexity: O(M * N) */
-class Solution {
+class Solution_Bottom_Up__Tabulation {
 public:
     bool isInterleave(string s1, string s2, string s3)
     {
-        if (s1.length() + s2.length() != s3.length())
+        const int N = s1.size();
+        const int M = s2.size();
+        const int K = s3.size();
+
+        if (N + M != K)
             return false;
 
-        int M = s2.length(); // This is easier for me for some reason
-        int N = s1.length();
+        vector<vector<bool>> dp(N+1, vector<bool>(M+1, false));
+        dp[N][M] = true;
 
-        int S3_LEN = s3.length();
-
-        vector<vector<bool>> dp(M+1, vector<bool>(N+1, false));
-
-        /*
-            If both s1 and s2 are empty, s3 is guaranteed to be empty or else
-            we would've return false just upon entering this function.
-
-            So since s1=="" and s2=="" and s3=="", therefore dp[M][N] = true.
-        */
-        dp[M][N] = true;
-
-        // Fill Last Column
-        for (int i = M-1; i >= 0; i--)
+        /* Initialize last ROW */
+        for (int col = M-1; col >= 0; col--)
         {
-            int x_from_the_back_of_s3 = s2.length() - i;
+            int s1_characters = 0;       // Last s1_characters from s1
+            int s2_characters = M - col; // Last s2_characters from s2
 
-            if (s2[i] == s3[S3_LEN - x_from_the_back_of_s3])
-                dp[i][N] = dp[i+1][N];
-            else
-                dp[i][N] = false;
+            int consider_amount = s1_characters + s2_characters;
+
+            bool possible_with_s2 = s2[M - s2_characters] == s3[K - consider_amount];
+
+            dp[N][col] = possible_with_s2 && dp[N][col+1];
         }
 
-        // Fill Last Row
-        for (int j = N-1; j >= 0; j--)
+        /* Initialize last COL */
+        for (int row = N-1; row >= 0; row--)
         {
+            int s1_characters = N - row; // Last s1_characters from s1
+            int s2_characters = 0;       // Last s2_characters from s2
 
-            int x_from_the_back_of_s3 = s1.length() - j;
+            int consider_amount = s1_characters + s2_characters;
 
-            if (s1[j] == s3[S3_LEN - x_from_the_back_of_s3])
-                dp[M][j] = dp[M][j+1];
-            else
-                dp[M][j] = false;
+            bool possible_with_s1 = s1[N - s1_characters] == s3[K - consider_amount];
+
+            dp[row][M] = possible_with_s1 && dp[row+1][M];
         }
 
-        // Start from Bottom Right and go to the Left until >= 0, then Up.
-        for (int i = M-1; i >= 0; i--)
+        /* Solve */
+        for (int row = N-1; row >= 0; row--)
         {
-            for (int j = N-1; j >= 0; j--)
+            for (int col = M-1; col >= 0; col--)
             {
-                int x_from_the_back_of_s3 = s2.length()-i + s1.length()-j;
+                int s1_characters = N - row;
+                int s2_characters = M - col;
 
-                bool can_use_s1 = s1[j] == s3[S3_LEN - x_from_the_back_of_s3];
-                bool can_use_s2 = s2[i] == s3[S3_LEN - x_from_the_back_of_s3];
+                int consider_amount = s1_characters + s2_characters;
 
-                bool possible_using_s1 = can_use_s1 && dp[i  ][j+1];
-                bool possible_using_s2 = can_use_s2 && dp[i+1][j  ];
+                bool possible_with_s1 = s1[N - s1_characters] == s3[K - consider_amount];
+                bool possible_with_s2 = s2[M - s2_characters] == s3[K - consider_amount];
 
-                dp[i][j] = possible_using_s1 | possible_using_s2;
+                dp[row][col] = false;
+
+                if (possible_with_s1)
+                    dp[row][col] = dp[row][col] | (possible_with_s1 && dp[row+1][col  ]);
+
+                if (possible_with_s2)
+                    dp[row][col] = dp[row][col] | (possible_with_s2 && dp[row  ][col+1]);
             }
         }
 
