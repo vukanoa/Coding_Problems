@@ -162,3 +162,45 @@ public:
         return nums[low]; // Or nums[high], it does NOT matter
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is the most elegant, and most efficient of all 3 in this file.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  90.00% */
+
+/* Time  Complexity: O(N) */ // Average: O(logN)
+/* Space Complexity: O(1) */
+class Solution_Efficient_and_Elegant {
+public:
+    int findMin(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        int low  = 0;
+        int high = N - 1;
+
+        while (low < high)
+        {
+            int mid = low + (high - low) / 2;
+
+            if (nums[mid] > nums[high])
+                low = mid + 1;
+            else if (nums[mid] < nums[high])
+                high = mid;
+            else
+                high--;
+        }
+
+        return nums[low]; // Or nums[high], it does NOT matter
+    }
+};
