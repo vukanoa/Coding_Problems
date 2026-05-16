@@ -257,8 +257,8 @@ public:
         {
             for (int col = M-1; col >= 0; col--)
             {
-                int s1_characters = N - row;
-                int s2_characters = M - col;
+                int s1_characters = N - row; // Last s1_characters from s1
+                int s2_characters = M - col; // Last s2_characters from s2
 
                 int consider_amount = s1_characters + s2_characters;
 
@@ -276,5 +276,83 @@ public:
         }
 
         return dp[0][0];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, though this one uses only O(M) extra Space.
+
+*/
+
+/* Time  Beats: 51.23% */
+/* Space Beats: 92.06% */
+
+/* Time  Complexity: O(M * N) */
+/* Space Complexity: O(M)     */
+class Solution_Bottom_Up__Tabulation__Space_Optimized {
+public:
+    bool isInterleave(string s1, string s2, string s3)
+    {
+        const int N = s1.size();
+        const int M = s2.size();
+        const int K = s3.size();
+
+        if (N + M != K)
+            return false;
+
+        vector<bool> dp_next(M+1, false);
+        dp_next[M] = true;
+
+        /* Initialize last ROW */
+        for (int col = M-1; col >= 0; col--)
+        {
+            int s1_characters = 0;       // Last s1_characters from s1
+            int s2_characters = M - col; // Last s2_characters from s2
+
+            int total_chars = s1_characters + s2_characters;
+
+            bool possible_with_s2 = s2[M - s2_characters] == s3[K - total_chars];
+
+            dp_next[col] = possible_with_s2 && dp_next[col+1];
+        }
+
+        /* Solve */
+        for (int row = N-1; row >= 0; row--)
+        {
+            vector<bool> dp_curr(M+1, false);
+            
+            int s1_chars = N - row;
+            bool possible = s1[N - s1_chars] == s3[K - s1_chars];
+
+            dp_curr[M] = possible && dp_next[M];
+
+            for (int col = M-1; col >= 0; col--)
+            {
+                int s1_characters = N - row; // Last s1_characters from s1
+                int s2_characters = M - col; // Last s2_characters from s2
+
+                int total_chars = s1_characters + s2_characters;
+
+                bool possible_with_s1 = s1[N - s1_characters] == s3[K - total_chars];
+                bool possible_with_s2 = s2[M - s2_characters] == s3[K - total_chars];
+
+                if (possible_with_s1)
+                    dp_curr[col] = dp_curr[col] | (possible_with_s1 && dp_next[col  ]);
+
+                if (possible_with_s2)
+                    dp_curr[col] = dp_curr[col] | (possible_with_s2 && dp_curr[col+1]);
+            }
+
+            dp_next = std::move(dp_curr);
+        }
+
+        return dp_next[0];
     }
 };
