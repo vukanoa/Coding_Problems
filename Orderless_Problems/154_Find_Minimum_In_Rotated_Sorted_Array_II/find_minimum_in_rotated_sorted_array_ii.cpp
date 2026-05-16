@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === HARD ===
@@ -35,10 +32,10 @@
 
        This problem is similar to "Find Minimum in Rotated Sorted Array", but
        nums may contain duplicates. Would this affect the runtime complexity?
-       How and why? 
+       How and why?
 
     =========================================
-    FUNCTION: int findMin(vector<int>& nums); 
+    FUNCTION: int findMin(vector<int>& nums);
     =========================================
 
     ==========================================================================
@@ -62,6 +59,9 @@
 
 */
 
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -71,52 +71,94 @@
 
 */
 
-/* Time  Beats: 31.44% */
-/* Space Beats: 95.24% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  27.34% */
 
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(1)        */
-class Solution {
+/* Time  Complexity: O(N) */ // Average: O(logN)
+/* Space Complexity: O(1) */
+class Solution_Binary_Search_Then_Linear_scan {
 public:
     int findMin(vector<int>& nums)
     {
-        int result = INT_MAX;
+        const int N = nums.size();
 
         int low  = 0;
-        int high = nums.size() - 1;
+        int high = N-1;
 
-        while(low <= high)
+        while (low < high)
         {
             int mid = low + (high - low) / 2;
 
-            result = std::min(result, nums[mid]);
-
-            if (nums[low] == nums[mid] and nums[mid] == nums[high])
+            if (nums[low] == nums[mid] && nums[mid] == nums[high])
             {
-                low++;
-                high--;
-                continue;
+                for (int i = low; i <= high; i++)
+                {
+                    if (nums[i] < nums[low])
+                        return nums[i];
+                }
+
+                return nums[low]; // Or nums[high], it does NOT matter
             }
 
-            if(nums[low] < nums[mid])
-            {
-                // left array is sorted
-                if(nums[low] >= nums[high] and nums[mid] > nums[high])
-                    low = mid + 1;
-                else
-                    high = mid - 1;
-
-            }
+            if (nums[mid] > nums[high])
+                low = mid + 1;
             else
-            {
-                // Right array is sorted
-                if (nums[high] <= nums[low] and nums[mid] < nums[low])
-                    high = mid - 1;
-                else
-                    low = mid + 1;
-            }
+                high = mid;
         }
 
-        return result;
+
+        return nums[low]; // Or nums[high], it does NOT matter
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, but written in a slightly different way. Here we FIRST do a
+    linear scan to "get rid of the duplicates" and only then we perform Binary
+    Search, whereas in the Solution_1(up above) we did the opposite--i.e. we
+    first performed Binary Search and once we realized there are duplicates,
+    we started a linear scan.
+
+    It doesn't really matter but it's conceptually different. Depends how you
+    think about it.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  63.69% */
+
+/* Time  Complexity: O(N) */ // Average: O(logN)
+/* Space Complexity: O(1) */
+class Solution_Linear_scan_Then_Binary_Search {
+public:
+    int findMin(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        int last = nums[N-1];
+
+        int low  = 0;
+        int high = N-1;
+
+        while (low < N-1 && nums[low] == last)
+            low++;
+
+        while (low < high)
+        {
+            int mid = low + (high - low) / 2;
+
+            if (nums[mid] > nums[high])
+                low  = mid + 1;
+            else
+                high = mid;
+        }
+
+        return nums[low]; // Or nums[high], it does NOT matter
     }
 };
