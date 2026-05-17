@@ -160,3 +160,58 @@ public:
         return dp[0][0];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 64.13% */
+/* Space Beats: 85.24% */
+
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(2 * M) */
+class Solution_Bottom_Up__Tabulation__Space_Optimized {
+public:
+    int minDistance(string word1, string word2)
+    {
+        const int N = word1.size();
+        const int M = word2.size();
+
+        vector<int> dp_next(M+1, INT_MAX);
+        dp_next[M] = 0;
+
+        /* Initialize last ROW */
+        for (int j = M-1; j >= 0; j--)
+            dp_next[j] = 1 + dp_next[j+1];
+
+        /* Solve */
+        for (int i = N-1; i >= 0; i--)
+        {
+            vector<int> dp_curr(M+1, INT_MAX);
+            dp_curr[M] = N - i;
+
+            for (int j = M-1; j >= 0; j--)
+            {
+                if (word1[i] != word2[j])
+                    dp_curr[j] = 1 + dp_next[j+1]; // Replace in word1 
+                else
+                    dp_curr[j] = 0 + dp_next[j+1]; // Same letters
+
+                dp_curr[j] = min(dp_curr[j], 1 + dp_next[j  ]); // Delete from word1
+                dp_curr[j] = min(dp_curr[j], 1 + dp_curr[j+1]); // Insert in   word2
+            }
+
+            dp_next = std::move(dp_curr);
+        }
+
+        return dp_next[0];
+    }
+};
