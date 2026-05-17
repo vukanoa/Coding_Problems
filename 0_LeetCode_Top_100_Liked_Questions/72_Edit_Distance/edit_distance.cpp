@@ -45,6 +45,7 @@
 #include <cstring>
 #include <string>
 #include <algorithm>
+#include <vector>
 using namespace std;
 
 /*
@@ -103,5 +104,59 @@ private:
         int insert_chr  = 1 + solve(i  , j+1, word1, word2);
 
         return memo[i][j] = min( {replace_chr, delete_chr, insert_chr} );
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 70.83% */
+/* Space Beats: 73.29% */
+
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(N * M) */
+class Solution_Bottom_Up__Tabulation {
+public:
+    int minDistance(string word1, string word2)
+    {
+        const int N = word1.size();
+        const int M = word2.size();
+
+        vector<vector<int>> dp(N+1, vector<int>(M+1, INT_MAX));
+        dp[N][M] = 0;
+
+        /* Initialize last ROW */
+        for (int j = M-1; j >= 0; j--)
+            dp[N][j] = 1 + dp[N][j+1];
+
+        /* Initialize last COL */
+        for (int i = N-1; i >= 0; i--)
+            dp[i][M] = 1 + dp[i+1][M];
+
+        /* Solve */
+        for (int i = N-1; i >= 0; i--)
+        {
+            for (int j = M-1; j >= 0; j--)
+            {
+                if (word1[i] != word2[j])
+                    dp[i][j] = 1 + dp[i+1][j+1]; // Replace in word1 
+                else
+                    dp[i][j] = 0 + dp[i+1][j+1]; // Same letters
+
+                dp[i][j] = min(dp[i][j], 1 + dp[i+1][j  ]); // Delete from word1
+                dp[i][j] = min(dp[i][j], 1 + dp[i  ][j+1]); // Insert in   word2
+            }
+        }
+
+        return dp[0][0];
     }
 };
