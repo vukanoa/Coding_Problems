@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
 /*
     ============
     === HARD ===
@@ -60,113 +56,10 @@
 
 */
 
+#include <functional>
+#include <vector>
+#include <algorithm>
 using namespace std;
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    TODO
-
-    (Classic 2D Dynamic Programming)
-
-*/
-
-/* Time  Beats: 32.85% */
-/* Space Beats: 27.49% */
-
-/* Time  Complexity: O(ROWS * COLS) */
-/* Space Complexity: O(ROWS * COLS) */
-class Solution {
-public:
-    int longestIncreasingPath(vector<vector<int>>& matrix)
-    {
-        const int ROWS = matrix.size();
-        const int COLS = matrix[0].size();
-
-        vector<vector<int>> dp(ROWS, vector(COLS, 0));
-        vector<vector<bool>> visited(ROWS, vector(COLS, false));
-
-        int absolute_longest = 0;
-
-        for (int i = 0; i < ROWS; i++)
-        {
-            for (int j = 0; j < COLS; j++)
-            {
-                if (dp[i][j] > 0)
-                    continue;
-
-                int local_longest = 0;
-
-                visited[i][j] = true;
-
-                int up    = dfs(matrix, i-1, j  , visited, dp, matrix[i][j]);
-                int down  = dfs(matrix, i+1, j  , visited, dp, matrix[i][j]);
-                int left  = dfs(matrix, i  , j-1, visited, dp, matrix[i][j]);
-                int right = dfs(matrix, i  , j+1, visited, dp, matrix[i][j]);
-
-                visited[i][j] = false;
-
-                up    =   up  == 0 ? 0 : up+1;
-                down  = down  == 0 ? 0 : down+1;
-                left  = left  == 0 ? 0 : left+1;
-                right = right == 0 ? 0 : right+1;
-
-                local_longest = max( {1, up, down, left, right} );
-
-                dp[i][j] = local_longest;
-
-                absolute_longest = max(absolute_longest, dp[i][j]);
-            }
-        }
-
-        return absolute_longest;
-    }
-
-private:
-    int dfs(vector<vector<int>>& matrix,
-            int i,
-            int j,
-            vector<vector<bool>>& visited,
-            vector<vector<int>>& dp,
-            int prev)
-    {
-        const int ROWS = matrix.size();
-        const int COLS = matrix[0].size();
-
-        if (i < 0 || j < 0 || i == ROWS || j == COLS || visited[i][j] || prev <= matrix[i][j])
-            return 0;
-
-        if (dp[i][j] > 0)
-            return dp[i][j];
-
-        int local_longest = 0;
-
-        visited[i][j] = true;
-
-        int up    = dfs(matrix, i-1, j  , visited, dp, matrix[i][j]);
-        int down  = dfs(matrix, i+1, j  , visited, dp, matrix[i][j]);
-        int left  = dfs(matrix, i  , j-1, visited, dp, matrix[i][j]);
-        int right = dfs(matrix, i  , j+1, visited, dp, matrix[i][j]);
-
-        visited[i][j] = false;
-
-        up    =   up  == 0 ? 0 : up+1;
-        down  = down  == 0 ? 0 : down+1;
-        left  = left  == 0 ? 0 : left+1;
-        right = right == 0 ? 0 : right+1;
-
-        local_longest = max( {1, up, down, left, right} );
-
-        dp[i][j] = local_longest;
-
-        return dp[i][j];
-    }
-};
-
-
-
 
 /*
     ------------
