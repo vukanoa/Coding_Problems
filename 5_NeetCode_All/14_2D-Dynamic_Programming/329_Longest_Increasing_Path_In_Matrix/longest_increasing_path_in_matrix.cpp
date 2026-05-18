@@ -18,9 +18,9 @@
     down. You may not move diagonally or move outside the boundary (i.e.,
     wrap-around is not allowed).
 
-    ===============================
-    FUNCTION:
-    ===============================
+    =================================================================
+    FUNCTION: int longestIncreasingPath(vector<vector<int>>& matrix);
+    =================================================================
 
     ==========================================================================
     ================================ EXAMPLES ================================
@@ -56,7 +56,7 @@
 
 */
 
-#include <functional>
+#include <cstring>
 #include <vector>
 #include <algorithm>
 using namespace std;
@@ -66,58 +66,62 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    Same as above, the only difference is that the above Solution is written
-    more explicitly.
-
-    For example it has both visited and dp, whereas here we only has dp, but if
-    dp[i][j] = -1, it measn that it's NOT visited.
-
-    It's easier to read the above Solution.
+    TODO
 
 */
 
-/* Time  Beats: 26.73% */
-/* Space Beats: 31.87% */
+/* Time  Beats: 12.80% */
+/* Space Beats: 90.04% */
 
 /* Time  Complexity: O(ROWS * COLS) */
 /* Space Complexity: O(ROWS * COLS) */
-class Solution_Concise {
+class Solution_Top_Down__Memoization {
+private:
+    int memo[201][201];
+
 public:
     int longestIncreasingPath(vector<vector<int>>& matrix)
     {
-        int ROWS = matrix.size();
-        int COLS = matrix[0].size();
+        const int ROWS = matrix.size();
+        const int COLS = matrix[0].size();
+        int result = 0;
 
-        vector<vector<int>> dp(ROWS, vector<int>(COLS, -1));
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
 
-        function<int(int, int, int)> dfs = [&](int r, int c, int prev)
+        for (int row = 0; row < 201; row++)
         {
-            if (r < 0 || r == ROWS || c < 0 || c == COLS || matrix[r][c] <= prev)
-                return 0;
-
-            if (dp[r][c] != -1)
-                return dp[r][c];
-
-            int result = 1;
-            result = max(result, 1 + dfs(r+1, c  , matrix[r][c]));
-            result = max(result, 1 + dfs(r-1, c  , matrix[r][c]));
-            result = max(result, 1 + dfs(r  , c+1, matrix[r][c]));
-            result = max(result, 1 + dfs(r  , c-1, matrix[r][c]));
-
-            dp[r][c] = result;
-
-            return result;
-        };
-
-        int longest_path = 0;
-        for (int r = 0; r < ROWS; r++)
-        {
-            for (int c = 0; c < COLS; c++)
+            for (int col = 0; col < 201; col++)
             {
-                longest_path = max(longest_path, dfs(r, c, -1));
+                result = max(result, solve(row, col, -1, matrix));
             }
         }
 
-        return longest_path;
+        return result;
+    }
+
+private:
+    int solve(int row, int col, int prev_value, vector<vector<int>>& matrix)
+    {
+        const int ROWS = matrix.size();
+        const int COLS = matrix[0].size();
+
+        if (row < 0 || col < 0 || row >= ROWS || col >= COLS)
+            return 0;
+
+        if (matrix[row][col] <= prev_value)
+            return 0;
+
+        if (memo[row][col] != -1)
+            return memo[row][col];
+
+
+        /* Signing Cross */
+        int up    = solve(row-1, col  , matrix[row][col], matrix);
+        int down  = solve(row+1, col  , matrix[row][col], matrix);
+        int left  = solve(row  , col-1, matrix[row][col], matrix);
+        int right = solve(row  , col+1, matrix[row][col], matrix);
+
+        return memo[row][col] = 1 + max( {up, down, left, right} );
     }
 };
