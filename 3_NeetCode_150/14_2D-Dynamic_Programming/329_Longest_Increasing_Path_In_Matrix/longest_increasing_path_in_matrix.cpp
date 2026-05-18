@@ -57,6 +57,7 @@
 */
 
 #include <cstring>
+#include <queue>
 #include <vector>
 #include <algorithm>
 using namespace std;
@@ -123,5 +124,107 @@ private:
         int right = solve(row  , col+1, matrix[row][col], matrix);
 
         return memo[row][col] = 1 + max( {up, down, left, right} );
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We can think of the matrix as a directed graph.
+
+    Edges should go SMALLER to LARGER, and thus the graph has NO cycles,
+    therefore it's a DAG.
+
+    In a DAG, the longest path length can be found using Topological Sort.
+    Kahn’s algorithm (BFS with indegrees) processes nodes level by level
+
+*/
+
+/* Time  Beats: 63.21% */
+/* Space Beats: 28.51% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
+class Solution__Topological_Kahn_Algorithm {
+public:
+    int longestIncreasingPath(vector<vector<int>>& matrix)
+    {
+        const int ROWS = matrix.size();
+        const int COLS = matrix[0].size();
+
+        vector<vector<int>> indegree(ROWS, vector<int>(COLS, 0));
+
+        /* Singing Cross: Up-Down-Left-RIght */
+        vector<vector<int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                for (const auto& dir : directions)
+                {
+                    int new_row = row + dir[0];
+                    int new_col = col + dir[1];
+
+                    if (new_row < 0 || new_col < 0 || new_row >= ROWS || new_col >= COLS)
+                        continue;
+
+                    if (matrix[row][col] <= matrix[new_row][new_col])
+                        continue;
+
+                    indegree[new_row][new_col]++;
+                }
+            }
+        }
+
+        queue<pair<int, int>> queue;
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                if (indegree[row][col] == 0)
+                {
+                    queue.push( {row, col} );
+                }
+            }
+        }
+
+        int result = 0;
+        while ( ! queue.empty())
+        {
+            int size = queue.size();
+
+            for (int i = 0; i < size; i++)
+            {
+                auto [row, col] = queue.front();
+                queue.pop();
+
+                for (const auto& dir : directions)
+                {
+                    int new_row = row + dir[0];
+                    int new_col = col + dir[1];
+
+                    if (new_row < 0 || new_col < 0 || new_row >= ROWS || new_col >= COLS)
+                        continue;
+
+                    if (matrix[row][col] <= matrix[new_row][new_col])
+                        continue;
+
+                    indegree[new_row][new_col]--;
+
+                    if (indegree[new_row][new_col] == 0)
+                        queue.push( {new_row, new_col} );
+                }
+            }
+
+            result++;
+        }
+
+        return result;
     }
 };
