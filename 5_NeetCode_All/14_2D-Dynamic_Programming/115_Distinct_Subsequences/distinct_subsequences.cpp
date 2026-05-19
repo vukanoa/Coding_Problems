@@ -163,23 +163,25 @@ private:
         Input: s = "rabbbit", t = "rabbit"
         Output: 3
 
-             0     1     2     3     4     5     6      7
-            'r'   'a'   'b'   'b'   'b'   'i'   't'    ''
-          +-----+-----+-----+-----+-----+-----+-----++-----+
-    0 'r' |  3  |  0  |  0  |  0  |  0  |  0  |  0  ||  0  |
-          +-----+-----+-----+-----+-----+-----+-----++-----+
-    1 'a' |  3  |  3  |  0  |  0  |  0  |  0  |  0  ||  0  |
-          +-----+-----+-----+-----+-----+-----+-----++-----+
-    2 'b' |  3  |  3  |  3  |  1  |  0  |  0  |  0  ||  0  |
-          +-----+-----+-----+-----+-----+-----+-----++-----+
-    3 'b' |  3  |  3  |  3  |  2  |  1  |  0  |  0  ||  0  |
-          +-----+-----+-----+-----+-----+-----+-----++-----+
-    4 'i' |  1  |  1  |  1  |  1  |  1  |  1  |  0  ||  0  |
-          +-----+-----+-----+-----+-----+-----+-----++-----+
-    5 't' |  1  |  1  |  1  |  1  |  1  |  1  |  1  ||  0  |
-          +=====+=====+=====+=====+=====+=====+=====++=====+
-    6 ''  |  1  |  1  |  1  |  1  |  1  |  1  |  1  ||  1  |
-          +-----+-----+-----+-----+-----+-----+-----++-----+
+             0     1     2     3     4     5      6
+            'r'   'a'   'b'   'b'   'i'   't'    ''
+          +-----+-----+-----+-----+-----+-----++-----+
+    0 'r' |  3  |  3  |  3  |  3  |  1  |  1  ||  1  |
+          +-----+-----+-----+-----+-----+-----++-----+
+    1 'a' |  0  |  3  |  3  |  3  |  1  |  1  ||  1  |
+          +-----+-----+-----+-----+-----+-----++-----+
+    2 'b' |  0  |  0  |  3  |  3  |  1  |  1  ||  1  |
+          +-----+-----+-----+-----+-----+-----++-----+
+    3 'b' |  0  |  0  |  1  |  2  |  1  |  1  ||  1  |
+          +-----+-----+-----+-----+-----+-----++-----+
+    4 'b' |  0  |  0  |  0  |  1  |  1  |  1  ||  1  |
+          +-----+-----+-----+-----+-----+-----++-----+
+    5 'i' |  0  |  0  |  0  |  0  |  1  |  1  ||  1  |
+          +-----+-----+-----+-----+-----+-----++-----+
+    6 't' |  0  |  0  |  0  |  0  |  0  |  1  ||  1  |
+          +=====+=====+=====+=====+=====+=====++=====+
+    7 ''  |  0  |  0  |  0  |  0  |  0  |  0  ||  1  |
+          +-----+-----+-----+-----+-----+-----++-----+
 
 
 
@@ -189,22 +191,31 @@ private:
         Input: s = "babgbag", t = "bag"
         Output: 5
 
-             0     1     2     3     4     5     6      7
-            'b'   'a'   'b'   'g'   'b'   'a'   'g'    ''
-          +-----+-----+-----+-----+-----+-----+-----++-----+
-    0 'b' |  5  |  2  |  2  |  1  |  1  |  0  |  0  ||  0  |
-          +-----+-----+-----+-----+-----+-----+-----++-----+
-    1 'a' |  3  |  3  |  1  |  1  |  1  |  1  |  0  ||  0  |
-          +-----+-----+-----+-----+-----+-----+-----++-----+
-    2 'g' |  2  |  2  |  2  |  2  |  1  |  1  |  1  ||  0  |
-          +=====+=====+=====+=====+=====+=====+=====++=====+
-    6 ''  |  1  |  1  |  1  |  1  |  1  |  1  |  1  ||  1  |
-          +-----+-----+-----+-----+-----+-----+-----++-----+
+             0     1     2      3
+            'b'   'a'   'g'    ''
+          +-----+-----+-----++-----+
+    0 'b' |  5  |  3  |  2  ||  1  |
+          +-----+-----+-----++-----+
+    1 'a' |  2  |  3  |  2  ||  1  |
+          +-----+-----+-----++-----+
+    2 'b' |  2  |  1  |  2  ||  1  |
+          +-----+-----+-----++-----+
+    3 'g' |  1  |  1  |  2  ||  1  |
+          +-----+-----+-----++-----+
+    4 'b' |  1  |  1  |  1  ||  1  |
+          +-----+-----+-----++-----+
+    5 'a' |  0  |  1  |  1  ||  1  |
+          +-----+-----+-----++-----+
+    6 'g' |  0  |  0  |  1  ||  1  |
+          +=====+=====+=====++=====+
+    7 ''  |  0  |  0  |  0  ||  1  |
+          +-----+-----+-----++-----+
 
 
-    First we fill the very last row with 1's because if t is an empty string
-    then whatever happens to be in the string s, we know that the maximum
-    number of distinct subsequences is 1. (Omit all character in the string s).
+    First we fill the very last column with 1's because if t is an empty
+    string then whatever happens to be in the string s, we know that the
+    maximum number of distinct subsequences is 1.
+    (Omit all character in the string s).
 
     However, if the opposite is the case then that means that the maximum
     number of distinct subsequences is 0. Why?
@@ -213,8 +224,8 @@ private:
         s = "bc"
         t = "abc"
 
-    There is nothing we can do to string s to make it be equal to t(adding is
-    not allow, this is not "Edit Distance" Problem).
+    There is NOTHING we can do to string s to make it be equal to t(adding is
+    not allowed, this is not "Edit Distance" Problem).
 
     So then if:
         s = ""
@@ -222,45 +233,55 @@ private:
 
     Then the answer is 0.
 
-    Since this matrix "dp" is of size (M+1) * (N+1) we are strating from:
-        i = M
-        j = N
+    Since this matrix "dp" is of size (N+1) * (M+1) we are strating from:
+        row = N
+        col = M
 
     Since we have already computed the very last row and the very last column.
 
     So we are starting at that position and we are going backwards(left) within
-    the Rows and then backwards(up) once the Rows is finished.
+    the COLUMNS and then backwards(up) once the entire current ROW is finished.
 
     This is the main point:
-        if (t[i] == s[j]) // Remember that i is the Row and M == t.length()!!
-            dp[i][j] = Right + Diagonal
+        if (s[row] == t[col])
+            dp[row][col] = Down + Diagonal
         else
-            dp[i][j] = Right only
+            dp[row][col] = Down only
 
     Make sure to understand what this means.
 
-    If we are at certain position 'i' that means that we're considering string
-    s being equal to the substring from that position untli the end.
+    If we are at certain position 'row' that means that we're considering
+    string s being equal to the substring from that position untli the end.
 
-             0     1     2     3     4     5     6      7
-            'b'   'a'   'b'   'g'   'b'   'a'   'g'    ''
-          +-----+-----+-----+-----+-----+-----+-----++-----+
-    0 'b' |  5  |  2  |  2  |  1  |  1  |  0  |  0  ||  0  |
-          +-----+-----+-----+-----+-----+-----+-----++-----+
-    1 'a' |  3  |  3  |  1  |  1  |  1  |  1  |  0  ||  0  |
-          +-----+-----+-----+-----+-----+-----+-----++-----+
-    2 'g' |  2  |  2  |  2  |  2  |  1  |  1  |  1  ||  0  |
-          +=====+=====+=====+=====+=====+=====+=====++=====+
-    6 ''  |  1  |  1  |  1  |  1  |  1  |  1  |  1  ||  1  |
-          +-----+-----+-----+-----+-----+-----+-----++-----+
+             0     1     2      3
+            'b'   'a'   'g'    ''
+          +-----+-----+-----++-----+
+    0 'b' |  5  |  3  |  2  ||  1  |
+          +-----+-----+-----++-----+
+    1 'a' |  2  |  3  |  2  ||  1  |
+          +-----+-----+-----++-----+
+    2 'b' |  2  |  1  |  2  ||  1  |
+          +-----+-----+-----++-----+
+    3 'g' |  1  |  1  |  2  ||  1  |
+          +-----+-----+-----++-----+
+    4 'b' |  1  |  1  |  1  ||  1  |
+          +-----+-----+-----++-----+
+    5 'a' |  0  |  1  |  1  ||  1  |
+          +-----+-----+-----++-----+
+    6 'g' |  0  |  0  |  1  ||  1  |
+          +=====+=====+=====++=====+
+    7 ''  |  0  |  0  |  0  ||  1  |
+          +-----+-----+-----++-----+
 
     Each cell represents one subproblem.
-    i determines what substring out of string s, we are looking right now.
-    j determines what substring out of string t, we are looking right now.
+    row determines what substring out of string s, we are looking right now.
+    col determines what substring out of string t, we are looking right now.
 
-    Let's say that i == 3. That means subtring of s we're considering is "gbag"
+    Let's say that row == 3. That means subtring of s we're considering is
+    "gbag"
 
-    Let's say that j == 1. That means substring of t we're considering is "ag"
+    Let's say that col == 1. That means substring of t we're considering is
+    "ag"
 
     So what does that mean?
 
@@ -320,7 +341,8 @@ private:
         s = "bit"  (notice how the first 'b' isn't there anymore)
         t = "it"   (notuce how the first 'b' isn't there anymore)
 
-    And we have to add those two answers together and store it in out dp[i][j].
+    And we have to add those two answers together and store it in out
+    dp[row][col].
 
 
     But how do we get the answer of this subproblem:
@@ -333,43 +355,45 @@ private:
 
 
     Well, you can see that the answer you're looking for is:
-        Diagonally ==> (i+1, j+1)
+        Diagonally ==> (row+1, col+1)
 
 
     That's why we do:
-        if (t[i] == s[j])
-            dp[i][j] = dp[i][j+1] + dp[i+1][j+1];
+        if (s[row] == t[col])
+            dp[row][col] = dp[row+1][col] + dp[row+1][col+1];
         else
-            dp[i][j] = dp[i][j+1]
+            dp[row][col] = dp[row+1][col]
 
 */
 
 /* Time  Beats: 65.41% */
 /* Space Beats: 28.02% */
 
-/* Time  Complexity: O(M * N) */
-/* Space Complexity: O(M * N) */
-class Solution {
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(N * M) */
+class Solution_Bottom_Up__Tabulation {
 public:
     int numDistinct(string s, string t)
     {
-        int N = s.length();
-        int M = t.length(); // Rows are T's length(It's easier for me to visualize it that way)
+        const int N = s.size();
+        const int M = t.size();
 
-        // It has to be "unsigned long long" since there can be some big examples
-        vector<vector<unsigned long long>> dp(M + 1, vector<unsigned long long>(N + 1, 0));
+        vector<vector<unsigned long long>> dp(N+1, vector<unsigned long long>(M+1, 0ULL));
+        dp[N][M] = 1ULL;
 
-        for (int i = 0; i <= N; i++)
-            dp[M][i] = 1; // Last Row: s="..."  t=""
+        /* Initialize Last COL */
+        for (int i = N-1; i >= 0; i--)
+            dp[i][M] = 1;
 
-        for (int i = M-1; i >= 0; i--)
+        /* Solve */
+        for (int i = N-1; i >= 0; i--)
         {
-            for (int j = N-1; j >= 0; j--)
+            for (int j = M-1; j >= 0; j--)
             {
-                if (t[i] == s[j])
-                    dp[i][j] = dp[i+1][j+1] + dp[i][j+1]; // Diagonal + Right
+                if (s[i] == t[j])
+                    dp[i][j] = dp[i+1][j] + dp[i+1][j+1]; // Down + Diagonal
                 else
-                    dp[i][j] = dp[i][j+1]; // Right
+                    dp[i][j] = dp[i+1][j];                // Down
             }
         }
 
