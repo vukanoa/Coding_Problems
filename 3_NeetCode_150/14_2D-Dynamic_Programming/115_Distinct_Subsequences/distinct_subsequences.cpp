@@ -400,3 +400,53 @@ public:
         return dp[0][0];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same idea as above, though you can notice above that we're only ever using
+    the very next row, therefore we can use only two DP arrays instead, thus
+    optimizing Space Complexity from O(N * M) down to O(M).
+
+*/
+
+/* Time  Beats: 75.32% */
+/* Space Beats: 44.79% */
+
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(M)     */
+class Solution_Bottom_Up__Tabulation_Space_Optimized {
+public:
+    int numDistinct(string s, string t)
+    {
+        const int N = s.size();
+        const int M = t.size();
+
+        vector<unsigned long long> dp_next(M+1, 0ULL);
+        dp_next[M] = 1ULL;
+
+        /* Solve */
+        for (int i = N-1; i >= 0; i--)
+        {
+            vector<unsigned long long> dp_curr(M+1, 0ULL);
+            dp_curr[M] = 1ULL;
+
+            for (int j = M-1; j >= 0; j--)
+            {
+                if (s[i] == t[j])
+                    dp_curr[j] = dp_next[j] + dp_next[j+1]; // Down + Diagonal
+                else
+                    dp_curr[j] = dp_next[j];                // Down
+            }
+
+            dp_next = std::move(dp_curr);
+        }
+
+        return dp_next[0];
+    }
+};
