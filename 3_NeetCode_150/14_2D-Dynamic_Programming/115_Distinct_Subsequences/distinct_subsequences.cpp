@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === HARD ===
@@ -38,7 +35,7 @@
             |              |
             v              |
         rabbbit            |
-            #           Omit this one
+            #             Omit this one
                            |
                            |
            -----------------
@@ -84,6 +81,72 @@
     s and t consist of English letters.
 
 */
+
+#include <climits>
+#include <cstring>
+#include <string>
+#include <vector>
+using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 77.72% */
+/* Space Beats: 74.29% */
+
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(N * M) */
+class Solution_Top_Down__Memoization {
+private:
+    unsigned long long memo[1001][1001];
+
+public:
+    int numDistinct(string s, string t)
+    {
+        const int N = s.size();
+        const int M = t.size();
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo)); // Fills with ULLONG_MAX
+
+        return solve(0, 0, s, t);
+    }
+
+private:
+    int solve(int i, int j, string& s, string& t)
+    {
+        const int N = s.size();
+        const int M = t.size();
+
+        if (j == M)
+            return 1;
+
+        if (i == N)
+            return 0;
+
+        if (N-i < M-j) // substring s is SMALLER than substring t
+            return 0;
+
+        if (memo[i][j] != ULLONG_MAX)
+            return memo[i][j];
+
+        unsigned long long diagonal = 0ULL;
+        unsigned long long down     = solve(i+1, j  , s, t);
+
+        if (s[i] == t[j])
+            diagonal = solve(i+1, j+1, s, t);
+
+        return memo[i][j] = down + diagonal;
+    }
+};
+
+
 
 
 /*
@@ -288,13 +351,14 @@
 /* Space Complexity: O(M * N) */
 class Solution {
 public:
-    int numDistinct(std::string s, std::string t)
+    int numDistinct(string s, string t)
     {
-        int M = t.length(); // Rows are T's length(It's easier for me to visualize it that way)
         int N = s.length();
+        int M = t.length(); // Rows are T's length(It's easier for me to visualize it that way)
 
-        // It has to be "unsigned long long" since there can be some big example, as the one below
-        std::vector<std::vector<unsigned long long>> dp(M + 1, std::vector<unsigned long long>(N + 1, 0));
+        // It has to be "unsigned long long" since there can be some big examples
+        vector<vector<unsigned long long>> dp(M + 1, vector<unsigned long long>(N + 1, 0));
+
         for (int i = 0; i <= N; i++)
             dp[M][i] = 1; // Last Row: s="..."  t=""
 
@@ -309,43 +373,6 @@ public:
             }
         }
 
-        return (int)dp[0][0];
+        return dp[0][0];
     }
 };
-
-int
-main()
-{
-    Solution sol;
-
-    /* Example 1 */
-    // std::string s = "rabbbit";
-    // std::string t = "rabbit";
-
-
-    /* Example 2 */
-    std::string s = "babgbag";
-    std::string t = "bag";
-
-
-    /* Example BIG */
-    // std::string s = "xslledayhxhadmctrliaxqpokyezcfhzaskeykchkmhpyjipxtsuljkwkovmvelvwxzwieeuqnjozrfwmzsylcwvsthnxujvrkszqwtglewkycikdaiocglwzukwovsghkhyidevhbgffoqkpabthmqihcfxxzdejletqjoxmwftlxfcxgxgvpperwbqvhxgsbbkmphyomtbjzdjhcrcsggleiczpbfjcgtpycpmrjnckslrwduqlccqmgrdhxolfjafmsrfdghnatexyanldrdpxvvgujsztuffoymrfteholgonuaqndinadtumnuhkboyzaqguwqijwxxszngextfcozpetyownmyneehdwqmtpjloztswmzzdzqhuoxrblppqvyvsqhnhryvqsqogpnlqfulurexdtovqpqkfxxnqykgscxaskmksivoazlducanrqxynxlgvwonalpsyddqmaemcrrwvrjmjjnygyebwtqxehrclwsxzylbqexnxjcgspeynlbmetlkacnnbhmaizbadynajpibepbuacggxrqavfnwpcwxbzxfymhjcslghmajrirqzjqxpgtgisfjreqrqabssobbadmtmdknmakdigjqyqcruujlwmfoagrckdwyiglviyyrekjealvvigiesnvuumxgsveadrxlpwetioxibtdjblowblqvzpbrmhupyrdophjxvhgzclidzybajuxllacyhyphssvhcffxonysahvzhzbttyeeyiefhunbokiqrpqfcoxdxvefugapeevdoakxwzykmhbdytjbhigffkmbqmqxsoaiomgmmgwapzdosorcxxhejvgajyzdmzlcntqbapbpofdjtulstuzdrffafedufqwsknumcxbschdybosxkrabyfdejgyozwillcxpcaiehlelczioskqtptzaczobvyojdlyflilvwqgyrqmjaeepydrcchfyftjighntqzoo";
-    // std::string t = "rwmimatmhydhbujebqehjprrwfkoebcxxqfktayaaeheys";
-
-
-    std::cout << "\n\t==============================";
-    std::cout << "\n\t=== DISTINCT SUBSEQUENCES ===";
-    std::cout << "\n\t==============================\n";
-
-    /* Write Input */
-    std::cout << "\n\ts = \"" << s << "\"";
-    std::cout << "\n\tt = \"" << t << "\"\n";
-
-    /* Solution */
-    int res = sol.numDistinct(s, t);
-
-    /* Write Output */
-    std::cout << "\n\tResult: " << res << "\n\n";
-
-    return 0;
-}
