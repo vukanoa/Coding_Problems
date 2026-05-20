@@ -53,6 +53,7 @@
 
 */
 
+#include <cstdint>
 #include <vector>
 using namespace std;
 
@@ -93,5 +94,48 @@ public:
         }
 
         return C;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Instead of using N extra space, we can use O(1) Space, however this is ONLY
+    possible when N is <= 64, therefore O(N) can arguably also be considered
+    O(1).
+
+    However, it's a different approach, therefore it's beneficial to understand
+    it as well.
+
+*/
+
+/* Time  Beats:  73.50% */
+/* Space Beats: 100.00% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Bitmasking {
+public:
+    vector<int> findThePrefixCommonArray(vector<int>& A, vector<int>& B)
+    {
+        const int N = A.size();
+        uint64_t mask_A = 0;
+        uint64_t mask_B = 0;
+
+        for (uint8_t i = 0; i < N; i++)
+        {
+            mask_A |= 1ULL << A[i];
+            mask_B |= 1ULL << B[i];
+
+            // __builtin_popcountll is built-in function in GCC/Clang compiler
+            B[i] = __builtin_popcountll(mask_A & mask_B);
+        }
+
+        return B;
     }
 };
