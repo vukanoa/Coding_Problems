@@ -107,3 +107,51 @@ private:
         return memo[L][R] = result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 61.85% */
+/* Space Beats: 55.77% */
+
+/* Time  Complexity: O(N^3) */
+/* Space Complexity: O(N^2) */
+class Solution_Bottom_Up__Tabulation {
+public:
+    int maxCoins(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        vector<int> new_nums(N + 2, 1);
+        for (int i = 0; i < N; i++)
+            new_nums[i + 1] = nums[i];
+
+        vector<vector<int>> dp(N + 2, vector<int>(N + 2, 0));
+        for (int L = N; L >= 1; L--)
+        {
+            for (int R = L; R <= N; R++)
+            {
+                for (int i = L; i <= R; i++)
+                {
+                    int coins = new_nums[L - 1] * new_nums[i] * new_nums[R + 1];
+
+                    coins += dp[L    ][i - 1] +
+                             dp[i + 1][R    ];
+
+                    dp[L][R] = max(dp[L][R], coins);
+                }
+            }
+        }
+
+        return dp[1][N];
+    }
+};
