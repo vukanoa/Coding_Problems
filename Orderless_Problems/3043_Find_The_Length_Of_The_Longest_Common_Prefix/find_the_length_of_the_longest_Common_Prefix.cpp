@@ -162,3 +162,91 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Trie Solution.
+
+*/
+
+/* Time  Beats: 69.50% */
+/* Space Beats: 43.50% */
+
+/* Time  Complexity: O(N * d  +  M * d) */
+/* Space Complexity: O(N * d)           */
+struct TrieNode {
+    TrieNode* digit[10] = {nullptr};
+};
+
+class Trie {
+private:
+    TrieNode* root;
+
+public:
+    Trie()
+    {
+        root = new TrieNode();
+    }
+
+    void insert(const int num1)
+    {
+        TrieNode* node = root;
+
+        string num1_str = to_string(num1);
+
+        for (const char& digit_chr : num1_str)
+        {
+            if ( ! node->digit[digit_chr - '0'])
+                node->digit[digit_chr - '0'] = new TrieNode();
+
+            node = node->digit[digit_chr - '0'];
+        }
+    }
+
+    int find_longest_prefix(int num2)
+    {
+        TrieNode* node = root;
+
+        string num2_str   = to_string(num2);
+        int    prefix_len = 0;
+
+        for (const char& digit_chr : num2_str)
+        {
+            if ( ! node->digit[digit_chr - '0'])
+                break;
+
+            node = node->digit[digit_chr - '0'];
+            prefix_len++;
+        }
+
+        return prefix_len;
+    }
+};
+
+class Solution_Trie {
+public:
+    int longestCommonPrefix(vector<int>& arr1, vector<int>& arr2)
+    {
+        Trie trie;
+
+        for (const int& num1 : arr1)
+            trie.insert(num1);
+
+        int result = 0;
+
+        for (const int& num2 : arr2)
+        {
+            int prefix_len = trie.find_longest_prefix(num2);
+
+            result = max(result, prefix_len);
+        }
+
+        return result;
+    }
+};
