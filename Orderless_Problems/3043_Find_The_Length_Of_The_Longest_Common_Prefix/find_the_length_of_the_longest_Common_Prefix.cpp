@@ -58,8 +58,9 @@
 
 */
 
+#include <cmath>
 #include <string>
-#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 using namespace std;
 
@@ -75,44 +76,89 @@ using namespace std;
 /* Time  Beats: 25.75% */
 /* Space Beats: 36.48% */
 
-/* Time  Complexity: O(n * k + m * k) */
-/* Space Complexity: O(n * k) */
-class Solution {
+/* Time  Complexity: O(N * d  +  M * d) */
+/* Space Complexity: O(N * d)           */
+class Solution_1 {
 public:
     int longestCommonPrefix(vector<int>& arr1, vector<int>& arr2)
     {
-        unordered_map<string, int> umap_prefix;
+        unordered_set<string> arr1_prefixes; // Store all prefixes from arr1
 
-        // Step 1: Build the prefix map for arr1
-        for (const int& num : arr1)
+        for (const int& num1 : arr1)
         {
-            string str_num = to_string(num);
+            string str_num = to_string(num1);
             string prefix = "";
 
             for (const char& chr : str_num)
             {
                 prefix += chr;
-                umap_prefix[prefix]++;
+                arr1_prefixes.insert(prefix);
             }
         }
 
-        int max_len = 0;
+        int result = 0;
 
-        // Step 2: Check for common prefixes in arr2
-        for (const int& num : arr2)
+        for (const int& num2 : arr2)
         {
-            string str_num = to_string(num);
+            string str_num = to_string(num2);
             string prefix = "";
 
             for (const char& chr : str_num)
             {
                 prefix += chr;
 
-                if (umap_prefix.find(prefix) != umap_prefix.end())
-                    max_len = max(max_len, static_cast<int>(prefix.length()));
+                if (arr1_prefixes.count(prefix)) // Exists
+                    result = max(result, static_cast<int>(prefix.size()));
             }
         }
 
-        return max_len;
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, however this one does NOT have string overhead.
+
+*/
+
+/* Time  Beats: 73.67% */
+/* Space Beats: 95.50% */
+
+/* Time  Complexity: O(N * d  +  M * d) */
+/* Space Complexity: O(N * d)           */
+class Solution_2 {
+public:
+    int longestCommonPrefix(vector<int>& arr1, vector<int>& arr2)
+    {
+        unordered_set<int> arr1_prefixes; // Store all prefixes from arr1
+
+        for (int num1 : arr1)
+        {
+            while (num1 > 0 && ! arr1_prefixes.count(num1))
+            {
+                arr1_prefixes.insert(num1);
+                num1 /= 10;
+            }
+        }
+
+        int result = 0;
+
+        for (int num2 : arr2)
+        {
+            while (num2 > 0 && ! arr1_prefixes.count(num2))
+                num2 /= 10;
+
+            if (num2 > 0)
+                result = max(result, static_cast<int>(log10(num2) + 1));
+        }
+
+        return result;
     }
 };
