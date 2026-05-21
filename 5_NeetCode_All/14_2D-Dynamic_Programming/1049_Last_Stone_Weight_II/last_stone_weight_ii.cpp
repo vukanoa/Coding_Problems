@@ -156,3 +156,64 @@ private:
                                      put_in_right_subset);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is also a Memoization technique, howver this Solutions is conceptually
+    different from the one above.
+
+    It is beneficial to understand both.
+
+*/
+
+/* Time  Beats: 23.75% */
+/* Space Beats: 31.40% */
+
+/* Time  Complexity: O(N * sum) */
+/* Space Complexity: O(N * sum) */
+class Solution_Top_Down__Memoization__Skip_Take {
+private:
+    vector<vector<int>> memo;
+
+public:
+    int lastStoneWeightII(vector<int>& stones)
+    {
+        const int N = stones.size();
+
+        int total_sum = accumulate(stones.begin(), stones.end(), 0);
+        int target = total_sum / 2;
+
+        /* Initialize */
+        memo = vector<vector<int>>(N, vector<int>(target + 1, -1));
+
+        int best = solve(0, target, stones);
+
+        return total_sum - 2 * best;
+    }
+
+private:
+    int solve(int i, int remaining, const vector<int>& stones)
+    {
+        const int N = stones.size();
+
+        if (i == N || remaining == 0)
+            return 0;
+
+        if (memo[i][remaining] != -1)
+            return memo[i][remaining];
+
+        int skip = solve(i + 1, remaining, stones);
+
+        int take = 0;
+        if (stones[i] <= remaining)
+            take = stones[i] + solve(i + 1, remaining - stones[i], stones);
+
+        return memo[i][remaining] = max(skip, take);
+    }
+};
