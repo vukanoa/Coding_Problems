@@ -176,3 +176,64 @@ public:
         return dp[ROWS-1][COLS-1];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, but instead of using 2D vector, we use only 1D, thus
+    optimizing Space Complexity from: O(N^2) down to O(N).
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  83.77% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(COLS)        */
+class Solution_Bottom_Up__Tabulation__Space_Optimized {
+public:
+    int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid)
+    {
+        const int ROWS = obstacleGrid.size();
+        const int COLS = obstacleGrid[0].size();
+
+        if (obstacleGrid[0][0] == 1)
+            return 0;
+
+        vector<int> dp(COLS, 0);
+        dp[0] = 1;
+
+        /* Initialize 0th ROW */
+        for (int col = 1; col < COLS; col++)
+        {
+            if (obstacleGrid[0][col] == 1) // Obstacle
+                break;
+
+            dp[col] = 1;
+        }
+
+        for (int row = 1; row < ROWS; row++)
+        {
+            dp[0] = dp[0] && (obstacleGrid[row][0] != 1);
+
+            for (int col = 1; col < COLS; col++)
+            {
+                if (obstacleGrid[row][col] == 1) // Obstacle
+                {
+                    dp[col] = 0;
+                    continue;
+                }
+
+                dp[col] = dp[col  ] + // "Up"
+                          dp[col-1];  // Left
+            }
+        }
+
+        return dp[COLS-1];
+    }
+};
