@@ -112,3 +112,67 @@ private:
         return memo[row][col] = up + left;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, though implemented in a Bottom-Up Tabulation way.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  28.93% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
+class Solution_Bottom_Up__Tabulation {
+public:
+    int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid)
+    {
+        const int ROWS = obstacleGrid.size();
+        const int COLS = obstacleGrid[0].size();
+
+        if (obstacleGrid[0][0] == 1)
+            return 0;
+
+        vector<vector<int>> dp(ROWS, vector<int>(COLS, 0));
+        dp[0][0] = 1;
+
+        /* Initialize 0th ROW */
+        for (int col = 1; col < COLS; col++)
+        {
+            if (obstacleGrid[0][col] == 1) // Obstacle
+                break;
+
+            dp[0][col] = 1;
+        }
+
+        /* Initialize 0th COL */
+        for (int row = 1; row < ROWS; row++)
+        {
+            if (obstacleGrid[row][0] == 1) // Obstacle
+                break;
+
+            dp[row][0] = 1;
+        }
+
+        for (int row = 1; row < ROWS; row++)
+        {
+            for (int col = 1; col < COLS; col++)
+            {
+                if (obstacleGrid[row][col] == 1) // Obstacle
+                    continue;
+
+                dp[row][col] = dp[row-1][col  ] +
+                               dp[row  ][col-1];
+            }
+        }
+
+        return dp[ROWS-1][COLS-1];
+    }
+};
