@@ -61,7 +61,7 @@ using namespace std;
 /* Time  Beats: 29.18% */
 /* Space Beats: 57.58% */
 
-/* Time  Complexity: O(N * logN) */
+/* Time  Complexity: O(N * logM) */
 /* Space Complexity: O(1)        */
 class Solution_Binary_Search {
 public:
@@ -101,8 +101,8 @@ public:
 /* Time  Beats: 100.00% */
 /* Space Beats:  96.92% */
 
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(1) */
+/* Time  Complexity: O(N + M ) */
+/* Space Complexity: O(1)      */
 class Solution_Linear {
 public:
     int getCommon(vector<int>& nums1, vector<int>& nums2)
@@ -126,8 +126,50 @@ public:
             else
                 j++;
         }
-        
+
 
         return result == 0 ? -1 : result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  81.53% */
+
+/* Time  Complexity: O(logN + logM) */ // Average, but worst O(N + M)
+/* Space Complexity: O(1)           */
+class Solution_Two_Pointer_Binary_Searches {
+public:
+    int getCommon(vector<int>& nums1, vector<int>& nums2)
+    {
+        const int N = nums1.size();
+        const int M = nums2.size();
+
+        auto iter1 = nums1.begin();
+        auto iter2 = nums2.begin();
+
+        while (iter1 != nums1.end() && iter2 != nums2.end())
+        {
+            if (*iter1 == *iter2)
+                return *iter1; // Or *iter2, it does NOT matter
+
+            if (*iter1 < *iter2)
+                iter1 = lower_bound(iter1 + 1, nums1.end(), *iter2);
+            else
+                iter2 = lower_bound(iter2 + 1, nums2.end(), *iter1);
+        }
+
+        return -1;
     }
 };
