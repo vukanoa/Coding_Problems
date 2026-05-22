@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -56,58 +54,61 @@
 
 */
 
-/* Time  Beats: 53.77% */
-/* Space Beats: 67.60% */
+#include <cstring>
+#include <vector>
+using namespace std;
 
-/* Time  Complexity: O(m * n) */
-/* Space Complexity: O(m * n) */
-class Solution {
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  93.05% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
+class Solution_Top_Down__Memoization {
+private:
+    int memo[101][101];
+
 public:
-    int uniquePathsWithObstacles(vector<vector<int>>& grid)
+    int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid)
     {
-        int m = grid.size();
-        int n = grid[0].size();
+        const int ROWS = obstacleGrid.size();
+        const int COLS = obstacleGrid[0].size();
 
-        if (grid[0][0] == 1 || grid[m-1][n-1] == 1)
+        if (obstacleGrid[0][0] == 1)
             return 0;
 
-        if (m == 1 && n == 1)
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        return solve(ROWS-1, COLS-1, obstacleGrid);
+    }
+
+private:
+    int solve(int row, int col, vector<vector<int>>& obstacleGrid)
+    {
+        const int ROWS = obstacleGrid.size();
+        const int COLS = obstacleGrid[0].size();
+
+        if (row < 0 || col < 0 || obstacleGrid[row][col] == 1)
+            return 0;
+
+        if (row == 0 && col == 0)
             return 1;
 
-        vector<vector<long long>> dp(m, vector<long long>(n, 0));
+        if (memo[row][col] != -1)
+            return memo[row][col];
 
-        for (int i = m-1;i >= 0; i--)
-        {
-            for (int j = n-1;j >= 0; j--)
-            {
-                if ((i == m-1 && j == n-1) || grid[i][j] == 1 )
-                {
-                    dp[i][j] = 0;
-                }
-                else if(i == m-1 && j+1 < n-1 && dp[i][j+1] == 0)
-                {
-                    dp[i][j]=0;
-                }
-                else if (j == n-1 && i+1 < m-1 && dp[i+1][j] == 0 )
-                {
-                    dp[i][j]=0;
-                }
-                else if(i == m-1 || j == n-1)
-                {
-                    dp[i][j]=1;
-                }
-                else
-                {
-                    dp[i][j]=dp[i+1][j] + dp[i][j+1];
-                }
-            }
-        }
+        int up   = solve(row-1, col  , obstacleGrid);
+        int left = solve(row  , col-1, obstacleGrid);
 
-        return dp[0][0];
+        return memo[row][col] = up + left;
     }
 };
-
-
-
-
-
