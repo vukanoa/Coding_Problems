@@ -149,7 +149,7 @@ public:
 
 /* Time  Complexity: O(logN + logM) */ // Average, but worst O(N + M)
 /* Space Complexity: O(1)           */
-class Solution_Two_Pointer_Binary_Searches {
+class Solution_Two_Pointer_Binary_Search {
 public:
     int getCommon(vector<int>& nums1, vector<int>& nums2)
     {
