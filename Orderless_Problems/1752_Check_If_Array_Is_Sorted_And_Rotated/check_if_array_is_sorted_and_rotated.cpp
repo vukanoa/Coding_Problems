@@ -59,120 +59,43 @@
 #include <vector>
 using namespace std;
 
-
-
 /*
     ------------
     --- IDEA ---
     ------------
 
-    We begin from the back of the array and we go back until we hit an element
-    that is GREATER than our current element. That inidicates a potential end
-    of the rotated sorted string.
-
-    Example:
-
-        [1, 2, 2, 3, 4, 4, 5]
-
-    If we rotate it:
-
-        [3, 4, 4, 5, 1, 2, 2]
-                     ^
-                     |___________________________________________
-                                                                |
-    We'll find first GREATER, going from the back, once we're here.
-
-    Now all we have to do is check whether elements from the beginning of the
-    array, until the index from which we've found there's a GREATER element
-    behind, are in NON-DECREASING order.
-
-    In other words - Start from index 0 and check if all elements until element
-    1 at index 4(excluding) are in NON-DECREASING order.
-
-    However, there's one more thing we absolutely must check here.
-    What if we had an example like this:
-
-         0  1  2  3  4  5  6
-        [3, 4, 4, 5, 2, 4, 8]
-
-
-    Had we done the same approach, we'd be going from the back and we'd stop
-    at element 2 since we'd found 5 is the element to the left thta is greater.
-
-    Now we'd start from the beginning and all the elements up until 2, would
-    indeed be in a NON-DECREASING order, but we should NOT return "true".
-
-    Why?
-    Because this is not a sorted-rotated array. Look:
-
-        [3, 4, 4, 5, 2, 4, 8]
-        [2, 4, 8, 3, 4, 4, 5]
-
-    So, what should we do?
-
-    If we've done our two steps already, simply check if the 0th element is
-    GREATER THAN OR EQUALS TO the last element.
-
-         0  1  2  3  4  5  6
-        [3, 4, 4, 5, 2, 4, 8]
-
-    Since 3 is NOT greater than or equals to 8, we'd return false.
-
-
-    There's one more thing you should think about--What if all the elements are
-    in NON-DECREASING order already and not rotated?
-
-    What if we had this:
-
-         0  1  2  3  4  5  6
-        [1, 2, 2, 3, 4, 4, 5]
-
-    In that case, since we have NOT found a GREATER element to the left while
-    going backwards, we'd simply return "true".
+    TODO
 
 */
 
 /* Time  Beats: 100.00% */
-/* Space Beats:  85.59% */
+/* Space Beats:  82.15% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_1 {
 public:
     bool check(vector<int>& nums)
     {
         const int N = nums.size();
-
-        int start = -1;
-        for (int i = N-1; i >= 1; i--)
-        {
-            if (nums[i-1] > nums[i])
-            {
-                start = i;
-                break;
-            }
-        }
-
-        if (start == -1) // They are all in non-decreasing order already
+        if (N <= 2)
             return true;
 
-        if (start == 1)
-            return nums[0] >= nums[N-1];
-
-        int end = -1;
-        for (int i = 0; i < start && i < N-1; i++)
+        bool found_pivot = false;
+        for (int i = 0; i < N-1; i++)
         {
             if (nums[i] > nums[i+1])
             {
-                end = i;
-                break;
+                if (found_pivot)
+                    return false;
+
+                found_pivot = true;
             }
         }
 
-        return end + 1 == start && nums[0] >= nums[N-1];
+        return found_pivot ? nums.back() <= nums[0] : true;
     }
 };
-
 
 
 
