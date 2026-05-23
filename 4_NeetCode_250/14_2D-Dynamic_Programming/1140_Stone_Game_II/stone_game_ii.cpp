@@ -56,7 +56,9 @@
 
 */
 
+#include <cstring>
 #include <vector>
+#include <climits>
 using namespace std;
 
 /*
@@ -68,55 +70,54 @@ using namespace std;
 
 */
 
-/* Time  Beats: 54.50% */
-/* Space Beats: 45.59% */
+/* Time  Beats: 39.12% */
+/* Space Beats: 92.15% */
 
-/* Time  Complexity: O(n^3) */
-/* Space Complexity: O(n^2) */
-class Solution_Memoization {
+/* Time  Complexity: O(N^3) */
+/* Space Complexity: O(N^2) */
+class Solution_Memooooo {
+private:
+    int memo[101][101][2];
+
 public:
     int stoneGameII(vector<int>& piles)
     {
         const int N = piles.size();
 
-        if (N == 1)
-            return piles[0];
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
 
-        vector<vector<vector<int>>> dp(2, vector<vector<int>>(N, vector<int>(N, -1)));
-
-        return dfs(piles, 1, 0, 1, dp);
+        return solve(0, 1, true, piles);
     }
 
 private:
-    int dfs(vector<int>& piles, int alice, int i, int j, vector<vector<vector<int>>>& dp)
+    int solve(int idx, int M, bool alice_turn, vector<int>& piles)
     {
         const int N = piles.size();
 
-        if (i >= N)
+        if (idx >= N)
             return 0;
 
-        if (dp[alice][i][j] != -1)
-            return dp[alice][i][j];
+        if (memo[idx][M][alice_turn] != -1)
+            return memo[idx][M][alice_turn];
 
-        int result = (alice == 1) ? 0 : INT_MAX;
+        int result = alice_turn ? 0 : INT_MAX;
+        int value  = 0;
 
-        int total = 0;
-        for (int X = 1; X <= 2 * j; X++)
+        for (int X = 1; X <= 2*M; X++)
         {
-            if (i + X - 1 >= N)
+            if (idx + X-1 >= N)
                 break;
 
-            total += piles[i + X - 1];
+            value += piles[idx + X-1];
 
-            if (alice == 1) // Alice tries to maximize her score
-                result = max(result, total + dfs(piles, alice ^ 1, i + X, max(j, X), dp));
-            else // Bob tries to minimize Alice's score
-                result = min(result, dfs(piles, alice ^ 1, i + X, max(j, X), dp));
+            if (alice_turn)
+                result = max(result, value + solve(idx + X, max(M, X), false, piles));
+            else
+                result = min(result, 0     + solve(idx + X, max(M, X),  true, piles));
         }
 
-        dp[alice][i][j] = result;
-
-        return result;
+        return memo[idx][M][alice_turn] = result;
     }
 };
 
