@@ -123,3 +123,65 @@ private:
         return memo[start][end] = max(take_first, take_last);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, though implemented using Bottom-Up Tabulation technique.
+
+*/
+
+/* Time  Beats: 20.22% */
+/* Space Beats: 12.93% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_Bottom_Up__Tabulation {
+public:
+    bool stoneGame(vector<int>& piles)
+    {
+        const int N = piles.size();
+
+        int total_sum = accumulate(piles.begin(), piles.end(), 0);
+        vector<vector<int>> dp(N, vector<int>(N, 0));
+
+        for (int start = N-1; start >= 0; start--)
+        {
+            for (int end = start; end < N; end++)
+            {
+                bool alice_turn = (end - start) & 1;
+
+                int take_first = 0;
+                int take_last  = 0;
+
+                if (start == end)
+                {
+                    dp[start][end] = 0; // Because it's CERTAINLY Bob's turn
+                    continue;
+                }
+
+                if (alice_turn)
+                {
+                    take_first = piles[start] + dp[start+1][end  ];
+                    take_last  = piles[end  ] + dp[start  ][end-1];
+                }
+                else
+                {
+                    take_first = 0            + dp[start+1][end  ];
+                    take_last  = 0            + dp[start  ][end-1];
+                }
+
+                dp[start][end] = max(take_first, take_last);
+            }
+        }
+
+        int alice_points = dp[0][N-1];
+
+        return alice_points > (total_sum / 2);
+    }
+};
