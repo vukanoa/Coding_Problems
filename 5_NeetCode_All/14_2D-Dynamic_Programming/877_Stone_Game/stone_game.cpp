@@ -185,3 +185,93 @@ public:
         return alice_points > (total_sum / 2);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 26.03% */
+/* Space Beats: 28.41% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N)   */
+class Solution_Bottom_Up__Tabulation__Space_Optimized {
+public:
+    bool stoneGame(vector<int>& piles)
+    {
+        const int N = piles.size();
+
+        int total_sum = accumulate(piles.begin(), piles.end(), 0);
+        vector<int> dp(N, 0);
+
+        for (int start = N-1; start >= 0; start--)
+        {
+            for (int end = start; end < N; end++)
+            {
+                bool alice_turn = (end - start) & 1;
+
+                int take_first = 0;
+                int take_last  = 0;
+
+                if (start == end)
+                {
+                    dp[end] = 0; // Because it's CERTAINLY Bob's turn
+                    continue;
+                }
+
+                if (alice_turn)
+                {
+                    take_first = piles[start] + dp[end  ];
+                    take_last  = piles[end  ] + dp[end-1];
+                }
+                else
+                {
+                    take_first = 0            + dp[end  ];
+                    take_last  = 0            + dp[end-1];
+                }
+
+                dp[end] = max(take_first, take_last);
+            }
+        }
+
+        int alice_points = dp[N-1];
+
+        return alice_points > (total_sum / 2);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    If you examine the testcases and the Description, you'll realize that Alice
+    ALWAYS(!!) wins.
+
+    Therefore, simplu return "true".
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  82.27% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Alice_Always_Wins {
+public:
+    bool stoneGame(vector<int>& piles)
+    {
+        return true;
+    }
+};
