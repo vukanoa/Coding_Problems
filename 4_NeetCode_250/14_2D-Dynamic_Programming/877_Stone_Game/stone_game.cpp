@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -62,6 +59,10 @@
 
 */
 
+#include <vector>
+#include <bits/stdc++.h>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -71,36 +72,54 @@
 
 */
 
-/* Time  Beats: 58.50% */
-/* Space Beats: 33.81% */
+/* Time  Beats: 20.22% */
+/* Space Beats: 26.60% */
 
-/* Time  Complexity: O(n^2) */
-/* Space Complexity: O(n^2) */
-class Solution {
-    int dp[501][501];
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_Top_Down__Memoization {
+private:
+    int memo[501][501];
+
 public:
     bool stoneGame(vector<int>& piles)
     {
-        // O(1) approach: Alice always wins
-        // return true;
+        const int N = piles.size();
 
-        // Dynamic Programming approach
-        memset(dp, -1, sizeof dp); // Initialize DP array
-        return play(0, piles.size() - 1, piles) > 0;  // If Alice's score difference is positive, she wins
+        int total_sum = accumulate(piles.begin(), piles.end(), 0);
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        /* Solve */
+        int alice_points = solve(0, N-1, 0, true, piles);
+
+        return alice_points > (total_sum / 2);
     }
 
 private:
-
-    int play(int i, int j, vector<int> &piles)
+    int solve(int start, int end, int alice_points, bool alice_turn, vector<int>& piles)
     {
-        if (i >= j)
-            return 0; // Base case: no stones left
+        if (start > end)
+            return alice_points;
 
-        if (dp[i][j] != -1)
-            return dp[i][j]; // Return cached result
+        if (memo[start][end] != -1)
+            return memo[start][end];
 
-        // Compute the maximum score difference for the current player
-        return dp[i][j] = max((piles[i] - play(i+1, j  , piles)), 
-                              (piles[j] - play(i  , j-1, piles)));
+        int take_first = 0;
+        int take_last  = 0;
+
+        if (alice_turn)
+        {
+            take_first = solve(start+1, end  , alice_points + piles[start], false, piles);
+            take_last  = solve(start  , end-1, alice_points + piles[end]  , false, piles);
+        }
+        else
+        {
+            take_first = solve(start+1, end  , alice_points + 0           , true , piles);
+            take_last  = solve(start  , end-1, alice_points + 0           , true , piles);
+        }
+
+        return memo[start][end] = max(take_first, take_last);
     }
 };
