@@ -43,8 +43,62 @@
 */
 
 #include <climits>
+#include <cstring>
 #include <vector>
 using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 33.66% */
+/* Space Beats: 80.55% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
+class Solution_Top_Down__Memoization {
+private:
+    int memo[201][201];
+
+public:
+    int minPathSum(vector<vector<int>>& grid)
+    {
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        return solve(0, 0, grid);
+    }
+
+private:
+    int solve(int row, int col, vector<vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        if (row >= ROWS || col >= COLS)
+            return INT_MAX;
+
+        if (row == ROWS-1 && col == COLS-1)
+            return grid[row][col];
+
+        if (memo[row][col] != -1)
+            return memo[row][col];
+
+        int move_down  = solve(row+1, col,   grid);
+        int move_right = solve(row,   col+1, grid);
+
+        return memo[row][col] = grid[row][col] + min(move_down, move_right);
+    }
+
+};
+
+
+
 
 /*
     ------------
