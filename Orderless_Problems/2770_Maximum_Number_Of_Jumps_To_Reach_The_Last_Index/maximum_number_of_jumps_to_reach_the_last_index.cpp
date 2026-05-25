@@ -71,6 +71,7 @@
 
 */
 
+#include <cstring>
 #include <vector>
 using namespace std;
 
@@ -80,7 +81,11 @@ using namespace std;
     ------------
 
     Since Constraints for 'n' are:
+
         2 <= nums.length == n <= 1000
+
+    and since there are "too many cases", Memoization or Tabulation is usually
+    the answer.
 
 */
 
@@ -89,7 +94,7 @@ using namespace std;
 
 /* Time  Complexity: O(N^2) */
 /* Space Complexity: O(N)   */
-class Solution {
+class Solution_Bottom_Up__Tabulation {
 public:
     int maximumJumps(vector<int>& nums, int target)
     {
@@ -112,5 +117,65 @@ public:
         }
 
         return dp[0] == 0 ? -1 : dp[0];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 27.33% */
+/* Space Beats: 95.34% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N)   */
+class Solution_Top_Down__Memoization {
+private:
+    int memo[1001];
+
+public:
+    int maximumJumps(vector<int>& nums, int target)
+    {
+        const int N = nums.size();
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+        int result = solve(0, nums, target);
+
+        return result == 0 ? -1 : result;
+    }
+
+private:
+    int solve(int idx, vector<int>& nums, int target)
+    {
+        const int N = nums.size();
+
+        if (idx == N)
+            return 0;
+
+        if (memo[idx] != -1)
+            return memo[idx];
+
+        int result = 0;
+        for (int j = idx+1; j < N; j++)
+        {
+            int diff = nums[j] - nums[idx];
+
+            if (-target <= diff && diff <= target)
+            {
+                int next = solve(j, nums, target);
+                result = max(result, (next == 0 && j < N-1) ? 0 : 1 + next);
+            }
+        }
+
+        return memo[idx] = result;
     }
 };
