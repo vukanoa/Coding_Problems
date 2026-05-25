@@ -4,7 +4,7 @@
     ==============
 
     ===========================
-    63) Minimum Path Sum
+    64) Minimum Path Sum
     ===========================
 
     ============
@@ -60,7 +60,7 @@ using namespace std;
 
 /* Time  Complexity: O(ROWS * COLS) */
 /* Space Complexity: O(ROWS * COLS) */
-class Solution_64_Tabulation {
+class Solution_Bottom_Up__Tabulation {
 public:
     int minPathSum(vector<vector<int>>& grid)
     {
@@ -78,6 +78,7 @@ public:
         for (int row = 1; row < ROWS; row++)
             dp[row][0] = dp[row-1][0] + grid[row][0];
 
+        /* Solve */
         for (int row = 1; row < ROWS; row++)
         {
             for (int col = 1; col < COLS; col++)
@@ -90,5 +91,55 @@ public:
         }
 
         return dp[ROWS-1][COLS-1];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, though we only ever neet the very next row while doing DP.
+    Thus, we can reduce Space Complexity from O(N) down to O(1).
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  80.21% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(COLS)        */
+class Solution_Bottom_Up__Tabulation__Space_Optimized {
+public:
+    int minPathSum(vector<vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        vector<int> dp(COLS, INT_MAX);
+        dp[0] = grid[0][0];
+
+        /* Initialize 0th ROW */
+        for (int col = 1; col < COLS; col++)
+            dp[col] = dp[col-1] + grid[0][col];
+
+        /* Solve */
+        for (int row = 1; row < ROWS; row++)
+        {
+            dp[0] += grid[row][0];
+
+            for (int col = 1; col < COLS; col++)
+            {
+                dp[col] = min(dp[col  ],
+                              dp[col-1]);
+
+                dp[col] += grid[row][col];
+            }
+        }
+
+        return dp[COLS-1];
     }
 };
