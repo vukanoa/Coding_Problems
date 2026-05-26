@@ -104,3 +104,64 @@ public:
         return dp[0][0];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Each state depends only on:
+
+        current row:   dp[i  ][...]
+        next    row:   dp[i+1][...]
+
+    Therefore, we can reduce Space Complexity from O(N * M) down to O(M).
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  80.94% */
+
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(M)     */
+class Solution_Bottom_Up__Tabulation__Space_Optimized {
+public:
+    bool isMatch(string s, string p)
+    {
+        const int N = s.size();
+        const int M = p.size();
+
+        vector<bool> next_row(M+1, false);
+        next_row[M] = true;
+
+        for (int i = N; i >= 0; i--)
+        {
+            vector<bool> curr_row(M+1, false);
+
+            /* Base Case */
+            if (i == N)
+                curr_row[M] = true;
+
+            for (int j = M-1; j >= 0; j--)
+            {
+                bool match = i < N && (s[i] == p[j] || p[j] == '.');
+
+                if (match)
+                    curr_row[j] = curr_row[j] | next_row[j+1];
+
+                if (j+1 < M && p[j+1] == '*')
+                {
+                    curr_row[j] = curr_row[j] | (true  && curr_row[j+2]); // Skip
+                    curr_row[j] = curr_row[j] | (match && next_row[j  ]); // Take
+                }
+            }
+
+            next_row = std::move(curr_row);
+        }
+
+        return next_row[0];
+    }
+};
