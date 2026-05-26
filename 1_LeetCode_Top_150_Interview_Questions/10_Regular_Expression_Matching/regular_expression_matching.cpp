@@ -54,9 +54,76 @@
 
 */
 
+#include <cstring>
 #include <string>
 #include <vector>
 using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  68.03% */
+
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(N * M) */
+class Solution_Top_Down__Memoization {
+private:
+    int memo[21][21];
+
+public:
+    bool isMatch(string s, string p)
+    {
+        const int N = s.size();
+        const int M = p.size();
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        /* Solve */
+        return solve(0, 0, s, p);
+    }
+
+private:
+    int solve(int i, int j, string& s, string& p)
+    {
+        const int N = s.size();
+        const int M = p.size();
+
+        if (i >= N && j >= M)
+            return true;
+
+        if (j >= M)
+            return false;
+
+        if (memo[i][j] != -1)
+            return memo[i][j];
+
+        int result = false;
+
+        bool match = i < N && (s[i] == p[j] || p[j] == '.');
+
+        if (match)
+            result = result | solve(i+1, j+1, s, p);
+
+        if (j+1 < M && p[j+1] == '*')
+        {
+            result = result | (true  && solve(i  , j+2, s, p)); // Skip
+            result = result | (match && solve(i+1, j  , s, p)); // Take
+        }
+
+        return memo[i][j] = result;
+    }
+};
+
+
+
 
 /*
     ------------
