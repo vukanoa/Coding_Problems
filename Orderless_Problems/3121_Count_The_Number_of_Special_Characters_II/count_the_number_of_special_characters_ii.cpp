@@ -58,12 +58,12 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    Intuitive.
+    TODO
 
 */
 
-/* Time  Beats: 92.41% */
-/* Space Beats: 69.05% */
+/* Time  Beats: 36.24% */
+/* Space Beats: 53.09% */
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
@@ -74,28 +74,32 @@ public:
         const int N = word.size();
         int result = 0;
 
-        vector<int> lower(26, -1);
-        vector<int> upper(26, -1);
+        int leftmost_uppercase[26];
+        int rightmost_lowercase[26];
+
+        /* Fill */
+        fill(begin(leftmost_uppercase), end(leftmost_uppercase), -1);
+        fill(begin(rightmost_lowercase), end(rightmost_lowercase), -1);
 
         for (int i = 0; i < N; i++)
         {
-            if (word[i] > 95) // Lower
-            {
-                lower[word[i] - 'a'] = i;
-            }
-            else
-            {
-                if (upper[word[i] - 'A'] == -1)
-                    upper[word[i] - 'A'] = i;
-            }
+            char chr = word[i];
+
+            if (isupper(chr) && leftmost_uppercase[chr - 'A'] == -1)
+               leftmost_uppercase[chr - 'A'] = i; 
+
+            if (islower(chr))
+                rightmost_lowercase[chr - 'a'] = i;
         }
 
         for (int i = 0; i < 26; i++)
         {
-            if (lower[i] != -1 && upper[i] != -1 && lower[i] < upper[i])
-                result++;
+            if (leftmost_uppercase[i] != -1 && rightmost_lowercase[i] != -1)
+            {
+                if (rightmost_lowercase[i] < leftmost_uppercase[i])
+                    result++;
+            }
         }
-
 
         return result;
     }
