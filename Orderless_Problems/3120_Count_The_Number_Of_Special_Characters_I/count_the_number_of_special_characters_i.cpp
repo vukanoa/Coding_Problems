@@ -50,7 +50,6 @@
 */
 
 #include <string>
-#include <unordered_set>
 using namespace std;
 
 /*
@@ -58,12 +57,12 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    Intuitive.
+    TODO
 
 */
 
-/* Time  Beats: 100.00% */
-/* Space Beats:  14.97% */
+/* Time  Beats: 33.33% */
+/* Space Beats: 77.01% */
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
@@ -71,37 +70,18 @@ class Solution {
 public:
     int numberOfSpecialChars(string word)
     {
-        const int N = word.length();
+        const int N = word.size();
         int result = 0;
-        unordered_set<char> used;
 
-        unordered_set<char> uset;
+        bool exist[128] = {false};
+
         for (const char& chr : word)
-            uset.insert(chr);
+            exist[chr] = true;
 
-        for (const char& chr : uset)
+        for (int i = 65; i <= 91; i++)
         {
-            if (used.find(chr) != used.end())
-                continue;
-
-            if (chr < 95)
-            {
-                if (uset.count(chr + 32))
-                {
-                    used.insert(chr);
-                    used.insert(chr + 32);
-                    result++;
-                }
-            }
-            else
-            {
-                if (uset.count(chr + 32))
-                {
-                    used.insert(chr);
-                    used.insert(chr - 32);
-                    result++;
-                }
-            }
+            if (exist[i] && exist[i + 32])
+                result++;
         }
 
         return result;
