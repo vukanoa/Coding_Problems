@@ -87,3 +87,80 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  98.14% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Bitmasking_1 {
+public:
+    int numberOfSpecialChars(string word)
+    {
+        const int N = word.size();
+        int result = 0;
+
+        unsigned long long exist = 0x0;
+
+        for (const char& chr : word)
+            exist |= (1ULL << (chr - 'A'));
+
+        for (int i = 0; i < 26; i++)
+        {
+            if ((exist & (1ULL << i)) && (exist & (1ULL << (i + ('a' - 'A')))))
+                result++;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  95.18% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Bitmasking_2 {
+public:
+    int numberOfSpecialChars(string word)
+    {
+        int lower = 0;
+        int upper = 0;
+
+        for (const char& chr : word)
+        {
+            if (islower(chr))
+                lower |= (1 << (chr - 'a'));
+            else
+                upper |= (1 << (chr - 'A'));
+        }
+
+        int common = lower & upper;
+
+        return __builtin_popcount(common);
+    }
+};
