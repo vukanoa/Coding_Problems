@@ -47,6 +47,7 @@
 */
 
 #include <map>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -73,31 +74,98 @@ public:
         if (N % groupSize != 0)
             return false;
 
-        map<int,int> map;
-        for (const int& card : hand)
-            map[card]++;
+        map<int,int> map_freq;
+        for (const int& card_value : hand)
+            map_freq[card_value]++;
 
-        while ( ! map.empty())
+        while ( ! map_freq.empty())
         {
-            auto lowest_card = map.begin();
+            auto lowest_card = map_freq.begin();
 
-            int card = lowest_card->first;
+            int start_card = lowest_card->first;
             lowest_card->second--;
 
             if (lowest_card->second == 0)
-                map.erase(lowest_card->first);
+                map_freq.erase(lowest_card->first);
 
-            int next = card+1;
+            int next_card = start_card+1;
             for (int i = 1; i < groupSize; i++)
             {
-                if (map.find(next) == map.end()) // It does NOT exist
+                if (map_freq.find(next_card) == map_freq.end())// DOESN'T exist
                     return false;
 
-                map[next]--;
-                if (map[next] == 0)
-                    map.erase(next);
+                map_freq[next_card]--;
+                if (map_freq[next_card] == 0)
+                    map_freq.erase(next_card);
 
-                next++;
+                next_card++;
+            }
+        }
+
+        return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 79.67% */
+/* Space Beats: 79.69% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Greedy {
+public:
+    bool isNStraightHand(vector<int>& hand, int groupSize)
+    {
+        const int N = hand.size();
+
+        if (N % groupSize != 0)
+            return false;
+
+        // Map to store the count of each card value
+        unordered_map<int, int> freq;
+        for (const int& card_value : hand)
+            freq[card_value]++;
+
+        for (const int& card_value : hand)
+        {
+            int start_card = card_value;
+
+            // Find the start of a potential straight sequence
+            while (freq[start_card - 1])
+                start_card--;
+
+            // Process sequences starting from every start_card <= card_value
+            while (start_card <= card_value)
+            {
+                // There can be multiple sequences that start on the same
+                // start_card
+                while (freq[start_card] > 0)
+                {
+                    int next_card = start_card;
+                    while (next_card < start_card + groupSize)
+                    {
+                        if (freq[next_card] == 0) // next_card does NOT exist
+                            return false;
+
+                        freq[next_card]--;
+
+                        // Increment
+                        next_card++;
+                    }
+                }
+
+                start_card++;
             }
         }
 
