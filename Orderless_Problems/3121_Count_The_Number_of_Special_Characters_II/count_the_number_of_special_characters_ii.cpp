@@ -49,6 +49,7 @@
     word consists of only lowercase and uppercase English letters.
 */
 
+#include <bitset>
 #include <string>
 #include <vector>
 using namespace std;
@@ -102,5 +103,40 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 56.56% */
+/* Space Beats: 87.08% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Bitset {
+public:
+    int numberOfSpecialChars(string word)
+    {
+        bitset<27> seen[2]; // seen <==> seen characters by case
+
+        for (const auto& chr : word)
+        {
+            int idx = chr & 31;
+            int is_lowercase = (chr >> 5) & 1;
+
+            seen[is_lowercase].set(idx, ! (is_lowercase & seen[0][idx]));
+        }
+
+        return (seen[0] & seen[1]).count();
     }
 };
