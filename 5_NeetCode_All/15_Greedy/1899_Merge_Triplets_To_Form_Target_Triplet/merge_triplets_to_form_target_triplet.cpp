@@ -70,7 +70,6 @@
 
 */
 
-#include <unordered_set>
 #include <vector>
 using namespace std;
 
@@ -83,37 +82,30 @@ using namespace std;
 
 */
 
-/* Time  Beats: 86.64% */
-/* Space Beats: 40.66% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  84.90% */
 
-/*
-    Time  Complexity: O(n)
-*/
-/*
-    Space Complexity: O(1)
-
-    Set "good_triplets" is, at worst(if the result is "true") going to have
-    only 3 elements, therefore, since it's a constant, we can say that the
-    overall Space Complexity is O(1).
-*/
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
 class Solution {
 public:
     bool mergeTriplets(vector<vector<int>>& triplets, vector<int>& target)
     {
-        unordered_set<int> good_triplets;
+        const int N = triplets.size();
+        vector<int> result(3, 0);
 
-        for (auto& t : triplets)
+        for (const vector<int>& triplet : triplets)
         {
-            if (t[0] > target[0] || t[1] > target[1] || t[2] > target[2])
-                continue;
-
-            for (int i = 0; i < 3; i++)
+            if (triplet[0] <= target[0] &&
+                triplet[1] <= target[1] &&
+                triplet[2] <= target[2])
             {
-                if (t[i] == target[i])
-                    good_triplets.insert(i);
+                result[0] = max(result[0], triplet[0]);
+                result[1] = max(result[1], triplet[1]);
+                result[2] = max(result[2], triplet[2]);
             }
         }
 
-        return good_triplets.size() == 3 ? true : false;
+        return result == target;
     }
 };
