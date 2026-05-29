@@ -51,6 +51,7 @@
 
 */
 
+#include <bitset>
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -81,22 +82,22 @@ class Solution_Intuitive_Naive {
 public:
     string findDifferentBinaryString(vector<string>& nums)
     {
-        int n = nums.size();
+        const int N = nums.size();
 
-        if (n == 1)
+        if (N == 1)
             return nums[0] == "0" ? "1" : "0";
 
         unordered_set<int> integers;
         for (string& str : nums)
             integers.insert(convertFromBinStrToInt(str));
 
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < N; i++)
         {
             if (integers.find(i) == integers.end())
-                return convertFromIntToBinStr(i, n);
+                return convertFromIntToBinStr(i, N);
         }
 
-        return convertFromIntToBinStr(n, n);
+        return convertFromIntToBinStr(N, N);
     }
 
 private:
@@ -162,8 +163,8 @@ private:
 /* Time  Beats: 28.82% */
 /* Space Beats: 15.41% */
 
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
+/* Time  Complexity: O(2^N) */
+/* Space Complexity: O(N)   */
 class Solution_Convert_To_Numbers {
 public:
     std::string findDifferentBinaryString(std::vector<std::string>& nums)
@@ -196,6 +197,55 @@ public:
         }
 
         return "";
+    }
+};
+
+
+
+
+/* Time  Complexity: O(2^N * N) */
+/* Space Complexity: O(N)       */
+class Solution_Bitset {
+public:
+    string findDifferentBinaryString(vector<string>& nums)
+    {
+        int N = nums.size();
+        unordered_set<int> uset;
+        
+        // O(N) (entire block)
+        for (const string& num_str : nums)
+            uset.insert(stoi(num_str, nullptr, 2));
+
+        // O(2^N * N) (entire block)
+        for (int i = 0; i < (1 << N); i++)
+        {
+            if (uset.count(i) == 0)
+            {
+                string s = bitset<32>(i).to_string(); // O(32) --> O(1)
+                return s.substr(32 - N);              // O(N)
+            }
+        }
+        
+        return "";
+    }
+};
+
+
+
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */ // "result" is not EXTRA Space
+class Solution_Diagonal {
+public:
+    string findDifferentBinaryString(vector<string>& nums)
+    {
+        int N = nums.size();
+        string result(N, '0');
+
+        for (int i = 0; i < N; i++)
+            result[i] = (nums[i][i] == '0') ? '1' : '0';
+
+        return result;
     }
 };
 
