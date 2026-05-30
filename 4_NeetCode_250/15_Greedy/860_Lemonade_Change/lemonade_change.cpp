@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === EASY ===
@@ -60,6 +57,9 @@
 
 */
 
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -71,49 +71,55 @@
 
 */
 
-/* Time  Beats: 99.72% */
-/* Space Beats: 32.71% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  43.55% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
     bool lemonadeChange(vector<int>& bills)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        const int N = bills.size();
 
-        vector<int> cash_register(3, 0); // 5, 10, 20
+        int fives = 0;
+        int tens  = 0;
 
-        for (int i = 0; i < bills.size(); i++)
+        for (const int& dollar_bill : bills)
         {
-            if (bills[i] == 5)
+            switch (dollar_bill)
             {
-                cash_register[0] += 1;
-            }
-            else if (bills[i] == 10)
-            {
-                if (cash_register[0] == 0)
-                    return false;
+                case 5:
+                    fives++;
+                    break;
 
-                cash_register[0] -= 1;
-                cash_register[1] += 1;
-            }
-            else
-            {
-                if (cash_register[1] >= 1 && cash_register[0] >= 1)
-                {
-                    cash_register[1] -= 1;
-                    cash_register[0] -= 1;
+                case 10:
+                    if (fives == 0) // Unable to give him the change
+                        return false;
 
-                    cash_register[2] += 1;
-                }
-                else if (cash_register[0] >= 3)
-                {
-                    cash_register[0] -= 3;
-                    cash_register[2] += 1;
-                }
-                else
-                    return false;
+                    tens++;
+                    fives--;
+
+                    break;
+
+                case 20:
+                    if (tens >= 1 && fives >= 1)
+                    {
+                        --tens;  // 10
+                        --fives; // 5
+                    }
+                    else if (fives >= 3)
+                    {
+                        --fives; // 5
+                        --fives; // 5
+                        --fives; // 5
+                    }
+                    else
+                    {
+                        return false;
+                    }
+
+                    break;
             }
         }
 
