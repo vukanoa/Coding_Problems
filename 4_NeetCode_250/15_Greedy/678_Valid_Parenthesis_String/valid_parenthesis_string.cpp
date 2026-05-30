@@ -123,3 +123,72 @@ public:
         return true;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  73.90% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Greedy__Space_Efficient {
+public:
+    bool checkValidString(string s)
+    {
+        int unpaired_open            = 0;
+        int unused_asterisk          = 0;
+        int asterisk_used_as_closing = 0;
+
+        for (const char& chr : s)
+        {
+            if (chr == '*')
+            {
+                if (unpaired_open > 0)
+                {
+                    --unpaired_open;
+                    ++asterisk_used_as_closing;
+                }
+                else
+                {
+                    ++unused_asterisk;
+                }
+            }
+            else if (chr == '(')
+            {
+                ++unpaired_open;
+            }
+            else if (chr == ')')
+            {
+                if (unpaired_open > 0)
+                {
+                    --unpaired_open;
+                }
+                else if (asterisk_used_as_closing > 0)
+                {
+                    --asterisk_used_as_closing;
+                    ++unused_asterisk;
+                }
+                else if (unused_asterisk > 0)
+                {
+                    --unused_asterisk;
+                }
+                else
+                {
+                    return false; // No pair for this ')'.
+                }
+            }
+        }
+
+        return unpaired_open == 0;
+    }
+};
