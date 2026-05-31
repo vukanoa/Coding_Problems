@@ -97,3 +97,54 @@ public:
         return true;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   8.47% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Counting_Sort {
+public:
+    static bool asteroidsDestroyed(int mass, vector<int>& asteroids)
+    {
+        static constexpr int MAX_ASTEROID_MASS = 1e5;
+
+        unsigned freq[MAX_ASTEROID_MASS + 1] = {0};
+
+        unsigned max_asteroid = 0;
+        for (const unsigned& asteroid_mass: asteroids)
+        {
+            freq[asteroid_mass]++;
+            max_asteroid = max(max_asteroid, asteroid_mass);
+        }
+
+        unsigned long long planet = 1ULL * mass;
+
+        for (int curr_asteroid = 1; curr_asteroid <= max_asteroid; curr_asteroid++)
+        {
+            if (freq[curr_asteroid] == 0)
+                continue;
+
+            if (planet < curr_asteroid)
+                return false;
+
+            planet += 1ULL * curr_asteroid * freq[curr_asteroid];
+
+            freq[curr_asteroid] = 0; // Used all the asteroids with this mass
+        }
+
+        return true;
+    }
+};
