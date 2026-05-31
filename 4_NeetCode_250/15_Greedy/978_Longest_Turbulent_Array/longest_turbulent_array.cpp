@@ -69,82 +69,82 @@ using namespace std;
 
 */
 
-/* Time  Beats: 68.99% */
-/* Space Beats: 36.41% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  27.22% */
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution_Naive_Intuitive {
+class Solution {
 public:
     int maxTurbulenceSize(vector<int>& arr)
     {
-        if (arr.size() == 1)
-            return 1;
+        const int N = arr.size();
+        int result = 1;
 
-        int max_subarray = 0;
-
-        int start = 0;
-        int subarray = 0;
-
-        // k is odd
-        while (start < arr.size()-1)
+        /**********************/
+        /* Start with GREATER */
+        /**********************/
+        int L = 0;
+        int R = 0;
+        while (R < N-1)
         {
-            int k;
-            for (k = start; k < arr.size()-1; k++)
+            result = max(result, R - L + 1);
+
+            int k = (R - L);
+
+            if (k & 1) // Odd
             {
-                if (k & 1) // k is odd
-                {
-                    if ( !(arr[k] > arr[k + 1]))
-                        break;
-
-                    subarray++;
-                }
-                else
-                {
-                    if ( !(arr[k] < arr[k + 1]) )
-                        break;
-
-                    subarray++;
-                }
+                if (arr[R] > arr[R+1]) // NOT what we want
+                    L = R;
+                else if (arr[R] == arr[R+1])
+                    L = R + 1;
+            }
+            else
+            {
+                if (arr[R] < arr[R+1]) // NOT what we want
+                    L = R + 1;
+                else if (arr[R] == arr[R+1])
+                    L = R + 1;
             }
 
-            max_subarray = std::max(max_subarray, subarray+1);
-
-            start = k+1;
-            subarray = 0;
+            // Increment
+            R++;
         }
+        result = max(result, R - L + 1);
 
-        start = 0;
-        subarray = 0;
 
-        // k is even
-        while (start < arr.size()-1)
+
+        /**********************/
+        /* Start with SMALLER */
+        /**********************/
+        int l = 0;
+        int r = 0;
+        while (r < N-1)
         {
-            int k;
-            for (k = start; k < arr.size()-1; k++)
+            result = max(result, r - l + 1);
+
+            int k = (r - l);
+
+            if (k & 1) // Odd
             {
-                if (k & 1) // k is odd
-                {
-                    if ( !(arr[k] < arr[k + 1]))
-                        break;
-
-                    subarray++;
-                }
-                else
-                {
-                    if ( !(arr[k] > arr[k + 1]) )
-                        break;
-
-                    subarray++;
-                }
+                if (arr[r] < arr[r+1]) // NOT what we want
+                    l = r;
+                else if (arr[r] == arr[r+1])
+                    l = r + 1;
+            }
+            else
+            {
+                if (arr[r] > arr[r+1]) // NOT what we want
+                    l = r + 1;
+                else if (arr[r] == arr[r+1])
+                    l = r + 1;
             }
 
-            max_subarray = std::max(max_subarray, subarray+1);
-
-            start = k+1;
-            subarray = 0;
+            // Increment
+            r++;
         }
+        result = max(result, r - l + 1);
 
-        return max_subarray;
+        return result;
     }
 };
