@@ -146,3 +146,50 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is asymptotically more optimal than the above two because the
+    value range is fixed [1,100], so it avoids O(N log N) comparison sort and
+    becomes linear.
+
+    The trick with k % 3 works because it simulates taking every 3rd candy for
+    free after processing prices in ascending order.
+
+*/
+/* Time  Beats: 100.00% */
+/* Space Beats:  21.54% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(M)     */
+class Solution_Counting_Sort__Linear {
+public:
+    int minimumCost(vector<int>& cost)
+    {
+        const int N = cost.size();
+        int result = 0;
+
+        int freq[101] = {0};
+        int k = 0;
+
+        for (const auto& price : cost)
+            freq[price]++;
+
+        for (int price = 1; price < 101; price++)
+        {
+            for (int j = 0; j < freq[price]; j++)
+            {
+                if (k++ % 3 != N % 3)
+                    result += price;
+            }
+        }
+
+        return result;
+    }
+};
