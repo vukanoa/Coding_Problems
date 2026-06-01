@@ -102,3 +102,47 @@ public:
         return (N-1) % 3 == 0 ? result + cost[0] : result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Essentially the same as above, though it's concepptually different.
+    It's much easier to read and there are ternary operators or additonal
+    if-statements.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  21.54% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(logN)     */ // Space Complexity of C++'s Intro Sort
+class Solution_2 {
+public:
+    int minimumCost(vector<int>& cost)
+    {
+        const int N = cost.size();
+        int result = 0;
+
+        /* Sort in DESCENDING order */
+        sort(cost.begin(), cost.end(), greater<int>());
+
+        int i = 0;
+        while (i < N)
+        {
+            result += cost[i];
+
+            if (i+1 < N)
+                result += cost[i+1];
+
+            i += 3;
+        }
+
+        return result;
+    }
+};
