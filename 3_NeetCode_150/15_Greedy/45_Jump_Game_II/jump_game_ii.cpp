@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -53,47 +50,9 @@
 
 */
 
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Classical "fibonacci" type of Dynamic Programming technique.
-
-*/
-
-/* Time  Beats:  8.07% */
-/* Space Beats: 19.33% */
-
-/* Time  Complexity: O(n * max(nums)) */
-/* Space Complexity: O(n) */
-class Solution {
-public:
-    int jump(std::vector<int>& nums)
-    {
-        int n = nums.size();
-
-        std::vector<int> dp(n, INT_MAX);
-        dp[n-1] = 0;
-
-        for (int i = n-2; i >= 0; i--)
-        {
-            for (int j = 1; j <= nums[i]; j++)
-            {
-                if (i + j >= n)
-                    break;
-
-                if (dp[i + j] != INT_MAX)
-                    dp[i] = std::min(dp[i], 1 + dp[i + j]);
-            }
-        }
-
-        return dp[0];
-    }
-};
-
-
-
+#include <climits>
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -110,28 +69,28 @@ public:
 /* Time  Beats: 32.55% */
 /* Space Beats: 19.33% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution {
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Dynamic_Programming {
 public:
-    int jump(std::vector<int>& nums)
+    int jump(vector<int>& nums)
     {
-        int n = nums.size();
-        std::vector<int> dp(n, INT_MAX);
+        const int N = nums.size();
+        vector<int> dp(N, INT_MAX);
 
         dp[0] = 0;
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < N; i++)
         {
-            for (int j = 1; j <= nums[i]; j++)
+            for (int jump_len = 1; jump_len <= nums[i]; jump_len++)
             {
-                if (i + j >= n)
+                if (i + jump_len >= N)
                     continue;
 
-                if (dp[i + j] == INT_MAX) // If it's not yet level-marked
-                    dp[i + j] = dp[i] + 1;
+                if (dp[i + jump_len] == INT_MAX) // Not yet level-marked
+                    dp[i + jump_len] = dp[i] + 1;
 
-                if (i+j == n-1)
-                    return dp[i + j];
+                if (i + jump_len == N-1)
+                    return dp[i + jump_len];
             }
         }
 
@@ -155,23 +114,23 @@ public:
 /* Time  Beats: 95.10% */
 /* Space Beats: 43.87% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Greedy {
 public:
-    int jump(std::vector<int>& nums)
+    int jump(vector<int>& nums)
     {
-        int n = nums.size();
+        const int N = nums.size();
         int jumps = 0;
 
         int left  = 0;
         int right = 0;
 
-        while (right < n-1)
+        while (right < N-1)
         {
             int farthest = 0;
             for (int j = left; j <= right; j++)
-                farthest = std::max(farthest, j + nums[j]);
+                farthest = max(farthest, j + nums[j]);
 
             left  = right + 1;
             right = farthest;
