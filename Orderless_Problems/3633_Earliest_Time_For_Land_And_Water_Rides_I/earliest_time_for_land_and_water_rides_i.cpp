@@ -146,3 +146,127 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  59.92% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(1)     */
+class Solution_Explicit__for__Didactic_purposes {
+public:
+    int earliestFinishTime(vector<int>& landStartTime, vector<int>& landDuration, vector<int>& waterStartTime, vector<int>& waterDuration)
+    {
+        const int N = landStartTime.size();
+        const int M = waterStartTime.size();
+        int result = INT_MAX;
+
+        int min_land_start = INT_MAX;
+        int min_land_end   = INT_MAX;
+        for (int i = 0; i < N; i++)
+        {
+            if (landStartTime[i] + landDuration[i] < min_land_end)
+            {
+                min_land_start = landStartTime[i];
+                min_land_end   = landStartTime[i] + landDuration[i];
+            }
+        }
+
+        int min_water_start = INT_MAX;
+        int min_water_end   = INT_MAX;
+        for (int j = 0; j < M; j++)
+        {
+            if (waterStartTime[j] + waterDuration[j] < min_water_end)
+            {
+                min_water_start = waterStartTime[j];
+                min_water_end   = waterStartTime[j] + waterDuration[j];
+            }
+        }
+
+        for (int j = 0; j < M; j++)
+        {
+            int total_end;
+
+            if (min_land_end <= waterStartTime[j])
+                total_end = waterStartTime[j] + waterDuration[j];
+            else
+                total_end = min_land_end + waterDuration[j];
+
+            result = min(result, total_end);
+        }
+
+        for (int i = 0; i < N; i++)
+        {
+            int total_end;
+
+            if (min_water_end <= landStartTime[i])
+                total_end = landStartTime[i] + landDuration[i];
+            else
+                total_end = min_water_end + landDuration[i];
+
+            result = min(result, total_end);
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  59.92% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(1)     */
+class Solution_Linear_Elegant {
+public:
+    int earliestFinishTime(vector<int>& landStartTime, vector<int>& landDuration, vector<int>& waterStartTime, vector<int>& waterDuration)
+    {
+        const int N = landStartTime.size();
+        const int M = waterStartTime.size();
+        int result = INT_MAX;
+
+        int min_land_end = INT_MAX;
+        for (int i = 0; i < N; i++)
+        {
+            min_land_end = min(min_land_end, landStartTime[i] + landDuration[i]);
+        }
+
+        int min_water_end = INT_MAX;
+        for (int j = 0; j < M; j++)
+        {
+            min_water_end = min(min_water_end, waterStartTime[j] + waterDuration[j]);
+
+            result = min(result, max(min_land_end, waterStartTime[j]) + waterDuration[j]);
+        }
+
+        for (int i = 0; i < N; i++)
+        {
+            result = min(result, max(min_water_end, landStartTime[i]) + landDuration[i]);
+        }
+
+        return result;
+    }
+};
+
