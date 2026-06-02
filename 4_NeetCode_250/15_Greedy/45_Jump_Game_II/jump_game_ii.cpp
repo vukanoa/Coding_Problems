@@ -51,6 +51,7 @@
 */
 
 #include <climits>
+#include <queue>
 #include <vector>
 using namespace std;
 
@@ -95,6 +96,65 @@ public:
         }
 
         return 0;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    BFS_Greedy max reachability Solution.
+
+*/
+
+/* Time  Beats: 13.15% */
+/* Space Beats: 25.26% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_BFS_Greedy_Max_Reachability {
+public:
+    int jump(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        if (N == 1)
+            return 0;
+
+        queue<int> queue;
+        queue.push(0);
+
+        int max_reach_idx = 0;
+        int jumps = 0;
+
+        while ( ! queue.empty())
+        {
+            int size = queue.size();
+            while (size > 0)
+            {
+                int i = queue.front();
+                queue.pop();
+
+                for (int j = max(max_reach_idx + 1, i+1); j <= min(i + nums[i], N-1); j++)
+                    queue.push(j);
+
+                max_reach_idx = max(max_reach_idx, i + nums[i]);
+
+                // Decrement
+                size--;
+            }
+
+            jumps++;
+
+            if (max_reach_idx >= N-1)
+                break;
+        }
+
+        return jumps;
     }
 };
 
