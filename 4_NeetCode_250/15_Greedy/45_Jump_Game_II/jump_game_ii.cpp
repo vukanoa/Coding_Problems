@@ -201,3 +201,57 @@ public:
         return jumps;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is just another way of implementing this BFS-Greedy Solution.
+
+    It's always beneficial to see more than a simgle way to solve a problem.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  61.40% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Greedy_2 {
+public:
+    int jump(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        if (N == 1)
+            return 0;
+
+        int jumps = 0;
+        int max_reach = 0;
+
+        int i = 0;
+        for (;;)
+        {
+            int level_end = max_reach;
+
+            while (i <= level_end)
+            {
+                max_reach = max(max_reach, i + nums[i]);
+
+                if (max_reach >= N-1)
+                    return jumps + 1;
+
+                // Increment
+                i++;
+            }
+
+            jumps++;
+        }
+
+        return -1; // Unreachable, as we'll ALWAYS be able to reach nums[N-1]
+    }
+};
