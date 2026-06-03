@@ -142,3 +142,52 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We can do it in 3 Passes instead of 4. Small optimization, but still an
+    optimization.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  59.92% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(1)     */
+class Solution_Slightly_Optimized {
+public:
+    int earliestFinishTime(vector<int>& landStartTime, vector<int>& landDuration, vector<int>& waterStartTime, vector<int>& waterDuration)
+    {
+        const int N = landStartTime.size();
+        const int M = waterStartTime.size();
+        int result = INT_MAX;
+
+        int min_land_end = INT_MAX;
+        for (int i = 0; i < N; i++)
+        {
+            min_land_end = min(min_land_end, landStartTime[i] + landDuration[i]);
+        }
+
+        int min_water_end = INT_MAX;
+        for (int j = 0; j < M; j++)
+        {
+            min_water_end = min(min_water_end, waterStartTime[j] + waterDuration[j]);
+
+            result = min(result, max(min_land_end, waterStartTime[j]) + waterDuration[j]);
+        }
+
+        for (int i = 0; i < N; i++)
+        {
+            result = min(result, max(min_water_end, landStartTime[i]) + landDuration[i]);
+        }
+
+        return result;
+    }
+};
