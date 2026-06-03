@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -77,79 +75,9 @@
 
 */
 
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Naive, intuitive approach.
-
-*/
-
-/* Time  Beats: 12.25% */
-/* Space Beats:  5.23% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_Naive {
-public:
-    std::string predictPartyVictory(std::string senate)
-    {
-        int num_rad = 0;
-        int num_dir = 0;
-
-        for (char& party : senate)
-        {
-            if (party == 'R')
-                num_rad++;
-            else
-                num_dir++;
-        }
-
-        int ban_rad = 0;
-        int ban_dir = 0;
-
-        std::unordered_set<int> uset;
-        for (;;)
-        {
-            for (int i = 0; i < senate.length(); i++)
-            {
-                if (uset.count(i))
-                    continue;
-
-                if (ban_rad > 0 && senate[i] == 'R')
-                {
-                    ban_rad--;
-                    num_rad--;
-                    uset.insert(i);
-                    continue;
-                }
-                else if (ban_dir > 0 && senate[i] == 'D')
-                {
-                    ban_dir--;
-                    num_dir--;
-                    uset.insert(i);
-                    continue;
-                }
-
-                if (senate[i] == 'R' && num_dir == 0)
-                    return "Radiant";
-                else if (senate[i] == 'D' && num_rad == 0)
-                    return "Dire";
-
-                if (senate[i] == 'R')
-                    ban_dir++;
-                else
-                    ban_rad++;
-            }
-        }
-
-        return "Radiant"; // Or "Dire" it's irrelevant
-    }
-};
-
-
-
+#include <queue>
+#include <string>
+using namespace std;
 
 /*
     ------------
@@ -258,17 +186,18 @@ public:
 /* Time  Beats: 85.16% */
 /* Space Beats: 31.35% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution {
 public:
-    std::string predictPartyVictory(std::string senate)
+    string predictPartyVictory(string senate)
     {
-        std::queue<int> radiants;
-        std::queue<int> dires;
+        const int N = senate.length();
 
-        int n = senate.length();
-        for (int i = 0; i < n; i++)
+        queue<int> radiants;
+        queue<int> dires;
+
+        for (int i = 0; i < N; i++)
         {
             if (senate[i] == 'R')
                 radiants.push(i);
@@ -276,12 +205,15 @@ public:
                 dires.push(i);
         }
 
-        while (!radiants.empty() && !dires.empty())
+        while ( ! radiants.empty() &&  ! dires.empty())
         {
-            if (radiants.front() < dires.front())
-                radiants.push(n++);
+            int R_idx = radiants.front();
+            int D_idx = dires.front();
+
+            if (R_idx < D_idx)
+                radiants.push(R_idx + N);
             else
-                dires.push(n++);
+                dires.push(D_idx + N);
 
             dires.pop();
             radiants.pop();
