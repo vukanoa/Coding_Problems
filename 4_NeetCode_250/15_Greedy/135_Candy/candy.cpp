@@ -66,12 +66,12 @@ using namespace std;
 
 */
 
-/* Time  Beats: 94.89% */
-/* Space Beats: 41.03% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  77.54% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution {
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Greedy_Two_Pass {
 public:
     int candy(vector<int>& ratings)
     {
@@ -91,5 +91,63 @@ public:
         }
 
         return accumulate(candies.begin(), candies.end(), 0);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  98.06% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_One_Pass {
+public:
+    int candy(vector<int>& ratings)
+    {
+        const int N = ratings.size();
+        int result = N;
+
+        int i = 1;
+        while (i < N)
+        {
+            if (ratings[i-1] == ratings[i])
+            {
+                i++;
+                continue;
+            }
+
+            int increment = 0;
+            while (i < N && ratings[i-1] < ratings[i])
+            {
+                increment++;
+                result += increment;
+
+                i++;
+            }
+
+            int decrement = 0;
+            while (i < N && ratings[i-1] > ratings[i])
+            {
+                decrement++;
+                result += decrement;
+
+                i++;
+            }
+
+            result -= min(increment, decrement);
+        }
+
+        return result;
     }
 };
