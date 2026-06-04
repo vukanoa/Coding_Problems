@@ -148,3 +148,56 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  60.70% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Kadane_Algorithm {
+public:
+    int maxTurbulenceSize(vector<int>& arr)
+    {
+        const int N = arr.size();
+
+        int result = 1;
+
+        int smaller = 1;
+        int greater = 1;
+
+        for (int i = 0; i < N-1; i++)
+        {
+            if (arr[i] > arr[i+1])
+            {
+                smaller = greater + 1;
+                greater = 1;
+            }
+            else if (arr[i] < arr[i+1])
+            {
+                greater = smaller + 1;
+                smaller = 1;
+            }
+            else
+            {
+                smaller = 1;
+                greater = 1;
+            }
+
+            result = max(result, max(smaller, greater));
+        }
+
+        return result;
+    }
+};
