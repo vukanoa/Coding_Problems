@@ -96,15 +96,59 @@ class Solution_Greedy {
 public:
     bool canJump(vector<int>& nums)
     {
-        int n = nums.size();
-        int goal = n-1;
+        const int N = nums.size();
+        int goal = N-1; // Leftmost index that can reach >= N-1
 
-        for (int i = n-2; i >= 0; i--)
+        for (int i = N-2; i >= 0; i--)
         {
             if (i + nums[i] >= goal)
                 goal = i;
         }
 
         return goal == 0;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Similar to above, though conceptually different.
+
+    This one goes left-to-right, instead of the other way around. I believe
+    this one is much easier to grasp.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  82.12% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Greedy_2 {
+public:
+    bool canJump(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        int idx = 0;
+        int max_reach = 0;
+
+        while (idx <= max_reach)
+        {
+            max_reach = max(max_reach, idx + nums[idx]);
+
+            if (max_reach >= N-1)
+                return true;
+
+            // Increment
+            idx++;
+        }
+
+        return false;
     }
 };
