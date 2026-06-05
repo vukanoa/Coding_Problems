@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <numeric> // for accumulate
-
 /*
     ==============
     === MEDIUM ===
@@ -70,196 +66,16 @@
 
 */
 
-
-
-/*
-    ============
-    === NOTE ===
-    ============
-
-    This Problem was taken down from Top 100 Liked Questions on LeetCode.
-
-    This Problem is not intuitive to me at all. It's a very weird form of
-    Greedy Algorithm.
-
-*/
-
-
+#include <vector>
+#include <numeric> // for accumulate
+using namespace std;
 
 /*
     ------------
     --- IDEA ---
     ------------
 
-    They say that this Problem is similar to 53_Maximum_Subarray because it
-    also uses Kadane's Algorithm.
-
-
-
-    It is said that if there is a solution it is guaranteed to be unique.
-    So either there is a solution and it's the only one, or there isn't.
-
-    If our total_gas < total_cost then in that case we can't complete our
-    journey, so will return -1.
-
-    Checking:
-        if (total_gas is less than total_cost)
-    is the same as checking:
-        if (total_gas - total_cost is less than 0)
-
-    If total_gas >= total_cost then that means there is only one solution.
-    Meaning there is only a single station we could start from to be able
-    to successfully complete the cycle.
-
-    To find that gas station will will keep track of the "tank".
-    tank = gas[i] - cost[i];
-
-    Let's suppose at any index our "tank"(current gas) became negative so we
-    can clearly say that till that index all the gas station between i-th
-    starting point are bad, starting point as well.
-
-    That means we can start trying at the next gas station on the i+1 station.
-
-
-    Example: gas = [1, 2, 3, 4, 5]  cost = [3, 4, 5, 1, 2]
-
-     i  gas  cost   tank        start
-    ––– –––  ––––   –––––––––   –––––
-     start = 0              0     0
-     0   1    3    0+1-3 = -2     1    reset tank to 0, start to 0+1 = 1
-     1   2    4    0+2-4 = -2     2    reset tank to 0, start to 1+1 = 2
-     2   3    5    0+3-5 = -2     3    reset tank to 0, start to 2+1 = 3
-     3   4    1    0+4-1 =  3     3
-     4   5    2    3+5-2 =  6     3
-
-*/
-
-/* Time  Beats: 54.90% */
-/* Space Beats: 88.30% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution_Kadane {
-public:
-    int canCompleteCircuit(std::vector<int>& gas, std::vector<int>& cost)
-    {
-        int total = 0;
-        int tank  = 0;
-        int start = 0;
-
-        for (int i = 0; i < gas.size(); i++)
-        {
-            total += gas[i] - cost[i];
-            tank  += gas[i] - cost[i];
-
-            if (tank < 0)
-            {
-                start = i + 1;
-                tank = 0;
-            }
-        }
-
-        return (total >= 0) ? start : - 1;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Another implementation.
-
-*/
-
-/* Time  Beats: 54.49% */
-/* Space Beats: 31.02% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution_Neat {
-public:
-    int canCompleteCircuit(vector<int>& gas, vector<int>& cost)
-    {
-        if (std::accumulate(gas.begin(), gas.end(), 0) < std::accumulate(cost.begin(), cost.end(), 0))
-            return -1;
-
-        int n = gas.size();
-
-        int tank = 0;
-        int start = -1;
-        for (int i = 0; i < n; i++)
-        {
-            int curr_diff = gas[i] - cost[i];
-
-            if (tank + curr_diff < 0)
-                tank = 0;
-            else
-            {
-                start = tank == 0 ? i : start;
-                tank += curr_diff;
-            }
-        }
-
-        return start;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Another implementation.
-
-*/
-
-/* Time  Beats: 61.76% */
-/* Space Beats: 31.73% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
-class Solution_Neat_2_Optimized {
-public:
-    int canCompleteCircuit(vector<int>& gas, vector<int>& cost)
-    {
-        int total = 0;
-        int tank  = 0;
-        int start = -1;
-
-        for (int i = 0; i < gas.size(); i++)
-        {
-            total += gas[i] - cost[i];
-
-            int curr_diff = gas[i] - cost[i];
-            if (tank + curr_diff < 0)
-                tank = 0;
-            else
-            {
-                start = tank == 0 ? i : start;
-                tank += curr_diff;
-            }
-        }
-
-        return (total >= 0) ? start : -1;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    The "std::accumulate" function takes three arguments:
+    The "accumulate" function takes three arguments:
         1. Starting point of the vector
         2. Ending point of the vector
         3. Initial value
@@ -273,7 +89,7 @@ public:
     equal to total sum of cost, then there is NO Solution. In that case just
     return -1.
 
-    We're doing that with std::accumulate.
+    We're doing that with accumulate.
 
     However, afterwards, this is absolutely not intuitive.
 
@@ -390,12 +206,12 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_Neat {
+class Solution {
 public:
-    int canCompleteCircuit(std::vector<int>& gas, std::vector<int>& cost)
+    int canCompleteCircuit(vector<int>& gas, vector<int>& cost)
     {
-        int gas_sum  = std::accumulate(gas.begin(),  gas.end(), 0);
-        int cost_sum = std::accumulate(cost.begin(), cost.end(), 0);
+        int gas_sum  = accumulate(gas.begin(),  gas.end(), 0);
+        int cost_sum = accumulate(cost.begin(), cost.end(), 0);
 
         /* There is NO Solution */
         if (gas_sum < cost_sum)
@@ -421,81 +237,3 @@ public:
         return start;
     }
 };
-
-
-int
-main()
-{
-    Solution_Kadane sol_kadane;
-    Solution_Neat sol_neat;
-
-    /* Example 1 */
-    std::vector<int> gas  = {1, 2, 3, 4, 5};
-    std::vector<int> cost = {3, 4, 5, 1, 2};
-
-    /* Example 2 */
-    // std::vector<int> gas  = {2, 3, 4};
-    // std::vector<int> cost = {3, 4, 3};
-
-    /* Example 3 */
-    // std::vector<int> gas  = {3, 1, 1};
-    // std::vector<int> cost = {1, 2, 2};
-
-    /* Example 4 */
-    // std::vector<int> gas  = {7, 1, 0, 11, 4};
-    // std::vector<int> cost = {5, 9, 1, 2, 5};
-
-    /* Example 5 */
-    // std::vector<int> gas  = {2};
-    // std::vector<int> cost = {9};
-
-    /* Example 6 */
-    // std::vector<int> gas  = {5};
-    // std::vector<int> cost = {3};
-
-
-    std::cout << "\n\t===================";
-    std::cout << "\n\t=== GAS STATION ===";
-    std::cout << "\n\t===================\n";
-
-
-    /* Write input */
-
-    // Gas
-    bool first = true;
-    std::cout << "\n\tGas:  [";
-    for (auto x: gas)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        std::cout << x;
-        first = false;
-    }
-    std::cout << "]";
-
-    // Cost
-    first = true;
-    std::cout << "\n\tCost: [";
-    for (auto x: cost)
-    {
-        if (!first)
-            std::cout << ", ";
-
-        std::cout << x;
-        first = false;
-    }
-    std::cout << "]\n";
-
-
-    /* Solution */
-    int solution = sol_kadane.canCompleteCircuit(gas, cost);
-    // int solution = sol_neat.canCompleteCircuit(gas, cost);
-
-
-    /* Write output */
-    std::cout << "\n\tStarting Gas Station is: " << solution << "\n\n";
-
-
-    return 0;
-}
