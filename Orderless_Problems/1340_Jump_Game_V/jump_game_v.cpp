@@ -66,6 +66,8 @@
 */
 
 #include <cstring>
+#include <queue>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -139,5 +141,110 @@ private:
         }
 
         return memo[idx] = result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Monotonic_Stack__plus__Topological_BFS__Kanh_Algorithm__DAG {
+public:
+    int maxJumps(vector<int>& arr, int d)
+    {
+        const int N = arr.size();
+
+        unordered_map<int, vector<int>> adj_list;
+        unordered_map<int, int> indegree;
+
+        vector<int> monotonic_stack; // Monotonicly DECREASING Stack
+
+        // Consider larger element from the left side
+        for (int idx = 0; idx < N; idx++)
+        {
+            while ( ! monotonic_stack.empty())
+            {
+                int idx_of_prev_higher = monotonic_stack.back();
+
+                if (arr[idx_of_prev_higher] < arr[idx] && idx - idx_of_prev_higher <= d)
+                {
+                    monotonic_stack.pop_back();
+
+                    adj_list[idx].push_back(idx_of_prev_higher);
+                    indegree[idx_of_prev_higher]++;
+                }
+                else
+                    break;
+            }
+
+            monotonic_stack.push_back(idx);
+        }
+
+        monotonic_stack.clear();
+
+        // Consider larger element from the right side
+        for (int idx = N - 1; idx >= 0; idx--)
+        {
+            while ( ! monotonic_stack.empty())
+            {
+                int idx_of_next_higher = monotonic_stack.back();
+
+                if (arr[idx_of_next_higher] < arr[idx] && idx_of_next_higher - idx <= d)
+                {
+                    monotonic_stack.pop_back();
+
+                    adj_list[idx].push_back(idx_of_next_higher);
+                    indegree[idx_of_next_higher]++;
+                }
+                else
+                    break;
+            }
+
+            monotonic_stack.push_back(idx);
+        }
+
+        queue<pair<int, int>> queue;
+
+        for (int idx = 0; idx < N; idx++)
+        {
+            if ( ! indegree.count(idx))
+                queue.push({idx, 0});
+        }
+
+        int max_jumps = 0;
+
+        while ( ! queue.empty())
+        {
+            int queue_size = queue.size();
+
+            // Each BFS layer increases jump count by 1
+            while (queue_size--)
+            {
+                auto [curr_idx, jumps] = queue.front();
+                queue.pop();
+
+                for (int neighbor : adj_list[curr_idx])
+                {
+                    indegree[neighbor]--;
+
+                    if (indegree[neighbor] == 0)
+                        queue.push({neighbor, jumps + 1});
+                }
+            }
+
+            max_jumps++;
+        }
+
+        return max_jumps;
     }
 };
