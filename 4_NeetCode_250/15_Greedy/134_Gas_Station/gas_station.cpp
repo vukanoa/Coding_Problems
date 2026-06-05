@@ -75,165 +75,227 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    The "accumulate" function takes three arguments:
-        1. Starting point of the vector
-        2. Ending point of the vector
-        3. Initial value
+    First, in order to know whether a solution even exists, we must check
+    whether the total amount of gas is greater than the total cost.
 
-    It's equivalent to Python function: sum(array)
+    If a solution exists, we are told that it is unique.
 
-    This Problem is not intuitive to me at all. It's a very weird form of
-    Greedy Algorithm.
+    In that case--i.e. if a solution exists--we only need to find the "idx" of
+    the first station from which we NEVER drop below 0 until the end of the
+    array.
 
-    Important thing to note is that if the total sum of gas isn't greater or
-    equal to total sum of cost, then there is NO Solution. In that case just
-    return -1.
+    Why and how is this sufficient?
 
-    We're doing that with accumulate.
+    If we know that a solution exists, that means that at least 1 index from
+    [0, N-1] is a valid solution.
 
-    However, afterwards, this is absolutely not intuitive.
+    At every station we refill gas[i] and subtract(consume) cost[i].
 
-    In Example 1:
-        gas  = [ 1,  2,  3,  4,  5]
-        cost = [ 3,  4,  5,  1,  2]
+    Since we know that at least 1 index from [0, N-1] is a solution, we start
+    from index 0.
 
-        diff = [-2, -2, -2,  3,  3]
+    We assume that the potential solution, i.e. "starting_idx", is equal to 0
+    and begin.
 
-    Once we start from the index 3, where the value is positive, and we
-    continue and not "dip" under the 0 until the end, then THAT index is the
-    Solution.
-    We DON'T go around trying to subtract the remaining ones. This is why it's
-    absolutely not intuitive.
+    Also, initially the "tank"(i.e. current amount of gas) is 0.
 
+    Now we start from station "starting_idx" = 0.
 
-    There are 3 comments that I've found that are explaining this a bit better.
+    At every station we always first refill gas[i], and then subtract(consume)
+    cost[i], i.e.:
 
-    I)
-        Actually, the reason why it works is simple, and it happens because of
-        two factors.
-            1) If you moved to some value, and your total sum is greater than
-               zero, then it means, that previous values did bring some value
-               to the outcome.
+        tank += gas[i] - cost[i];
 
-               For example, we have gas = [2,3,0] and cost = [0,0,5].
+    If--and this is now EXTREMELY important--at ANY moment "tank" becomes < 0,
+    that means that CERTAINLY none of the stations BEFORE the current one, nor
+    the current one itself, are a solution.
 
-               If we take just solely value 3 without 2, it wouldn't be enough
-               to pass the last station, but previous values definitely bring
-               some value to the outcome.
+    Formally: no station in the range [0, i] (inclusive), is a solution.
 
-            2) If we know, that there's definitely has to be a solution.
-               Then, we may assume, that it has to be the smallest possible
-               value, as I said before it may bring the most value to the
-               result.
+    How do we know that? How can we be certain?
 
+    Let's look at this example:
 
+        gas = [1, 4, 2, 3, 5]
+       cost = [2, 3, 4, 1, 1]
+               0  1  2  3  4
 
-    II)
-        The solution would click if you try to apply the pattern as in:
-            Kadane's Algorithm.
-        Try to build a solution from the starting index, once you are certain
-        that it can no longer be an answer, forget everything and consider the
-        next index.
+    First, we immediately see that index 0 is not a solution because the "tank"
+    after refilling gas[i] and consuming cost[i] becomes smaller than 0.
 
+    In other words, if we start from station 0, we will not even be able to
+    reach station 1.
 
+    Because of that, we reset "tank" back to 0 and set the new potential
+    solution:
 
-    III)
-        I will try to explain it in my own way-- please be patient and read it,
-        hope you will get the intuition behind the algorithm.
+        starting_idx = 1
 
-        There are 4 parts to it.
+    and continue with i = 1.
 
-        Part 1)
-            Sum of gas array>=sum of cost array, Therefore: very intuitive, we
-            should always have enough gas.
+    When we are at station idx = 1, the current state of "tank" is 0.
 
+    We refill gas[1] and subtract cost[1]:
 
-        Part 2)
-            We are keeping a total+=gas[i]-cost[i] for each i, and whenever it
-            is < 0 we are skipping that point and moving forward,
-            making total 0, Therefore, it means we ran out of gas if we started
-            at some point which was <= current pos of i, so now we have to find
-            a new starting position, which wall be > curr pos of i.
+        tank += gas[1] - cost[1]
+        tank += 4      - 3
 
-            Now think, why will this new start lie ahead of curr pos i, not
-            anywhere before it,  you could think, we started from point
-                A------>B(total till +ve)------->C(total<0),
-            as per this algo we try to find start ahead of C, what if we
-            started from B and skipped A instead, well that won't work.
-            You moved from A--------> B with some positive value(or 0), or else
-            you would have stopped right at B and made total to 0. So add A
-            improved our chances of having a positive total, so there is no
-            point in looking for the new position start anywhere behind point
-            C.
+    Since "tank" >= 0, that means we can reach station idx = 2.
 
+    Now we are at station idx = 2 with "tank" = 1 (this is VERY important)
 
-        Part 3)
-            When the total stays +ve, we dn't do anything to the start point,
-            our start pointer points to the first index when our total became
-            positive.
+    We refill gas[2] and subtract cost[2].
 
-            Again this is similar to the above explanation.
-            Lets suppose we start from
-                X(-ve)--->Y(-ve)--->A(+ve)---->B(+ve)---->C(+ve),
-            where C is the end of the array, our start(which is also the ans)
-            would be A.
+        tank += gas[2] - cost[1]
+        tank +=  2     -   4
+        tank += (-2)
 
-            Why not B? why not C?
+    Since "tank" when entering the station was 1, and after refilling gas[2]
+    and subtracting cost[2] the tank is:
 
-            It is because we moved from A to B with some +ve value or atleast
-            0, whereas if we started from B we would have had only the value of
-            B so earlier point added some value to our total, so its more
-            favorable to help us reach the ans, hence earliest point is always
-            better.
+        tank = tank + (-2)
+        tank =  1   + (-2)
+        tank = -1
 
+    This now is the core idea:
 
-        Part 4)
-            Why we just stop at point C and don t complete the cycle and check.
+    Since tank < 0, that means that if we start from starting_idx=1, we will
+    not even be able to reach station idx=3, let alone complete the whole
+    circle.
 
-            It is because from Part 1 we would have already identified that if
-            the given set of inputs will have an ans, so if we have reached to
-            Part 3 it means we surely have an ans, and it is mentioned in the
-            question that there is only one valid ans, so we will always choose
-            the most favorable ans-- which is also the fundamental idea of
-            Greedy Algorithims. There is also a mathematical proof for this,
-            that if we got a start point given our total gas >=total cost, we
-            will be able to reach back to that point with just enough gas.
+    However, how exactly do we know that not only starting_idx = 1 is not a
+    solution, but also that none of the indices [0, i] are solutions?
+
+    First, we know that stations [0, starting_idx - 1] are not solutions
+    because we already established that earlier(that is why "starting_idx" is
+    where it is)
+
+    However, we also established that station idx = 1 is not a solution because
+    "tank" dropped below 0 BEFORE reaching the end of the array.
+
+    But how do we know that some station from:
+
+        [starting_idx + 1, i]
+
+    is not a solution?
+
+    If we start from some station--i.e. if starting_idx is equal to that
+    station--then our "tank" is 0.
+
+    However, if we did not START from some station, but instead ARRIVED at it
+    by starting from some earlier station, that means that we arrived at this
+    station with -- in the WORST case -- "tank" equal to 0.
+
+    In other words, in the WORST case it is as if we started from this station.
+
+    If even then we cannot reach the end of the array, then we know that:
+
+        [starting_idx + 1, i]
+
+    certainly are not stations from which we should start in order to complete
+    the whole circle.
+
+    However, we still did not answer why it is sufficient to check only whether
+    we can reach the end of the array in order to conclude that it is possible
+    to complete the whole circle starting from "starting_idx".
+
+    The reason is very simple. Suppose we had:
+
+         gas = [1, 1, 1, 1, 17]
+        cost = [2, 3, 2, 4, 5 ]
+                0  1  2  3  4
+
+    At the beginning we established that a solution exists because the total
+    amount of gas is greater than the total amount of cost.
+
+    That means at least one station from the range:
+
+        [0, N-1]
+
+    IS a solution. Visually, we can immediately conclude that stations:
+
+        {0, 1, 2, 3}
+
+    are not solutions because starting from any of these stations, we cannot
+    even reach the next station, let alone complete the whole circle.
+
+    Since {0, 1, 2, 3} are not solutions, and from station idx=4 we can reach
+    the end of the array, and since we know that a solution exists and must
+    belong to the set [0, N-1], we conclude that idx=4 IS a solution.
+
+    However, what would happen if we had this example:
+
+         gas = [1, 1, 1, 1, 8, 4, 5]
+        cost = [2, 3, 2, 4, 1, 2, 3]
+
+    Again we see that a solution exists because the total "gas" is greater than
+    the total cost, and we see that stations {0, 1, 2, 3} are not solutions. If
+    we start from station idx = 4, we can reach the end of the array and
+    therefore conclude that it is the solution.
+
+    However, how EXACTLY can we claim that idx=4 is the solution, and not some
+    later station, e.g. idx=5 or idx=6?
+
+    Mathematically:
+
+    If we have already established that stations:
+
+        [0, idx-1]
+
+    are not solutions, and we see that starting from idx=4 we can reach the end
+    of the array, then we can conclude that idx=4 is a solution because later
+    stations CERTAINLY cannot reach the end of the array with MORE gas than
+    when starting from idx=4.
+
+    How do we know that?
+
+    If we start from "i" we can reach some station "j"(where i < j):
+
+        + either with tank >  0
+        + or with tank == 0
+
+    If we start from some station "j", then tank is ALWAYS == 0, which means
+    that if we managed to reach the end of the array(starting from "i"), i.e.
+    station 0, then maybe some station "j" (j from [i+1, N-1]) could also be a
+    solution, but it can CERTAINLY reach station 0 with LESS gas, and at the
+    same time we already know that stations [0, i-1] are not solutions,
+    therefore if from "i" we managed to reach station 0--We know that it is
+    the solution.
 
 */
 
-/* Time  Beats: 83.49% */
-/* Space Beats: 88.30% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  23.28% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
     int canCompleteCircuit(vector<int>& gas, vector<int>& cost)
     {
+        const int N = gas.size();
+
         int gas_sum  = accumulate(gas.begin(),  gas.end(), 0);
         int cost_sum = accumulate(cost.begin(), cost.end(), 0);
 
-        /* There is NO Solution */
-        if (gas_sum < cost_sum)
+        if (gas_sum < cost_sum) // There is NO Solution
             return -1;
 
-        /* There is certainly a Solution */
-        int n = gas.size();
+        /* There is CERTAINLY a Solution */
+        int starting_idx = 0;
+        int tank         = 0;
 
-        int total = 0;
-        int start = 0;
-
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < N; i++)
         {
-            total += gas[i] - cost[i];
+            tank += gas[i] - cost[i];
 
-            if (total < 0)
+            if (tank < 0)
             {
-                total = 0;
-                start = i + 1;
+                tank = 0;
+                starting_idx = i + 1;
             }
         }
 
-        return start;
+        return starting_idx;
     }
 };
