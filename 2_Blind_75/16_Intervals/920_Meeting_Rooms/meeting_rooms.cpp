@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
 /*
     ============
     === EASY ===
@@ -42,6 +38,10 @@
 
 */
 
+#include <vector>
+#include <algorithm>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -49,25 +49,25 @@
 
     Sort the input(intervals) based on the start time.
 
-    If the previous interval's "end time" is larger than curren't interval's
-    "start time" - That means that they overlap, hence we return false.
+    If the current interval's END time is STRICTLY LARGER than next interval's
+    start time--That means that they overlap, therefore we return false.
 
 */
 
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(1) */
-class Solution{
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(1)        */
+class Solution {
 public:
-    bool canAttendMeetings(std::vector<std::vector<int>>& intervals)
+    bool canAttendMeetings(vector<vector<int>>& intervals)
     {
-        if (intervals.empty())
-            return true;
+        const int N = intervals.size();
 
-        std::sort(intervals.begin(), intervals.end());
+        /* Sort in ASCENDING by start, then by end */
+        sort(intervals.begin(), intervals.end());
 
-        for (int i = 1; i < intervals.size(); i++)
+        for (int i = 0; i < N-1; i++)
         {
-            if (intervals[i-1][1] > intervals[i][0])
+            if (intervals[i][1] > intervals[i+1][0])
                 return false;
         }
 
