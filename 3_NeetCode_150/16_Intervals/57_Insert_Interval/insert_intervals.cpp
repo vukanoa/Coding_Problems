@@ -80,41 +80,59 @@ using namespace std;
             10. [16, 20] // Overlapping
             11. [19, 20] // After the last interval
 
-    It's pretty much self-explanatory.
+    It's pretty much self-explanatory, especially with comments.
 
 */
 
-/* Time  Beats: 69.92% */
-/* Space Beats: 26.73% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  12.85% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution_1 {
 public:
     vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval)
     {
+        const int N = intervals.size();
+
+        if (intervals.empty())
+            return {newInterval};
+
         vector<vector<int>> result;
+        result.reserve(N+1); // To prevent reallocations
 
-        for (int i = 0; i < intervals.size(); i++)
+        int start = newInterval[0];
+        int end   = newInterval[1];
+
+        for (int i = 0; i < N; i++)
         {
-            if (newInterval[1] < intervals[i][0])
+            if (end < intervals[i][0]) // We're DONE
             {
-                result.push_back(newInterval);
+                // Push newInterval that is potentially merged with other intervals
+                // aka "potentially_merged_new_interval"
+                result.push_back( {start, end} );
 
-                result.insert(end(result), begin(intervals) + i, end(intervals));
+                // Push remaining intervals that come AFTER the end of the "potentially_merged_new_interval"
+                result.insert(result.end(), intervals.begin() + i, intervals.end());
 
                 return result;
             }
-            else if (newInterval[0] > intervals[i][1])
-                result.push_back(intervals[i]);
-            else // (newInterval[1] >= intervals[i][0])
+
+
+
+            // If an interval ends BEFORE the newInterval, push it and continue
+            if (intervals[i][1] < start)
             {
-                newInterval[0] = min(newInterval[0], intervals[i][0]);
-                newInterval[1] = max(newInterval[1], intervals[i][1]);
+                result.push_back( {intervals[i]} );
+            }
+            else // Potentially merge newInterval
+            {
+                start = min(start, intervals[i][0]);
+                end   = max(end  , intervals[i][1]);
             }
         }
 
-        result.push_back(newInterval);
+        result.push_back( {start, end} ); // Push "potentially_merged_new_interval"
 
         return result;
     }
@@ -128,40 +146,61 @@ public:
     --- IDEA ---
     ------------
 
-    This Solution is more in the spirit of C++
+    Another way to implement it. This is maybe a bit more clean.
 
 */
 
 /* Time  Beats: 98.73% */
 /* Space Beats: 51.03% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution_2 {
 public:
     vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval)
     {
         const int N = intervals.size();
-        int i = 0;
+
+        if (intervals.empty())
+            return {newInterval};
+
         vector<vector<int>> result;
+        result.reserve(N+1); // To prevent reallocations
 
-        // Case 1: no overlapping case before the merge intervals
-        // Compare ending point of intervals to starting point of newInterval
-        while(i < N && intervals[i][1] < newInterval[0])
-            result.push_back(intervals[i++]);
+        int start = newInterval[0];
+        int end   = newInterval[1];
 
-        // Case 2: overlapping case and merging of intervals
-        while(i < N && newInterval[1] >= intervals[i][0])
+        int i = 0;
+
+        // Case 1: Intervals that end STRICTLY BEFORE the start of newInterval
+        while (i < N && intervals[i][1] < start)
         {
-            newInterval[0] = min(newInterval[0], intervals[i][0]);
-            newInterval[1] = max(newInterval[1], intervals[i][1]);
+            result.push_back(intervals[i]);
+
+            // Increment
             i++;
         }
-        result.push_back(newInterval);
 
-        // Case 3: no overlapping of intervals after newinterval being merged
-        while(i < N)
-            result.push_back(intervals[i++]);
+        // Case 2: Keep extending(merging) "potentially_merged_new_interval" in
+        //         both directions as long as there is an overlap
+        while (i < N && intervals[i][0] <= end)
+        {
+            start = min(start, intervals[i][0]);
+            end   = max(end  , intervals[i][1]);
+
+            // Increment
+            i++;
+        }
+        result.push_back( {start, end} );
+
+        // Case 3: Intervals that begin STRICTLY AFTER "potentially_merged_new_interval"
+        while (i < N)
+        {
+            result.push_back(intervals[i]);
+
+            // Increment
+            i++;
+        }
 
         return result;
     }
