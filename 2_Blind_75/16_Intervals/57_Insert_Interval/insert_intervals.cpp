@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -53,6 +50,9 @@
 
 */
 
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -91,9 +91,9 @@
 /* Space Complexity: O(n) */
 class Solution_1 {
 public:
-    std::vector<std::vector<int>> insert(std::vector<std::vector<int>>& intervals, std::vector<int>& newInterval)
+    vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval)
     {
-        std::vector<std::vector<int>> result;
+        vector<vector<int>> result;
 
         for (int i = 0; i < intervals.size(); i++)
         {
@@ -101,7 +101,7 @@ public:
             {
                 result.push_back(newInterval);
 
-                result.insert(std::end(result), std::begin(intervals) + i, std::end(intervals));
+                result.insert(end(result), begin(intervals) + i, end(intervals));
 
                 return result;
             }
@@ -109,8 +109,8 @@ public:
                 result.push_back(intervals[i]);
             else // (newInterval[1] >= intervals[i][0])
             {
-                newInterval[0] = std::min(newInterval[0], intervals[i][0]);
-                newInterval[1] = std::max(newInterval[1], intervals[i][1]);
+                newInterval[0] = min(newInterval[0], intervals[i][0]);
+                newInterval[1] = max(newInterval[1], intervals[i][1]);
             }
         }
 
@@ -139,19 +139,19 @@ public:
 /* Space Complexity: O(n) */
 class Solution_2 {
 public:
-    std::vector<std::vector<int>> insert(std::vector<std::vector<int>>& intervals, std::vector<int>& newInterval)
+    vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval)
     {
-        int n = intervals.size();
+        const int N = intervals.size();
         int i = 0;
-        std::vector<std::vector<int>> result;
+        vector<vector<int>> result;
 
         // Case 1: no overlapping case before the merge intervals
         // Compare ending point of intervals to starting point of newInterval
-        while(i < n && intervals[i][1] < newInterval[0])
+        while(i < N && intervals[i][1] < newInterval[0])
             result.push_back(intervals[i++]);
 
         // Case 2: overlapping case and merging of intervals
-        while(i < n && newInterval[1] >= intervals[i][0])
+        while(i < N && newInterval[1] >= intervals[i][0])
         {
             newInterval[0] = min(newInterval[0], intervals[i][0]);
             newInterval[1] = max(newInterval[1], intervals[i][1]);
@@ -160,77 +160,9 @@ public:
         result.push_back(newInterval);
 
         // Case 3: no overlapping of intervals after newinterval being merged
-        while(i < n)
+        while(i < N)
             result.push_back(intervals[i++]);
 
         return result;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Almost equivalent as the previous Solution, however, this explitictly takes
-    care of the two edge cases. It's maybe better to look at this Solution
-    since you're certainly not going to overlook those two cases.
-
-*/
-
-/* Time  Beats: 68.76% */
-/* Space Beats: 58.62% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_3 {
-public:
-    std::vector<std::vector<int>> insert(std::vector<std::vector<int>>& intervals, std::vector<int>& newInterval)
-    {
-        int n = intervals.size();
-        std::vector<std::vector<int>> results;
-
-        if (intervals.empty()) // Intervals Empty
-            return {newInterval};
-
-        if (newInterval[1] < intervals[0][0]) // Before first
-        {
-            results.push_back(newInterval);
-            results.insert(results.end(), intervals.begin(), intervals.end());
-
-            return results;
-        }
-        else if (intervals[n - 1][1] < newInterval[0]) // After last
-        {
-            results = intervals;
-            results.push_back(newInterval);
-
-            return results;
-        }
-
-        /* Same as the above Solution */
-        int i = 0;
-
-        // First non-overlapping intervals
-        while (intervals[i][1] < newInterval[0])
-            results.push_back(intervals[i++]);
-
-        // New(potentially merged) interval
-        while (i < n && intervals[i][0] <= newInterval[1])
-        {
-            newInterval[0] = std::min(newInterval[0], intervals[i][0]);
-            newInterval[1] = std::max(newInterval[1], intervals[i][1]);
-            i++;
-        }
-        results.push_back(newInterval);
-
-        // Last overlapping intervals
-        while (i < n)
-            results.push_back(intervals[i++]);
-
-        return results;
     }
 };
