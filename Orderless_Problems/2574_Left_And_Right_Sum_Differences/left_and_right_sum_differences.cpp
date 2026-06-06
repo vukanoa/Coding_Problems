@@ -69,8 +69,8 @@ using namespace std;
 /* Space Beats:  74.41% */
 
 /* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */ // Or O(1) since "answer" is a must, not extra.
-class Solution {
+/* Space Complexity: O(N) */
+class Solution_MESSY {
 public:
     vector<int> leftRightDifference(vector<int>& nums)
     {
@@ -89,6 +89,44 @@ public:
             answer[i] = abs((i == 0 ? 0 : left) - (i == N-1 ? 0 : right - nums[i]));
             left  += nums[i];
             right -= nums[i];
+        }
+
+        return answer;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Slightly cleaner implementation.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  63.06% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Cleaner {
+public:
+    vector<int> leftRightDifference(vector<int>& nums)
+    {
+        const int N = nums.size();
+        vector<int> answer(N, 0);
+
+        for (int i = N-2; i >= 0; i--)
+            answer[i] = answer[i+1] + nums[i+1];
+
+        int left_sum = 0;
+        for (int i = 0; i < N; i++)
+        {
+            answer[i] = abs(left_sum - answer[i]);
+            left_sum += nums[i];
         }
 
         return answer;
