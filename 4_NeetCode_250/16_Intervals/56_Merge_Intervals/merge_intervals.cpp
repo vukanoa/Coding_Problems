@@ -51,30 +51,42 @@ using namespace std;
 
 */
 
+/* Time  Beats: 100.00% */
+/* Space Beats:  95.03% */
+
 /* Time  Complexity: O(N * logN) */
 /* Space Complexity: O(N)        */
-class Solution_Elegant {
+class Solution {
 public:
     vector<vector<int>> merge(vector<vector<int>>& intervals)
     {
-        int n = intervals.size();
-        sort(intervals.begin(), intervals.end()); // Default by first val
+        const int N = intervals.size();
 
-        vector<vector<int>> results;
-        results.push_back(intervals[0]);
+        vector<vector<int>> result;
+        result.reserve(N); // To prevent reallocations
 
-        for (int i = 1; i < intervals.size(); i++)
+        /* Sort in ASCENDING order by start */
+        sort(intervals.begin(), intervals.end());
+
+        int start = intervals[0][0];
+        int end   = intervals[0][1];
+
+        for (int i = 1; i < N; i++)
         {
-            int res_size = results.size();
-            if (results[res_size - 1][1] >= intervals[i][0])
+            if (end >= intervals[i][0])
             {
-                results[res_size - 1][0] = min(results[res_size - 1][0], intervals[i][0]);
-                results[res_size - 1][1] = max(results[res_size - 1][1], intervals[i][1]);
+                end = max(end, intervals[i][1]);
             }
             else
-                results.push_back(intervals[i]);
-        }
+            {
+                result.push_back( {start, end} );
 
-        return results;
+                start = intervals[i][0];
+                end   = intervals[i][1];
+            }
+        }
+        result.push_back( {start, end} );
+
+        return result;
     }
 };
