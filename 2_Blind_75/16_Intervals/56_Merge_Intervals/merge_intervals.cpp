@@ -38,6 +38,7 @@
 
 */
 
+#include <climits>
 #include <vector>
 #include <algorithm>
 using namespace std;
@@ -56,7 +57,7 @@ using namespace std;
 
 /* Time  Complexity: O(N * logN) */
 /* Space Complexity: O(N)        */
-class Solution {
+class Solution_Sorting {
 public:
     vector<vector<int>> merge(vector<vector<int>>& intervals)
     {
@@ -86,6 +87,103 @@ public:
             }
         }
         result.push_back( {start, end} );
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+    (SweepLine)
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  21.77% */
+
+/* Time  Complexity: O(N * RANGE) */
+/* Space Complexity: O(RANGE)     */
+class Solution_Sweep_Line {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals)
+    {
+        const int N = intervals.size();
+
+        vector<vector<int>> result;
+        result.reserve(N); // To prevent reallocations
+
+        int min_start = INT_MAX;
+        int max_end   = INT_MIN;
+
+        // Find the absolute bounds of our timeline
+        for (int i = 0; i < N; i++)
+        {
+            min_start = min(min_start, intervals[i][0]);
+            max_end   = max(max_end,   intervals[i][1]);
+        }
+
+        const int RANGE = max_end - min_start + 1;
+
+        // Initialize frequency arrays sized exactly to our range
+        vector<int> sweep_line_start(RANGE, 0);
+        vector<int> sweep_line_end  (RANGE, 0);
+
+        int start;
+        int end;
+
+        for (int i = 0; i < N; i++)
+        {
+            start = intervals[i][0];
+            end   = intervals[i][1];
+
+            ++sweep_line_start[start - min_start];
+            ++sweep_line_end[end - min_start];
+        }
+
+        int i = 0;
+        int sum = 0;
+
+        // Sweep the timeline to merge overlapping active zones
+        while (i < RANGE)
+        {
+            while (i < RANGE && sum == 0)
+            {
+                sum += sweep_line_start[i];
+                i++;
+            }
+            i--; // Rewind 1 step to process the current valid coordinate
+            sum -= sweep_line_end[i];
+
+            // Edge case: Handle isolated point intervals [x, x]
+            if (sum == 0)
+            {
+                result.push_back( {i + min_start, i + min_start});
+                i++;
+                continue;
+            }
+
+            start = i + min_start;
+            i++;
+
+            // Fast-forward through the active merged interval
+            while (i < RANGE && sum != 0)
+            {
+                sum -= sweep_line_end[i];   // Subtract ends
+                sum += sweep_line_start[i]; // Add starts (bounces sum back up if touching)
+                i++;
+            }
+
+            // The active interval has fully closed
+            end = i + min_start - 1;
+            result.push_back( {start, end} );
+        }
 
         return result;
     }
