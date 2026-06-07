@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-
 /*
     ==============
     === MEDIUM ===
@@ -56,6 +52,8 @@
 
 */
 
+#include <vector>
+#include <unordered_map>
 using namespace std;
 
 /**
@@ -71,126 +69,76 @@ using namespace std;
  * };
  */
 
-/*
-    ------------
-    --- IDEA ---
-    ------------
+// Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
 
-    TODO
-
-*/
-
-/* Time  Beats: 98.47% */
-/* Space Beats: 98.25% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
 class Solution {
 public:
     TreeNode* createBinaryTree(vector<vector<int>>& descriptions)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        const int N = descriptions.size();
 
-        const int N = 100001;
+        unordered_map<int, TreeNode*> umap;
+        unordered_map<int, int> indegree;
 
-        bitset<N> seen = 0;
-        int root = -1;
-        int parent[N] = {0};           // parent val
-        TreeNode* node[N] = {nullptr}; // array for TreeNode*
-
-        for (auto& d : descriptions)
+        for (const vector<int>& description : descriptions)
         {
-            int x = d[0], y = d[1], l = d[2];
+            const int& parent = description[0];
+            const int& child  = description[1];
+            const int& isLeft = description[2];
 
-            if (!seen[x])
+            TreeNode* parent_node;
+            if (umap.find(parent) == umap.end()) // does NOT exist yet
             {
-                node[x] = new TreeNode(x);
-                seen[x] = 1;
-
-                if (parent[x] == 0)
-                    root = x;
+                parent_node = new TreeNode(parent);
+                umap.insert ( {parent, parent_node} );
             }
-
-            if (!seen[y])
-            {
-                node[y] = new TreeNode(y);
-                seen[y] = 1;
-            }
-
-            parent[y] = x;
-
-            if (l)
-                node[x]->left  = node[y];
             else
-                node[x]->right = node[y];
+            {
+                parent_node = umap[parent];
+            }
+
+            TreeNode* child_node;
+            if (umap.find(child) == umap.end())
+            {
+                child_node = new TreeNode(child);
+                umap.insert( {child, child_node} );
+            }
+            else
+            {
+                child_node = umap[child];
+            }
+
+            if (isLeft)
+                parent_node->left = child_node;
+            else
+                parent_node->right = child_node;
+
+
+            indegree.try_emplace(parent, 0); // C++17
+            // if ( ! indegree.count(parent))
+            //     indegree[parent] = 0;
+
+            indegree[child]++;
         }
 
-        while (parent[root] != 0) // Find real root
-            root = parent[root];
-
-        return node[root];
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    TODO
-
-*/
-
-/* Time  Beats: 95.20% */
-/* Space Beats: 88.86% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_Hash_Map {
-public:
-    TreeNode* createBinaryTree(vector<vector<int>>& descriptions)
-    {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
-
-        int root = -1;
-        const int n = descriptions.size();
-
-        unordered_map<int, int> parent;
-        unordered_map<int, TreeNode*> node;
-
-        parent.reserve(n);
-        node.reserve(n);
-
-        for (auto& d : descriptions)
+        TreeNode* root = nullptr;
+        for (const auto& [node_val, indegree_val] : indegree)
         {
-            int x = d[0];
-            int y = d[1];
-            int l = d[2];
-
-            if (node.count(x) == 0)
+            if (indegree_val == 0)
             {
-                node[x] = new TreeNode(x);
-
-                if (parent.count(x) == 0)
-                    root = x;
+                root = umap[node_val];
+                break;
             }
-
-            if (node.count(y)==0)
-                node[y] = new TreeNode(y);
-
-            parent[y] = x;
-            if (l)
-                node[x]->left = node[y];
-            else
-                node[x]->right = node[y];
         }
 
-        while (parent.count(root))// find real root
-            root = parent[root];
-
-        return node[root];
+        return root;
     }
 };
