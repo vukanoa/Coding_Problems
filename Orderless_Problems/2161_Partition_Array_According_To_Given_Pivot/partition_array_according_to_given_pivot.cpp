@@ -74,7 +74,7 @@
 
 */
 
-#include <queue>
+#include <algorithm>
 #include <vector>
 using namespace std;
 
@@ -83,43 +83,63 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    Self-Explanatory.
+    Naive Solution, it passess because the Constraints are small, however this
+    is NOT an optimal and right way to solve this problem.
+
+    Check the Solution_Linear down below.
 
 */
 
-/* Time  Beats: 100.00% */
-/* Space Beats:  36.54% */
+/* Time  Beats: 5.25% */
+/* Space Beats: 5.15% */
 
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
-class Solution {
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Naive_using_Sort {
 public:
     vector<int> pivotArray(vector<int>& nums, int pivot)
     {
         const int N = nums.size();
         vector<int> result;
+        result.reserve(N); // To prevent reallocationos
 
-        int equal = 0;
-        queue<int> queue_greater;
+        vector<pair<int,int>> smaller;
+        vector<pair<int,int>> equal;
+        vector<pair<int,int>> bigger;
 
         for (int i = 0; i < N; i++)
         {
             if (nums[i] < pivot)
-                result.push_back(nums[i]);
-            else if (nums[i] > pivot)
-                queue_greater.push(nums[i]);
-            else // nums[i] == pivot
-                equal++;
+                smaller.push_back( {nums[i], i} );
+            else if (nums[i] == pivot)
+                equal.push_back( {nums[i], i} );
+            else
+                bigger.push_back( {nums[i], i} );
         }
 
-        for (int i = 0; i < equal; i++)
-            result.push_back(pivot);
+        sort(smaller.begin(), smaller.end(), [](const pair<int,int>& a,
+                                                const pair<int,int>& b) {
+                return a.second < b.second;
+        });
 
-        while ( ! queue_greater.empty())
-        {
-            result.push_back(queue_greater.front());
-            queue_greater.pop();
-        }
+        sort(equal.begin(), equal.end(), [](const pair<int,int>& a,
+                                            const pair<int,int>& b) {
+                return a.second < b.second;
+        });
+
+        sort(bigger.begin(), bigger.end(), [](const pair<int,int>& a,
+                                              const pair<int,int>& b) {
+                return a.second < b.second;
+        });
+
+        for (const auto& pair : smaller)
+            result.push_back(pair.first);
+
+        for (const auto& pair : equal)
+            result.push_back(pair.first);
+
+        for (const auto& pair : bigger)
+            result.push_back(pair.first);
 
         return result;
     }
@@ -133,51 +153,37 @@ public:
     --- IDEA ---
     ------------
 
-    Two Pointers technique. Read the code and you'll get it.
+    Optimal way using Two Pointers.
 
 */
 
-/* Time  Beats: 88.52% */
-/* Space Beats: 87.50% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  88.18% */
 
 /* Time  Complexity: O(N) */
-/* Space Complexity: O(1) */
-class Solution_TwoPointers {
+/* Space Complexity: O(N) */
+class Solution_Linear {
 public:
     vector<int> pivotArray(vector<int>& nums, int pivot)
     {
         const int N = nums.size();
-        vector<int> result(nums.size());
+        vector<int> result;
+        result.resize(N);
 
-        int idx_lesser  = 0;
-        int idx_greater = nums.size() - 1;
+        int L = 0;
+        int R = N-1;
 
-        int i = 0;
-        int j = N-1;
-        while (i < N)
+        for (int i = 0; i < N; i++)
         {
             if (nums[i] < pivot)
-            {
-                result[idx_lesser] = nums[i];
-                idx_lesser++;
-            }
+                result[L++] = nums[i];
 
-            if (nums[j] > pivot)
-            {
-                result[idx_greater] = nums[j];
-                idx_greater--;
-            }
-
-            // Increment/Decrement
-            i++;
-            j--;
+            if (nums[N-1 - i] > pivot)
+                result[R--] = nums[N-1 - i];
         }
 
-        while (idx_lesser <= idx_greater)
-        {
-            result[idx_lesser] = pivot;
-            idx_lesser++;
-        }
+        /* Fill remaining with pivot values */
+        fill(result.begin() + L, result.begin() + R + 1, pivot);
 
         return result;
     }
