@@ -97,7 +97,7 @@ using namespace std;
 
 /* Time  Complexity: O(N * logN) */
 /* Space Complexity: O(logN)     */ // Space Complexity of C++'s Intro Sort
-class Solution {
+class Solution_Sort_By_start_time {
 public:
     int eraseOverlapIntervals(vector<vector<int>>& intervals)
     {
@@ -123,6 +123,56 @@ public:
             {
                 prev_end = curr_end;
             }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Almost equivalent idea to the one above, however once we sort by end_time
+    instead, the code becomes a bit more clean.
+
+    You should be aware of this "trick" for interval problem. Sorting by
+    end_time is very handy at times in interval problems.
+
+*/
+
+/* Time  Beats: 67.77% */
+/* Space Beats: 68.16% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(logN)     */ // Space Complexity of C++'s Intro Sort
+class Solution_Sort_By_end_time {
+public:
+    int eraseOverlapIntervals(vector<vector<int>>& intervals)
+    {
+        const int N = intervals.size();
+        int result = 0;
+
+        /* Sort */
+        sort(intervals.begin(), intervals.end(), [](auto& a, auto& b){
+            return a[1] < b[1]; // Sort by end_time
+        });
+
+        int prev_end = intervals[0][1];
+
+        for (int i = 1; i < N; i++)
+        {
+            int& curr_start = intervals[i][0];
+            int& curr_end   = intervals[i][1];
+
+            if (prev_end > curr_start)
+                result++;
+            else
+                prev_end = curr_end;
         }
 
         return result;
