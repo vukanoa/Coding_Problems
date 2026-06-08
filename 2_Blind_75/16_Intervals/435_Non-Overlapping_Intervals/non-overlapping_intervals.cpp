@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
 /*
     ==============
     === MEDIUM ===
@@ -52,6 +48,10 @@
 
 */
 
+#include <vector>
+#include <algorithm>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -87,91 +87,44 @@
 
 
     Each time two adjacent intervals are overlapping, continue with the one
-    that has a smaller ending point. (That assures that we'll have minimum
-    amount of removal)
-
-    So if the "left" one has smaller ending point, then just continue(i will be
-    incremented in the for loop)
-
-    If "left" one has bigger ending point or if they are not overlapping then:
-        left = i;
+    that has a smaller ending point.
+    (That ensures that we'll have MINIMUM amount of removals)
 
 */
 
-/* Time  Beats: 94.67% */
-/* Space Beats: 53.74% */
+/* Time  Beats: 32.74% */
+/* Space Beats: 90.03% */
 
-/*
-    Time  Complexity: O(n * logn)
-*/
-/*
-    Space Complexity: O(n)
-    Depends on the sort that is used. Heapsort has O(1) Space Complexity.
-*/
-class Solution{
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(logN)     */ // Space Complexity of C++'s Intro Sort
+class Solution {
 public:
-    int eraseOverlapIntervals(std::vector<std::vector<int>>& intervals)
+    int eraseOverlapIntervals(vector<vector<int>>& intervals)
     {
-        std::sort(intervals.begin(), intervals.end());
+        const int N = intervals.size();
+        int result = 0;
 
-        int count = 0;
-        int left  = 0;
-        for (int i = 1; i < intervals.size(); i++)
+        /* Sort by start in ASCENDING order */
+        sort(intervals.begin(), intervals.end());
+
+        int prev_end = intervals[0][1];
+
+        for (int i = 1; i < N; i++)
         {
-            if (intervals[left][1] > intervals[i][0])
+            int& curr_start = intervals[i][0];
+            int& curr_end   = intervals[i][1];
+
+            if (prev_end > curr_start)
             {
-                count++;
-
-                if (intervals[left][1] < intervals[i][1])
-                    continue;
-            }
-
-            // If "left" one has bigger ending point or if they are not
-            // overlapping at all
-            left = i;
-        }
-
-        return count;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Similar idea. Written on another occassion.
-
-*/
-
-/* Time  Beats: 91.17% */
-/* Space Beats: 55.52% */
-
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(1) or O(n) depending on the underlying Sort */
-class Solution_another_way {
-public:
-    int eraseOverlapIntervals(std::vector<std::vector<int>>& intervals)
-    {
-        std::sort(intervals.begin(), intervals.end());
-
-        int count = 0;
-        int last_ending = intervals[0][1];
-
-        for (int i = 1; i < intervals.size(); i++)
-        {
-            if (last_ending > intervals[i][0])
-            {
-                count++;
-                last_ending = std::min(last_ending, intervals[i][1]);
+                prev_end = min(prev_end, curr_end);
+                result++;
             }
             else
-                last_ending = intervals[i][1];
+            {
+                prev_end = curr_end;
+            }
         }
 
-        return count;
+        return result;
     }
 };
