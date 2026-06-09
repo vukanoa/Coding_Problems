@@ -189,3 +189,55 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    If there are multiple points at some time, then we want ending points to be
+    BEFORE the starting points.
+
+    To achieve that we can associate -1 within the pairs of ending times and
+    that also helps us with the remaining part of the Solution since we want to
+    decrement rooms anytime we hit an ending point.
+
+    Similarly, when we hit a starting point we want to increment the current
+    number of rooms, so it works boths ways and the code because very concise.
+
+*/
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Greedy {
+public:
+    int minMeetingRooms(vector<vector<int>>& intervals)
+    {
+        const int N = intervals.size();
+        int result = 0; // Max number of rooms at any given time
+
+        vector<pair<int,int>> points;
+        points.reserve(2 * N); // To prevent reallocations
+
+        for (int i = 0; i < N; i++)
+        {
+            points.push_back( {intervals[i][0], +1} );
+            points.push_back( {intervals[i][1], -1} );
+        }
+
+        /* Sort */
+        sort(points.begin(), points.end());
+
+        int rooms = 0;
+        for (const auto& [time_point, room_delta] : points)
+        {
+            rooms += room_delta;
+            result = max(result, rooms);
+        }
+
+        return result;
+    }
+};
