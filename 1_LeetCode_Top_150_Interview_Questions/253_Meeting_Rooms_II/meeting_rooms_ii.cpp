@@ -39,7 +39,9 @@
 
 */
 
-#include <bits/stdc++.h>
+#include <algorithm>
+#include <set>
+#include <vector>
 using namespace std;
 
 /*
@@ -239,5 +241,72 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This approach could be done either with:
+
+        Sorted MultiSet + BinarySearch
+                
+            or
+
+        MinHeap
+
+    I chose the former option since many Solutions online already show the
+    MinHeap Solution.
+
+*/
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_MultiSet__and__Binary_Search { // Or just Min-Heap
+public:
+    int minMeetingRooms(vector<vector<int>>& intervals)
+    {
+        if (intervals.empty())
+            return 0;
+
+        const int N = intervals.size();
+
+        if (N == 1)
+            return 1;
+
+        /* Sort by start in ASCENDING order */
+        sort(intervals.begin(), intervals.end(), [](auto& a, auto& b){
+            if (a[0] == b[0])
+                return a[1] < b[1];
+
+            return a.start < b.start;
+        });
+
+        multiset<int> multiset_of_ends;
+        multiset_of_ends.insert(intervals[0][1]);
+
+        for (int i = 1; i < N; i++)
+        {
+            int& curr_start = intervals[i][0];
+            int& curr_end   = intervals[i][1];
+
+            /* Binary Search */
+            auto iter = multiset_of_ends.upper_bound(curr_start);
+
+            if (iter != multiset_of_ends.begin())
+            {
+                iter--;
+                multiset_of_ends.erase(iter); // Detete only ONE instance!
+            }
+
+            multiset_of_ends.insert(curr_end);
+        }
+
+        return multiset_of_ends.size();
     }
 };
