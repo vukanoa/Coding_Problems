@@ -1,9 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <unordered_map>
-#include <algorithm>
-
 /*
     ============
     === HARD ===
@@ -65,6 +59,11 @@
 
 */
 
+#include <vector>
+#include <queue>
+#include <algorithm>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -74,45 +73,61 @@
 
 */
 
-/* Time  Beats: 30.32% */
-/* Space Beats: 27.43% */
+/* Time  Beats: 50.23% */
+/* Space Beats: 91.38% */
 
-// n = intervals.size(), m = queries.size()
-/* Time  Complexity: O(n*logn + m*logm) */
-/* Space Complexity: O(n + m) */
-class Solution {
+/* Time  Complexity: O(N * logN  +  Q * logQ) */
+/* Space Complexity: O(N         +  Q      )  */
+class Solution_Min_Heap {
 public:
-    std::vector<int> minInterval(std::vector<std::vector<int>>& intervals,
-                                 std::vector<int>& queries)
+    vector<int> minInterval(vector<vector<int>>& intervals, vector<int>& queries)
     {
-        std::priority_queue<std::vector<int>> max_heap;
-        std::unordered_map<int, int> umap;
-        std::vector<int> sorted_queries = queries;
+        const int N = intervals.size();
+        const int Q = queries.size();
 
-        std::sort(intervals.begin(), intervals.end());
-        std::sort(sorted_queries.begin(), sorted_queries.end());
+        vector<int> result(Q, -1);
+
+        /* Sort by start_time in ASCENDING order */
+        sort(intervals.begin(), intervals.end()); // O(N * logN)
+
+        vector<pair<int,int>> q_val_and_orig_idx;
+        q_val_and_orig_idx.reserve(Q); // To prevent Reallocations
+
+        for (int j = 0; j < Q; j++)
+            q_val_and_orig_idx.push_back( {queries[j], j} );
+
+        /* Sort in ASCENDING order */
+        sort(q_val_and_orig_idx.begin(), q_val_and_orig_idx.end()); // O(Q * logQ)
+
+
+
+        priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> min_heap;
 
         int i = 0;
-        int n = intervals.size();
-        for (const int& query : sorted_queries)
+        for (const auto& [query_val, query_orig_idx] : q_val_and_orig_idx)
         {
-            while (i < n && intervals[i][0] <= query)
+            while (i < N && intervals[i][0] <= query_val)
             {
-                int left  = intervals[i][0];
-                int right = intervals[i++][1];
+                const int& start = intervals[i][0];
+                const int& end   = intervals[i][1];
 
-                max_heap.push({left - right - 1, right});
+                int interval_size = end - start + 1;
+
+                min_heap.push( {interval_size, end} ); // O(logN)
+
+                // Increment
+                i++;
             }
 
-            while (max_heap.size() && max_heap.top()[1] < query)
-                max_heap.pop();
+            // Pop all the intervals that end STRICTLY BEFORE the query_val
+            while ( ! min_heap.empty() && min_heap.top().second < query_val)
+                min_heap.pop();
 
-            umap[query] = max_heap.size() ? -max_heap.top()[0] : -1;
+            if ( ! min_heap.empty())
+                result[query_orig_idx] = min_heap.top().first;
+            else
+                result[query_orig_idx] = -1; // Just to be explicit
         }
-
-        std::vector<int> result;
-        for (const int& query : queries)
-            result.push_back(umap[query]);
 
         return result;
     }
