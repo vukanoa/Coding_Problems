@@ -59,6 +59,7 @@
 
 */
 
+#include <set>
 #include <vector>
 #include <queue>
 #include <algorithm>
@@ -127,6 +128,88 @@ public:
                 result[query_orig_idx] = min_heap.top().first;
             else
                 result[query_orig_idx] = -1; // Just to be explicit
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+
+    Here the idea is kind of inverted. We keep all queries sorted inside a
+    std::set:
+
+        {queries[j], j}         // (a Red-Black ree)
+
+    Then we iterate through the intervals, which we have previously sorted by
+    LENGTH.
+
+    For each interval, we perform a binary search, i.e. a lower_bound, using:
+
+        {start, 0}
+
+    where 0 is a dummy value that allows us to perform lower_bound on pairs.
+
+    Since the queries are stored in a std::set, if lower_bound finds a query
+    such that query <= end (this is important for the subsequent checks), we
+    can immediately store the length of the current interval as the answer for
+    that query. This works because we sorted the intervals from shortest to
+    longest.
+
+    After removing the iterator that points to the smallest query contained
+    within the current interval, we increment the iterator so that it points to
+    the next SMALLEST query that MAY also belong to this interval.
+
+    As long as this condition holds, we keep repeating process--the one
+    described in two paragraphs above--inside a while loop.
+
+*/
+
+/* Time  Beats: 39.43% */
+/* Space Beats: 35.17% */
+
+/* Time  Complexity: O(N * logN  +  N * logQ  +  Q * logQ) */
+/* Space Complexity: O(Q)                                  */
+class Solution_Ordered_Set_Greedy {
+public:
+    vector<int> minInterval(vector<vector<int>>& intervals, vector<int>& queries)
+    {
+        const int N = intervals.size();
+        const int Q = queries.size();
+
+        vector<int> result(queries.size(), -1);
+
+        /* Sort by SIZE of intervals */
+        sort(intervals.begin(), intervals.end(), [](const auto& a, const auto& b) {
+            return a[1] - a[0] < b[1] - b[0];
+        });
+
+        set<pair<int, int>> q_val_and_orig_idx;
+        for (int j = 0; j < Q; ++j)
+            q_val_and_orig_idx.insert( {queries[j], j} );
+
+        for (int i = 0; i < N; i++)
+        {
+            const int& start = intervals[i][0];
+            const int& end   = intervals[i][1];
+
+            auto iter = q_val_and_orig_idx.lower_bound( {start, 0} );
+            // iter->first   <==>  query_value
+            // iter->second  <==>  query_orig_idx
+
+            while (iter != q_val_and_orig_idx.end() && iter->first <= end)
+            {
+                result[iter->second] = end - start + 1;
+
+                q_val_and_orig_idx.erase(iter++);
+            }
         }
 
         return result;
