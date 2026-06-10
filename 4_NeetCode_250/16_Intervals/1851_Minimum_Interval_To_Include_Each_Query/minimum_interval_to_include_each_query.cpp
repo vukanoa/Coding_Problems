@@ -215,3 +215,91 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 12.76% */
+/* Space Beats: 6.67%  */
+
+/* Time  Complexity: O((N + Q) * logN) */
+/* Space Complexity: O(N + Q)          */
+class Solution_Line_Sweep {
+public:
+    vector<int> minInterval(vector<vector<int>>& intervals, vector<int>& queries)
+    {
+        const int N = intervals.size();
+        const int Q = queries.size();
+        vector<int> result(Q, -1);
+
+        vector<vector<int>> events; // {point, type, length, original_idx}
+
+        // Push intervals to "events"
+        for (int i = 0; i < N; i++)
+        {
+            const int& start = intervals[i][0];
+            const int& end   = intervals[i][1];
+
+            int interval_len = end - start + 1;
+
+            events.push_back( {start, 0, interval_len, i} );
+            events.push_back( {end  , 2, interval_len, i} );
+        }
+
+        // Push queries to "events" as well. They will be denoted with a 1.
+        for (int j = 0; j < Q; j++)
+            events.push_back( {queries[j], 1, 1, j} );
+
+        // Sort by time and type
+        sort(events.begin(), events.end(), [](const auto& a, const auto& b) {
+            if (a[0] == b[0])
+                return a[1] < b[1]; // This sorts by TYPE if starting times
+                                    // are equal
+
+            return a[0] < b[0];
+        });
+
+        // Min heap [length, orig_idx]
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> min_heap;
+
+        vector<bool> inactive_intervals(N, false);
+
+        for (const auto& event : events)
+        {
+            const int& point    = event[0];
+            const int& type     = event[1];
+            const int& length   = event[2];
+            const int& orig_idx = event[3];
+
+            if (type == 0) // Interval start
+            {
+                min_heap.push( {length, orig_idx} );
+            }
+            else if (type == 2) // Interval end
+            {
+                inactive_intervals[orig_idx] = true;
+            }
+            else // Query
+            {
+                while ( ! min_heap.empty() && inactive_intervals[min_heap.top().second])
+                    min_heap.pop();
+
+                if ( ! min_heap.empty())
+                    result[orig_idx] = min_heap.top().first;
+                else
+                    result[orig_idx] = -1; // Just to be explicit
+            }
+        }
+
+        return result;
+    }
+};
