@@ -67,7 +67,9 @@
 
 */
 
+#include <queue>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 using namespace std;
 
@@ -93,14 +95,15 @@ private:
 public:
     int assignEdgeWeights(vector<vector<int>>& edges)
     {
-        const int N = edges.size() + 1;    
-
         unordered_map<int, vector<int>> adj_list;
 
-        for (auto& entry : edges)
+        for (auto& edge : edges)
         {
-            adj_list[entry[0]].push_back(entry[1]);
-            adj_list[entry[1]].push_back(entry[0]);
+            const int& u = edge[0];
+            const int& v = edge[1];
+
+            adj_list[u].push_back(u);
+            adj_list[v].push_back(v);
         }
 
         // Number of edges from 1 to X is "max_depth"
@@ -124,18 +127,114 @@ private:
         }
     }
 
-    // Needed numbers are too large to left shift.
-    // It's basiclaly: (base^exp) % mod
+    // (base^exp) % mod
     long long modular_exponentiation(long long base, long long exp)
     {
         long long result = 1;
         while (exp > 0)
         {
-            if (exp % 2 == 1)
+            // If the current LSB is set(i.e. 1)
+            if (exp & 1)
                 result = (result * base) % MOD;
 
             base = (base * base) % MOD;
-            exp /= 2;
+
+            // Right Shift
+            exp >>= 1; // Divide by 2
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, the only difference is that here we're using a BFS to find a
+    maximum depth.
+
+*/
+
+/* Time  Beats: 8.06% */
+/* Space Beats: 5.37% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_BFS {
+private:
+    const int MOD = 1e9 + 7;
+
+public:
+    int assignEdgeWeights(vector<vector<int>>& edges)
+    {
+        unordered_map<int, vector<int>> adj_list;
+
+        for (auto& edge : edges)
+        {
+            const int& u = edge[0];
+            const int& v = edge[1];
+
+            adj_list[u].push_back(v);
+            adj_list[v].push_back(u);
+        }
+
+
+        queue<int> queue;
+        queue.push(1);
+
+        unordered_set<int> uset_visited;
+        uset_visited.insert(1);
+
+        int max_depth = -1;
+
+        /* BFS */
+        while ( ! queue.empty())
+        {
+            int size = queue.size();
+
+            while (size-- > 0)
+            {
+                int node = queue.front();
+                queue.pop();
+
+                for (const int& child : adj_list[node])
+                {
+                    // Already visited
+                    if (uset_visited.find(child) != uset_visited.end())
+                        continue;
+
+                    queue.push(child);
+                    uset_visited.insert(child);
+                }
+            }
+
+            max_depth++;
+        }
+
+        return modular_exponentiation(2, max_depth - 1);
+    }
+
+private:
+    // (base^exp) % mod
+    long long modular_exponentiation(long long base, long long exp)
+    {
+        long long result = 1;
+
+        while (exp > 0)
+        {
+            // If the current LSB is set(i.e. 1)
+            if (exp & 1)
+                result = (result * base) % MOD;
+
+            base = (base * base) % MOD;
+
+            // Right Shift
+            exp >>= 1; // Divide by 2
         }
 
         return result;
