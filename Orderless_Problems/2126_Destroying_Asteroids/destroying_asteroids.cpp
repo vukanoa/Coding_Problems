@@ -58,6 +58,7 @@
 */
 
 #include <algorithm>
+#include <climits>
 #include <vector>
 using namespace std;
 
@@ -143,6 +144,63 @@ public:
             planet += 1ULL * curr_asteroid * freq[curr_asteroid];
 
             freq[curr_asteroid] = 0; // Used all the asteroids with this mass
+        }
+
+        return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    If the smallest asteroid in a specific 2^k bucket can be destroyed, all
+    asteroids within that bucket can also be destroyed, requiring only:
+
+        2 * O(32)
+
+    constant space.
+
+*/
+
+/* Time  Beats: 99.12% */
+/* Space Beats: 7.45% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */ // O(32 * 2) ---> O(1)
+class Solution_Bitwise_Bucket_Greedy { 
+private:
+    const int SIZE = 1 << 5;
+
+public:
+    bool asteroidsDestroyed(int mass, vector<int> asteroids)
+    {
+        vector<int>                mins(SIZE, INT_MAX);
+        vector<unsigned long long> sums(SIZE);
+
+        for (const int& curr_asteroid : asteroids)
+        {
+            int k = 31 - __builtin_clz(curr_asteroid);
+
+            mins[k] = min(mins[k], curr_asteroid);
+            sums[k] += curr_asteroid;
+        }
+
+        unsigned long long total_mass = 1ULL * mass;
+
+        for (int i = 0; i < SIZE; i++)
+        {
+            if (sums[i] == 0)
+                continue;
+
+            if (total_mass < mins[i])
+                return false;
+
+            total_mass += sums[i];
         }
 
         return true;
