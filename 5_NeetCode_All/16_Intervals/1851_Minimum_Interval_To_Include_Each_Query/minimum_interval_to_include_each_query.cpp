@@ -59,7 +59,9 @@
 
 */
 
+#include <climits>
 #include <set>
+#include <unordered_map>
 #include <vector>
 #include <queue>
 #include <algorithm>
@@ -298,6 +300,165 @@ public:
                 else
                     result[orig_idx] = -1; // Just to be explicit
             }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats:  6.68% */
+/* Space Beats: 10.64% */
+
+/* Time  Complexity: O((N + Q) * log(N + Q)) */
+/* Space Complexity: O(N + Q)                */
+class SegTree {
+private:
+    int n;
+    vector<int> tree;
+    vector<int> lazy;
+
+public:
+    SegTree(int n)
+        : n(n)
+    {
+        tree.resize(4 * n, INT_MAX);
+        lazy.resize(4 * n, INT_MAX);
+    }
+
+    void update(int q_L, int q_R, int val)
+    {
+        update(0, 0, n-1, q_L, q_R, val);
+    }
+
+    int RMQ(int q_L, int q_R)
+    {
+        return RMQ(0, 0, n-1, q_L, q_R);
+    }
+
+private:
+    void push(int node, int start, int end)
+    {
+        if (lazy[node] == INT_MAX)
+            return;
+
+        tree[node] = min(tree[node], lazy[node]);
+
+        if (start != end)
+        {
+            int L_child = 2 * node + 1;
+            int R_child = 2 * node + 2;
+
+            lazy[L_child] = min(lazy[L_child], lazy[node]);
+            lazy[R_child] = min(lazy[R_child], lazy[node]);
+        }
+
+        lazy[node] = INT_MAX;
+    }
+
+    void update(int node, int start, int end, int q_L, int q_R, int val)
+    {
+        push(node, start, end);
+
+        if (q_L <= start && end <= q_R) // Total Overlap
+        {
+            lazy[node] = min(lazy[node], val);
+            push(node, start, end);
+            return;
+        }
+
+        if (q_R < start || end < q_L) // No Overlap
+            return;
+
+        int L_child = 2 * node + 1;
+        int R_child = 2 * node + 2;
+
+        int mid = start + (end - start) / 2;
+
+        update(L_child, start, mid, q_L, q_R, val);
+        update(R_child, mid+1, end, q_L, q_R, val);
+
+        tree[node] = min(tree[L_child], tree[R_child]);
+    }
+
+    int RMQ(int node, int start, int end, int q_L, int q_R)
+    {
+        push(node, start, end);
+
+        if (q_L <= start && end <= q_R) // Total Overlap
+            return tree[node];
+
+        if (q_R < start || end < q_L) // No Overlap
+            return INT_MAX;
+
+        int L_child = 2 * node + 1;
+        int R_child = 2 * node + 2;
+
+        int mid = start + (end - start) / 2;
+
+        return min(RMQ(L_child, start, mid, q_L, q_R),
+                   RMQ(R_child, mid+1, end, q_L, q_R));
+    }
+};
+
+class Solution_Segment_Tree {
+public:
+    vector<int> minInterval(vector<vector<int>>& intervals, vector<int>& queries)
+    {
+        vector<int> result;
+
+        vector<int> points;
+        for (const auto& interval : intervals)
+        {
+            points.push_back(interval[0]);
+            points.push_back(interval[1]);
+        }
+
+        for (const auto& query : queries)
+            points.push_back(query);
+
+        const int POINTS_SIZE = points.size();
+
+        /* Sort in ASCENDING order first by start, then by end */
+        sort(points.begin(), points.end());
+
+        points.erase(unique(points.begin(), points.end()), points.end());
+
+        unordered_map<int, int> compressed_idx;
+        for (int idx = 0; idx < POINTS_SIZE; idx++)
+            compressed_idx[points[idx]] = idx;
+
+        SegTree seg_tree(POINTS_SIZE);
+
+        for (const auto& interval : intervals)
+        {
+            int start = compressed_idx[interval[0]];
+            int end   = compressed_idx[interval[1]];
+
+            int interval_len = interval[1] - interval[0] + 1;
+
+            seg_tree.update(start, end, interval_len);
+        }
+
+        for (const auto& query : queries)
+        {
+            int compressed_query = compressed_idx[query];
+
+            int len = seg_tree.RMQ(compressed_query,
+                                   compressed_query);
+
+            result.push_back(len == INT_MAX ? -1 : len);
         }
 
         return result;
