@@ -117,14 +117,14 @@ using namespace std;
 
 /* Time  Complexity: O(n^2) */
 /* Space Complexity: O(1) */
-class Solution_L_R_T_B {
+class Solution_In_Cycles {
 public:
     void rotate(vector<vector<int>>& matrix)
     {
-        int n = matrix.size();
+        const int N = matrix.size();
 
         int left  = 0;
-        int right = n-1;
+        int right = N-1;
 
         while (left < right)
         {
@@ -132,7 +132,7 @@ public:
             int bottom = right;
 
             int tmp;
-            for (int i = 0; i < right-left; i++)
+            for (int i = 0; i < right - left; i++)
             {
                 tmp = matrix[top][left + i];
 
@@ -144,6 +144,53 @@ public:
 
             left++;
             right--;
+        }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Similar to the above one, but I like this one a lot more.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  91.76% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(1)   */
+class Solution_In_Cycles_2 {
+public:
+    void rotate(vector<vector<int>>& matrix)
+    {
+        const int N = matrix.size();
+
+        for (int i = 0; i < N / 2; i++)
+        {
+            for (int j = i; j < N-1 - i; j++)
+            {
+                int row_1 = i;
+                int col_1 = j;
+
+                int row_2 = col_1;
+                int col_2 = N-1 - i;
+
+                int row_3 = col_2;
+                int col_3 = N-1 - row_2;
+
+                int row_4 = col_3;
+                int col_4 = row_1;
+
+                swap(matrix[row_1][col_1], matrix[row_2][col_2]);
+                swap(matrix[row_3][col_3], matrix[row_4][col_4]);
+                swap(matrix[row_1][col_1], matrix[row_3][col_3]);
+            }
         }
     }
 };
@@ -171,15 +218,15 @@ class Solution_Transpose_Reverse {
 public:
     void rotate(vector<vector<int>>& matrix)
     {
-        int rows = matrix.size();
+        const int ROWS = matrix.size();
 
-        for (int row = 0; row < rows; row++)
+        for (int row = 0; row < ROWS; row++)
         {
             for (int col = 0; col < row; col++)
                 swap(matrix[row][col], matrix[col][row]);
         }
 
-        for (int row = 0; row < rows; row++)
+        for (int row = 0; row < ROWS; row++)
             reverse(matrix[row].begin(), matrix[row].end());
     }
 };
