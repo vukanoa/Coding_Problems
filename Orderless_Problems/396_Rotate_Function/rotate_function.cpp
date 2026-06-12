@@ -52,9 +52,57 @@
 
 */
 
-#include <climits>
 #include <vector>
 using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is much easier to grasp than the Optimized version.
+
+*/
+
+/* Time  Beats: 14.97% */
+/* Space Beats:  5.23% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Suffix_Array {
+public:
+    int maxRotateFunction(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        int sum = 0;
+        for (int i = 0; i < N; i++)
+            sum += i * nums[i];
+
+        int result = sum;
+
+        vector<int> copy = nums;
+        copy.insert(copy.end(), nums.begin(), nums.end()); // Append
+
+        vector<int> suffix_sum(2*N, 0);
+        suffix_sum[2*N - 1] = copy.back();
+        for (int i = 2*N - 2; i >= 0; i--)
+            suffix_sum[i] += copy[i] + suffix_sum[i+1];
+
+        for (int i = N-1; i > 0; i--)
+        {
+            sum -= (N-1) * copy[i + N];
+            sum += suffix_sum[i+1] - suffix_sum[i + N];
+
+            result = max(result, sum);
+        }
+
+        return result;
+    }
+};
+
+
+
 
 /*
     ------------
