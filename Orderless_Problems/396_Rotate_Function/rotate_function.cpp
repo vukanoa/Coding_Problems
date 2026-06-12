@@ -109,6 +109,51 @@ public:
     --- IDEA ---
     ------------
 
+    We don't actually need to use extra space.
+
+*/
+
+/* Time  Beats: 58.05% */
+/* Space Beats: 51.69% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Optimized {
+public:
+    int maxRotateFunction(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        int total_sum = 0;
+        int sum       = 0;
+
+        for (int i = 0; i < N; i++)
+        {
+            total_sum += nums[i];
+            sum       += i * nums[i];
+        }
+
+        int result = sum;
+        for (int i = N-1; i > 0; i--)
+        {
+            sum -= (N-1) * nums[i];
+            sum += total_sum - nums[i];
+
+            result = max(result, sum);
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     Let us do some pre-processing using basic Math:
     Let the array elements be:
 
@@ -147,7 +192,7 @@ public:
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_General_Optimized {
 public:
     int maxRotateFunction(vector<int>& nums)
     {
@@ -166,7 +211,7 @@ public:
         }
 
         long long result = F0;
-        long long prev = F0;
+        long long prev   = F0;
 
         for (int i = 1; i < N; i++)
         {
