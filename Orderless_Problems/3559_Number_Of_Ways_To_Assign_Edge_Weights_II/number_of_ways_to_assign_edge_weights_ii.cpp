@@ -218,3 +218,148 @@ private:
         return dp[x][0];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way to impement it.
+
+*/
+
+/* Time  Beats: 32.22% */
+/* Space Beats: 54.44% */
+
+/* Time  Complexity: O((N + Q) * logN) */
+/* Space Complexity: O(N * logN)       */
+class Solution_2 {
+private:
+    const int MOD = 1e9 + 7;
+
+    int LOG;
+
+public:
+    vector<int> assignEdgeWeights(vector<vector<int>>& edges, vector<vector<int>>& queries)
+    {
+        const int N = edges.size() + 1;
+
+        LOG = 1;
+        while ((1 << LOG) <= N)
+            LOG++;
+
+        vector<vector<int>> adj_list(N + 1);
+
+        for (const auto& edge : edges)
+        {
+            const int& u = edge[0];
+            const int& v = edge[1];
+
+            adj_list[u].push_back(v);
+            adj_list[v].push_back(u);
+        }
+
+        vector<int> levels(N + 1, 0);
+        vector<vector<int>> ancestor_table(N + 1, vector<int>(LOG, 0));
+
+        dfs(adj_list, 1, 0, 0, levels, ancestor_table);
+
+        vector<int> results;
+        results.reserve(queries.size());
+
+        for (auto& query : queries)
+        {
+            const int& u = query[0];
+            const int& v = query[1];
+
+            const int LCA = lowest_common_ancestor(u, v, levels, ancestor_table);
+
+            const long long distance = levels[u] + levels[v] - 2LL * levels[LCA];
+
+            if (distance == 0)
+                results.push_back(0);
+            else
+                results.push_back(modular_exponentiation(2, distance - 1));
+        }
+
+        return results;
+    }
+
+private:
+    void dfs(vector<vector<int>>& adj_list, int node, int level, int parent, vector<int>& levels, vector<vector<int>>& ancestor_table)
+    {
+        levels[node] = level;
+
+        ancestor_table[node][0] = parent;
+
+        for (int j = 1; j < LOG; j++)
+            ancestor_table[node][j] = ancestor_table[ancestor_table[node][j - 1]][j - 1];
+
+        for (const int& child : adj_list[node])
+        {
+            if (child == parent)
+                continue;
+
+            dfs(adj_list,
+                child,
+                level + 1,
+                node,
+                levels,
+                ancestor_table);
+        }
+    }
+
+    int lowest_common_ancestor(int u, int v, vector<int>& levels, vector<vector<int>>& ancestor_table)
+    {
+        // Make sure "u" is the deeper node
+        if (levels[u] < levels[v])
+            swap(u, v);
+
+        const int level_difference = levels[u] - levels[v];
+
+        // Bring both nodes to the same level
+        for (int j = LOG - 1; j >= 0; j--)
+        {
+            if (level_difference & (1 << j))
+                u = ancestor_table[u][j];
+        }
+
+        if (u == v)
+            return u;
+
+        // Lift both nodes until their parents become equal
+        for (int j = LOG - 1; j >= 0; j--)
+        {
+            if (ancestor_table[u][j] == ancestor_table[v][j])
+                continue;
+
+            u = ancestor_table[u][j];
+            v = ancestor_table[v][j];
+        }
+
+        return ancestor_table[u][0];
+    }
+
+    // (base^exp) % mod
+    long long modular_exponentiation(long long base, long long exp)
+    {
+        long long result = 1;
+
+        while (exp > 0)
+        {
+            // If the current LSB is set(i.e. 1)
+            if (exp & 1)
+                result = (result * base) % MOD;
+
+            base = (base * base) % MOD;
+
+            // Right Shift
+            exp >>= 1; // Divide by 2
+        }
+
+        return result;
+    }
+};
