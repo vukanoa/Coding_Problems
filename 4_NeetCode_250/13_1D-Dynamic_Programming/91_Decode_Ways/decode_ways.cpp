@@ -142,7 +142,7 @@ using namespace std;
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution_Memoization {
+class Solution_Top_Down__Memoization {
 private:
     int memo[101];
 
@@ -192,127 +192,7 @@ private:
     --- IDEA ---
     ------------
 
-    Bottom-Up approach.
-
-    Consider these Examples:
-        1. s = "226"
-        2. s = "229"
-        3. s = "06"
-
-    1. s = "226"
-
-        s  = "2 2 6"
-        dp = [0 0 0 0]
-              0 1 2 3
-
-        We're essentially looking at subproblems.
-
-        For example, if we had only "6" - In how many ways could we decode it?
-        The answer is, obviously, 1.
-
-        So does that help us somehow?
-
-        What if we had "26", but we've already concluded that string "6" can
-        be decoded only in 1 way.
-
-        Can we use that to our advantage? Yes!
-
-        First, we have to check if the current digit(2 in our case) is != 0
-        because string starting with 0 cannot be decoded in any way:
-            "0", "033243", "0111", ...
-
-        If it's not 0, then we can count in how many ways can we decode 6 and
-        then we have to consider if we can take 6(in our case) as our 2nd digit
-        of a 2-digit number.
-
-        In this case "26" can indeed be decoded. It's going to be letter 'Z'.
-
-        So we add that as well. Now we know for a fact that string "26" can be
-        decoded in 2 ways.
-            1. 2 6 --> BF
-            2. 26  --> Z
-
-        Now we have to see in how many ways can a string "226" be decoded.
-
-        Again, can we use our, already computed, result for string "26"? Yes!
-
-        We are essentially going to have a vector dp which will store number of
-        ways in which we can decode from that digit until the end of the
-        string.
-
-        Simulation of example "226" would look like this:
-            "2 2 6"
-            [0 0 0 1]
-                   ^
-         __________|
-        |
-        We know for a fact that an empty string can be "decoded" in only one
-        way, i.e. no letter at all.
-
-        ##################
-        ### SIMULATION ###
-        ##################
-        1)
-                      i
-            s  = "2 2 6"
-            dp = [0 0 0 1]
-
-        2)
-                    i
-            s  = "2 2 6"
-            dp = [0 0 1 1]
-
-        3)
-                  i
-            s  = "2 2 6"
-            dp = [0 2 1 1]
-
-        4)
-            dp = [3 2 1 1]
-
-
-
-    2. s = "229"
-        ##################
-        ### SIMULATION ###
-        ##################
-        1)
-                      i
-            s  = "2 2 9"
-            dp = [0 0 0 1]
-
-        2)
-                    i
-            s  = "2 2 9"
-            dp = [0 0 1 1]
-
-        3)
-                  i
-            s  = "2 2 9"
-            dp = [0 1 1 1]
-
-        4)
-            dp = [2 1 1 1]
-
-
-    3. s = "06"
-        ##################
-        ### SIMULATION ###
-        ##################
-        1)
-                    i
-            s  = "0 6"
-            dp = [0 0 1]
-
-        2)
-                  i
-            s  = "0 6"
-            dp = [0 1 1]
-
-        3)
-            dp = [0 1 1]
-
-        We're returning dp[0] always.
+    TODO
 
 */
 
@@ -321,7 +201,7 @@ private:
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution_Bottom_Up {
+class Solution_Bottom_Up__Tabulation {
 public:
     int numDecodings(string s)
     {
@@ -359,37 +239,38 @@ public:
     Similar to a House Robber problem or the Kadane's Algorithm.
 
 */
-
 /* Time  Beats: 100.00% */
-/* Space Beats:  97.47% */
+/* Space Beats:  98.83% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution_Bottom_Up_Space_Efficient {
+class Solution_Bottom_Up__Tabulation__Space_Optimized {
 public:
-    int numDecodings(const string& s)
+    int numDecodings(string s)
     {
-        int n = s.length();
+        const int N = s.size();
 
-        int dp  = 0;
-        int dp1 = 1;
-        int dp2 = 0;
+        int next_next = 1;
+        int next      = s.back() == '0' ? 0 : 1;
 
-        for (int i = n - 1; i >= 0; i--)
+        for (int i = N-2; i >= 0; i--)
         {
-            /* One digit */
+            int curr = 0;
             if (s[i] != '0')
-                dp += dp1;
+            {
+                if (s[i] >= '3' && s[i+1] == '0')
+                    return 0; // Cannot decode "30", "40", ..., "90"
 
-            /* Two digits */
-            if (i+1 < s.size() && (s[i] == '1' || s[i] == '2' && s[i+1] <= '6'))
-                dp += dp2;
+                if (s[i] == '1' || (s[i] == '2' && s[i+1] <= '6'))
+                    curr = next + next_next;
+                else
+                    curr = next;
+            }
 
-            dp2 = dp1;
-            dp1 = dp;
-            dp = 0;
+            next_next = next;
+            next      = curr;
         }
 
-        return dp1;
+        return next;
     }
 };
