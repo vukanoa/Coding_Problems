@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-
 /*
     ============
     === HARD ===
@@ -93,6 +89,12 @@
 
 */
 
+
+#include <algorithm>
+#include <queue>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -102,84 +104,66 @@
 
 */
 
-/* Time  Beats: 67.55% */
-/* Space Beats: 46.72% */
+/* Time  Beats: 80.93% */
+/* Space Beats: 94.05% */
 
-// N - number of rooms
-// M - number of meetings
-
-/* Time  Complexity: O(M + logM) */
-/* Space Complexity: O(N + M)   */
+/* Time  Complexity: O(M * logM  +  M * logn) */
+/* Space Complexity: O(n)                     */
 class Solution {
+private:
+    using ull = unsigned long long;
+
+    template<typename T>
+    using MinHeap = priority_queue<T, vector<T>, greater<T>>;
+
 public:
     int mostBooked(int n, vector<vector<int>>& meetings)
     {
-        vector<int> freq(n, 0);
+        const int M = meetings.size();
 
+        /* Sort in ASCENDING order by start */
         sort(meetings.begin(), meetings.end());
 
-        // min_heap stores the current meetings going on with lowest end time at top
-        priority_queue<pair<long long,int>, vector<pair<long long,int>>, greater<pair<long long,int>>> curr_meetings;
-
-        // Mean Heap
-        priority_queue<int, vector<int>, greater<int>> available_rooms;
-
-        // Initially all rooms are available
+        MinHeap<pair<ull,int>> ongoing;
+        MinHeap<int>           available_rooms;
         for (int i = 0; i < n; i++)
             available_rooms.push(i);
 
-        int i = 0;
+        int held[101] = {0};
 
-        while (i<meetings.size())
+        for (const auto& meeting : meetings)
         {
-            // Remove all meetings from the curr_meetings that are over when current meeting starts
-            while ( ! curr_meetings.empty() && curr_meetings.top().first <= meetings[i][0])
+            const int& start = meeting[0];
+            const int& end   = meeting[1];
+
+            while ( ! ongoing.empty() && ongoing.top().first <= start)
             {
-                available_rooms.push(curr_meetings.top().second);
-                freq[curr_meetings.top().second]++;
-                curr_meetings.pop();
+                auto [end_time, room] = ongoing.top();
+                ongoing.pop();
+
+                available_rooms.push(room);
             }
 
-            // If all rooms full, delay the current meeting and add it
-            if (curr_meetings.size() == n)
+            if ( ! available_rooms.empty()) // There ARE available rooms
             {
-                long long end_time = curr_meetings.top().first;
-                long long room = curr_meetings.top().second;
+                int room = available_rooms.top();
+                available_rooms.pop();
 
-                curr_meetings.pop();
-                freq[room]++;
-                curr_meetings.push({end_time-meetings[i][0]+meetings[i][1], room});
+                ongoing.push( {end, room} );
+                held[room]++;
             }
-
-            // Otherwise add the current meeting
             else
             {
-                curr_meetings.push({meetings[i][1], available_rooms.top()});
-                available_rooms.pop();
+                auto [earliest_end, room] = ongoing.top();
+                ongoing.pop();
+
+                long long duration = end - start;
+
+                ongoing.push( {earliest_end + duration, room} );
+                held[room]++;
             }
-            i++;
         }
 
-        // Empty all the ongoing meetings
-        while ( ! curr_meetings.empty())
-        {
-            freq[curr_meetings.top().second]++;
-            curr_meetings.pop();
-        }
-
-        // Matrix to store multiple rooms of same frequency
-
-        vector<vector<int>> result(meetings.size()+1);
-
-        for (int i = 0; i < freq.size(); i++)
-            result[freq[i]].push_back(i);
-
-        for (int i = result.size()-1; i >= 0; i--)
-        {
-            if (result[i].size() > 0)
-                return result[i][0];
-        }
-
-        return -1;
+        return max_element(held, held + n) - held;
     }
 };
