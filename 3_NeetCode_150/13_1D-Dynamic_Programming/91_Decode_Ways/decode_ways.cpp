@@ -69,6 +69,7 @@
 
 */
 
+#include <cstring>
 #include <string>
 #include <vector>
 using namespace std;
@@ -136,39 +137,50 @@ using namespace std;
 
 */
 
-/* Time  Beats:  5.23% */
-/* Space Beats: 92.67% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  79.49% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution {
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Memoization {
+private:
+    int memo[101];
+
 public:
-    int memo[100] = {}; // 100 is listed to be a constraint
-    int numDecodings(const string& s)
+    int numDecodings(string s)
     {
-        return dp(s, 0);
+        const int N = s.size();
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        return solve(0, s);
     }
 
 private:
-    int dp(const string& s, int i)
+    int solve(int idx, string& s)
     {
-        if (i == s.size())
+        const int N = s.size();
+
+        if (idx >= N)
             return 1;
 
-        if (memo[i] != 0)
-            return memo[i];
+        if (memo[idx] != -1)
+            return memo[idx];
 
-        int res = 0;
+        if (s[idx] == '0')
+            return memo[idx] = 0;
 
-        /* One digit */
-        if (s[i] != '0')
-            res += dp(s, i+1);
+        if (idx < N-1 && s[idx] >= '3' && s[idx + 1] == '0')
+            return memo[idx] = 0; // Cannot decode "30", "40", ..., "90"
 
-        /* Two digits */
-        if (i+1 < s.size() && (s[i] == '1' || s[i] == '2' && s[i+1] <= '6'))
-            res += dp(s, i+2);
+        int take_one = solve(idx + 1, s);
+        int take_two = 0;
 
-        return memo[i] = res;
+        if (idx < N-1 && (s[idx] == '1' || (s[idx] == '2' && s[idx + 1] <= '6')))
+            take_two = solve(idx + 2, s);
+
+        return memo[idx] = take_one + take_two;
     }
 };
 
@@ -304,11 +316,11 @@ private:
 
 */
 
-/* Time  Beats:   100% */
-/* Space Beats: 32.02% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  65.05% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution_Bottom_Up {
 public:
     int numDecodings(string s)
@@ -325,7 +337,7 @@ public:
                 dp[i] += dp[i + 1];
 
             /* Two digits */
-            if (i + 1 < N && (s[i] == '1' || (s[i] == '2' && s[i+1] >= '0' && s[i+1] < '7')))
+            if (i + 1 < N && (s[i] == '1' || (s[i] == '2' && s[i+1] <= '6')))
                 dp[i] += dp[i + 2];
         }
 
