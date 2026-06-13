@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -71,169 +69,9 @@
 
 */
 
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    This Code gives TLE, but I wanted to save it here since you may think about
-    it this way at first.
-
-    However, this doesn't pass the "secret tests" since we're doing a lot of
-    repeated work.
-
-    Consider this example:
-
-    s =  "111111111111111111111111111111111111"
-*/
-
-/* This Code gives TLE(Time Limit Exceeded) */
-
-/* Time  Complexity: O(2^n) */
-/* Space Complexity: O(n) */
-class Solution{
-public:
-    int numDecodings(std::string s)
-    {
-        int count = 0;
-
-        dfs_backtracking(s, count, 0);
-
-        return count;
-    }
-
-private:
-    void dfs_backtracking(std::string& s, int& count, int i)
-    {
-        if (i == s.length())
-        {
-            count++;
-            return;
-        }
-        else if (s[i] == '0')
-            return;
-
-        /* One digit */
-        dfs_backtracking(s, count, i+1);
-
-        /* Two digits */
-        if (i + 1 < s.length())
-        {
-            if (s[i] == '1')
-                dfs_backtracking(s, count, i+2);
-            else if (s[i] == '2' && s[i+1] >= '0' && s[i+1] < '7')
-                dfs_backtracking(s, count, i+2);
-        }
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Example 1:
-
-                               "11106"
-
-            ______________________._______________________
-            __________1______________________11___________
-            ____1__________11___________1__________10_____
-            _1____10_____F___________F___________6________
-            _____6_______________________________T________
-                 T
-
-    We have two "T"s, so the answer is: 2.
-
-    For recursion to stop It's either that:
-        1. dp[i] is not 0
-
-           or
-
-        2. s[i] == 0
-
-
-    if s[i] == 0, that's F. It means that "combination" is not possible, thus
-    return 0.
-
-    Essentially: dp[i] = dp[i + 1] + dp[i + 2];
-
-    And we do that recursively.
-
-    At one point, index "i" will get out of bounds if a combination is okay, so
-    that's why we have to have: dp(s.length() + 1, 0) and that's why we have to
-    assign dp[s.length()] = 1;
-
-    If we have, successfully, gone through all the elements, without returning
-    0, that means that "path" is valid and must be included in overall count of
-    results.
-
-    So:
-        dp[s.length() + 1] = 1
-
-    is necessary.
-
-
-    Example 2:
-
-                                "12"
-                             ___________
-                             _____1_____
-                             __2____12__
-                             T_____T____
-
-    Again, two T's, so the answer is: 2
-
-    Go through the code for this example and you'll get it.
-
-*/
-
-/* Time  Beats: 5.23% */
-/* Space Beats: 72.79% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution {
-public:
-    int numDecodings(const std::string& s)
-    {
-        std::vector<int> dp(s.length() + 1, 0);
-        dp[s.length()] = 1;
-
-        return backtracking(s, dp, 0);
-    }
-
-private:
-    int backtracking(const std::string& s, std::vector<int>& dp, int i)
-    {
-        if (dp[i] != 0)
-            return dp[i];
-
-        if (s[i] == '0')
-            return 0;
-
-        int result = backtracking(s, dp, i+1);
-
-        if (i + 1 < s.length())
-        {
-            std::string str = s.substr(i, 2);
-            int num = std::stoi(str);
-
-            if (num >= 1 && num <= 26)
-                result += backtracking(s, dp, i + 2);
-        }
-
-        dp[i] = result;
-
-        return dp[i];
-    }
-};
-
-
-
+#include <string>
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -303,10 +141,10 @@ private:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution_2 {
+class Solution {
 public:
     int memo[100] = {}; // 100 is listed to be a constraint
-    int numDecodings(const std::string& s)
+    int numDecodings(const string& s)
     {
         return dp(s, 0);
     }
@@ -473,72 +311,22 @@ private:
 /* Space Complexity: O(n) */
 class Solution_Bottom_Up {
 public:
-    int numDecodings(std::string s)
+    int numDecodings(string s)
     {
-        std::vector<int> dp(s.length() + 1, 0);
-        int n = dp.size();
+        const int N = s.size();
 
-        dp[n-1] = 1; // or dp[s.length()] = 1
+        vector<int> dp(N+1, 0);
+        dp[N] = 1;
 
-        for (int i = s.length()-1; i >= 0; i--)
+        for (int i = N-1; i >= 0; i--)
         {
             /* One digit */
             if (s[i] != '0')
                 dp[i] += dp[i + 1];
 
             /* Two digits */
-            if (i + 1 < s.length() && (s[i] == '1' || (s[i] == '2' && s[i+1] >= '0' && s[i+1] < '7')))
+            if (i + 1 < N && (s[i] == '1' || (s[i] == '2' && s[i+1] >= '0' && s[i+1] < '7')))
                 dp[i] += dp[i + 2];
-        }
-
-        return dp[0];
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Similar to the above one, however the logic is a bit diffent. Some people
-    may find this one much easier to understand.
-
-*/
-
-/* Time  Beats: 100.00% */
-/* Space Beats:  78.29% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_My_Own_DP_version {
-public:
-    int numDecodings(string s)
-    {
-        const int N = s.length();
-
-        if (s[N-1] == '0' && (N == 1 || s[N-2] > '2'))
-            return 0;
-
-        std::vector<int> dp(N+1, 0);
-        dp[N]   = 1;
-        dp[N-1] = s[N-1] == '0' ? 0 : 1;
-
-        for (int i = N-2; i >= 0; i--)
-        {
-            if (s[i] == '0' && (i == 0 || s[i-1] > '2'))
-                return 0;
-            else if (s[i] == '0')
-                continue;
-
-            /* One digit */
-            dp[i] = dp[i+1];
-
-            /* Two digits */
-            if (s[i] == '1' || (s[i] == '2' && s[i+1] <= '6'))
-                dp[i] += dp[i+2];
         }
 
         return dp[0];
@@ -567,7 +355,7 @@ public:
 /* Space Complexity: O(1) */
 class Solution_Bottom_Up_Space_Efficient {
 public:
-    int numDecodings(const std::string& s)
+    int numDecodings(const string& s)
     {
         int n = s.length();
 
