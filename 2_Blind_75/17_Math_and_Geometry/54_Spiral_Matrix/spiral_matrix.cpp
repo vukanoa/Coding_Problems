@@ -45,6 +45,62 @@ using namespace std;
     --- IDEA ---
     ------------
 
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  14.27% */
+
+/* Time  Complexity: O(ROWS * COLS)     */
+/* Space Complexity: O(min(ROWS, COLS)) */
+class Solution_Recursion {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix)
+    {
+        int ROWS = matrix.size();
+        int COLS = matrix[0].size();
+
+        vector<int> result;
+        result.reserve(ROWS * COLS);
+
+        dfs(ROWS, COLS, 0, -1, 0, 1, matrix, result);
+
+        return result;
+    }
+
+    void dfs(int remaining_rows,
+             int remaining_cols,
+             int row,
+             int col,
+             int delta_row,
+             int delta_col,
+             vector<vector<int>>& matrix, vector<int>& result)
+    {
+        if (remaining_rows == 0 || remaining_cols == 0)
+            return;
+
+        for (int j = 0; j < remaining_cols; j++)
+        {
+            row += delta_row;
+            col += delta_col;
+
+            result.push_back(matrix[row][col]);
+        }
+
+        // Sub-problem
+        dfs(remaining_cols, remaining_rows-1, row, col, delta_col, -delta_row, matrix, result);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     Idea is self-explanatory
 
     It's important to be aware that it is HARD to get the implementation right.
@@ -56,7 +112,7 @@ using namespace std;
 
 /* Time  Complexity: O(ROWS * COLS) */
 /* Space Complexity: O(1)           */
-class Solution {
+class Solution_Iteration {
 public:
     vector<int> spiralOrder(vector<vector<int>>& matrix)
     {
@@ -122,7 +178,7 @@ public:
 
 /* Time  Complexity: O(ROWS * COLS) */
 /* Space Complexity: O(1)           */
-class Solution_Elegant {
+class Solution_Iteration_Elegant {
 public:
     vector<int> spiralOrder(vector<vector<int>>& matrix)
     {
