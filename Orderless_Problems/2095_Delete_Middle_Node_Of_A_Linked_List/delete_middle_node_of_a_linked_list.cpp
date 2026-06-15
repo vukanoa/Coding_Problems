@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -64,52 +62,47 @@
 
 */
 
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode() : val(0), next(nullptr) {}
- *     ListNode(int x) : val(x), next(nullptr) {}
- *     ListNode(int x, ListNode *next) : val(x), next(next) {}
- * };
- */
+// Definition for singly-linked list.
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
+};
 
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Fundamental Linked List Problem.
+    Tortoise & Hare technique on Linked List. Fundamental technique.
 
 */
 
-/* Time  Beats: 79.83% */
-/* Space Beats: 77.69% */
+/* Time  Beats: 100.00% */
+/* Space Beats: 54.78% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_Tortoise_and_Hare__using_Dummy_node {
 public:
     ListNode* deleteMiddle(ListNode* head)
     {
-        if ( ! head->next)
-            return nullptr;
+        ListNode dummy(0);
+        dummy.next = head;
 
-        ListNode* slow = head;
-        ListNode* fast = head->next;
+        ListNode* slow = &dummy;
+        ListNode* fast = dummy.next;
 
-        while (fast->next && fast->next->next)
+        while (fast && fast->next)
         {
             slow = slow->next;
             fast = fast->next->next;
         }
 
-        ListNode* middle = slow->next;
+        slow->next = slow->next->next; // Unlink the very middle node
 
-        slow->next = middle->next; // Relink "over" the middle node
-        middle->next = nullptr; // Unlink
-
-        return head;
+        return dummy.next;
     }
 };
