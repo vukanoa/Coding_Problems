@@ -146,3 +146,42 @@ public:
         return head;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same technqieu as above, though here we've implemented it using RECURSION
+    for didactic purposes.
+
+    The key for understanding this one is that we're passing "head"(i.e. our
+    "slow" pointer) by REFERENCE. That's the key!
+
+*/
+
+/* Time  Beats: 45.35% */
+/* Space Beats: 54.78% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Floyd__Tortoise_and_Hare__Recursion {
+public:
+    ListNode* deleteMiddle(ListNode* head)
+    {
+        remove_middle_node(head, head);
+        return head;
+    }
+
+    // "head"(i.e. "slow") node is passed by REFFERENCE. That's the key.
+    void remove_middle_node(ListNode*& slow, ListNode* fast)
+    {
+        if (fast == nullptr || fast->next == nullptr)
+           slow = slow->next;
+        else
+            remove_middle_node(slow->next, fast->next->next);
+    }
+};
