@@ -85,7 +85,7 @@ struct ListNode {
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution_Tortoise_and_Hare__using_Dummy_node {
+class Solution_Floyd__Tortoise_and_Hare__using_Dummy_node {
 public:
     ListNode* deleteMiddle(ListNode* head)
     {
@@ -104,5 +104,45 @@ public:
         slow->next = slow->next->next; // Unlink the very middle node
 
         return dummy.next;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same technique as above, though here we skip using Dummy node completely.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  83.64% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Floyd__Tortoise_and_Hare__without_Dummy {
+public:
+    ListNode* deleteMiddle(ListNode* head)
+    {
+        // head is CERTAINLY not nullptr because of the Constraints
+        if ( ! head->next)
+            return nullptr;
+
+        ListNode* slow = head;
+        ListNode* fast = slow->next->next;
+
+        while (fast && fast->next)
+        {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+
+        slow->next = slow->next->next; // Unlink the very middle node
+
+        return head;
     }
 };
