@@ -61,11 +61,11 @@ using namespace std;
     indicators in 0th row and 0th column.
 
     First we iterate through 0th(first) row. If we find that there is a 0
-    somewhere in it, we remember that in variable "zero_row".
+    somewhere in it, we remember that in variable "nullify_row_zero".
     We only need to know if there is any zero in 0th row(without matrix[0][0]).
 
     Then we iterate through 0th(first) column. If we find that there is a 0
-    somewhere in it, we remember that in variable "zero_col".
+    somewhere in it, we remember that in variable "nullify_col_zero".
     We only need to know if there is any zero in 0th col(without matrix[0][0]).
 
     It's important to note that in both iterations we're iterating starting
@@ -89,50 +89,45 @@ using namespace std;
     After we finish that, now we check if matrix[0][0] == 0. If it is then
     nullify both 0th row and 0th column.
 
-    If it is not, then our "zero_row" and "zero_col" boolean variables come in
-    play.
+    If it is not, then our "nullify_row_zero" and "nullify_col_zero" boolean
+    variables come in play.
 
-    We nullify 0th row if "zero_row" is true.
-    We nullify 0th col if "zero_col" is true.
+    We nullify 0th row if "nullify_row_zero" is true.
+    We nullify 0th col if "nullify_col_zero" is true.
 
 */
 
-/* Time  Beats: 91.63% */
-/* Space Beats: 99.74% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  99.74% */
 
-/* Time  Complexity: O(m * n) */
-/* Space Complexity: O(1) */
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(1)           */
 class Solution {
 public:
     void setZeroes(vector<vector<int>>& matrix)
     {
-        int ROWS = matrix.size();
-        int COLS = matrix[0].size();
+        const int ROWS = matrix.size();
+        const int COLS = matrix[0].size();
 
         if (ROWS == 1 && COLS == 1)
             return;
 
-        bool zero_row = false;
-        bool zero_col = false;
-
-        // We don't check matrix[0][0], we'll take care of that at the end
-
-        // Check first row
-        for (int col = 1; col < COLS; col++)
+        bool nullify_col_zero = false;
+        for (int row = 0; row < ROWS; row++)
         {
-            if (matrix[0][col] == 0)
+            if (matrix[row][0] == 0)
             {
-                zero_row = true;
+                nullify_col_zero = true;
                 break;
             }
         }
 
-        // Check first column
-        for (int row = 1; row < ROWS; row++)
+        bool nullify_row_zero = false;
+        for (int col = 0; col < COLS; col++)
         {
-            if (matrix[row][0] == 0)
+            if (matrix[0][col] == 0)
             {
-                zero_col = true;
+                nullify_row_zero = true;
                 break;
             }
         }
@@ -144,56 +139,44 @@ public:
             {
                 if (matrix[row][col] == 0)
                 {
-                    matrix[ 0 ][col] = 0;
-                    matrix[row][ 0 ] = 0;
+                    matrix[ 0 ][col] = 0; // Mark
+                    matrix[row][ 0 ] = 0; // Mark
                 }
             }
         }
 
-        // Nullify certain rows
-        for (int row = 1; row < ROWS; row++)
-        {
-            if (matrix[row][0] == 0)
-                nullify_row(matrix, row);
-        }
-
-        // Nullify certain columns
+        // Nullify corresponding ROWS
         for (int col = 1; col < COLS; col++)
         {
             if (matrix[0][col] == 0)
-                nullify_col(matrix, col);
+                nullify_col(col, matrix);
         }
 
-        // We're taking care of it here
-        if (matrix[0][0] == 0)
+        // Nullify corresponding COLS
+        for (int row = 1; row < ROWS; row++)
         {
-            nullify_row(matrix, 0);
-            nullify_col(matrix, 0);
+            if (matrix[row][0] == 0)
+                nullify_row(row, matrix);
         }
-        else
-        {
-            if (zero_row)
-                nullify_row(matrix, 0);
 
-            if (zero_col)
-                nullify_col(matrix, 0);
-        }
+        if (nullify_row_zero) nullify_row(0, matrix);
+        if (nullify_col_zero) nullify_col(0, matrix);
     }
 
 private:
-    void nullify_row(vector<vector<int>>&matrix, int curr_row)
+    void nullify_col(int col, vector<vector<int>>& matrix)
     {
-        int COLS = matrix[0].size();
-
-        for (int col = 0; col < COLS; col++)
-            matrix[curr_row][col] = 0;
-    }
-
-    void nullify_col(vector<vector<int>>& matrix, int curr_col)
-    {
-        int ROWS = matrix.size();
+        const int ROWS = matrix.size();
 
         for (int row = 0; row < ROWS; row++)
-            matrix[row][curr_col] = 0;
+            matrix[row][col] = 0;
+    }
+
+    void nullify_row(int row, vector<vector<int>>& matrix)
+    {
+        const int COLS = matrix[0].size();
+
+        for (int col = 0; col < COLS; col++)
+            matrix[row][col] = 0;
     }
 };
