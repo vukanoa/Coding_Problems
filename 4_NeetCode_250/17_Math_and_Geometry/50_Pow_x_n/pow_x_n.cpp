@@ -129,8 +129,8 @@ using namespace std;
 /* Space Beats:  69.48% */
 
 /* Time  Complexity: O(log2(N)) */
-/* Space Complexity: O(log2(N)) */
-class Solution {
+/* Space Complexity: O(log2(N)) */ // Because of the Call-Stack
+class Solution_Recursive_Binary_Exponentiation {
 public:
     double myPow(double x, int n)
     {
@@ -162,8 +162,81 @@ private:
 
         double result = subproblem * subproblem;
 
+        // If the current LSB is set(i.e. 1)
         if (exp & 1)
             result *= base;
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is an optimal impementation of "Binary Exponentiation". An Iterative
+    approach is ALWAYS preferable as it doesn't have the overhead of the Call
+    Stack.
+
+    In Competitive Programming this implementation is the one that is actually
+    used and not the above, recursive, one.
+
+    However, the recursive solution is much easier to reason about and much
+    easier to understand.
+
+    That's why I've explained it above.
+
+    Even though this Solution here--the Iterative one--is MORE optimal, I'll
+    leave the recursive Solution as well, for didactic purposes.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  42.51% */
+
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(1)    */
+class Solution_Optimal_Iterative_Binary_Exponentiation {
+public:
+    double myPow(double x, int n)
+    {
+        bool odd_exponent      = n & 1;
+        bool negative_exponent = n < 0;
+        bool negative_base     = x < 0;
+
+        x = abs(x);
+        long long LL_n = llabs(1LL * n); // LL_n  <==>  "long long n"
+
+        double result = 1.0;
+
+        result = binary_exponentiation(x, LL_n);
+
+        if (negative_exponent)
+            result = 1.0 / result;
+
+        if (negative_base && odd_exponent)
+            result *= -1.0;
+
+        return result;
+    }
+
+private:
+    double binary_exponentiation(double base, long long exp)
+    {
+        double result = 1.0;
+        while (exp > 0)
+        {
+            // If the current LSB is set(i.e. 1)
+            if (exp & 1)
+                result = (result * base);
+
+            base = (base * base);
+            exp /= 2;
+        }
 
         return result;
     }
