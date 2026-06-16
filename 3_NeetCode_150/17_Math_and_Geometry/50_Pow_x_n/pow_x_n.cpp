@@ -101,43 +101,70 @@ using namespace std;
 
     So what will be the Base Case:
 
-    if x == 0, it's always going to be 0.
-    if n == 0, it's always going to be 1.
+        if n == 0, it's always going to be 1.
+
+
+    However, what happens if the exponent is ODD?
+    Let's say we have:
+
+        3^11
+
+    In that case we need to do one additional multiplication, multiplying once
+    more with the base.
+
+        3^11 = 3^5 * 3^5 * 3
+                           ^
+                           |
+                           |
+                        Additional multiplication with the base
+
+    In the code we'll cover this case by simply having an if statement:
+
+        if (exp & 1)
+            result *= base;
 
 */
 
-/* Time  Beats:  100% */
-/* Space Beats: 69.48% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  69.48% */
 
-/* Time  Complexity: O(log2(n)) */
-/* Space Complexity: O(log2(n)) */
+/* Time  Complexity: O(log2(N)) */
+/* Space Complexity: O(log2(N)) */
 class Solution {
 public:
     double myPow(double x, int n)
     {
-        double result = helper(x, abs(n));
+        bool negative_exponent = n < 0;
+        bool negative_base = x < 0;
+        bool odd_exponent = n & 1;
 
-        if (n >= 0)
-            return result;
+        x = abs(x);
+        long long LL_n = llabs((long long)n);
 
-        return 1 / result;
+        double result = recursive_binary_exponentiation(x, LL_n);
+
+        if (negative_exponent)
+            result = 1.0 / result;
+
+        if (negative_base && odd_exponent)
+            result *= -1.0;
+
+        return result;
     }
 
 private:
-    double helper(double x, int n)
+    double recursive_binary_exponentiation(double base, long long exp)
     {
-        if (x == 0)
-            return 0;
+        if (exp == 0)
+            return 1.0;
 
-        if (n == 0)
-            return 1;
+        double subproblem = recursive_binary_exponentiation(base, exp / 2);
 
-        double result = helper(x, n / 2);
-        result = result * result;
+        double result = subproblem * subproblem;
 
-        if (n % 2 == 0)
-            return result;
+        if (exp & 1)
+            result *= base;
 
-        return x * result;
+        return result;
     }
 };
