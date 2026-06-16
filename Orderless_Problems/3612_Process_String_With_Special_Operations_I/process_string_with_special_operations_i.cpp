@@ -56,34 +56,48 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    Simulation problem, nothing to think about, just code it up.
+    If you don't understand why the Time Complexity is O(2^N), then consider
+    this:
+
+        s = "a#####"
+
+    The size of result will grow exponenntially. Look at the sizes after each
+    iteration:
+
+        1 2 4 8 16 32
 
 */
 
-/* Time  Beats: 14.29% */
-/* Space Beats: 85.71% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  15.15% */
 
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(1) */ // Result string is not considered extra space
+/* Time  Complexity: O(2^N) */
+/* Space Complexity: O(2^N) */
 class Solution {
 public:
     string processStr(string s)
     {
-        string result = "";
+        const int N = s.size();
+
+        string result;
+        result.reserve(1 << N); // To prevent reallocations
+
         for (const char& chr : s)
         {
-            if (chr >= 97 && chr <= 122)
+            if (islower(chr))
+            {
                 result += chr;
+            }
             else if (chr == '*')
             {
-                if (result.length() > 0)
-                    result.pop_back();
+                if ( ! result.empty())
+                result.pop_back();
             }
-            else if(chr == '#')
+            else if (chr == '#')
             {
                 result += result;
             }
-            else if (chr == '%')
+            else
             {
                 reverse(result.begin(), result.end());
             }
