@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -86,6 +84,11 @@
 
 */
 
+#include <cstdlib>
+#include <unordered_map>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -95,45 +98,51 @@
 
 */
 
-/* Time  Beats: 97.71% */
-/* Space Beats: 20.92% */
-
-/* Time  Complexity: O(n^2) */
-/* Space Complexity: O(n) */
+/* Time  Beats: 54.04% */
+/* Space Beats: 50.11% */
 class DetectSquares {
+private:
+    unordered_map<long long, int> freq_points;
+    vector<vector<int>> points;
+
 public:
     DetectSquares()
-    {
+    {}
 
+    // O(1)
+    void add(vector<int> point)
+    {
+        long key = get_key(point[0], point[1]);
+
+        freq_points[key]++;
+        points.push_back(point);
     }
 
-    void add(std::vector<int> point)
-    {
-        int x = point[0];
-        int y = point[1];
-
-        count_points[x][y]++;
-        vec_points.push_back({x, y});
-    }
-
+    // O(N)
     int count(vector<int> point)
     {
-        int x = point[0];
-        int y = point[1];
         int result = 0;
 
-        for (auto& [x2, y2] : vec_points)
-        {
-            if (std::abs(x - x2) == 0 || std::abs(x - x2) != std::abs(y - y2))
-                continue; // Skip empty square or invalid square point!
+        int q_x = point[0];
+        int q_y = point[1];
 
-            result += count_points[x][y2] * count_points[x2][y];
+        for (const auto& point : points)
+        {
+            int x = point[0];
+            int y = point[1];
+
+            if (abs(q_y - y) != abs(q_x - x) || x == q_x || y == q_y)
+                continue;
+
+            result += freq_points[get_key(x, q_y)] * freq_points[get_key(q_x, y)];
         }
 
         return result;
     }
 
 private:
-    int count_points[1001][1001] = {};
-    std::vector<std::pair<int, int>> vec_points;
+    long long get_key(int x, int y)
+    {
+        return (1LL * x << 32) | (1LL * y);
+    }
 };
