@@ -138,3 +138,33 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  23.46% */
+
+/* Time  Complexity: O(log(columnNumber)) */
+/* Space Complexity: O(log(columnNumber)) */ // Because of the Call-Stack
+class Solution_Recursive {
+public:
+    string convertToTitle(int columnNumber)
+    {
+        if (columnNumber == 0)
+            return "";
+
+        int n = columnNumber - 1;
+
+        return convertToTitle(n / 26) + char('A' + n % 26);
+    }
+};
