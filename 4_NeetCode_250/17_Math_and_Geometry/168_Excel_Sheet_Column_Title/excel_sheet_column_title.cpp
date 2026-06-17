@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <sstream>
-
 /*
     ============
     === EASY ===
@@ -55,31 +51,89 @@
 
 */
 
-/* Time  Beats:   100% */
-/* Space Beats: 74.50% */
+#include <algorithm>
+#include <string>
+#include <vector>
+using namespace std;
 
-/* Time  Complexity: O(columnNumber / 26) */
-/* Space Complexity: O(1) */
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  74.50% */
+
+/* Time  Complexity: O(log(columnNumber)) */
+/* Space Complexity: O(1)                 */
 class Solution {
 public:
     string convertToTitle(int columnNumber)
     {
-        std::vector<char> letters = {'Z', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
+        vector<char> letters = {'Z', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
                                      'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
                                      'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
                                      'X', 'Y', 'Z'};
 
-        std::ostringstream out;
+        string result;
+        result.reserve(4);
+
         while (columnNumber > 0)
         {
-            out << letters[columnNumber % 26];
+            result += letters[columnNumber % 26];
 
             columnNumber--;
             columnNumber /= 26;
         }
 
-        std::string result = out.str();
-        std::reverse(result.begin(), result.end());
+        /* Reverse */
+        reverse(result.begin(), result.end());
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same idea, however here we did took care of "off by one" in another way.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   1.52% */
+
+/* Time  Complexity: O(log(columnNumber)) */
+/* Space Complexity: O(1)                 */
+class Solution_2 {
+public:
+    string convertToTitle(int columnNumber)
+    {
+        string result;
+        result.reserve(4);
+
+        while (columnNumber > 0)
+        {
+            columnNumber--;
+
+            int offset = columnNumber % 26;
+            result += ('A' + offset);
+
+            // Divide
+            columnNumber /= 26;
+        }
+
+        /* Reverse */
+        reverse(result.begin(), result.end());
 
         return result;
     }
