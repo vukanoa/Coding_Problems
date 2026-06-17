@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -47,6 +45,10 @@
 
 */
 
+#include <string>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -61,42 +63,41 @@
 
 /* Time  Complexity: O(M * N) */
 /* Space Complexity: O(M + N) */
+
 class Solution {
 public:
-    std::string multiply(std::string num1, std::string num2)
+    string multiply(string num1, string num2)
     {
-        if (num1[0] == '0' || num2[0] == '0')
+        if (num1 == "0" || num2 == "0")
             return "0";
 
-        int M = num1.length();
-        int N = num2.length();
+        int N = num1.size();
+        int M = num2.size();
 
-        std::vector<int> result(M + N, 0);
-        std::reverse(num1.begin(), num1.end());
-        std::reverse(num2.begin(), num2.end());
+        vector<int> vec_result(N + M, 0);
 
-        for (int i = 0; i < M; i++)
+        for (int i = N-1; i >= 0; i--)
         {
-            for (int j = 0; j < N; j++)
+            for (int j = M-1; j >= 0; j--)
             {
-                int x = (num1[i] - '0') * (num2[j] - '0');
+                int product = (num1[i] - '0') * (num2[j] - '0');
 
-                result[i + j]     += x;
-                result[i + j + 1] += (result[i + j] / 10);
-                result[i + j]     %= 10;
+                int sum = product + vec_result[i + j + 1];
+
+                vec_result[i + j + 1]  = sum % 10;
+                vec_result[i + j    ] += sum / 10;
             }
         }
 
-        // Get rid of the "Leading" Zeroes
-        while (result.back() == 0)
-            result.pop_back();
+        string str_result = "";
+        str_result.reserve(N + M); // To prevent reallocations
 
-        std::reverse(result.begin(), result.end());
-        std::ostringstream out;
+        for (const int& num : vec_result)
+        {
+            if ( ! (str_result.empty() && num == 0))
+                str_result += to_string(num);
+        }
 
-        for (int& digit : result)
-            out << digit;
-
-        return out.str();
+        return str_result.empty() ? "0" : str_result;
     }
 };
