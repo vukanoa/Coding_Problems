@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === EASY ===
@@ -45,6 +42,7 @@
 
 */
 
+#include <vector>
 using namespace std;
 
 /*
@@ -56,11 +54,11 @@ using namespace std;
 
 */
 
-/* Time  Beats: 77.96% */
-/* Space Beats: 54.41% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  68.38% */
 
 /* Time  Complexity: O(ROWS * COLS) */
-/* Space Complexity: O(1)           */
+/* Space Complexity: O(ROWS * COLS) */
 class Solution {
 public:
     vector<vector<int>> transpose(vector<vector<int>>& matrix)
