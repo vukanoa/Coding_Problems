@@ -61,8 +61,8 @@ using namespace std;
 /* Time  Beats: 6.00% */
 /* Space Beats: 5.00% */
 
-/* Time  Complexity: O(T^2  +  T * S) */
-/* Space Complexity: O(T    +  S)     */
+/* Time  Complexity: O(min(N, M) * (N + M)) */
+/* Space Complexity: O(N + M)               */
 class Solution_Intuitive {
 public:
     string gcdOfStrings(string str1, string str2)
@@ -190,8 +190,8 @@ public:
 /* Space Beats:  84.86% */
 
 /* Time  Complexity: O(N + M) */
-/* Space Complexity: O(1)     */
-class Solution {
+/* Space Complexity: O(N + M) */
+class Solution_Trick {
 public:
     string gcdOfStrings(string str1, string str2)
     {
@@ -199,6 +199,48 @@ public:
             return "";
 
         int g = gcd(str1.size(), str2.size());
+
+        return str1.substr(0, g);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  94.02% */
+
+/* Time  Complexity: O(N + M) */
+/* Space Complexity: O(g)     */ // For the result
+class Solution_Trick_Space_Optimized {
+public:
+    string gcdOfStrings(string str1, string str2)
+    {
+        const int SIZE_ONE = str1.size();
+        const int SIZE_TWO = str2.size();
+
+        int g = gcd(SIZE_ONE, SIZE_TWO);
+
+        for (int i = 0; i < SIZE_ONE; i++)
+        {
+            if (str1[i] != str1[i % g])
+                return "";
+        }
+
+        for (int i = 0; i < str2.size(); i++)
+        {
+            if (str2[i] != str1[i % g])
+                return "";
+        }
 
         return str1.substr(0, g);
     }
