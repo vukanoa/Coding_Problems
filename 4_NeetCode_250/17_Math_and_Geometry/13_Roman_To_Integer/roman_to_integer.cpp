@@ -254,3 +254,65 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Instead of dealing with "edge cases", we can just preprocess the string,
+    replacing each "edge case" with a "normal case".
+
+    Then simply add all the values one-by-one, going from left to right.
+
+*/
+
+/* Time  Beats: 56.69% */
+/* Space Beats:  6.77% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Replace_Edge_Cases {
+public:
+    int romanToInt(string s)
+    {
+        unordered_map<char, int> value_of_roman = {
+            { 'I', 1 },
+            { 'V', 5 },
+            { 'X', 10 },
+            { 'L', 50 },
+            { 'C', 100 },
+            { 'D', 500 },
+            { 'M', 1000 }
+        };
+
+        int number = 0;
+
+        replace_all("IV", "IIII",  s);
+        replace_all("IX", "VIIII", s);
+        replace_all("XL", "XXXX",  s);
+        replace_all("XC", "LXXXX", s);
+        replace_all("CD", "CCCC",  s);
+        replace_all("CM", "DCCCC", s);
+
+        for (const char& chr : s)
+            number += value_of_roman[chr];
+
+        return number;
+    }
+
+private:
+    void replace_all(const string& from, const string& to, string& s)
+    {
+        int idx = 0;
+
+        while ((idx = s.find(from, idx)) != string::npos)
+        {
+            s.replace(idx, from.size(), to);
+            idx += to.size();
+        }
+    }
+};
