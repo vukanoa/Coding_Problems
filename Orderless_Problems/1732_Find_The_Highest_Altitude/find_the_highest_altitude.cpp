@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ============
     === EASY ===
@@ -49,28 +46,37 @@
 
 */
 
-/* Time  Beats:  100% */
-/* Space Beats: 69.28% */
+#include <vector>
+using namespace std;
 
-/* Time  Complexity: O(n) */
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Easiest problem on the entire LeetCode.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  99.89% */
+
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    int largestAltitude(std::vector<int>& gain)
+    int largestAltitude(vector<int>& gain)
     {
-        if (gain.size() == 1)
-            return gain[0] < 0 ? 0 : gain[0];
+        const int N = gain.size();
+        int result = 0;
 
-        int highest = 0;
-        int curr_height = 0;
-
-        for (int i = 0; i < gain.size(); i++)
+        int altitude = 0;
+        for (int i = 0; i < N; i++)
         {
-            curr_height += gain[i];
-
-            highest = std::max(highest, curr_height);
+            altitude += gain[i];
+            result = max(result, altitude);
         }
 
-        return highest;
+        return result;
     }
 };
