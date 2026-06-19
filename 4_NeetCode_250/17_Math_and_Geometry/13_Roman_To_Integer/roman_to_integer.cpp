@@ -125,8 +125,8 @@ public:
 
         for (int i = 0; i < N; i++)
         {
-            char curr_val = value_of_roman[s[i]];
-            char next_val = (i+1 < N) ? value_of_roman[s[i+1]] : 0;
+            int curr_val = value_of_roman[s[i]];
+            int next_val = (i+1 < N) ? value_of_roman[s[i+1]] : 0;
 
             if (curr_val < next_val)
                 number -= curr_val;
@@ -135,5 +135,122 @@ public:
         }
 
         return number;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Here we literally cover each of the "edge cases" manually. This makes the
+    Solution much much messier and less elegant, however we do NOT use any
+    additional space.
+
+    Though, you could argue that in the above Solution we haven't used any
+    additional space either because the size of the HashMap is ALWAYS going to
+    be 7, thus O(7) --> O(1).
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  94.12% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Manual_Parsing {
+public:
+    int romanToInt(string s)
+    {
+        const int N = s.size();
+        int result = 0;
+
+        int i = 0;
+        while (i < N)
+        {
+            switch (s[i])
+            {
+                case 'I':
+                    if (i+1 == N || (s[i+1] != 'V' && s[i+1] != 'X'))
+                    {
+                        result += 1;
+                        i++;
+                    }
+                    else if (s[i+1] == 'V')
+                    {
+                        result += 4;
+                        i += 2;
+                    }
+                    else if (s[i+1] == 'X')
+                    {
+                        result += 9;
+                        i += 2;
+                    }
+                    break;
+
+                case 'V':
+                    result += 5;
+                    i++;
+                    break;
+
+                case 'X':
+                    if (i+1 == N || (s[i+1] != 'L' && s[i+1] != 'C'))
+                    {
+                        result += 10;
+                        i++;
+                    }
+                    else if (s[i+1] == 'L')
+                    {
+                        result += 40;
+                        i += 2;
+                    }
+                    else if (s[i+1] == 'C')
+                    {
+                        result += 90;
+                        i += 2;
+                    }
+                    break;
+
+                case 'L':
+                    result += 50;
+                    i++;
+
+                    break;
+
+                case 'C':
+                    if (i+1 == N || (s[i+1] != 'D' && s[i+1] != 'M'))
+                    {
+                        result += 100;
+                        i++;
+                    }
+                    else if (s[i+1] == 'D')
+                    {
+                        result += 400;
+                        i += 2;
+                    }
+                    else if (s[i+1] == 'M')
+                    {
+                        result += 900;
+                        i += 2;
+                    }
+
+                    break;
+
+                case 'D':
+                    result += 500;
+                    i++;
+                    break;
+
+                case 'M':
+                    result += 1000;
+                    i++;
+                    break;
+            }
+        }
+
+        return result;
     }
 };
