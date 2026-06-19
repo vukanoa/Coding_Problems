@@ -1,6 +1,3 @@
-#include <iostream>
-#include <unordered_map>
-
 /*
     ============
     === EASY ===
@@ -68,6 +65,11 @@
 
 */
 
+#include <string>
+#include <unordered_map>
+using namespace std;
+
+
 
 /*
     ------------
@@ -91,9 +93,9 @@
     "number".
 
     Why?
-    If we are at position 2(at character 'I' for the above example) then
-    if its right Roman character is greater in value than the current one('I')
-    then that means that this character represent "decreasing part" of the very
+    If we are at index 2(at character 'I' for the above example) then if its
+    right Roman character is greater in value than the current one('I') then
+    that means that this character represents "decreasing part" of the very
     next Roman character. Thus we subtract this one and add the next one.
 
 */
@@ -101,68 +103,37 @@
 /* Time  Beats: 74.40% */
 /* Space Beats: 32.17% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution{
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution {
 public:
-    int romanToInt(std::string s)
+    int romanToInt(string s)
     {
-        std::unordered_map<char,int> umap;
+        const int N = s.size();
         int number = 0;
 
-        umap.insert({'I', 1});
-        umap.insert({'V', 5});
-        umap.insert({'X', 10});
-        umap.insert({'L', 50});
-        umap.insert({'C', 100});
-        umap.insert({'D', 500});
-        umap.insert({'M', 1000});
+        unordered_map<char, int> value_of_roman = {
+            { 'I', 1 },
+            { 'V', 5 },
+            { 'X', 10 },
+            { 'L', 50 },
+            { 'C', 100 },
+            { 'D', 500 },
+            { 'M', 1000 }
+        };
 
-        for (int i = 0; i < s.length(); i++)
+
+        for (int i = 0; i < N; i++)
         {
-            if (umap[s[i]] >= umap[s[i + 1]])
-                number += umap[s[i]];
+            char curr_val = value_of_roman[s[i]];
+            char next_val = (i+1 < N) ? value_of_roman[s[i+1]] : 0;
+
+            if (curr_val < next_val)
+                number -= curr_val;
             else
-                number -= umap[s[i]];
+                number += curr_val;
         }
 
         return number;
     }
 };
-
-
-int
-main()
-{
-    Solution sol;
-
-    /* Example 1 */
-    // std::string s = "III";
-
-    /* Example 2 */
-    // std::string s = "LVIII";
-
-    /* Example 3 */
-    // std::string s = "MCMXCIV";
-
-    /* Example 4 */
-    std::string s = "MDLXXIX";
-
-    /* Example 5 */
-    // std::string s = "XIV";
-
-    std::cout << "\n\t========================";
-    std::cout << "\n\t=== ROMAN TO INTEGER ===";
-    std::cout << "\n\t========================\n";
-
-    /* Write Input */
-    std::cout << "\n\tRoman: " << s << "\n";
-
-    /* Solution */
-    int number = sol.romanToInt(s);
-
-    /* Write Output */
-    std::cout << "\n\tInteger: " << number << "\n\n";
-
-    return 0;
-}
