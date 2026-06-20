@@ -219,3 +219,32 @@ public:
         return n > 0 ? 1 + hammingWeight(n & (n - 1)) : 0;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    __builtin_popcount and __builtin_popcountll are NOT a part of C++, this is
+    GCC/Clang extension. Keep in mind that this is Compiler specific.
+
+    MSVC does NOT provide __builtin_popcount or __builtin_popcountll. If you
+    use a MSVC compiler then you'd need to use:
+
+        __pocnt or __popcnt64
+
+    In C++20 there is a std::popcount() function.
+
+*/
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_CPP_Way {
+public:
+    int hammingWeight(int n) {
+        return __builtin_popcount(n);
+    }
+};
