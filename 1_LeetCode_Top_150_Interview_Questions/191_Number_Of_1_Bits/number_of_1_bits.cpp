@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ============
     === EASY ===
@@ -51,9 +49,6 @@
 
 */
 
-
-
-
 /*
     ------------
     --- IDEA ---
@@ -62,24 +57,25 @@
     Self-Explanaotry. Just look at the code.
 
     How do we know if the last bit is 1 or 0?
-    We simple do a "%" operation and if the result is 1, the number certainly
-    has bit 1 at the LowestSignificantBit.
 
-    If that's the case, add 1 to "num" which we'll return at the very end.
-    If that's NOT the case, add 0 to "num", i.e. do nothing.
+    Doing a '&"(i.e. bitwise-AND operation) on the very last bit(i.e. LSB)
+    gives us whether the number is ODD or EVEN.
 
-    Before doing next iteration, we do a LOGICAL SHIFT of "n" to the right by
-    one position.
+    If the number is ODD, i.e. LSB is Set, i.e. LSB is 1, then count it in our
+    "result" variable.
 
-    We do this 32 times since the input is type "int" which is on most 64bit
-    architectures 32bits.
+    If it's an EVEN number, then the result of doing a bitwise-AND will be 0.
+    If we add 0 to our result then nothing will change and that's exactly the
+    desired behavior.
 
-    Therefore, in order to process every single digit we have to process the
-    LSB and then do a LSR.
+    Before doing next iteration, we do a LOGICAL SHIFT of "n" to the RIGHT by
+    one position, which is equvalent to dividing a number by 2.
 
-    LSB - Least Significant Bit
-    LSR - Logical Shift Right
+    We do this 32 times since the input is type "int"which is--on most 64-bit
+    architectures--exactly 32 bits.
 
+    Therefore, in order to process every single bit we have to process the
+    LSB (Least Significant Bit) and then do a LSR (Logical Shift Right).
 
         Example:  21
             0 0 0 1    0 1 0 1
@@ -88,58 +84,28 @@
           MSB               LSB
 
 
-    MSB - Most Significant Bit
+    MSB (Most Significant Bit)
 
 */
 
-/* Time  Beats:  100% */
-/* Space Beats: 74.56% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  74.56% */
 
 /* Time  Complexity: O(1) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    int hammingWeight(uint32_t n) {
-        int num = 0;
+    int hammingWeight(int n)
+    {
+        int hamming_weight = 0;
 
         for (int i = 0; i < 32; i++)
         {
-            num += n % 2 ? 1 : 0;
-            n >>= 1;
+            hamming_weight += n & 1;
+
+            n >>= 1; // LSR (Logical Shift Right) by one
         }
 
-        return num;
-    }
-};
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Another way of implementing it.
-
-*/
-
-
-/* Time  Beats:   100% */
-/* Space Beats: 28.56% */
-
-/* Time  Complexity: O(1) */
-/* Space Complexity: O(1) */
-class Solution {
-public:
-    int hammingWeight(uint32_t n)
-    {
-        int count = 0;
-
-        while (n)
-        {
-            count += n & 1;
-            n >>= 1;
-        }
-
-        return count;
+        return hamming_weight;
     }
 };
