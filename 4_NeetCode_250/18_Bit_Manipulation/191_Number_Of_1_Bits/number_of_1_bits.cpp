@@ -109,3 +109,85 @@ public:
         return hamming_weight;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    There is an important trick when it comes to getting rid of Set bits.
+
+    In the Solution above we had to go over all 32 bits individually, even if
+    most of them were 0s, i.e. they did not contribute to our result.
+
+    But what if we can do a loop for ONLY as many set-bits in a number?
+
+    For example:
+
+        0001 1000   0000 0000   0001 0000   0000 0000
+
+
+    Instead of iterating 32 times through this "sparse set-bit" number, what if
+    we can iterate ONLY 3 times, i.e. exactly the number of Set-bits in out
+    number.
+
+    There is an Algorithm for that. It's called "Brian Kernighans Algorithm":
+
+        n & (n - 1) drops the lowest SET-bit
+
+    Example:
+        n = 44  --->   0010 1100
+
+    This binary representation has three 1s.
+
+    ===========================================================================
+
+        n   = 44  --->   0010 1100
+        n-1 = 43  --->   0010 1011  &
+                        ----------                      ONE
+                         0010 1000 = 40
+
+    ===========================================================================
+
+        n   = 40  --->   0010 1000
+        n-1 = 39  --->   0010 0111  &
+                        ----------                      TWO
+                         0010 0000 = 32
+
+    ===========================================================================
+
+        n   = 32  --->   0010 0000
+        n-1 = 39  --->   0001 1111  &
+                        ----------                      THREE
+                         0000 0000 = 0
+
+    ===========================================================================
+
+    And we STOP after ONLY three(3) iterations!
+
+    The number of iterations is exactly the "Hamming Weight", i.e. the number
+    of Set-bits in a number.
+
+*/
+
+/* Time  Complexity: O(1) */ // But faster in practice than looping over all 32
+/* Space Complexity: O(1) */
+class Solution_Brian_Kernighan_Algorithm {
+public:
+    int hammingWeight(int n)
+    {
+        int hamming_weight = 0;
+
+        while (n > 0)
+        {
+            hamming_weight++;
+
+            n &= (n - 1); // Drops the lowest SET-bit
+        }
+
+        return hamming_weight;
+    }
+};
