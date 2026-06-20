@@ -173,6 +173,9 @@ public:
 
 */
 
+/* Time  Beats: 100.00% */
+/* Space Beats:  81.52% */
+
 /* Time  Complexity: O(1) */ // But faster in practice than looping over all 32
 /* Space Complexity: O(1) */
 class Solution_Brian_Kernighan_Algorithm {
@@ -189,5 +192,30 @@ public:
         }
 
         return hamming_weight;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Recursive way of solving it in an above way.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  81.52% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */ // But LESS Space Efficient than above Solution
+class Solution_Recursive_Brian_Kernighan_Algorithm {
+public:
+    int hammingWeight(int n)
+    {
+        return n > 0 ? 1 + hammingWeight(n & (n - 1)) : 0;
     }
 };
