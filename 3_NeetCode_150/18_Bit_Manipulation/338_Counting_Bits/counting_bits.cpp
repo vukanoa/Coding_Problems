@@ -56,6 +56,7 @@
     0 <= n <= 105
 */
 
+#include <cstring>
 #include <vector>
 using namespace std;
 
@@ -340,6 +341,100 @@ public:
 
         for (int i = 1; i <= num; ++i)
             result[i] = result[i & (i-1)] + 1;
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is a Top-Down Dynamic Programming Solution, aka "Memoization", not
+    "MemoRization"!
+
+    It's really beneficial to learn Memoization properly, so whenever you're
+    writing a Bottom-Up DP, make sure to write Top-Down as well. And vice-verca
+    as sometimes one approach is MUCH more natural than the other, therefore it
+    makes you really learn ins-and-outs of both approaches.
+
+*/
+
+/* Time  Beats:  6.11% */
+/* Space Beats: 32.04% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Top_Down__Memoization {
+private:
+    int memo[100001];
+
+public:
+    int solve(int n)
+    {
+        if (n == 0) return 0;
+        if (n == 1) return 1;
+
+        if (memo[n] != 0)
+            return memo[n];
+
+        if (n & 1)
+            memo[n] = 1;
+
+        return memo[n] += solve(n / 2);
+    }
+
+    vector<int> countBits(int n)
+    {
+        vector<int> result(n + 1);
+
+        /* Memset */
+        memset(memo, 0x00, sizeof(memo));
+
+        for (int i = 0; i <= n; i++)
+            result[i] = solve(i);
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    __builtin_popcount and __builtin_popcountll are NOT a part of C++, this is
+    GCC/Clang extension. Keep in mind that this is Compiler specific.
+
+    MSVC does NOT provide __builtin_popcount or __builtin_popcountll. If you
+    use a MSVC compiler then you'd need to use:
+
+        __pocnt or __popcnt64
+
+    In C++20 there is a std::popcount() function.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  55.47% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_CPP_Way {
+public:
+    vector<int> countBits(int n)
+    {
+        vector<int> result(n + 1, 0);
+
+        for (int i = 0; i <= n; i++)
+            result[i] = __builtin_popcount(i);
 
         return result;
     }
