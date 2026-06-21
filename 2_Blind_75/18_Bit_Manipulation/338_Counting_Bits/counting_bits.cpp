@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ============
     === EASY ===
@@ -58,6 +56,8 @@
     0 <= n <= 105
 */
 
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -81,8 +81,8 @@
         9: 1001
 
 
-    Even number, on the contrary, have 0 at the very end.
-    Examples:                         ~~~~~~~~~~~~~~~~~~
+    Even numbers, on the other hand, have 0 at the very end.
+    Examples:                             ~~~~~~~~~~~~~~
                                                    |
               _____________________________________|
               |
@@ -108,77 +108,133 @@
 
 */
 
-/* Time  Beats: 41.06% */
-/* Space Beats: 30.68% */
+/* Time  Beats: 22.61% */
+/* Space Beats: 78.77% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_Slower {
 public:
     vector<int> countBits(int n)
     {
-        std::vector<int> ans;
+        vector<int> result(n+1, 0);
 
-        for (int i = 0; i <= n; i++)
+        for (int i = 0; i <= n; i++) // Inclding n
         {
-            int num = i;
             int count = 0;
 
-            for (int j = 0; j < 32; j++) // O(32) => constant => O(1)
+            int num  = i;
+            while (num > 0)
             {
                 if (num & 1)
-                    count++;
+                    result[i]++;
 
                 num >>= 1;
             }
-
-            ans.push_back(count);
         }
 
-        return ans;
+        return result;
     }
 };
 
 
 
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, though this one will iterate exactly "number of bits" times
+    for each number, which is faster even if the TC of this part is O(1) in
+    both SOlutions.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  78.77% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Faster {
+public:
+    vector<int> countBits(int n)
+    {
+        vector<int> result(n + 1, 0);
+
+        for (int i = 1; i <= n; i++)
+        {
+            int num = i;
+
+            while (num > 0)
+            {
+                result[i]++;
+                num &= (num - 1); // Cool little trick
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
 
 /* Time  Beats: 95.87% */
 /* Space Beats: 63.11% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution {
+class Solution_DP {
 public:
-    std::vector<int> countBits(int n)
+    vector<int> countBits(int n)
     {
 
-        vector<int> res(n+1);
-        res[0] = 0;
+        vector<int> result(n+1);
+        result[0] = 0;
 
-        for (int i = 1; i <= n; ++i)
-            res[i] = res[i/2] + i%2;
+        for (int i = 1; i <= n; i++)
+            result[i] = result[i/2] + i%2;
 
-        return res;
+        return result;
     }
 };
 
 
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
 /* Time  Beats: 95.87% */
 /* Space Beats: 51.59% */
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution{
+class Solution_DP_2 {
 public:
-    std::vector<int> countBits(int num)
+    vector<int> countBits(int num)
     {
-        std::vector<int> res(num+1, 0);
+        vector<int> result(num+1, 0);
 
         for (int i = 1; i <= num; ++i)
-            res[i] = res[i & (i-1)] + 1;
+            result[i] = result[i & (i-1)] + 1;
 
-        return res;
+        return result;
     }
 };
