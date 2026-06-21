@@ -221,7 +221,43 @@ public:
     --- IDEA ---
     ------------
 
-    TODO
+    Bottom-Up Dynamic Programming, aka "Tabulation".
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  97.09% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */ // But it's not AUXILIARY space since it's result
+class Solution_Bottom_Up__Tabulation_1 {
+public:
+    vector<int> countBits(int n)
+    {
+        vector<int> result(n+1, 0);
+
+        int pow_of_two = 1;
+        for (int i = 1; i <= n; i++)
+        {
+            if (pow_of_two * 2 == i)
+                pow_of_two = i;
+
+            result[i] = 1 + result[i - pow_of_two];
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Effectively same as bove, but written in another, more elegant, way.
 
 */
 
@@ -230,18 +266,52 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution_DP {
+class Solution_Bottom_Up__Tabulation_2 {
 public:
     vector<int> countBits(int n)
     {
-
-        vector<int> result(n+1);
-        result[0] = 0;
+        vector<int> result(n+1, 0);
 
         for (int i = 1; i <= n; i++)
             result[i] = result[i/2] + i%2;
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, however instead of using:
+    
+        "i / 2", we used "i >> 1"
+
+    and
+
+        "i % 2", we used "i & 1".
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  55.47% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Bottom_Up__Tabulation_3 {
+public:
+    vector<int> countBits(int n)
+    {
+        vector<int> dp(n + 1, 0);
+
+        for (int i = 1; i <= n; i++)
+            dp[i] = dp[i >> 1] + (i & 1);
+
+        return dp;
     }
 };
 
@@ -262,7 +332,7 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(n) */
-class Solution_DP_2 {
+class Solution_Bottom_Up__Tabulation_4 {
 public:
     vector<int> countBits(int num)
     {
