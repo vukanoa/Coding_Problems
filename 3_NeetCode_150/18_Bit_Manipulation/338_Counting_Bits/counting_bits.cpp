@@ -64,6 +64,42 @@ using namespace std;
     --- IDEA ---
     ------------
 
+    THe most basic Solution for this problem. However, for beginners even this
+    is not so obivous, that's why I'm including it.
+
+*/
+
+/* Time  Beats:  9.55% */
+/* Space Beats: 55.47% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Basic {
+public:
+    vector<int> countBits(int n) {
+        vector<int> result(n + 1, 0);
+
+        for (int num = 1; num <= n; num++)
+        {
+            for (int j = 0; j < 32; j++)
+            {
+                if (num & (1 << j))
+                    result[num]++;
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     If we do a "bitwise AND" with 0x1 on any number, we get to see if it's an
         1) Odd, or
         2) Even
