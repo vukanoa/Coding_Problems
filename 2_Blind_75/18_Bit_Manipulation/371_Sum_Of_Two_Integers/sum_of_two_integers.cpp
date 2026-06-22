@@ -35,6 +35,7 @@
 */
 
 #include <cmath>
+#include <cstdint>
 using namespace std;
 
 /*
@@ -267,5 +268,54 @@ public:
         }
 
         return a;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    I believe this one is much more easy to understand even if it seems a bit
+    "ugly" at a first glance.
+
+    Also, it makes sure you have a good understanding of "unsigned" integers.
+
+*/
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Bitwise_2 {
+public:
+    int getSum(int a, int b)
+    {
+        uint32_t result = 0;
+
+        uint32_t ua = static_cast<uint32_t>(a);
+        uint32_t ub = static_cast<uint32_t>(b);
+
+        int carry = 0;
+        int iteration = 0;
+
+        while ((ua != 0 || ub != 0 || carry != 0) && iteration < 32)
+        {
+            uint32_t a_bit = ua & 1;
+            uint32_t b_bit = ub & 1;
+
+            uint32_t bit = a_bit ^ b_bit ^ carry;
+
+            carry = (a_bit & b_bit) | (a_bit & carry) | (b_bit & carry);
+
+            result |= (bit << iteration);
+
+            ua >>= 1;
+            ub >>= 1;
+            iteration++;
+        }
+
+        return static_cast<int>(result);
     }
 };
