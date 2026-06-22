@@ -319,3 +319,51 @@ public:
         return static_cast<int>(result);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is almost equivalent to the above one, however it's much more
+    elegant. The reason I wanted to keep both is because it is beneficial to
+    see this part of the the above's Solution:
+
+        (ua != 0 || ub != 0 || carry != 0)
+
+    and also the use of unsinged integers.
+
+    However this one if much more elegant and straightforward.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  65.92% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Bitwise_3 {
+public:
+    int getSum(int a, int b)
+    {
+        int result = 0;
+
+        int carry = 0;
+        for (int i = 0; i < 32; i++)
+        {
+            int a_bit = (a >> i) & 1;
+            int b_bit = (b >> i) & 1;
+
+            int curr_bit = a_bit ^ b_bit ^ carry;
+
+            carry = (a_bit & b_bit) | (a_bit & carry) | (b_bit & carry);
+
+            result |= (curr_bit << i);
+        }
+
+        return result;
+    }
+};
