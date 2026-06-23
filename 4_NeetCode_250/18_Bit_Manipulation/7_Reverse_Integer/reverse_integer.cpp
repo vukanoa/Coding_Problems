@@ -269,3 +269,46 @@ public:
         return negative ? -result : result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This Solution takes care of both positive and NEGATIVE numbers. We don't
+    have to check anything else.
+
+    If you read and really understood the above two Solutions, then you don't
+    actually need a thorough explanation for this one.
+
+    Read the code slowly, go through one example and you'll understand it.
+
+*/
+
+/* Time  Complexity: O(log10(x)) */
+/* Space Complexity: O(1)        */
+class Solution_Elegant {
+public:
+    int reverse(int x)
+    {
+        int result = 0;
+
+        while (x != 0)
+        {
+            int digit = x % 10;
+
+            if (result > INT_MAX / 10) return 0;
+            if (result < INT_MIN / 10) return 0;
+
+            result *= 10;
+            result += digit;
+
+            x /= 10;
+        }
+
+        return result;
+    }
+};
