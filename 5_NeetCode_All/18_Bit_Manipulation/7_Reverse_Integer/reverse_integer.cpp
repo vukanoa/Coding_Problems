@@ -79,6 +79,9 @@ using namespace std;
 
         result  = 2147483642     // It has 10 digits already
         INT_MAX = 2147483647     // It has 10 digits
+                           ^
+                           |
+
 
     If we multiply our "result" by 10 it will overflow!
 
@@ -86,6 +89,8 @@ using namespace std;
 
         result  = 214748364      // It has  9 digits
         INT_MAX = 2147483647     // It has 10 digits
+                           ^
+                           |
 
     In that case we can indeed multiply by 10, but we can ONLY add digits that
     are LESS THAN OR EQUAL to 7:
@@ -107,8 +112,8 @@ using namespace std;
 /* Time  Beats: 100.00% */
 /* Space Beats:  65.36% */
 
-/* Time  Complexity: O(logN) */
-/* Space Complexity: O(1)    */
+/* Time  Complexity: O(log10(x)) */
+/* Space Complexity: O(1)        */
 class Solution {
 public:
     int reverse(int x)
@@ -122,6 +127,15 @@ public:
         if (x < 0)
         {
             negative = true;
+
+            // Have we NOT checked:
+            //
+            //     if (x == INT_MIN)
+            //         return 0;
+            //
+            // then this would give as an OVERFLOW or we'd need "long long"
+            // which is forbiden to use in this Problem. (Although it still
+            // will be accepted for some reason)
             x *= -1;
         }
 
@@ -135,6 +149,116 @@ public:
 
             if ((result == INT_MAX / 10) && (result > (INT_MAX % 10)))
                 return 0;
+
+            result *= 10;
+            result += digit;
+
+            x /= 10;
+        }
+
+        return negative ? -result : result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one is the same as above, however we do NOT use the 2nd if-statement:
+
+        if ((result == INT_MAX / 10) && (result > (INT_MAX % 10)))
+            return 0;
+
+    because it turns out it is NOT necessary.
+    Why?
+
+    Because x is of type "int" therefore if x consists of 10 digits then the
+    first one can either be 1 or 2.
+
+    Therefore, if we get to a point where we're about to add the very last
+    digit then it's certainly completely safe to do it without further check
+    ups.
+
+
+        INT_MAX = 2147483647     
+              x = 2148333333 <-----
+                                  |
+                                  |
+                                  |
+                You CANNOT have this value in x.
+                Why not?
+
+                Because x is an INTEGER and this value is GREATER than 2^31 - 1
+
+    However, let's assume that ALL of the last 9 digits are the SAME and that
+    ONLY the first--leftmost--differs.
+
+        INT_MAX = 2147483647     
+              x = ?3147483647
+                  ^
+                  |
+                  |
+
+
+    Now you tell me, since x is an INTEGER, which digits can replace the ? as
+    to make the x a VALID(!!!) Input?
+
+    Only 1 or 2.
+    (Assuming x indeed has exactly 10 digits. If it has LESS, then we don't
+     have to worry about anything)
+
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  83.26% */
+
+/* Time  Complexity: O(log10(x)) */
+/* Space Complexity: O(1)        */
+class Solution_Only_One_If_Statement {
+public:
+    int reverse(int x)
+    {
+        if (x == INT_MIN)
+            return 0;
+
+        int result = 0;
+
+        bool negative = false;
+        if (x < 0)
+        {
+            negative = true;
+
+            // Have we NOT checked:
+            //
+            //     if (x == INT_MIN)
+            //         return 0;
+            //
+            // then this would give as an OVERFLOW or we'd need "long long".
+            x *= -1;
+        }
+
+        while (x != 0)
+        {
+            int digit = x % 10;
+
+            if (result > INT_MAX / 10)
+                return 0;
+
+            // We do NOT actually need this 2nd if-statement below.
+            //
+            // Why?
+            //
+            // Because x is of type "int" therefore if x consists of 10 digits
+            // then the first one can either be 1 or 2. In both cases it's
+            // completely safe to add "digit" to "result".
+            //
+            // if (result == (INT_MAX / 10) && digit > (INT_MAX % 10))
+            //     return 0;
 
             result *= 10;
             result += digit;
