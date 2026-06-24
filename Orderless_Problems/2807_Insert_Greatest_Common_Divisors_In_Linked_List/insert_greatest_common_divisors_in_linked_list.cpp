@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -77,16 +75,17 @@
 
 */
 
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode() : val(0), next(nullptr) {}
- *     ListNode(int x) : val(x), next(nullptr) {}
- *     ListNode(int x, ListNode *next) : val(x), next(next) {}
- * };
- */
+using namespace std;
+
+// Definition for singly-linked list.
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
+};
+
 
 /*
     ------------
@@ -98,12 +97,6 @@
     It is VERY easy. I have no clue why is it marked "MEDIUM".
 
 */
-
-/* Time  Beats: 87.30% */
-/* Space Beats:  6.19% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */
 class Solution {
 public:
     ListNode* insertGreatestCommonDivisors(ListNode* head)
@@ -112,18 +105,32 @@ public:
 
         while (curr->next)
         {
-            int gcd = std::gcd(curr->val, curr->next->val);
+            int gcd_value = my_gcd_iterative(curr->val, curr->next->val);
 
-            ListNode* node_gcd = new ListNode(gcd);
+            ListNode* new_node = new ListNode(gcd_value);
 
             /* Insert bettwen current and current's next node */
-            node_gcd->next = curr->next;
-            curr->next = node_gcd;
+            new_node->next = curr->next;
+            curr->next     = new_node;
 
-            /* Move current node twice to the right */
-            curr = curr->next->next;
+            /* Move current node to the next ORIGINAL node */
+            curr = new_node->next;
         }
 
         return head;
+    }
+
+private:
+    int my_gcd_iterative(int a, int b)
+    {
+        while (b > 0)
+        {
+            int tmp = b;
+
+            b = a % b;
+            a = tmp;
+        }
+
+        return a;
     }
 };
