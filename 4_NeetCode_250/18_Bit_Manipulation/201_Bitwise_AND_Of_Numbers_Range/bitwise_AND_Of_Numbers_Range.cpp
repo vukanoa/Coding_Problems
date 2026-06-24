@@ -89,6 +89,39 @@ public:
     --- IDEA ---
     ------------
 
+    We actually do NOT need to be shifting both numbers, instead what we can do
+    is simply keep clearing the rightmost set bit of "right" until it becomes
+    LESS THAN OR EQUALS to the "left".
+
+    To do this efficiently there is a trick for that:
+
+        n & (n-1)
+
+    clears the LOWEST SET BIT.
+
+*/
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    int rangeBitwiseAnd(int left, int right)
+    {
+        while (left < right)
+            right &= (right - 1);
+
+        return right;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     TODO
 
     0th bit alternates every 1 number.
@@ -141,7 +174,7 @@ public:
 
 /* Time  Complexity: O(31)  -->  O(1) */ // Formally O(log(min(left, right))) 
 /* Space Complexity: O(1)             */
-class Solution_2 {
+class Solution_3 {
 public:
     int rangeBitwiseAnd(int left, int right)
     {
