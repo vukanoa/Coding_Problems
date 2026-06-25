@@ -49,6 +49,33 @@
     --- IDEA ---
     ------------
 
+    Self-explanatory. Can be considered a "Brute Force". Kind of.
+
+*/
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Linear_Simple {
+public:
+    long long minEnd(int n, int x)
+    {
+        long long result = x;
+
+        while (--n > 0) // Loop will execute exactly (n-1) times
+            result = (result + 1) | x;
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     Take pen and paper and go through one example. You'll get it by reading the
     code.
 
