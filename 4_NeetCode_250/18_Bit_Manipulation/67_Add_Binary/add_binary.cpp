@@ -39,6 +39,7 @@
 */
 
 #include <algorithm>
+#include <cstdint>
 #include <string>
 using namespace std;
 
@@ -82,6 +83,52 @@ public:
             // Decrement
             i--;
             j--;
+        }
+
+        /* Reverse */
+        reverse(result.begin(), result.end());
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Virtually the same, however maybe this one is more explicit and easier to
+    read.
+
+*/
+
+/* Time  Complexity: O(max(N, M)) */
+/* Space Complexity: O(max(N, M)) */
+class Solution_2 {
+public:
+    string addBinary(string a, string b)
+    {
+        const int N = a.size();
+        const int M = b.size();
+        string result;
+        result.reserve(max(N, M) + 1); // To prevent reallocations
+
+        uint8_t carry = 0;
+        while ( ! a.empty() || ! b.empty() || carry != 0)
+        {
+            uint8_t a_bit = a.empty() ? 0 : a.back() - '0';
+            uint8_t b_bit = b.empty() ? 0 : b.back() - '0';
+
+            uint8_t bit = a_bit ^ b_bit ^ carry;
+            carry = (a_bit & b_bit) | (a_bit & carry) | (b_bit & carry);
+
+            result += bit + '0';
+
+            if ( ! a.empty()) a.pop_back();
+            if ( ! b.empty()) b.pop_back();
         }
 
         /* Reverse */
