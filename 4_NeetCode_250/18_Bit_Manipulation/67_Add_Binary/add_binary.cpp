@@ -60,25 +60,28 @@ class Solution {
 public:
     string addBinary(string a, string b)
     {
+        const int N = a.size();
+        const int M = b.size();
         string result;
-        result.reserve(max(a.size(), b.size()));
+        result.reserve(max(N, M) + 1); // To prevent reallocations
 
-        int i = a.size() - 1;
-        int j = b.size() - 1;
+        int i = N - 1;
+        int j = M - 1;
+
         int carry = 0;
 
         while (i >= 0 || j >= 0 || carry > 0)
         {
-            int a_digit = i >= 0 ? (a[i] - '0') : 0;
-            int b_digit = j >= 0 ? (b[j] - '0') : 0;
+            int a_bit = i >= 0 ? (a[i] - '0') : 0;
+            int b_bit = j >= 0 ? (b[j] - '0') : 0;
 
-            result += to_string(a_digit ^ b_digit ^ carry);
+            result += static_cast<char>(a_bit ^ b_bit ^ carry);
 
-            carry  = (a_digit + b_digit + carry) >= 2 ? 1 : 0;
+            carry = (a_bit & b_bit) | (a_bit & carry) | (b_bit & carry);
 
             // Decrement
-            i -= i >= 0 ? 1 : 0;
-            j -= j >= 0 ? 1 : 0;
+            i--;
+            j--;
         }
 
         /* Reverse */
