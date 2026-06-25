@@ -76,99 +76,94 @@ public:
     --- IDEA ---
     ------------
 
-    Take pen and paper and go through one example. You'll get it by reading the
-    code.
+    #################
+    ### Intuition ###
+    #################
 
-    The main takeaway is this: The result MUST begin at x and ALL of the
-    subsequent numbers MUST HAVE all set-bits of x also set and more.
+    The idea is much simpler than you would think.
 
-    Example 1:
-        n = 4
-        x = 8
+    First it's obvious that we're NOT allowed to change ANY of the
+    SET-bits(i.e. 1s) of x because in order to have x as a result of bitwise
+    AND-ing all of the numbers, you need all the SET-bits of x in EACH number
+    to also be SET-bits(i.e. 1s).
 
-        8  = 0 0 0 0 ... 1 0 0 0
-        9  = 0 0 0 0 ... 1 0 0 1
-        10 = 0 0 0 0 ... 1 0 1 0
-        11 = 0 0 0 0 ... 1 0 1 1
+    That's why we assign result to be x, at the beginning.
 
+    We want to encode the number (n-1), in its binary form, within the ALLOWED
+    slots, i.e. the slots of x that are 0.
 
-        4th element starting at x=8 is 11.
+    Now we only need to go through 64 bits(slots) of x from the LSB (Least
+    Significant Bit) to MSB (Most Significant Bit) and any time a certain bit
+    of x is SET(i.e. 1) we SKIP doing anything to result since that bit
+    MUST(!!) remain unchanged!
 
+    However, if the i-th bit of x is ineed 0, then we can fill it with the last
+    bit of (n-1) that we still haven't encoded yet.
 
-    Example 2:
-        n = 2
-        x = 7
+    Let's see an example:
 
-        7  = 0 0 0 0 ... 0 1 1 1 <---- 1st
-        8  = 0 0 0 0 ... 1 0 0 0
-        9  = 0 0 0 0 ... 1 0 0 1
-        10 = 0 0 0 0 ... 1 0 1 0
-        11 = 0 0 0 0 ... 1 0 1 1
-        12 = 0 0 0 0 ... 1 1 0 0
-        13 = 0 0 0 0 ... 1 0 1 1
-        14 = 0 0 0 0 ... 1 1 1 0
-        15 = 0 0 0 0 ... 1 1 1 1  <--- 2nd 
+          x = 23  (000.. 0001 0111)
+          n = 38
+        n-1 = 37  (000.. 0010 0101)
 
+    (n-1) = 37, i.e. (000.. 0010 0101) is what we are trying to encode within
+    the ALLOWED slots of x.
 
-        2nd element starting at x=7 is 15.
+    Character '#' represents the slot(bit) of x we must NOT change! 
+    (since it is a SET-bit)
 
+    0000  ...  0000  00#0  0###
+                       ^    ^^^
+                       |    |||
+                       |    |||
+                       --------
+                         |
+                      These bits must NOT be changed!
 
-    Any number must have ALL of the same set-bits as x. Initially 'n' is NOT
-    a 0-indexed number, that's why we subtract 1.
+    Now you tell me--How do we simly encode the number (n-1)=37 in binary
+    within the ALLOWED slots?
 
-
-
-    So just think about this:
-        n = 4
-        x = 8
-
-        8  = 0 0 0 0 ... 1 0 0 0
-        9  = 0 0 0 0 ... 1 0 0 1
-        10 = 0 0 0 0 ... 1 0 1 0
-        11 = 0 0 0 0 ... 1 0 1 1
+    In the same exact way as any binary representation! We just encode the bits
+    of (n-1)=37 into these ALLOWED slots of x, i.e. of the result.
 
 
-        4th element starting at x=8 is 11.
 
-    We need 4th number starting at x. Since x will takeaway one from n, we end
-    up with 3.
+    ################
+    ### Approach ###
+    ################
 
-    3 in binary is 0000....0011
+    We go through 64 bits of x starting from LSB and going to MSB and if a bit
+    is SET(i.e. 1), we skip doing anything since we're NOT allowed to change
+    that bit of the result.
 
-    Now we go and put bits of this 3 in HOLES(i.e. 0 bits in x).
+    However, if i-th bit of x is CLEAR-bit(i.e. 0), then we encode the last bit
+    of the binary representation of (n-1) and we shift (n-1) to the right by 1
+    since we have just encoded this bit and can proceed to the next one.
 
-    And that's it.
+    At the end just return the result.
 
 */
 
 /* Time  Beats: 100.00% */
-/* Space Beats:  58.02% */
+/* Space Beats:  82.63% */
 
-/* Time  Complexity: O(logN) */
-/* Space Complexity: O(1)    */
-class Solution {
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Bit_Manipulation__Elegant {
 public:
-    long minEnd(int n, int x)
+    long long minEnd(int n, int x)
     {
-        long result = x;
+        long long goal = 1LL * n - 1; // The number we're trying to encode in
+                                      // ALLOWED slots
 
-        int th_LSB_of_result = 0;
-
-        int zero_indexed_n           = n-1;
-        int th_LSB_of_zero_indexed_n = 0;
-
-
-        while (th_LSB_of_result < 64)
+        long long result = x;
+        for (int i = 0; i < 64; i++)
         {
-            if ((result & (1LL << th_LSB_of_result)) == 0)
-            {
-                if (zero_indexed_n & (1LL << th_LSB_of_zero_indexed_n))
-                    result |= (1LL << th_LSB_of_result);
+            if (x & (1LL << i))
+                continue; // Since those SET-bits must remain UNCHANGED!
 
-                th_LSB_of_zero_indexed_n++;
-            }
-
-            th_LSB_of_result++;
+            result |= (goal & 1) << i;
+            goal >>= 1;
         }
 
         return result;
