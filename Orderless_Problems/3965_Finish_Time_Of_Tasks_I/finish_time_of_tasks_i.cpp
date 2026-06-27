@@ -101,6 +101,7 @@
 */
 
 #include <climits>
+#include <queue>
 #include <unordered_map>
 #include <vector>
 using namespace std;
@@ -119,7 +120,7 @@ using namespace std;
 
 /* Time  Complexity: O(V + E) */
 /* Space Complexity: O(V + E) */
-class Solution {
+class Solution_DFS {
 public:
     long long finishTime(int n, vector<vector<int>>& edges, vector<int>& baseTime)
     {
@@ -163,5 +164,79 @@ private:
         }
 
         finish_time[node] = latest + ((latest - earliest) + baseTime[node]);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 50.78% */
+/* Space Beats: 46.90% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_BFS {
+public:
+    long long finishTime(int n, vector<vector<int>>& edges, vector<int>& baseTime)
+    {
+        vector<vector<int>> adj_list(n);
+        vector<int> out_degree(n, 0);
+
+        for (const vector<int>& edge : edges)
+        {
+            int parent = edge[0];
+            int child  = edge[1];
+
+            adj_list[child].push_back(parent); // We're doing the REVERSE order
+            out_degree[parent]++;
+        }
+
+        vector<long long> finish_time(n, 0LL);
+        vector<long long> earliest_child(n, LLONG_MAX);
+        vector<long long> latest_child(n, LLONG_MIN);
+        vector<int> completed_children(n, 0);
+
+        queue<int> queue;
+
+        for (int node = 0; node < n; node++)
+        {
+            if (out_degree[node] != 0)
+                continue;
+
+            finish_time[node] = baseTime[node];
+            queue.push(node);
+        }
+
+        while ( ! queue.empty())
+        {
+            int child = queue.front();
+            queue.pop();
+
+            for (const int& parent : adj_list[child])
+            {
+                earliest_child[parent] = min(earliest_child[parent], finish_time[child]);
+                latest_child[parent]   = max(latest_child[parent],   finish_time[child]);
+
+                if (++completed_children[parent] != out_degree[parent])
+                    continue;
+
+                finish_time[parent] = latest_child[parent]
+                                    + (latest_child[parent] - earliest_child[parent])
+                                    + baseTime[parent];
+
+                queue.push(parent);
+            }
+        }
+
+        return finish_time[0];
     }
 };
