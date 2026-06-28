@@ -46,6 +46,7 @@
 
 */
 
+#include <numeric>
 #include <vector>
 using namespace std;
 
@@ -77,5 +78,56 @@ public:
             result ^= num;
 
         return result;
+    }
+};
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, different implementation. You should be aware of this one as
+    well.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  83.21% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    int singleNumber(vector<int>& nums)
+    {
+        return accumulate(nums.begin(), nums.end(), 0, [](int a, int b) { return a ^ b; });
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, different implementation. You should be aware of this one as
+    well.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  98.72% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_3 {
+public:
+    int singleNumber(vector<int>& nums)
+    {
+        return accumulate(nums.begin(), nums.end(), 0, std::bit_xor<int>{});
     }
 };
