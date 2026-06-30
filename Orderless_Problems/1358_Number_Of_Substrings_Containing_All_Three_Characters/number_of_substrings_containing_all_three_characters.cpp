@@ -51,6 +51,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 /*
@@ -72,7 +73,7 @@ using namespace std;
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution {
+class Solution_2 {
 public:
     int numberOfSubstrings(string s)
     {
@@ -101,6 +102,62 @@ public:
 
                 // Slide-Window
                 L++;
+            }
+
+            // Increment
+            R++;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, written in a different way. It's always beneficial to see
+    more than one implementation.
+
+*/
+
+/* Time  Beats: 69.58% */
+/* Space Beats: 54.92% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution {
+public:
+    int numberOfSubstrings(string s)
+    {
+        const int N = s.size();
+        int result = 0;
+
+        int freq[3] = {0};
+        int L = 0;
+        int R = 0;
+
+        while (R < N)
+        {
+            freq[s[R] - 'a']++;
+
+            if (freq[0] > 0 && freq[1] > 0 && freq[2] > 0)
+            {
+                result += (N-1) - R + 1;
+
+                freq[s[L] - 'a']--;
+                L++;
+                while ((R - L + 1) >= 3 && (freq[0] > 0 && freq[1] > 0 && freq[2] > 0))
+                {
+                    result += (N-1) - R + 1;
+
+                    freq[s[L] - 'a']--;
+                    L++;
+                }
             }
 
             // Increment
