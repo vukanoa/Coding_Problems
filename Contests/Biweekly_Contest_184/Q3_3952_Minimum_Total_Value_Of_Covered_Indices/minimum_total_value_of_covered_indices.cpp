@@ -130,3 +130,87 @@ private:
         return memo[idx][taken] = max(skip, take);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    If you inspect closely, you'll realize that we can actually be Greedy.
+
+    First thing--Leading 1s MUST ALWAYS be taken. We cannot move any of those
+    tokens to its left position, therefore we preprocess those first.
+
+    Now every remaining CONTIGUOUS block of 1s we are also going to consider
+    one element BEFORE the CONTIGUOUS block of 1s, also as a part of this
+    "block", or segment.
+
+    Why are we doing that?
+
+    Because in order to maximize the segment, we want to maximize the
+    contribution to the final "result". The optimal choise is to take ALL of
+    the value in the segment EXCEPT the minimum one, since exlucding the
+    MINIMUM one ALWAYS gives the max possible sum.
+
+    And we can move the "token" only to the left, that's why we're processing
+    ONE element BEFORE the current CONTIGUOUS block.
+
+    Therefore, for each block of CONSECUTIVE 1s, we compute the sum of the
+    entire segment(i.e. previous elemnt + contiguous block of elements) and we
+    subtract the MINIMUM element in that segment.
+
+*/
+
+/* Time  Beats: 95.48% */
+/* Space Beats: 94.81% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Greedy {
+public:
+    long long maxTotal(vector<int>& nums, string s)
+    {
+        const int N = nums.size();
+        long long result = 0LL;
+
+        int i = 0;
+        while (i < N && s[i] == '1')
+        {
+            result += nums[i];
+
+            // Increment
+            i++;
+        }
+
+        while (i < N)
+        {
+            if (s[i] == '1')
+            {
+                int min_elem_within_segment = nums[i-1];
+
+                /* Process the current Segment */
+                long long sum_of_segment = nums[i-1];
+                while (i < N && s[i] == '1')
+                {
+                    sum_of_segment += nums[i];
+
+                    if (nums[i] < min_elem_within_segment)
+                        min_elem_within_segment = nums[i];
+
+                    // Increment
+                    i++;
+                }
+
+                result += sum_of_segment - min_elem_within_segment;
+            }
+
+            // Increment
+            i++;
+        }
+
+        return result;
+    }
+};
