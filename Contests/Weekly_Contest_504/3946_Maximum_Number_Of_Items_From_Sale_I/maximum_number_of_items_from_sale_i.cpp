@@ -161,3 +161,65 @@ private:
     }
 
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 44.70% */
+/* Space Beats: 23.72% */
+
+/* Time  Complexity: O(N * MAX_BUDGET) */
+/* Space Complexity: O(N * MAX_BUDGET) */
+class Solution_Bottom_Up__Tabulation {
+public:
+    int maximumSaleItems(vector<vector<int>>& items, int budget)
+    {
+        const int N = items.size();
+
+        vector<int> number_of_free_items(N, 0);
+        int cheapest_item_price = INT_MAX;
+
+        for (int curr_item = 0; curr_item < N; curr_item++)
+        {
+            cheapest_item_price = min(cheapest_item_price, items[curr_item][1]);
+
+            for (int other_item = 0; other_item < N; other_item++)
+            {
+                if (items[other_item][0] % items[curr_item][0] == 0)
+                    number_of_free_items[curr_item]++;
+            }
+        }
+
+        vector<vector<int>> dp(N + 1, vector<int>(budget + 1, 0));
+
+        for (int remaining_budget = 0; remaining_budget <= budget; remaining_budget++)
+            dp[N][remaining_budget] = remaining_budget / cheapest_item_price;
+
+        for (int curr_item = N-1; curr_item >= 0; curr_item--)
+        {
+            for (int remaining_budget = 0; remaining_budget <= budget; remaining_budget++)
+            {
+                int skip = dp[curr_item + 1][remaining_budget];
+                int take = 0;
+
+                if (remaining_budget >= items[curr_item][1])
+                {
+                    take = number_of_free_items[curr_item] + dp[curr_item + 1][remaining_budget - items[curr_item][1]];
+                }
+
+                dp[curr_item][remaining_budget] = max(take, skip);
+            }
+        }
+
+        return dp[0][budget];
+    }
+};
