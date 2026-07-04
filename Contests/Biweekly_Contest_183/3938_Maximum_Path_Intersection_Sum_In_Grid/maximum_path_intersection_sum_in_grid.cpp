@@ -178,3 +178,70 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We can further improve the above Solution by actually using KADANE's
+    Algorithm.
+
+*/
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(1)           */
+class Solution_Kadane_Algo {
+public:
+    int maxScore(vector<vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        int result = INT_MIN;
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            int curr_subarray_sum = grid[row][0];
+
+            for (int col = 1; col < COLS; col++)
+            {
+                int length_two_or_more_sum = curr_subarray_sum + grid[row][col];
+
+                result = max(result, length_two_or_more_sum);
+
+                if (row > 0 && row < ROWS - 1 &&
+                    col > 0 && col < COLS - 1)
+                {
+                    result = max(result, grid[row][col]);
+                }
+
+                curr_subarray_sum = max(grid[row][col], curr_subarray_sum + grid[row][col]);
+            }
+        }
+
+        for (int col = 0; col < COLS; col++)
+        {
+            int curr_subarray_sum = grid[0][col];
+
+            for (int row = 1; row < ROWS; row++)
+            {
+                int length_two_or_more_sum = curr_subarray_sum + grid[row][col];
+
+                // Evry interior SINGLE CELL is already evaluated within the
+                // length_ONE horizontal subarray, therefore we do NOT need to
+                // have the same if-statement here. We only need to check the
+                // vertical subarrays of length >= 2
+
+                result = max(result, length_two_or_more_sum);
+
+                curr_subarray_sum = max(grid[row][col], curr_subarray_sum + grid[row][col]);
+            }
+        }
+
+        return result;
+    }
+};
