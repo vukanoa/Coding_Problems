@@ -79,3 +79,81 @@ public:
         return upper_kth_square - lower_kth_square + 1;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  83.84% */
+
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(1)    */
+class Solution_Binary_Search {
+private:
+    long long power(long long base, int exp, long long limit)
+    {
+        long long result = 1;
+
+        while (exp--)
+        {
+            result *= base;
+
+            if (result > limit)
+                return limit + 1;
+        }
+
+        return result;
+    }
+
+    int lower_bound_k(int low, int high, int l, int r, int k)
+    {
+        while (low < high)
+        {
+            int mid = low + (high - low) / 2;
+
+            long long val = power(mid, k, r);
+
+            if (val >= l)
+                high = mid;
+            else
+                low = mid + 1;
+        }
+
+        return low;
+    }
+
+    int upper_bound_k(int low, int high, int l, int r, int k)
+    {
+        while (low < high)
+        {
+            int mid = low + (high - low) / 2;
+
+            long long val = power(mid, k, r);
+
+            if (val <= r)
+                low = mid + 1;
+            else
+                high = mid;
+        }
+
+        return low;
+    }
+
+public:
+    int countKthRoots(int l, int r, int k)
+    {
+        int left  = lower_bound_k(0, r+1, l, r, k);
+        int right = upper_bound_k(0, r+1, l, r, k);
+
+        return max(0, right - left);
+    }
+};
