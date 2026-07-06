@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
 /*
     ==============
     === MEDIUM ===
@@ -49,13 +45,11 @@
 
 */
 
-bool comparator(const std::vector<int>& a, const std::vector<int>& b)
-{
-    if (a[0] != b[0])
-        return (a[0] < b[0]);
-    else
-        return (a[1] > b[1]);
-}
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+
 
 /*
     ------------
@@ -73,27 +67,90 @@ bool comparator(const std::vector<int>& a, const std::vector<int>& b)
 /* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(1)        */ // Depending on the sort it can be O(n)
 class Solution_1 {
+private:
+    static bool comparator(const vector<int>& a, const vector<int>& b)
+    {
+        if (a[0] == b[0])
+            return (a[1] > b[1]);
+
+        return (a[0] < b[0]);
+    }
+
 public:
     int removeCoveredIntervals(vector<vector<int>>& intervals)
     {
         int remaining = intervals.size();
 
-        std::sort(intervals.begin(), intervals.end(), comparator);
+        /* SOrt */
+        sort(intervals.begin(), intervals.end(), comparator);
 
-        int left  = 0;
-        int right = 1;
-        while (right < intervals.size())
+        int L = 0;
+        int R = 1;
+        while (R < intervals.size())
         {
-            while (left != right && intervals[left][1] < intervals[right][1])
-                left++;
+            // (L != R) is implicit. If (L == R) then the condition fails
+            while (intervals[L][1] < intervals[R][1])
+                L++;
 
-            if (left != right)
+            if (L != R)
                 remaining--;
 
-            right++;
+            R++;
         }
 
         return remaining;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Essentially the same as above, though written slightly differently. It is
+    beneficial to see both.
+
+*/
+
+/* Time  Beats: 42.52% */
+/* Space Beats: 82.12% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(logN)     */ // Space Complexity of C++'s Sort
+class Solution_2 {
+public:
+    int removeCoveredIntervals(vector<vector<int>>& intervals)
+    {
+        const int N = intervals.size();
+        int result = 0;
+
+        /* Sort */
+        sort(intervals.begin(), intervals.end(), [](const vector<int>& a, const vector<int>& b) {
+            if (a[0] == b[0])
+                return a[1] > b[1];
+
+            return a[0] < b[0];
+        });
+
+        int L = 0;
+        int R = 1;
+        while (R < N)
+        {
+            if (intervals[L][1] < intervals[R][1])
+            {
+                result++;
+                L = R;
+            }
+
+            // Increment
+            R++;
+        }
+        result++;
+
+        return result;
     }
 };
 
@@ -115,26 +172,27 @@ public:
 
 /* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(1)        */ // Depending on the sort it can be O(n)
-class Solution_2 {
+class Solution_3 {
 public:
     int removeCoveredIntervals(vector<vector<int>>& intervals)
     {
         int result = 0;
 
-        std::sort(intervals.begin(), intervals.end());
+        /* Sort */
+        sort(intervals.begin(), intervals.end());
 
-        int left  = -1;
-        int right = -1;
+        int start = -1;
+        int end   = -1;
 
-        for (auto& inter : intervals)
+        for (const auto& interval : intervals)
         {
-            if (inter[0] > left && inter[1] > right)
+            if (start < interval[0] && end < interval[1])
             {
-                left = inter[0];
+                start = interval[0];
                 result++;
             }
 
-            right = std::max(right, inter[1]);
+            end = max(end, interval[1]);
         }
 
         return result;
@@ -212,27 +270,29 @@ public:
 
 /* Time  Complexity: O(n * logn) */
 /* Space Complexity: O(1) */
-class Solution_3 {
+class Solution_4 {
 public:
-    int removeCoveredIntervals(std::vector<std::vector<int>>& intervals)
+    int removeCoveredIntervals(vector<vector<int>>& intervals)
     {
-        std::sort(intervals.begin(),intervals.end());
+        const int N = intervals.size();
 
-        int x1 = intervals[0][0];
-        int x2 = intervals[0][1];
+        /* SOrt */
+        sort(intervals.begin(),intervals.end());
+
+        int start = intervals[0][0];
+        int end   = intervals[0][1];
 
         int result = 1;
-
-        for(int i = 1; i < intervals.size(); i++)
+        for (int i = 1; i < N; i++)
         {
             // If they are overlapping, count as a non-covered interval
-            if(intervals[i][0] > x1 && intervals[i][1] > x2)
+            if (start < intervals[i][0] && end < intervals[i][1])
                 result++;
 
-            if(intervals[i][1] > x2)
+            if (end < intervals[i][1])
             {
-                x1 = intervals[i][0];
-                x2 = intervals[i][1];
+                start = intervals[i][0];
+                end   = intervals[i][1];
             }
         }
 
