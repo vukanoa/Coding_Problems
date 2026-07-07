@@ -184,3 +184,77 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 71.86% */
+/* Space Beats:  9.25% */
+
+/* Time  Complexity: O(N + Q) */
+/* Space Complexity: O(Q)     */
+class Solution_Elegant {
+public:
+    vector<int> countWordOccurrences(vector<string>& chunks, vector<string>& queries)
+    {
+        unordered_map<string, int> umap;
+
+        string s;
+        s.reserve(1e5 + 1); // To prevent repeated reallocations
+        for (const string& chunk : chunks)
+            s += chunk;
+
+        string curr_str;
+        const int TOTAL_SIZE = s.size();
+
+        for (int i = 0; i < TOTAL_SIZE; i++)
+        {
+            if (islower(s[i]))
+            {
+                curr_str += s[i];
+            }
+            else if (s[i] == '-')
+            {
+                if (i > 0              &&
+                    i + 1 < TOTAL_SIZE &&
+                    islower(s[i - 1])  &&
+                    islower(s[i + 1]))
+                {
+                    curr_str += '-';
+                }
+                else if ( ! curr_str.empty())
+                {
+                    umap[curr_str]++;
+                    curr_str.clear();
+                }
+            }
+            else if ( ! curr_str.empty())
+            {
+                umap[curr_str]++;
+                curr_str.clear();
+            }
+        }
+
+        // One additional at the end
+        if ( ! curr_str.empty())
+            umap[curr_str]++;
+
+        const int Q = queries.size();
+        vector<int> result;
+        result.reserve(Q);
+
+        for (const string& query : queries)
+            result.push_back(umap[query]);
+
+        return result;
+    }
+};
