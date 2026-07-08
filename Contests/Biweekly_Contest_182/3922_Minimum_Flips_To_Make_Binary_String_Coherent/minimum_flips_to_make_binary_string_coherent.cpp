@@ -112,3 +112,35 @@ public:
         return max(0, min(max(leading_ones, trailing_ones) - 1, zeroes));
     }
 };
+
+
+
+
+class Solution_elegant {
+public:
+    int minFlips(string s)
+    {
+        int freq[2] = {0, 0};
+
+        /*
+           character '0' is ASCII value of 48
+           character '1' is ASCII value of 49 
+
+           doing bitwise AND with 1 gives 1 for ODD number(i.e. for 49), and
+           gives 0 for EVEN numbers(i.e. 48 in this case).
+        */
+        for (const auto &chr : s)
+            freq[chr & 1]++;
+
+        if (freq[0] == 0 || freq[1] == 0)
+            return 0;
+
+        /*
+            We need to remove at least a single '1', however if both first and
+            last character of s are '1', then subtract one more.
+
+        */
+                         // freq[1] - (either 1 or 2)
+        return min(freq[0], freq[1] - 1 - (s.front() & s.back() & 1));
+    }
+};
