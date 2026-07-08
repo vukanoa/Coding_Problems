@@ -56,6 +56,7 @@
 
 */
 
+#include <algorithm>
 #include <string>
 using namespace std;
 
@@ -116,6 +117,17 @@ public:
 
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
 class Solution_elegant {
 public:
     int minFlips(string s)
@@ -142,5 +154,48 @@ public:
         */
                          // freq[1] - (either 1 or 2)
         return min(freq[0], freq[1] - 1 - (s.front() & s.back() & 1));
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    What do "011" and "110" have in common?
+
+    They BOTH have a 1 in the middle.
+    Though, they have opposite numbers on the FRONT and BACK.
+
+
+    String s is COHERENT only when either of these is true:
+        + If there is NO middle '1' (i.e. 1s are on two ends)
+        + If there is only a SINGLE '1'
+        + If ALL of the characters are '1'
+
+*/
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Elegant_2 {
+public:
+    int minFlips(string s)
+    {
+        const int N = s.length();
+
+        if (N < 3)
+            return 0;
+
+        int zeroes = count(s.begin(), s.end(), '0');
+        int ones   = N - zeroes;
+
+        int result_1 = zeroes;
+        int result_2 = max(ones - 1, 0);
+        int result_3 = ones - (s[0] - '0') - (s[N-1] - '0');
+
+        return min( {result_1, result_2, result_3} );
     }
 };
