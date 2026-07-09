@@ -75,6 +75,7 @@
 
 */
 
+#include <cstdlib>
 #include <vector>
 using namespace std;
 
@@ -118,6 +119,137 @@ public:
             const int& v = query[1];
 
             result.push_back(component[u] == component[v]);
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We could also do this by using DSU. It's a bit more cmoplicated than the
+    above Solution, however it's very very beneficial to be very comfortable
+    with DSU for other Graph problems.
+
+    It is a Fundamental Graph technique alongside DFS & BFS.
+
+*/
+
+/* Time  Beats: 59.18% */
+/* Space Beats: 55.07% */
+
+/* Time  Complexity: O(n * alpha(n)  +  Q * alpha(n)) */
+/* Space Complexity: O(n)                             */
+class DSU {
+private:
+    vector<int> parent;
+    vector<int> size;
+    int components;
+
+public:
+    DSU (int n)
+    {
+        components = n;
+
+        parent.resize(n);
+        size.resize(n);
+
+        for (int i = 0; i < n; i++)
+        {
+            parent[i] = i;
+            size[i]   = 1;
+        }
+    }
+
+    // TC: alpha(n), practically <= 5 for all practical Input, therefore we
+    //     could tread it as a constant, but formally it's alpha(n).
+    int find_root(int node)
+    {
+        while (node != parent[node])
+        {
+            // Reverse Ackerman function, <= 5 for all practical Inputs
+            parent[node] = parent[parent[node]];
+
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    bool union_components(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        if (root_1 == root_2)
+            return false; // We have NOT merged, they are already connected
+
+        if (size[root_1] < size[root_2])
+            swap(root_1, root_2);
+
+        parent[root_2] = root_1;
+        size[root_1]  += size[root_2];
+
+        components--;
+
+        return true; // We have INDEED Marged two components
+    }
+
+    int number_of_components()
+    {
+        return components;
+    }
+
+    bool are_connected(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        return root_1 == root_2;
+    }
+};
+
+class Solution_DSU {
+public:
+    vector<bool> pathExistenceQueries(int n, vector<int>& nums, int maxDiff, vector<vector<int>>& queries)
+    {
+        const int M = nums.size();
+        const int Q = queries.size();
+
+        DSU dsu(n);
+
+        int left  = 0;
+        int right = 1;
+        while (right < M)
+        {
+            while (left < right && abs(nums[right] - nums[left]) > maxDiff)
+                left++;
+
+            while (left < right)
+            {
+                dsu.union_components(left, right);
+                left++;
+            }
+
+            // Increment
+            right++;
+        }
+
+        
+        vector<bool> result;
+        result.reserve(Q);
+        for (const auto& query : queries)
+        {
+            const int& u = query[0];
+            const int& v = query[1];
+
+            result.push_back(dsu.are_connected(u, v));
         }
 
         return result;
