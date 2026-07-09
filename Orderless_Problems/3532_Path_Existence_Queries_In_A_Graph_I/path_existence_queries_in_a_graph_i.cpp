@@ -87,42 +87,39 @@ using namespace std;
 
 */
 
-/* Time  Beats: 81.93% */
-/* Space Beats: 90.32% */
+/* Time  Complexity: O(n + Q) */
+/* Space Complexity: O(n)     */
+class Solution_3 {
+private:
+    static constexpr int MAX_SIZE = 1e5;
 
-/* Time  Complexity: O(N + M) */
-/* Space Complexity: O(N)     */
-class Solution {
 public:
     vector<bool> pathExistenceQueries(int n, vector<int>& nums, int maxDiff, vector<vector<int>>& queries)
     {
-        const int N = nums.size();
-        vector<bool> answer;
+        const int Q = queries.size();
 
-        vector<int> diff(N, 0);
-        for (int i = 1; i < N; i++)
+        vector<bool> result;
+        result.reserve(Q);
+
+        int component[MAX_SIZE] = {0};
+
+        for (int i = 1; i < n; i++)
         {
-            if (nums[i-1] + maxDiff >= nums[i])
-                diff[i] = diff[i-1];
+            if (nums[i] - nums[i-1] <= maxDiff)
+                component[i] = component[i-1];
             else
-                diff[i] = i;
+                component[i] = component[i-1] + 1;
         }
 
 
-        for (const auto& q : queries)
+        for (const auto &query : queries)
         {
-            int L = q[0];
-            int R = q[1];
+            const int& u = query[0];
+            const int& v = query[1];
 
-            if (L > R)
-                swap(L, R);
-
-            if (L >= diff[R])
-                answer.push_back(true);
-            else
-                answer.push_back(false);
+            result.push_back(component[u] == component[v]);
         }
 
-        return answer;
+        return result;
     }
 };
