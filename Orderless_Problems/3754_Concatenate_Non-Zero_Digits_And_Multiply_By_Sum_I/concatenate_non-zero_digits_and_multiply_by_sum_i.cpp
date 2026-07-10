@@ -50,6 +50,7 @@
 */
 
 #include <stack>
+#include <string>
 using namespace std;
 
 /*
@@ -95,6 +96,46 @@ public:
 
             x *= 10;
             x += digit;
+        }
+
+        return x * sum;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same idea, different way to implement.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  76.90% */
+
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(logN) */
+class Solution_2 {
+public:
+    long long sumAndMultiply(int n)
+    {
+        long long x   = 0;
+        long long sum = 0;
+
+        string str_n = to_string(n);
+
+        for (const char& chr : str_n)
+        {
+            int digit = chr - '0';
+
+            if (digit > 0)
+                x = x * 10 + digit;
+
+            sum += digit;
         }
 
         return x * sum;
