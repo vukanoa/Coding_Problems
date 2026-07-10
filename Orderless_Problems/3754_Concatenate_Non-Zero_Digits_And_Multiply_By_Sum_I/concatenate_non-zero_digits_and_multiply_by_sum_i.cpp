@@ -141,3 +141,49 @@ public:
         return x * sum;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Anoher way to implement, this one doesn't use any additional space.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  89.81% */
+
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(1)    */
+class Solution_Space_Efficient_3 {
+public:
+    long long sumAndMultiply(int n)
+    {
+        long long x   = 0;
+        long long sum = 0;
+
+        long long pow_10 = 1;
+        while (n > 0)
+        {
+            int digit = n % 10;
+
+            if (digit > 0)
+            {
+                x += digit * pow_10;
+                pow_10 *= 10;
+            }
+
+            sum += digit;
+
+
+            // Divide
+            n /= 10;
+        }
+
+        return x * sum;
+    }
+};
