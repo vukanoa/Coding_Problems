@@ -172,8 +172,6 @@ public:
     }
 };
 
-
-
 class Solution {
 private:
     static constexpr int MAX_N = 1e3;
@@ -256,27 +254,158 @@ private:
         /* Dijkstra */
         while ( ! min_heap.empty())
         {
-            auto [heavy_edges, node] = min_heap.top();
+            auto [heavy_edges_used, node] = min_heap.top();
             min_heap.pop();
 
-            if (heavy_edges > min_heavy_edges[node])
+            if (heavy_edges_used > min_heavy_edges[node])
                 continue;
 
             if (node == target)
-                return heavy_edges <= k;
+                return heavy_edges_used <= k;
 
             for (auto [neighbor_node, neighbor_weight] : adj_list[node])
             {
-                int new_heavy_edges = heavy_edges + (neighbor_weight > threshold);
+                int cost = (neighbor_weight > threshold ? 1 : 0); // 0-1 BFS
+                int new_heavy_edges_used = heavy_edges_used + cost;
 
-                if (new_heavy_edges < min_heavy_edges[neighbor_node] && new_heavy_edges <= k)
+                if (new_heavy_edges_used <= k && new_heavy_edges_used < min_heavy_edges[neighbor_node])
                 {
-                    min_heavy_edges[neighbor_node] = new_heavy_edges;
-                    min_heap.push( {new_heavy_edges, neighbor_node} );
+                    min_heavy_edges[neighbor_node] = new_heavy_edges_used;
+                    min_heap.push( {new_heavy_edges_used, neighbor_node} );
                 }
             }
         }
 
         return false;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, though "possible_with" part is NOT a Dijkstra's Algorithm,
+    but a 0-1 BFS.
+
+    It's an important Algorithm to add to your toolset.
+
+*/
+
+/* Time  Complexity: O(V  +  E * alpha(V)  +  E  +  log(MAX_WEIGHT) * (E + V)) */
+/* Space Complexity: O(E + V)                                                  */
+class Solution___0_1_BFS {
+private:
+    static constexpr int MAX_N = 1e3;
+
+public:
+    int minimumThreshold(int n, vector<vector<int>>& edges, int source, int target, int k)
+    {
+        if (source == target)
+            return 0;
+
+        DSU dsu(n); // TC: O(V) for the Constructor
+
+        int heaviest_edge = 0;
+
+        /* Check if source and target are CONNECTED */
+        // TC: O(E * alpha(V)) for entire block
+        for (const auto& edge : edges) 
+        {
+            const int u = edge[0];
+            const int v = edge[1];
+            const int w = edge[2];
+
+            dsu.union_components(u, v);
+
+            heaviest_edge = max(heaviest_edge, w);
+        }
+
+        if ( ! dsu.are_connected(source, target)) // TC: O(alpha(V))
+            return -1;
+
+
+        /* Build an Adjacency List */
+        unordered_map<int, vector<pair<int,int>>> adj_list;
+
+        // TC: O(E) for entire block
+        for (const auto& edge : edges)
+        {
+            const int u = edge[0];
+            const int v = edge[1];
+            const int w = edge[2];
+
+            /* Undirected WEIGHTED edges */
+            adj_list[u].push_back( {v, w} );
+            adj_list[v].push_back( {u, w} );
+        }
+
+
+        /* Binary Search */
+        // 
+        // TC: O(log(MAX_WEIGHT)) is the "Binary Search" portion
+        // 
+        int low  = 0;
+        int high = heaviest_edge;
+        while (low < high)
+        {
+            int threshold_mid = low + (high - low) / 2; // Prevents OVERFLOW
+
+            // "possible_with" is "0-1 BFS" Algorithm and its Time Compexity:
+            // TC: O(E + V)
+            if (possible_with(threshold_mid, adj_list, k, source, target, n))
+                high = threshold_mid;
+            else
+                low  = threshold_mid + 1;
+        }
+
+        return low; // Or high, it does NOT matter
+    }
+
+private:
+    // 0-1 BFS
+    bool possible_with(int threshold,
+                       unordered_map<int, vector<pair<int,int>>>& adj_list,
+                       int k,
+                       int source,
+                       int target,
+                       int n)
+    {
+        deque<int> deque;
+
+        vector<int> min_heavy_edges(n, INT_MAX);
+        min_heavy_edges[source] = 0;
+
+        deque.push_front(source);
+
+        /* 0-1 BFS */
+        while ( ! deque.empty())
+        {
+            int current_node = deque.front();
+            deque.pop_front();
+
+            for (auto [neighbor_node, neighbor_weight] : adj_list[current_node])
+            {
+                int edge_cost = (neighbor_weight > threshold) ? 1 : 0; // 0-1 BFS
+
+                int new_heavy_edges_used = min_heavy_edges[current_node] + edge_cost;
+
+                if (new_heavy_edges_used <= k && new_heavy_edges_used < min_heavy_edges[neighbor_node])
+                {
+                    min_heavy_edges[neighbor_node] = new_heavy_edges_used;
+
+                    /* 0-1 BFS */
+                    if (edge_cost == 0)
+                        deque.push_front(neighbor_node);
+                    else
+                        deque.push_back(neighbor_node);
+                }
+            }
+        }
+
+        return min_heavy_edges[target] <= k;
     }
 };
