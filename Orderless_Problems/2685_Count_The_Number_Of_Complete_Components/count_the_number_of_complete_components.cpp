@@ -123,7 +123,7 @@ using namespace std;
     Why?
     Because in a complete component with k vertices, each vertex must have
     exactly k neighbors (including itself). And exactly k vertices must share
-    this pattern - one for each member of the component.
+    this pattern--One for each member of the component.
 
     Finally, we count the number of entries in the map that pass this
     validation and return this count as our answer.
@@ -159,8 +159,8 @@ public:
 
             // neighbors = [0,1,2,3] --> "0,1,2,3,"  // ',' as the last char
             string key;
-            for (int num : neighbors)
-                key += to_string(num) + ",";
+            for (const int& node_num : neighbors)
+                key += to_string(node_num) + ",";
 
             component_freq[key]++;
         }
@@ -269,19 +269,19 @@ public:
 
 private:
     void dfs(vector<vector<int>>& adj_list,
-             int componentInfo[2],
+             int component_info[2],
              unordered_set<int>& visited,
-             int curr)
+             int node)
     {
-        visited.insert(curr);
+        visited.insert(node);
 
-        componentInfo[0]++;                         // Increment vertex count
-        componentInfo[1] += adj_list[curr].size();  // Add edges from current vertex
+        component_info[0]++;                         // Increment vertex count
+        component_info[1] += adj_list[node].size();  // Add edges from current vertex
 
-        for (int neighbor : adj_list[curr])
+        for (int neighbor : adj_list[node])
         {
             if ( ! visited.count(neighbor))
-                dfs(adj_list, componentInfo, visited, neighbor);
+                dfs(adj_list, component_info, visited, neighbor);
         }
     }
 };
@@ -344,48 +344,48 @@ public:
 
         for (int vertex = 0; vertex < n; vertex++)
         {
-            if ( ! visited[vertex])
+            if (visited[vertex])
+                continue;
+
+            // BFS to find all vertices in the current component
+            vector<int> component;
+            queue<int> queue;
+
+            queue.push(vertex);
+            visited[vertex] = true;
+
+            /* BFS */
+            while ( ! queue.empty())
             {
-                // BFS to find all vertices in the current component
-                vector<int> component;
-                queue<int> queue;
+                int node = queue.front();
+                queue.pop();
 
-                queue.push(vertex);
-                visited[vertex] = true;
+                component.push_back(node);
 
-                /* BFS */
-                while ( ! queue.empty())
+                for (int neighbor : adj_list[node])
                 {
-                    int curr = queue.front();
-                    queue.pop();
-
-                    component.push_back(curr);
-
-                    for (int neighbor : adj_list[curr])
+                    if ( ! visited[neighbor])
                     {
-                        if ( ! visited[neighbor])
-                        {
-                            queue.push(neighbor);
-                            visited[neighbor] = true;
-                        }
+                        queue.push(neighbor);
+                        visited[neighbor] = true;
                     }
                 }
-
-                // Check if component is complete
-                // (all vertices have the right number of edges)
-                bool is_complete = true;
-                for (int node : component)
-                {
-                    if (adj_list[node].size() != component.size() - 1)
-                    {
-                        is_complete = false;
-                        break;
-                    }
-                }
-
-                if (is_complete)
-                    result++;
             }
+
+            // Check if component is complete
+            // (all vertices have the right number of edges)
+            bool is_complete = true;
+            for (int node : component)
+            {
+                if (adj_list[node].size() != component.size() - 1)
+                {
+                    is_complete = false;
+                    break;
+                }
+            }
+
+            if (is_complete)
+                result++;
         }
 
         return result;
@@ -395,141 +395,155 @@ public:
 
 
 
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    A complete connected component has a distinct property: it is a disjoint
-    unit of the graph, meaning it does not share any connections with other
-    parts of the graph. Our task is to identify these disjoint units and check
-    whether their vertices and edges meet the criteria for completeness and
-    connectivity.
+    We could do this--and this is the most natural--using a technique called:
 
-    One of the most effective ways to find separate groups in a graph is by
-    using the Union-Find algorithm (also known as Disjoint Set Union). This
-    method helps group vertices that belong together. Each group has a
-    representative vertex, known as the leader, which serves as the group's
-    identifier. To determine whether two vertices belong to the same group, we
-    simply check if they share the same leader.
+        "Disjoint Set Union" (i.e. "Union & Find")
 
-    In our Union-Find implementation, we also track the size of each component.
-    Maintaining size is not only useful for optimizing the merging of
-    components, since attaching a smaller component to a larger one is more
-    efficient, but also plays a crucial role in this problem: it tells us
-    exactly how many vertices exist in each component. To verify whether a
-    component is a valid complete connected component, we check if its edge
-    count matches:
+    DSU use a natural use when dealing with "Components" of a graph, but in
+    order to check whether a component is COMPLETE, we have to extend the
+    standard implementation.
 
-            k * (k-1) / 2,
+    If there are X nodes within a component, then in order for that component
+    to be COMPLETE, it needs to have exactly:
 
-    where k is the number of vertices in the component.
+        X * (X-1) / 2
 
-    Now, let’s implement our solution. First, we initialize a Union-Find
-    structure and perform the "union" operation for each edge in our input.
+    edges.
 
-    Since an edge signifies that two vertices belong to the same component,
-    applying "union" to all edges ensures that all vertices are grouped
-    correctly.
 
-    Next, we count the number of edges in each component. To do this, we use a
-    hash map that associates each component with its edge count. Since
-    Union-Find assigns each component a unique representative (the root of its
-    tree), we use these representatives as keys in the map.
+    Therefore, we'll extend the standard DSU by adding an "edges" vector, which
+    will count the number of edges within a component.
 
-    Finally, we iterate through each group leader and check if the group forms
-    a complete component. A group is complete if its edge count equals:
+    Then we simply do a "union_components" on ALL of the given edges and then
+    for each node, find its root and check whether the number of edges of the
+    component where "root" is the root is exactly: X * (X-1) / 2.
 
-        k * (k - 1) / 2
-
-   If it does, we increment our final count. Once all components have been
-   processed, we return the total number of complete components as our answer.
+    If it is--Count that in.
 
 */
 
-/* Time  Beats: 96.55% */
-/* Space Beats: 95.97% */
+/* Time  Beats: 98.83% */
+/* Space Beats: 93.99% */
 
-/*
-    Time  Complexity: O(N + M * alpha(N))
+/* Time  Complexity: O(E * alpha(V)  +  V * alpha(V)) */
+/* Space Complexity: O(V)                             */
+class DSU {
+private:
+    vector<int> parent;
+    vector<int> size;
+    vector<int> edges;
 
-    where alpha(n) is the inverse Ackermann function, which grows extremely
-    slowly and is practically constant.
-*/
-/*
-    Space Complexity: O(N)
+    int components;
 
-*/
-class Solution_Union_and_Find {
+public:
+    DSU (int n)
+    {
+        components = n;
+
+        parent.resize(n);
+        size.resize(n);
+        edges.resize(n);
+
+        for (int i = 0; i < n; i++)
+        {
+            parent[i] = i;
+            size[i]   = 1;
+            edges[i]  = 0;
+        }
+    }
+
+    int find_root(int node)
+    {
+        while (node != parent[node])
+        {
+            /* Reverse Ackerman function, <= 5 for all practical inputs */
+            parent[node] = parent[parent[node]]; // O(alpha(V)) --> O(1)
+
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    bool union_components(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        if (root_1 == root_2) // Both are part of the same component
+        {
+            edges[root_1] += 1;
+            return false; // We have NOT performed a Merge (i.e. "Union")
+        }
+
+        if (size[root_1] < size[root_2])
+            swap(root_1, root_2);
+
+        parent[root_2] = root_1;
+        size[root_1]  += size[root_2];
+
+        components--;
+        edges[root_1] += 1 + edges[root_2];
+
+        return true; // We have INDEED pergomed a Merge (i.e. "Union")
+    }
+
+    bool are_connected(int node_1, int node_2)
+    {
+        int root_1 = find_root(node_1);
+        int root_2 = find_root(node_2);
+
+        return root_1 == root_2;
+    }
+
+    bool is_complete_component(int node)
+    {
+        int root = find_root(node);
+
+        int num = size[root]; // number_of_nodes_within_a_component
+        int neccessary_number_of_edges = num * (num - 1) / 2;
+
+        return edges[root] == neccessary_number_of_edges;
+    }
+};
+
+class Solution_DSU {
 public:
     int countCompleteComponents(int n, vector<vector<int>>& edges)
     {
         int result = 0;
 
-        vector<int> component_size(n, 1);  // Track size of each component
+        DSU dsu(n);
 
-        vector<int> rank(n, 1);
-        vector<int> parent(n);
-
-        iota(parent.begin(), parent.end(), 0);
-
-        for (const auto& edge : edges)
-            Union(edge[0], edge[1], parent, rank, component_size);
-
-        vector<int> edges_count(n, 0);
+        /* Perform a "Union" on ALL of the edges */
         for (const auto& edge : edges)
         {
-            int root = Find(edge[0], parent);
-            edges_count[root]++;
+            const int& u = edge[0];
+            const int& v = edge[1];
+
+            dsu.union_components(u, v);
         }
-
-        for (int vertex = 0; vertex < n; vertex++)
+        
+        vector<bool> visited(n, false);
+        for (int node = 0; node < n; node++)
         {
-            if (vertex == Find(vertex, parent)) //If vertex is a root component
-            {
-                int k = component_size[vertex];
+            int root = dsu.find_root(node);
 
-                // Each edge is counted twice (undirected graph)
-                if (edges_count[vertex] == k * (k - 1) / 2)
-                    result++;
-            }
+            if (visited[root])
+                continue;
+
+            if (dsu.is_complete_component(root))
+                result++;
+
+            visited[root] = true;
         }
 
         return result;
-    }
-
-private:
-    int Find(int node, vector<int>& parent)
-    {
-        while (node != parent[node])
-            node = parent[parent[node]];
-
-        return node;
-    }
-
-    void Union(int node_1, int node_2, vector<int>& parent, vector<int>& rank, vector<int>& component_size)
-    {
-        int root1 = Find(node_1, parent);
-        int root2 = Find(node_2, parent);
-
-        if (root1 == root2)
-            return;
-
-        if (rank[root1] > rank[root2])
-        {
-            parent[root2] = root1;
-            component_size[root1] += component_size[root2];
-        }
-        else if (rank[root1] < rank[root2])
-        {
-            parent[root1] = root2;
-            component_size[root2] += component_size[root1];
-        }
-        else
-        {
-            parent[root2] = root1;
-            component_size[root1] += component_size[root2];
-            rank[root1]++;
-        }
     }
 };
