@@ -1,8 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-#include <algorithm>
-
 /*
     ============
     === EASY ===
@@ -61,6 +56,12 @@
 
 */
 
+#include <vector>
+#include <unordered_map>
+#include <algorithm>
+
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -73,27 +74,84 @@
 /* Time  Beats: 70.09% */
 /* Space Beats: 70.17% */
 
-/* Time  Complexity: O(n * logn) */
-/* Space Complexity: O(n)        */
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
 class Solution {
 public:
-    std::vector<int> arrayRankTransform(std::vector<int>& arr)
+    vector<int> arrayRankTransform(vector<int>& arr)
     {
-        std::unordered_map<int, int> valueToRank;  // Map to store value-to-rank mapping
-        std::vector<int> sortedUniqueNumbers = arr;
+        const int N = arr.size();
 
-        // Remove duplicates and sort
-        std::sort(sortedUniqueNumbers.begin(), sortedUniqueNumbers.end());
-        sortedUniqueNumbers.erase(std::unique(sortedUniqueNumbers.begin(), sortedUniqueNumbers.end()), sortedUniqueNumbers.end());
+        unordered_map<int, int> rank_of_num;
+        vector<int> sorted_uniq_nums = arr;
+
+        // Sort  &  Remove duplicates
+        sort(sorted_uniq_nums.begin(), sorted_uniq_nums.end());
+        sorted_uniq_nums.erase(unique(sorted_uniq_nums.begin(), sorted_uniq_nums.end()), sorted_uniq_nums.end());
 
         // Assign ranks to sorted unique elements
-        for (int i = 0; i < sortedUniqueNumbers.size(); i++)
-            valueToRank[sortedUniqueNumbers[i]] = i + 1;
+        for (unsigned i = 0; i < sorted_uniq_nums.size(); i++)
+            rank_of_num[sorted_uniq_nums[i]] = i + 1;
 
         // Replace each element in the original array with its rank
         for (int i = 0; i < arr.size(); i++)
-            arr[i] = valueToRank[arr[i]];
+            arr[i] = rank_of_num[arr[i]];
 
-        return arr;  // Return the updated array
+        return arr;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 42.82% */
+/* Space Beats: 42.78% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_2 {
+public:
+    vector<int> arrayRankTransform(vector<int>& arr)
+    {
+        const int N = arr.size();
+        vector<int> result(N, -1);
+
+        vector<pair<int,int>> nums;
+        nums.reserve(N);
+        for (int i = 0; i < N; i++)
+            nums.push_back( {arr[i], i} );  // {number, orig_idx}
+
+        /* Sort */
+        sort(nums.begin(), nums.end());
+
+        unordered_map<int,int> rank_of_num;
+        int smallest_unused_rank = 1;
+        for (int i = 0; i < N; i++)
+        {
+            if (rank_of_num.find(nums[i].first) != rank_of_num.end())
+                continue;
+
+            rank_of_num[nums[i].first] = smallest_unused_rank;
+            smallest_unused_rank++;
+        }
+
+        for (int i = 0; i < N; i++)
+        {
+            const int& number   = nums[i].first;
+            const int& orig_idx = nums[i].second;
+
+            result[orig_idx] = rank_of_num[number];
+        }
+
+        return result;
     }
 };
