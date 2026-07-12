@@ -190,9 +190,64 @@ public:
         /* Remove Duplicates */
         nums.erase(unique(nums.begin(), nums.end()), nums.end());
 
-        for (int i = 0; i < arr.size(); i++)
+        for (int i = 0; i < N; i++)
             arr[i] = lower_bound(nums.begin(), nums.end(), arr[i]) - nums.begin() + 1;
 
         return arr;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This one uses my own implementatino of "lower_bound" Binary Search.
+
+*/
+
+/* Time  Beats: 94.67% */
+/* Space Beats: 99.15% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_My_Own_Lower_Bound {
+public:
+    vector<int> arrayRankTransform(vector<int>& arr)
+    {
+        const int N = arr.size();
+        vector<int> nums = arr;
+
+        /* Sort */
+        sort(nums.begin(), nums.end());
+
+        /* Remove Duplicates */
+        nums.erase(unique(nums.begin(), nums.end()), nums.end());
+
+        const int UNIQUE_NUMBERS = nums.size();
+
+        for (int i = 0; i < N; i++)
+            arr[i] = 1 + my_lower_bound(0, UNIQUE_NUMBERS, arr[i], nums);
+
+        return arr;
+    }
+
+private:
+    int my_lower_bound(int low, int high, int target, vector<int>& nums)
+    {
+        while (low < high)
+        {
+            int mid = low + (high - low) / 2;
+
+            if (target > nums[mid])
+                low = mid + 1;
+            else
+                high = mid;
+        }
+
+        return low; // Or "high", it does NOT matter
     }
 };
