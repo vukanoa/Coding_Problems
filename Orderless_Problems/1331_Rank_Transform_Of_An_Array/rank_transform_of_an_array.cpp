@@ -85,12 +85,16 @@ public:
         unordered_map<int, int> rank_of_num;
         vector<int> sorted_uniq_nums = arr;
 
-        // Sort  &  Remove duplicates
+        /* Sort */
         sort(sorted_uniq_nums.begin(), sorted_uniq_nums.end());
+
+        /* Remove Duplicates */
         sorted_uniq_nums.erase(unique(sorted_uniq_nums.begin(), sorted_uniq_nums.end()), sorted_uniq_nums.end());
 
+        const int UNIQUE_NUMBERS = sorted_uniq_nums.size();
+
         // Assign ranks to sorted unique elements
-        for (unsigned i = 0; i < sorted_uniq_nums.size(); i++)
+        for (int i = 0; i < UNIQUE_NUMBERS; i++)
             rank_of_num[sorted_uniq_nums[i]] = i + 1;
 
         // Replace each element in the original array with its rank
@@ -153,5 +157,42 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way to solve it.
+
+*/
+
+/* Time  Beats: 96.01% */
+/* Space Beats: 99.15% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Binary_Search {
+public:
+    vector<int> arrayRankTransform(vector<int>& arr)
+    {
+        const int N = arr.size();
+        vector<int> nums = arr;
+
+        /* Sort */
+        sort(nums.begin(), nums.end());
+
+        /* Remove Duplicates */
+        nums.erase(unique(nums.begin(), nums.end()), nums.end());
+
+        for (int i = 0; i < arr.size(); i++)
+            arr[i] = lower_bound(nums.begin(), nums.end(), arr[i]) - nums.begin() + 1;
+
+        return arr;
     }
 };
