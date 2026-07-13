@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ============
     === HARD ===
@@ -38,89 +36,70 @@
 
 */
 
+#include <cstring>
+#include <string>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
     ------------
 
-    TODO
+    This is the most FUNDAMENTAL "Digit DP" problem.
+
+    If you don't understand this code, make sure to understand the basics of
+    the "Digit DP" first, then come back to read it again.
+
+    Prerequisite knowledge is that you're VERY good with "Memoization"
+    technique, i.e. "Top-Down Dynamic Programming".
+
+    Once you're comfortable with that, come back here and this'll be a breeze.
+    It's not that bad.
 
 */
 
-/* Time  Beats: 56.04% */
-/* Space Beats: 52.44% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  28.02% */
 
-/* Time  Complexity: O(len(n)^2) */ // 'len(n)' is the number of digits in n
-/* Space Complexity: O(len(n)^2) */ // 'len(n)' is the number of digits in n
-class Solution_Memoization {
+/* Time  Complexity: O(D * 2 * sum) --> O(logN * 2 * (logN * 9)) --> O(log(n)^2) */ // D is the number of digits in the largest numbers
+/* Time  Complexity: O(D * 2 * sum) --> O(logN * 2 * (logN * 9)) --> O(log(n)^2) */ // "sum" is the maximal sum, which is: D * 9, i.e. logN * 9.
+class Solution_Digit_DP {
+private:
+    int memo[10][2][10];
+
 public:
-    int dp[11][11][2];
-
     int countDigitOne(int n)
     {
-        string s = to_string(n);
-        memset(dp, -1, sizeof dp);
+        string str_num = to_string(n);
 
-        return dfs(s, 0, 0, true);
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        return solve(str_num, 0, 1, 0);
     }
 
 private:
-    int dfs(string &s, int idx, int cnt, bool flag)
+    int solve(string& str_num, int idx, int tight, int count_of_ones)
     {
-        if(idx == s.size())
-            return cnt;
+        const int N = str_num.size();
 
-        if (dp[idx][cnt][flag] != -1)
-            return dp[idx][cnt][flag];
+        if (idx == N)
+            return count_of_ones;
 
-        char upper_bound = '9'; // upper bound of position i
+        if (memo[idx][tight][count_of_ones] != -1)
+            return memo[idx][tight][count_of_ones];
 
-        if (flag)
-            upper_bound = s[idx];
+        int limit_digit = tight ? str_num[idx] - '0' : 9;
 
-        int count = 0;
-        for(char x = '0'; x <= upper_bound; x++)
+        int result = 0;
+        for (int curr_digit = 0; curr_digit <= limit_digit; curr_digit++)
         {
-            bool new_flag = flag & (x == upper_bound);
-            int  new_cnt  = cnt;
+            int next_tight            = tight && (curr_digit == limit_digit);
+            int updated_count_of_ones = count_of_ones + (curr_digit == 1);
 
-            if(x == '1')
-                new_cnt++;
-
-            count += dfs(s, idx+1, new_cnt, new_flag);
+            result += solve(str_num, idx+1, next_tight, updated_count_of_ones);
         }
 
-        return dp[idx][cnt][flag] = count;
-    }
-};
-
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Go through the digit positions one at a time, find out how often a "1"
-    appears at each position, and sum those up. 
-
-*/
-
-/* Time  Beats: 100%   */
-/* Space Beats: 99.90% */
-
-/* Time  Complexity: O(log10(n)) */
-/* Space Complexity: O(1)        */
-class Solution_Efficient {
-public:
-    int countDigitOne(int n)
-    {
-        int ones = 0;
-
-        for (long long m = 1; m <= n; m *= 10)
-            ones += (n/m + 8) / 10 * m + (n/m % 10 == 1) * (n % m + 1);
-
-        return ones;
+        return memo[idx][tight][count_of_ones] = result;
     }
 };
