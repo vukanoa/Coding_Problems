@@ -52,12 +52,11 @@ using namespace std;
 
 */
 
-
 /* Time  Beats: 100.00% */
 /* Space Beats:  76.91% */
 
-/* Time  Complexity: O(1) */
-/* Space Complexity: O(1) */
+/* Time  Complexity: O(S) */ // S ---> number of sequntial numbers(max 45)
+/* Space Complexity: O(S) */
 class Solution {
 public:
     vector<int> sequentialDigits(int low, int high)
@@ -138,8 +137,8 @@ public:
 /* Time  Beats: 100.00% */
 /* Space Beats:  97.69% */
 
-/* Time  Complexity: O(1) */
-/* Space Complexity: O(1) */
+/* Time  Complexity: O(S) */ // S ---> number of sequntial numbers(max 45) 
+/* Space Complexity: O(S) */
 class Solution_BFS {
 private:
     int sequential_numbers[45];
@@ -179,5 +178,71 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  48.96% */
+
+/* Time  Complexity: O(10 * D) */ // D ---> number of digits in "high"
+/* Space Complexity: O(D + S)  */ // S ---> number of sequntial numbers(max 45)
+class Solution_DigitDP {
+private:
+    vector<int> sequential_numbers;
+
+public:
+    vector<int> sequentialDigits(int low, int high)
+    {
+        string str_high = to_string(high);
+
+        /* Solve */
+        solve(str_high, 0, 1, -1, false, 0);
+
+        vector<int> filtered_result;
+
+        for (const int& sequential_number : sequential_numbers)
+        {
+            if (low <= sequential_number && sequential_number <= high)
+                filtered_result.push_back(sequential_number);
+        }
+
+        return filtered_result;
+    }
+
+private:
+    void solve(string& str_num, int idx, int tight, int prev_digit, bool started, int current_number)
+    {
+        const int N = str_num.size();
+
+        if (idx == N)
+        {
+            if (started)
+                sequential_numbers.push_back(current_number);
+
+            return;
+        }
+
+        int limit_digit = tight ? str_num[idx] - '0' : 9;
+
+        for (int curr_digit = 0; curr_digit <= limit_digit; curr_digit++)
+        {
+            int next_tight = tight && (curr_digit == limit_digit);
+
+            if ( ! started)
+            {
+                if (curr_digit == 0)
+                    solve(str_num, idx + 1, next_tight, -1,         false, 0);
+                else
+                    solve(str_num, idx + 1, next_tight, curr_digit, true,  curr_digit);
+            }
+            else
+            {
+                if (curr_digit == prev_digit + 1)
+                    solve(str_num, idx + 1, next_tight, curr_digit, true, current_number * 10 + curr_digit);
+            }
+        }
     }
 };
