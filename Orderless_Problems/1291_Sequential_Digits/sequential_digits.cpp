@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -42,6 +39,10 @@
 
 */
 
+#include <string>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -51,8 +52,9 @@
 
 */
 
-/* Time  Beats: 44.80% */
-/* Space Beats: 33.60% */
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  76.91% */
 
 /* Time  Complexity: O(1) */
 /* Space Complexity: O(1) */
@@ -61,19 +63,33 @@ public:
     vector<int> sequentialDigits(int low, int high)
     {
         vector<int> result;
-        string str = "123456789";
+        const int min_DIGITS = to_string(low).size();
+        const int MAX_DIGITS = to_string(high).size();
 
-        int len = str.length();
+        string str_digits = "0123456789";
+        const int DIGITS  = str_digits.size();
 
-        for (int i = 2; i <= len; i++) // start from 2 because low >= 10
+
+        // Start from 2 because low >= 10, which consist of 2 digits.
+        for (int num_digits = min_DIGITS; num_digits <= MAX_DIGITS; num_digits++)
         {
-            for (int j = 0; j <= len-i; j++) // len - i = require no. of digits
+            /*
+                Last valid starting index for a sequence of length num_digits
+                is (DIGITS - num_digits).
+                
+                start_idx <==> start_digit
+                
+                We CANNOT start a number with a '0' digit, that's why
+                start_idx begins at 1.
+            */
+            for (int start_idx = 1; start_idx <= DIGITS - num_digits; start_idx++)
             {
-                string temp = str.substr(j, i);
-                int num = stoi(temp);
+                string sequential_digits = str_digits.substr(start_idx, num_digits);
 
-                if (num >= low && num <= high)
-                    result.push_back(num);
+                int number = stoi(sequential_digits);
+
+                if (low <= number && number <= high)
+                    result.push_back(number);
             }
         }
 
