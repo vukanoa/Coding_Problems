@@ -71,8 +71,8 @@ using namespace std;
 /* Time  Beats: 47.82% */
 /* Space Beats: 62.61% */
 
-/* Time  Complexity: O(N^3) */
-/* Space Complexity: O(N^3) */
+/* Time  Complexity: O(M * N^2 * logN) */
+/* Space Complexity: O(M * N^2)        */
 class Solution_Top_Down__Memoization {
 private:
     static const int MOD = 1e9 + 7;
@@ -131,8 +131,8 @@ private:
 /* Time  Beats: 13.04% */
 /* Space Beats:  9.56% */
 
-/* Time  Complexity: O(N^3) */
-/* Space Complexity: O(N^3) */
+/* Time  Complexity: O(M * N^2 * logN) */
+/* Space Complexity: O(M * N^2)        */
 class Solution_Bottom_Up__Tabulation {
 public:
     int subsequencePairCount(vector<int>& nums)
@@ -157,16 +157,27 @@ public:
 
                     long long ways = dp[i][seq1_gcd][seq2_gcd];
 
-                    // SKIP num
-                    dp[i + 1][seq1_gcd][seq2_gcd] = (dp[i + 1][seq1_gcd][seq2_gcd] + ways) % MOD;
+                    ////////////////
+                    /// SKIP num ///
+                    ////////////////
+                    dp[i + 1][seq1_gcd][seq2_gcd] = (dp[i + 1][seq1_gcd][seq2_gcd] +
+                                                     dp[i    ][seq1_gcd][seq2_gcd]) % MOD;
 
-                    // TAKE num in seq1
+                    ////////////////////////
+                    /// TAKE num in seq1 ///
+                    ////////////////////////
                     int new_seq1_gcd = (seq1_gcd == 0) ? num : gcd(seq1_gcd, num);
-                    dp[i + 1][new_seq1_gcd][seq2_gcd] = (dp[i + 1][new_seq1_gcd][seq2_gcd] + ways) % MOD;
 
-                    // TAKE num in se12
+                    dp[i + 1][new_seq1_gcd][seq2_gcd] = (dp[i + 1][new_seq1_gcd][seq2_gcd] +
+                                                         dp[i    ][    seq1_gcd][seq2_gcd]) % MOD;
+
+                    ////////////////////////
+                    /// TAKE num in seq2 ///
+                    ////////////////////////
                     int new_seq2_gcd = (seq2_gcd == 0) ? num : gcd(seq2_gcd, num);
-                    dp[i + 1][seq1_gcd][new_seq2_gcd] = (dp[i + 1][seq1_gcd][new_seq2_gcd] + ways) % MOD;
+
+                    dp[i + 1][seq1_gcd][new_seq2_gcd] = (dp[i + 1][seq1_gcd][new_seq2_gcd] +
+                                                         dp[i    ][seq1_gcd][    seq2_gcd]) % MOD;
                 }
             }
         }
@@ -174,6 +185,78 @@ public:
         long long result = 0;
         for (int curr_gcd = 1; curr_gcd <= 200; curr_gcd++)
             result = (result + dp[N][curr_gcd][curr_gcd]) % MOD;
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, however this one a better Space Complexity by an order of M.
+
+*/
+
+/* Time  Beats: 30.43% */
+/* Space Beats: 22.61% */
+
+/* Time  Complexity: O(M * N^2 * logN) */
+/* Space Complexity: O(N^2)            */
+class Solution_Bottom_Up__Tabulation__Space_Optimized {
+public:
+    static const int MOD = 1e9 + 7;
+
+    int subsequencePairCount(vector<int>& nums) {
+
+        vector<vector<int>> curr(201, vector<int>(201, 0));
+        curr[0][0] = 1;
+
+        for (const int& num : nums)
+        {
+            vector<vector<int>> next(201, vector<int>(201, 0));
+
+            for (int seq1_gcd = 0; seq1_gcd <= 200; seq1_gcd++)
+            {
+                for (int seq2_gcd = 0; seq2_gcd <= 200; seq2_gcd++)
+                {
+                    if (curr[seq1_gcd][seq2_gcd] == 0)
+                        continue;
+
+                    ////////////////
+                    /// SKIP num ///
+                    ////////////////
+                    next[seq1_gcd][seq2_gcd] = (next[seq1_gcd][seq2_gcd] +
+                                                curr[seq1_gcd][seq2_gcd]) % MOD;
+
+                    ////////////////////////
+                    /// TAKE num in seq1 ///
+                    ////////////////////////
+                    int new_seq1_gcd = (seq1_gcd == 0 ? num : gcd(seq1_gcd, num));
+
+                    next[new_seq1_gcd][seq2_gcd] = (next[new_seq1_gcd][seq2_gcd] +
+                                                    curr[    seq1_gcd][seq2_gcd]) % MOD;
+
+                    ////////////////////////
+                    /// TAKE num in seq2 ///
+                    ////////////////////////
+                    int new_seq2_gcd = (seq2_gcd == 0 ? num : gcd(seq2_gcd, num));
+
+                    next[seq1_gcd][new_seq2_gcd] = (next[seq1_gcd][new_seq2_gcd] +
+                                                    curr[seq1_gcd][    seq2_gcd]) % MOD;
+                }
+            }
+
+            swap(curr, next);
+        }
+
+        long long result = 0;
+        for (int curr_gcd = 1; curr_gcd <= 200; curr_gcd++)
+            result = (result + curr[curr_gcd][curr_gcd]) % MOD;
 
         return result;
     }
