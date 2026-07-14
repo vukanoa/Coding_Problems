@@ -115,3 +115,66 @@ private:
         return memo[idx][seq1_gcd][seq2_gcd] = result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Bottom-Up implementation, same idea.
+
+*/
+
+/* Time  Beats: 13.04% */
+/* Space Beats:  9.56% */
+
+/* Time  Complexity: O(N^3) */
+/* Space Complexity: O(N^3) */
+class Solution_Bottom_Up__Tabulation {
+public:
+    int subsequencePairCount(vector<int>& nums)
+    {
+        const int N = nums.size();
+        const int MOD = 1e9 + 7;
+
+        // dp[i][g1][g2]  -->  After processing first 'i' elements
+        vector<vector<vector<int>>> dp(N + 1,vector<vector<int>>(201, vector<int>(201, 0)));
+        dp[0][0][0] = 1;
+
+        for (int i = 0; i < N; i++)
+        {
+            int num = nums[i];
+
+            for (int seq1_gcd = 0; seq1_gcd <= 200; seq1_gcd++)
+            {
+                for (int seq2_gcd = 0; seq2_gcd <= 200; seq2_gcd++)
+                {
+                    if (dp[i][seq1_gcd][seq2_gcd] == 0)
+                        continue;
+
+                    long long ways = dp[i][seq1_gcd][seq2_gcd];
+
+                    // SKIP num
+                    dp[i + 1][seq1_gcd][seq2_gcd] = (dp[i + 1][seq1_gcd][seq2_gcd] + ways) % MOD;
+
+                    // TAKE num in seq1
+                    int new_seq1_gcd = (seq1_gcd == 0) ? num : gcd(seq1_gcd, num);
+                    dp[i + 1][new_seq1_gcd][seq2_gcd] = (dp[i + 1][new_seq1_gcd][seq2_gcd] + ways) % MOD;
+
+                    // TAKE num in se12
+                    int new_seq2_gcd = (seq2_gcd == 0) ? num : gcd(seq2_gcd, num);
+                    dp[i + 1][seq1_gcd][new_seq2_gcd] = (dp[i + 1][seq1_gcd][new_seq2_gcd] + ways) % MOD;
+                }
+            }
+        }
+
+        long long result = 0;
+        for (int curr_gcd = 1; curr_gcd <= 200; curr_gcd++)
+            result = (result + dp[N][curr_gcd][curr_gcd]) % MOD;
+
+        return result;
+    }
+};
