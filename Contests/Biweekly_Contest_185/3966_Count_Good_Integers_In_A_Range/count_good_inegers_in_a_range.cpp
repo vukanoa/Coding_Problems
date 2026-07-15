@@ -141,3 +141,104 @@ private:
         return memo[idx][tight][started][prev_digit + 1] = result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We can reduce the state by removing "started" dimension. We don' need it
+    since we know whether we have started or not based on the "prev_digit".
+
+    If prev_digit == -1, that means we have NOT    started yet.
+    If prev_digit != -1, that means we have INDEED started.
+
+    However, I wanted to write both since the above Solution is more similar to
+    a general DigitDP Solution, so it's a good idea to be familiar with it.
+
+    You could argue that the ABOVE Solution is preffered as it's much easier to
+    read:
+
+        "started" and " ! started",
+
+    then it is to read:
+
+        (prev_digit != -1) and (prev_digit == -1)
+
+    respectively.
+
+    It's MUCH more explicit and less error prone while being only SLIGHTLY
+    slower and using SLIGHTLY less Space.
+
+    It's a trade-off.
+
+*/
+
+/* Time  Beats: 65.10% */
+/* Space Beats: 81.95% */
+
+// 16 --> because there are at most 16 digits in 10^15. N=10^15 --> log(N)=16
+//  2 --> because it's EITHER tight   or NOT tight
+//  2 --> because it's EITHER started or NOT started
+// 11 --> because there are exactly 10 digits, which is always a CONSTANT!
+/* Time  Complexity: O(16 * 2 * 2 * 11) --> O(logN * 1) --> O(logN) */
+/* Space Complexity: O(16 * 2 * 2 * 11) --> O(logN * 1) --> O(logN) */
+class Solution_Slightly_Optimized {
+private:
+    long long memo[16][2][11];
+
+public:
+    long long goodIntegers(long long l, long long r, int k)
+    {
+        return count_good_integers(r  , k) -
+               count_good_integers(l-1, k);
+    }
+
+private:
+    long long count_good_integers(long long num, int k)
+    {
+        string str_num = to_string(num);
+
+        /* Memset */
+        memset(memo, -1, sizeof(memo));
+
+        return solve(str_num, 0, true, -1, k);
+    }
+
+    long long solve(string& str_num, int idx, int tight, int prev_digit, int k)
+    {
+        const int N = str_num.size();
+
+        if (idx == N)
+            return (prev_digit != -1) ? 1 : 0;
+
+        if (memo[idx][tight][prev_digit + 1] != -1)
+            return memo[idx][tight][prev_digit + 1];
+
+        int limit_digit = tight ? str_num[idx] - '0' : 9;
+
+        long long result = 0;
+
+        for (int curr_digit = 0; curr_digit <= limit_digit; curr_digit++)
+        {
+            int new_tight = tight && (curr_digit == limit_digit);
+
+            if (prev_digit == -1 && curr_digit == 0)
+            {
+                result += solve(str_num, idx + 1, new_tight, -1, k);
+            }
+            else
+            {
+                if (prev_digit != -1 && abs(curr_digit - prev_digit) > k)
+                    continue;
+
+                result += solve(str_num, idx + 1, new_tight, curr_digit, k);
+            }
+        }
+
+        return memo[idx][tight][prev_digit + 1] = result;
+    }
+};
