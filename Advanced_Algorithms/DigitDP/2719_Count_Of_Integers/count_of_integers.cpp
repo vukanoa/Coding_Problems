@@ -70,7 +70,7 @@ using namespace std;
 
 /* Time  Complexity: O(D * 2 * 11 * S * 10) */ // S --> max_digit_sum
 /* Space Complexity: O(D * 2 * 11 * S)      */ // D --> max digits
-class Solution {
+class Solution_Top_Down__Memoization {
 private:
     const int MOD = 1e9 + 7;
 
@@ -84,7 +84,7 @@ private:
     //          3 at index 4
     //  ...
     // 208 --> Sum of 9s at each of 23 digit places, i.e. 23 * 9 = 207
-    long long memo[23][2][11][208];
+    long long memo[23][2][11][401];
 
 public:
     int count(string num1, string num2, int min_sum, int max_sum)
@@ -154,5 +154,123 @@ private:
         }
 
         return memo[idx][tight][prev_digit + 1][curr_sum] = result % MOD;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same Idea, implemented using BOttom-Up Tabulation technqieu.
+
+*/
+
+/* Time  Beats: 27.81% */
+/* Space Beats: 54.30% */
+
+/* Time  Complexity: O(D * 2 * 2 * S * 10) */ // S --> max_digit_sum
+/* Space Complexity: O(D * 2 * 2 * S)      */ // D --> max digits
+class Solution_Bottom_Up__Tabulation {
+private:
+    const int MOD = 1e9 + 7;
+
+    //  24 --> Constraint 10^22 needs 23 digits to be represented
+    //   2 --> Either TIGHT   or not
+    //   2 --> Either STARTED or not
+    // 401 --> Because max_sum is up to 400
+    long long dp[24][2][2][401];
+
+public:
+    int count(string num1, string num2, int min_sum, int max_sum)
+    {
+        return (count_integers(num2,               min_sum, max_sum) -
+                count_integers(subtract_one(num1), min_sum, max_sum) + MOD) % MOD;
+    }
+
+private:
+    string subtract_one(string number)
+    {
+        const int N = number.size();
+        int idx = N - 1;
+
+        while (idx >= 0 && number[idx] == '0')
+        {
+            number[idx] = '9';
+            idx--;
+        }
+
+        if (idx >= 0)
+            number[idx]--;
+
+        if (number[0] == '0')
+            number.erase(0, number.find_first_not_of('0'));
+
+        return number.empty() ? "0" : number;
+    }
+
+    int count_integers(string str_num, int min_sum, int max_sum)
+    {
+        const int N = str_num.size();
+
+        /* Memset */
+        memset(dp, 0, sizeof(dp));
+
+        // Initially:
+        // No digits processed
+        // Tight = true
+        // Started = false
+        // Sum = 0
+        dp[0][1][0][0] = 1;
+
+        for (int idx = 0; idx < N; idx++)
+        {
+            int curr_limit_digit = str_num[idx] - '0';
+
+            for (int tight = 0; tight <= 1; tight++)
+            {
+                for (int started = 0; started <= 1; started++)
+                {
+                    for (int curr_sum = 0; curr_sum <= max_sum; curr_sum++)
+                    {
+                        long long curr_count = dp[idx][tight][started][curr_sum];
+
+                        if (curr_count == 0)
+                            continue;
+
+                        int limit_digit = tight ? curr_limit_digit : 9;
+
+                        for (int curr_digit = 0; curr_digit <= limit_digit; curr_digit++)
+                        {
+                            int new_tight = tight && (curr_digit == curr_limit_digit);
+
+                            if ( ! started && curr_digit == 0)
+                            {
+                                dp[idx + 1][new_tight][0][curr_sum] = (dp[idx + 1][new_tight][0][curr_sum] + curr_count) % MOD;
+                            }
+                            else
+                            {
+                                if (curr_sum + curr_digit > max_sum)
+                                    break;
+
+                                dp[idx + 1][new_tight][1][curr_sum + curr_digit] = (dp[idx + 1][new_tight][1][curr_sum + curr_digit] + curr_count) % MOD;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        long long result = 0LL;
+        for (int tight = 0; tight <= 1; tight++)
+        {
+            for (int curr_sum = min_sum; curr_sum <= max_sum; curr_sum++)
+                result = (result + dp[N][tight][1][curr_sum]) % MOD;
+        }
+
+        return result;
     }
 };
