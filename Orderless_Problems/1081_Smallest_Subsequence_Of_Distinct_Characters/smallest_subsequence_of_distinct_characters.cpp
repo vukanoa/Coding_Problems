@@ -52,39 +52,40 @@ using namespace std;
 
 */
 
-/* Time  Beats: 20.69% */
-/* Space Beats: 91.59% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  79.99% */
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    string smallestSubsequence(string s)
+    string smallestSubsequence(string str)
     {
-        const int N = s.size();
+        int  freq[26] = {0};
+        bool seen[26] = {false}; // seen <==> currently_present_in_the_stack
 
-        string result = "";
+        string mono_stack; // Monotonically INCREASING Stack, by ASCII values
 
-        int last[26] = {};
-        int seen[26] = {};
+        for (const char& chr : str)
+            freq[chr - 'a']++;
 
-        for (int i = 0; i < N; ++i)
-            last[s[i] - 'a'] = i;
-
-        for (int i = 0; i < N; i++)
+        for (const char& chr : str)
         {
-            if (seen[s[i] - 'a']++ > 0)
+            freq[chr - 'a']--;
+
+            if (seen[chr - 'a'])
                 continue;
 
-            while ( ! result.empty() && result.back() > s[i] && i < last[result.back() - 'a'])
+            while ( ! mono_stack.empty() && mono_stack.back() > chr && freq[mono_stack.back() - 'a'] > 0)
             {
-                seen[result.back() - 'a'] = 0;
-                result.pop_back();
+                seen[mono_stack.back() - 'a'] = false;
+                mono_stack.pop_back();
             }
 
-            result.push_back(s[i]);
+            mono_stack.push_back(chr);
+            seen[chr - 'a'] = true;
         }
 
-        return result;
+        return mono_stack;
     }
 };
