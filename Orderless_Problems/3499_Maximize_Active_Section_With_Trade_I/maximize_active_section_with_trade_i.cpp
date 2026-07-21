@@ -85,7 +85,6 @@
 #include <string>
 #include <vector>
 using namespace std;
-
 /*
     ------------
     --- IDEA ---
@@ -115,11 +114,14 @@ public:
 
         for (int i = 1; i < N; i++)
         {
+            /* Prefix */
             prefix[i] = prefix[i-1];
 
             if (s[i] == '1')
                 prefix[i]++;
 
+
+            /* Suffix */
             suffix[N-1 - i] = suffix[N-1 - i + 1];
 
             if (s[N-1 - i] == '1')
@@ -137,18 +139,16 @@ public:
             {
                 if (zero_start != -1)
                     continue;
-                else
-                    zero_start = i;
+
+                zero_start = i;
             }
             else
             {
-                if (zero_start != -1)
-                {
-                    zeroes.push_back( {zero_start, i-1} );
-                    zero_start = -1;
-                }
-                else
+                if (zero_start == -1)
                     continue;
+
+                zeroes.push_back( {zero_start, i-1} );
+                zero_start = -1;
             }
         }
 
@@ -171,6 +171,98 @@ public:
 
             L++;
             R++;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_2 {
+public:
+    int maxActiveSectionsAfterTrade(string s)
+    {
+        const int N = s.size();
+        int result;
+
+        int ones = 0;
+        for (const char& chr : s)
+            ones += (chr == '1') ? 1 : 0;
+
+        result = ones;
+
+        /* Augmented String */
+        string aug_s;
+        aug_s.reserve(N + 2); // To prevent repeated reallocations
+
+        aug_s = "1" + s + "1";
+        const int AUGMENTED_SIZE = aug_s.size();
+
+        int i = 0;
+
+        // Skip LEADING 1's
+        while (i < N && s[i] == '1')
+            i++;
+
+        // Read LEFT 0-block
+        int left_block_zeroes_count = 0;
+        while (i < N && s[i] == '0')
+        {
+            left_block_zeroes_count++;
+
+            // Increment
+            i++;
+        }
+
+        /******************/
+        /* Sliding Window */
+        /******************/
+        while (i < N)
+        {
+
+            // Read MIDDLE 1-block
+            int middle_block_ones_count = 0;
+            while (i < N && s[i] == '1')
+            {
+                middle_block_ones_count++;
+
+                // Increment
+                i++;
+            }
+
+            if (middle_block_ones_count == 0)
+                break;
+
+            // Read RIGHT 0-block
+            int right_block_zeroes_count = 0;
+            while (i < N && s[i] == '0')
+            {
+                right_block_zeroes_count++;
+
+                // Increment
+                i++;
+            }
+
+            if (right_block_zeroes_count == 0)
+                break;
+
+            result = max(result, ones + left_block_zeroes_count + right_block_zeroes_count);
+
+            // Slide the window
+            left_block_zeroes_count = right_block_zeroes_count;
         }
 
         return result;
