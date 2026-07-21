@@ -83,6 +83,7 @@
 */
 
 #include <algorithm>
+#include <climits>
 #include <string>
 #include <vector>
 using namespace std;
@@ -323,6 +324,56 @@ public:
         int best_gain = 0;
         for (int i = 0; i < ZERO_BLOCKS - 1; ++i)
             best_gain = max(best_gain, zero_blocks_len[i] + zero_blocks_len[i + 1]);
+
+        return ones_count + best_gain;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We don't actually need to have a vector "zero_blocks", instead we can count
+    zero blocks as we go, thus reducing the Space complexity down to O(1).
+
+*/
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Greedy__Space_Optimized {
+public:
+    int maxActiveSectionsAfterTrade(string s)
+    {
+        const int N = s.size();
+        int ones_count = count(s.begin(), s.end(), '1');
+
+        int i = 0;
+        int best_gain = 0;
+
+        int prev_zero_block_len = INT_MIN;
+        int curr_zero_block_len = 0;      
+
+        while (i < N)
+        {
+            int start = i;
+
+            while (i < N && s[i] == s[start]) // While it's the SAME BLOCK
+                i++;
+
+            if (s[start] == '0') // If current CONSECUTIVE block was a block of ZEROES
+            {
+                curr_zero_block_len = i - start;
+
+                /* Potentially update best_gain */
+                best_gain = max(best_gain, prev_zero_block_len + curr_zero_block_len);
+
+                prev_zero_block_len = curr_zero_block_len;
+            }
+        }
 
         return ones_count + best_gain;
     }
