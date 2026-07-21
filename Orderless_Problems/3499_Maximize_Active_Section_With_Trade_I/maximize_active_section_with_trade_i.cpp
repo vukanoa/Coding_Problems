@@ -82,6 +82,7 @@
 
 */
 
+#include <algorithm>
 #include <string>
 #include <vector>
 using namespace std;
@@ -191,7 +192,7 @@ public:
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution_2 {
+class Solution_Sliding_Window {
 public:
     int maxActiveSectionsAfterTrade(string s)
     {
@@ -266,5 +267,63 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    It turns out that we can simply be greedy.
+
+    Any time we find a block of 1s that is surrounded by 0s, we know that the
+    NET GAIN is only the total number of zeroes in both zero blocks.
+
+    Thus, we record the lengths of zero blocks and simply try to see which two
+    CONSECUTIVE zero blocks are the longest.
+
+    It is GUARANTEED that a block of 1s is BETWEEN ANY TWO zero blocks.
+
+    The final result is the number of initial 1s + longest length of two
+    CONSECUTIVE zero blocks.
+
+*/
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(K) */
+class Solution_Greedy {
+public:
+    int maxActiveSectionsAfterTrade(string s)
+    {
+        const int N = s.size();
+        int ones_count = count(s.begin(), s.end(), '1');
+
+        vector<int> zero_blocks_len;
+        int i = 0;
+        while (i < N)
+        {
+            int start = i;
+
+            while (i < N && s[i] == s[start]) // While it's the same block
+                i++;
+
+            if (s[start] == '0')
+                zero_blocks_len.push_back(i - start);
+        }
+
+        int ZERO_BLOCKS = zero_blocks_len.size();
+
+        if (ZERO_BLOCKS < 2)
+            return ones_count;
+
+        int best_gain = 0;
+        for (int i = 0; i < ZERO_BLOCKS - 1; ++i)
+            best_gain = max(best_gain, zero_blocks_len[i] + zero_blocks_len[i + 1]);
+
+        return ones_count + best_gain;
     }
 };
