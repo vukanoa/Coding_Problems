@@ -45,6 +45,7 @@
 
 #include <algorithm>
 #include <cfloat>
+#include <cmath>
 using namespace std;
 
 /*
@@ -79,5 +80,33 @@ public:
                      two   < 0 ? DBL_MAX : two,
                      three < 0 ? DBL_MAX : three,
                      four  < 0 ? DBL_MAX : four} );
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   8.32% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    double angleClock(int hour, int minutes)
+    {
+        double x = hour + minutes / 60.0;
+        double diff = fmod(11.0 * x, 12.0);
+
+        return min(diff, 12.0 - diff) * 30.0;
     }
 };
