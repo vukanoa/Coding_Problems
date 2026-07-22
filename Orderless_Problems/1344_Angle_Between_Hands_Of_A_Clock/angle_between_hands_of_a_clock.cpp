@@ -110,3 +110,33 @@ public:
         return min(diff, 12.0 - diff) * 30.0;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   8.32% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_3 {
+public:
+    double angleClock(int hour, int minutes)
+    {
+        double angle_minute = 6.0 * minutes;
+        double angle_hour   = 30.0 * (hour % 12) + 0.5 * minutes;
+
+        double diff = abs(angle_hour - angle_minute);
+
+        return min(diff, 360.0 - diff);
+    }
+};
