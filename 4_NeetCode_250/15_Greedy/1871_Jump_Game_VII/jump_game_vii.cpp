@@ -113,6 +113,67 @@ public:
     --- IDEA ---
     ------------
 
+    Same as above, implemented a bit differently. It's always beneficial to see
+    more than one implementation of the same idea.
+
+*/
+
+/* Time  Beats: 71.26% */
+/* Space Beats: 64.29% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Greedy_2 {
+public:
+    bool canReach(string s, int minJump, int maxJump)
+    {
+        const int N = s.size();
+
+        if (s[N-1] == '1')
+            return false;
+
+        static constexpr int MAX_SIZE = 1e5;
+        bool visited[MAX_SIZE + 1] = {false};
+
+        queue<int> queue;
+        queue.push(0);
+
+        int max_reach = 0;
+
+        while ( ! queue.empty())
+        {
+            int i = queue.front();
+            queue.pop();
+
+            for (int j = max(i + minJump, max_reach+1); j <= min(i + maxJump, N-1); j++)
+            {
+                if (j == N-1)
+                    return true;
+
+                if (visited[j] || s[j] == '1')
+                    continue;
+
+                max_reach = max(max_reach, j);
+
+                queue.push(j);
+                visited[j] = true;
+            }
+
+            max_reach = max(max_reach, min(i + maxJump, N-1));
+        }
+
+        return false;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     TODO
 
 */
