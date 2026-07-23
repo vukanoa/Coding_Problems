@@ -63,67 +63,75 @@
 
 */
 
-#include <unordered_set>
 #include <vector>
 using namespace std;
+
 
 /*
     ------------
     --- IDEA ---
     ------------
 
-    TODO
+    Any group of XOR triplets will produce a binary value. Now, we only need to
+    see how many UNIQUE binary values are possible.
+
+    We're told that "nums" is a PERMUTATION of integers from 1 to N.
+
+    Therefore, ALL of the elements in "nums" are bounded by N, i.e. the values
+    that can be represented use AT MOST X bits, where 'X' is the number of bits
+    of in N.
+
+
+    For example, N = 5, therefore we have a permutation of 1 to 5 in "nums".
+    N=5 in binary is written using X=3 bits.
+
+        N = 5    --->   101   --->   X = 3 bits
+
+    Since X = 3 bits, that means that MAXIMUM BINARY VALUE is 7(all 3 bits SET)
+
+
+    Binary Combinations
+    (Unique XOR values = 8)
+
+      0       1       2       3       4       5       6       7
+     000     001     010     011     100     101     110     111
+    1^2^3   1^1^1   1^1^2   1^1^3   1^1^4   1^1^5   1^1^6   1^1^7
+    1^4^5   1^2^2   2^2^2   2^2^3   2^2^4   2^2^5   1^3^4   1^3^5
+            1^3^3   2^3^3   2^4^5   2^3^5   2^3^4
+            ...     ...     ...     ...     ...
+
+
+    So, if ever number from 1 to N uses AT MOST X bits, then their CUMULATIVE
+    XOR also uses AT MOST X bits.
+
+    Therefore, every XOR triplet value is a X-bit number, ranging from:
+
+        0 up to (2^X - 1)
+
+    Therefore the TOTAL number of UNIQUE XOR triplets is: (2^X - 1)
 
 */
 
-/* Time  Beats: 5.02% */
-/* Space Beats: 5.73% */
+/* Time  Beats: 100.00% */
+/* Space Beats: 100.00% */
 
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
 class Solution {
 public:
     int uniqueXorTriplets(vector<int>& nums)
     {
         const int N = nums.size();
-        int result = 0;
 
-        unordered_set<int> uset(nums.begin(), nums.end());
+        return next_power_of_two(N);
+    }
 
-        vector<int> ones  (32, 0);
-        vector<int> zeroes(32, 0);
+private:
+    int next_power_of_two(const int& N)
+    {
+        if (N <= 2)
+            return N;
 
-        for (int i = 0; i < N; i++)
-        {
-            for (int idx = 31; idx >= 0; idx--)
-            {
-                if (nums[i] & (1 << idx))
-                    ones[31 - idx]++;
-                else
-                    zeroes[31 - idx]++;
-            }
-        }
-
-        int power = 0;
-
-        for (int idx = 31; idx >= 0; idx--)
-        {
-            bool o = false; // Can xor three elements to get '1' at this pos.
-            bool z = false; // Can xor three elements to get '0' at this pos.
-
-            if (ones[idx] >= 3 || (ones[idx] >= 1 && zeroes[idx] >= 2))
-                o = true;
-
-            if (zeroes[idx] >= 3 || (ones[idx] >= 2 && zeroes[idx] >= 1))
-                z = true;
-
-            if (o && z)
-                power++;
-        }
-
-        if (uset.size() == 3)
-            return uset.size() + (1 << power);
-
-        return (uset.size() > 3 ? (1 << power) : uset.size());
+        return 1 << (32 - __builtin_clz(N));
     }
 };
