@@ -135,3 +135,47 @@ private:
         return 1 << (32 - __builtin_clz(N));
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This a Bit-Smearing technique. It is an alternative way of computing a
+    "next_power_of_two".
+
+    It can be handy, so it's a good technique to add to your toolset.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  85.00% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Smearing {
+public:
+    int uniqueXorTriplets(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        int bit_mask = N;
+        
+        /* Bit SMEARING technique <==> next_power_of_two(N) */
+        bit_mask |= bit_mask >> 1;
+        bit_mask |= bit_mask >> 2;
+        bit_mask |= bit_mask >> 4;
+        bit_mask |= bit_mask >> 8;
+        bit_mask |= bit_mask >> 16;
+
+        int next_power_of_two = bit_mask + 1;
+
+        if (N <= 2)
+            return next_power_of_two >> 1;
+
+        return next_power_of_two;
+    }
+};
