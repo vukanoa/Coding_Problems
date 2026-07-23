@@ -220,3 +220,48 @@ public:
         return tokens > 0;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 42.99% */
+/* Space Beats: 68.78% */
+
+/* Time Complexity:  O(N) */
+/* Space Complexity: O(N) */
+class Solution_DP_Sliding_Window {
+public:
+    bool canReach(string s, int minJump, int maxJump)
+    {
+        const int N = s.size();
+
+        vector<bool> dp(N, false);
+        dp[0] = true;
+
+        int reachable = 0;
+
+        for (int i = 1; i < N; i++)
+        {
+            // Add new index entering window
+            if (i - minJump >= 0 && dp[i - minJump])
+                reachable++;
+
+            // Remove old index leaving window
+            if (i - maxJump - 1 >= 0 && dp[i - maxJump - 1])
+                reachable--;
+
+            dp[i] = (reachable > 0 && s[i] == '0');
+        }
+
+        return dp[N - 1];
+    }
+};
