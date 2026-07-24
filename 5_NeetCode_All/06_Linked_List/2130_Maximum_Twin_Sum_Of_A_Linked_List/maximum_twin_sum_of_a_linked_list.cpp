@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ==============
     === MEDIUM ===
@@ -14,7 +12,7 @@
     ============
 
     In a linked list of size n, where n is even, the ith node (0-indexed) of
-    the linked list is known as the twin of the (n-1-i)th node,
+    the linked list is known as the twin of the (n-1 - i)th node,
     if 0 <= i <= (n/ 2) - 1.
 
         For example, if n = 4, then node 0 is the twin of node 3, and node 1 is
@@ -66,234 +64,17 @@
 
 */
 
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode() : val(0), next(nullptr) {}
- *     ListNode(int x) : val(x), next(nullptr) {}
- *     ListNode(int x, ListNode *next) : val(x), next(next) {}
- * };
- */
+#include <bits/stdc++.h>
+using namespace std;
 
-
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode() : val(0), next(nullptr) {}
- *     ListNode(int x) : val(x), next(nullptr) {}
- *     ListNode(int x, ListNode *next) : val(x), next(next) {}
- * };
- */
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    @@@@@@@@@@@@@@@@@@@@@
-    @@@ PREREQUISITES @@@
-    @@@@@@@@@@@@@@@@@@@@@
-        1. Reversing a Linked List
-
-
-    While reversing the entire list, push all the values one-by-one in a vector
-    "vec".
-
-    Now, since we have a reversed Linked List, use only first n/2 elements to
-    sum with corresponding vec[i] to get a correct twin_sum.
-
-    After i exceeds n/2, stop adding, but cointinue reversing until we end up
-    with a Linked List in the intial state.
-
-        5 -> 4 -> 3 -> 6 -> 1 -> 2 
-        ^
-        |
-       _|
-      |
-    head
-
-
-    *** REVERSE LINKED LIST ***
-
-        5 <- 4 <- 3 <- 6 <- 1 <- 2 
-                                 ^
-                                 |
-                                _|
-                               |
-                             head
-        
-        vec = [5, 4, 3, 6, 1, 2]
-               0  1  2  3  4  5
-
-
-    
-    While reversing the Linked List again, add ith with n-1-i, where i < n/2
-
-*******************************************************************************
-********************************** SIMULATION *********************************
-*******************************************************************************
-
-                                  int max = 0; 
-
--------------------------------------------------------------------------------
-
-    1.  i = 0
-
-                        5 <- 4 <- 3 <- 6 <- 1 <- 2 
-                                                 ^
-                                                 |
-                                                _|
-                                               |
-                                             head
-
-                               i 
-                        vec = [5, 4, 3, 6, 1, 2]
-                               0  1  2  3  4  5
-
-
-                        vec[i] + head->val = 5 + 2 = 7
-                        max = max(max, 7) = (0, 7) = 7; // New max 7
-
--------------------------------------------------------------------------------
-
-    1.  i = 1
-
-                        5 <- 4 <- 3 <- 6 <- 1 -> 2 
-                                            ^
-                                            |
-                                           _|
-                                          |
-                                        head
-
-                                  i 
-                        vec = [5, 4, 3, 6, 1, 2]
-                               0  1  2  3  4  5
-
-
-                        vec[i] + head->val = 4 + 1 = 5
-                        max = max(max, 5) = (7, 5) = 7; // Remains 7
-
--------------------------------------------------------------------------------
-
-    2.  i = 2
-
-                        5 <- 4 <- 3 <- 6 <- 1 -> 2 
-                                       ^
-                                       |
-                                      _|
-                                     |
-                                   head
-
-                                  i 
-                        vec = [5, 4, 3, 6, 1, 2]
-                               0  1  2  3  4  5
-
-
-                        vec[i] + head->val = 3 + 6 = 9
-                        max = max(max, 9) = (7, 9) = 9; // Remains 9
-
--------------------------------------------------------------------------------
-
-    3.  i = 3 // Now i is NOT < n/2, therefore we will ONLY keep reversing
-
-                        5 <- 4 <- 3 -> 6 -> 1 -> 2 
-                                  ^
-                                  |
-                                 _|
-                                |
-                              head
-                        
-                        if (i < n/2) // NOT TRUE
-
--------------------------------------------------------------------------------
-
-    4.  i = 4 // Now i is NOT < n/2, therefore we will ONLY keep reversing
-
-                        5 <- 4 -> 3 -> 6 -> 1 -> 2 
-                             ^
-                             |
-                            _|
-                           |
-                         head
-                        
-                        if (i < n/2) // NOT TRUE
-
--------------------------------------------------------------------------------
-
-    5.  i = 5 // Now i is NOT < n/2, therefore we will ONLY keep reversing
-
-                        5 -> 4 -> 3 -> 6 -> 1 -> 2 
-                        ^
-                        |
-                       _|
-                      |
-                    head
-                        
-                        if (i < n/2) // NOT TRUE
-
--------------------------------------------------------------------------------
-
-    At the end, just return variable "max".
-
-*/
-
-/* Time  Beats: 97.13% */
-/* Space Beats: 20.35% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution {
-public:
-    int pairSum(ListNode* head)
-    {
-        std::vector<int> vec;
-
-        /* Reverse Linked List & Fill vector "vec" */
-        ListNode* prev = nullptr;
-        ListNode* curr = head;
-        while (curr)
-        {
-            vec.push_back(curr->val);
-
-            ListNode* next = curr->next;
-
-            curr->next = prev;
-            prev = curr;
-            curr = next;
-        }
-
-        head = prev;
-
-        prev = nullptr;
-        curr = head;
-
-        int n = vec.size();
-        int max = INT_MIN;
-        for (int i = 0; i < n; i++)
-        {
-            if (i < n/2) // Only the "right half", vec[i] is "left half".
-                max = std::max(max, vec[i] + curr->val);
-
-            /* Re-reverse Linked list */
-            ListNode* next = curr->next;
-
-            curr->next = prev;
-            prev = curr;
-            curr = next;
-        }
-
-        head = prev;
-
-        return max;
-    }
+// Definition for singly-linked list.
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
 };
-
-
-
 
 /*
     ------------
@@ -309,41 +90,44 @@ public:
         2. Reverse a Linked List
 
 
-    Since we need to sum ith and n-1-i (where i is < n/2, where n is even),
-    that means we want to sum first with the last, second with the second to
-    last, etc.
+    Since we need to sum ith and (n-1 - i)--where i is < N/2 and N is even--
+    that means we want to sum:
+        + first with the last,
+        + second with the second to last,
+        + etc.
 
     How would we do that if we had an array "nums"?
 
         nums = [5, 4, 3, 2, 1, 2]
 
     We would use a "two pointer" technique, right?
+
     We'd have a pointer 'L' and a pointer 'R' set to the first and last index,
     respectively. Then we would sum two numbers at index 'L' and index 'R' and
     we would check if this "twin sum" is the greatest so far.
 
     It would be something like this:
-        max = 0;
+        result = 0;
     
         nums = [5, 4, 3, 6, 1, 2]
                 L              R
 
         twin_sum = 5 + 2 = 7
-        max = max(max, twin_sum) = max(0, 7) = 7 // New max 7
+        result = max(result, twin_sum) = max(0, 7) = 7 // New max 7
 
 
         nums = [5, 4, 3, 6, 1, 2]
                    L        R
 
         twin_sum = 4 + 1 = 5
-        max = max(max, twin_sum) = max(7, 5) = 7 // Remains 7
+        result = max(result, twin_sum) = max(7, 5) = 7 // Remains 7
 
 
         nums = [5, 4, 3, 2, 1, 2]
                       L  R
 
         twin_sum = 3 + 6 = 9
-        max = max(max, twin_sum) = max(7, 9) = 9 // New max 9
+        result = max(result, twin_sum) = max(7, 9) = 9 // New max 9
 
         Finally: return max; // max = 9
 
@@ -352,15 +136,15 @@ public:
     Now ask yourself - How would we do this if we had Linked List instead of an
     array?
 
-    We certainly can't have "two pointers" technique, right?
+    We certainly can't have "two pointers" technique, can we?
     Wrong! We actually can.
 
         5 -> 4 -> 3 -> 6 -> 1 -> 2 
 
-    So, "how can we have "two pointers" here?" you may ask.
+    So, "how can we have 'two pointers' here?" you may ask.
 
-    We can unlink two half right at the middle. Since 'n' is an even number, we
-    can have two halves of equal lengths.
+    We can unlink two halves exactly at the middle. Since 'N' is an even number
+    we can have two halves of equal lengths.
 
     We're going to have this:
 
@@ -539,49 +323,51 @@ public:
 
 */
 
-/* Time  Beats: 71.93% */
-/* Space Beats: 66.75% */
+/* Time  Beats: 100.00% */
+/* Space Beats:  42.78% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(1) */ // More Space Efficient than the one above
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
 class Solution {
 public:
     int pairSum(ListNode* head)
     {
-        ListNode* left_tail  = middle(head);
+        ListNode* left_tail  = middle_node(head);
         ListNode* right_head = left_tail->next;
 
-        /* Unlink left and right half */
+        /* Unlink LEFT & RIGHT half */
         left_tail->next = nullptr;
 
-        /* Reverse right half */
-        right_head = reverse_list(right_head);
+        /* Reverse 2nd Half */
+        right_head = reverse_linked_list(right_head);
 
+        /* Find MAX SUM using Two-Pointers techqniue */
         ListNode* twin1 = head;
         ListNode* twin2 = right_head;
 
-        int max = 0;
+        int result = 0;
         while (twin1 && twin2)
         {
-            int twin_sum = twin1->val + twin2->val;
+            int sum = twin1->val + twin2->val;
 
-            max = std::max(max, twin_sum);
+            result = max(result, sum);
 
+            // Increment
             twin1 = twin1->next;
             twin2 = twin2->next;
         }
 
-        /* Reverse Right half back */
-        right_head = reverse_list(right_head);
+        /* Re-Reverse 2nd Half, returning it to the ORIGINAL state */
+        right_head = reverse_linked_list(right_head);
 
-        /* Relink left and right half */
+        /* Re-Link LEFT & RIGHT half */
         left_tail->next = right_head;
 
-        return max;
+        return result;
     }
 
 private:
-    ListNode* middle(ListNode* head)
+    ListNode* middle_node(ListNode* head)
     {
         ListNode* slow = head;
         ListNode* fast = head->next;
@@ -595,7 +381,7 @@ private:
         return slow;
     }
 
-    ListNode* reverse_list(ListNode* head)
+    ListNode* reverse_linked_list(ListNode* head)
     {
         ListNode* prev = nullptr;
         ListNode* curr = head;
