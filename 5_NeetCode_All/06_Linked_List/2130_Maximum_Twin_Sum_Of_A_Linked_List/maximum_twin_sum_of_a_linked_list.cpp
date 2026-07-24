@@ -398,3 +398,53 @@ private:
         return prev;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    An elegant way to solve thsi problem, though it does NOT restore the
+    original Input List, however since "head" is just a pointer and not a
+    "pointer to pointer", we didn't mess up anything.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  97.44% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Elegant {
+public:
+    int pairSum(ListNode* head)
+    {
+        ListNode* prev = nullptr;
+        ListNode* slow = head;
+        ListNode* fast = head;
+
+        while (fast && fast->next)
+        {
+            fast = fast->next->next;
+
+            ListNode* next = slow->next;
+
+            slow->next = prev;
+            prev = slow;
+            slow = next;
+        }
+
+        int result = 0;
+        while (slow)
+        {
+            result = max(result, prev->val + slow->val);
+            prev = prev->next;
+            slow = slow->next;
+        }
+
+        return result;
+    }
+};
