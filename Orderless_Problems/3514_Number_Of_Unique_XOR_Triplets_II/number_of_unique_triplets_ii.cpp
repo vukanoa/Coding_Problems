@@ -150,3 +150,56 @@ public:
         return uset.size();
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Similar idea, implemented differently.
+
+*/
+
+/* Time  Beats: 67.98% */
+/* Space Beats: 81.46% */
+
+/* Time  Complexity: O(N^2 + MAX_XOR_VALUE) */
+/* Space Complexity: O(MAX_XOR_VALUE)       */
+class Solution_2 {
+public:
+    int uniqueXorTriplets(vector<int>& nums)
+    {
+        const int N           = nums.size();
+        const int MAX_XOR_VAL = 2048;
+
+        vector<bool> pair_xor   (MAX_XOR_VAL, false);
+        vector<bool> triplet_xor(MAX_XOR_VAL, false);
+
+        for (int i = 0; i < N; i++)
+        {
+            for (int j = i; j < N; j++)
+                pair_xor[nums[i] ^ nums[j]] = true;
+        }
+
+        for (int xor_val = 0; xor_val < MAX_XOR_VAL; xor_val++)
+        {
+            if ( ! pair_xor[xor_val])
+                continue;
+
+            for (const int& num : nums)
+                triplet_xor[xor_val ^ num] = true;
+        }
+
+        int result = 0;
+        for (int xor_val = 0; xor_val < MAX_XOR_VAL; xor_val++)
+        {
+            if (triplet_xor[xor_val])
+                result++;
+        }
+
+        return result;
+    }
+};
