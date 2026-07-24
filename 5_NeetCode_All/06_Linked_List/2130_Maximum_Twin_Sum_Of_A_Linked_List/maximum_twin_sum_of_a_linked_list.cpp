@@ -448,3 +448,43 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Recursive way of solving it.
+
+*/
+
+/* Time  Beats: 12.04% */
+/* Space Beats: 36.62% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Recursion {
+public:
+    int pairSum(ListNode* head)
+    {
+        int result = 0;
+        ListNode* left = head;
+
+        dfs(head, left, result);
+
+        return result;
+    }
+
+private:
+    void dfs(ListNode*& left, ListNode* right, int& result)
+    {
+        if (right->next)
+            dfs(left, right->next, result);
+
+        result = max(result, left->val + right->val);
+        left = left->next;
+    }
+};
