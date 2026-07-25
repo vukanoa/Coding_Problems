@@ -124,3 +124,37 @@ private:
         return (my_reversal(low, half) << half) | my_reversal(high, half);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 28.75% */
+/* Space Beats: 14.49% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_3 {
+public:
+    int reverseBits(int n)
+    {
+        int result = 0;
+
+        for (int i = 0; i < 32; i++)
+        {
+            result = result | ((n & 1) << (31 - i));
+
+            n >>= 1; // Right shift
+        }
+
+        return result;
+    }
+};
