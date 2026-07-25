@@ -137,11 +137,12 @@ private:
 
 */
 
-/* Time  Beats: 28.75% */
-/* Space Beats: 14.49% */
 
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
+/* Time  Beats: 100.00% */
+/* Space Beats:  73.73% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
 class Solution_3 {
 public:
     int reverseBits(int n)
@@ -154,6 +155,35 @@ public:
 
             n >>= 1; // Right shift
         }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_4 {
+public:
+    uint32_t reverseBits(uint32_t n)
+    {
+        uint32_t result = n;
+        result = (result >> 16) | (result << 16);
+        result = ((result & 0xff00ff00) >> 8) | ((result & 0x00ff00ff) << 8);
+        result = ((result & 0xf0f0f0f0) >> 4) | ((result & 0x0f0f0f0f) << 4);
+        result = ((result & 0xcccccccc) >> 2) | ((result & 0x33333333) << 2);
+        result = ((result & 0xaaaaaaaa) >> 1) | ((result & 0x55555555) << 1);
 
         return result;
     }
