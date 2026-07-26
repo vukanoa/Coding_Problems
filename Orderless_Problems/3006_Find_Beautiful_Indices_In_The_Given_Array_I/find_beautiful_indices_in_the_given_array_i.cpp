@@ -125,3 +125,127 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Optimized by using: (KMP + TwoPointers)
+
+*/
+
+/* Time  Beats: 95.28% */
+/* Space Beats: 18.03% */
+
+/* Time  Complexity: O(N + A + B) */
+/* Space Complexity: O(N + A + B + R) */
+class KMP {
+public:
+    vector<int> kmp_algo(string s, string pattern)
+    {
+        const int N = s.size();
+        const int M = pattern.size();
+
+        vector<int> result;
+
+        /* Populate LPS */
+        vector<int> LPS = calculate_LPS(pattern);
+
+        int i = 0;
+        int j = 0;
+
+        while (i < N)
+        {
+            if (s[i] == pattern[j])
+            {
+                i++;
+                j++;
+
+                if (j == M)
+                {
+                    result.push_back(i - M);
+                    j = LPS[j - 1];
+                }
+            }
+            else
+            {
+                if (j > 0)
+                    j = LPS[j - 1];
+                else
+                    i++;
+            }
+        }
+
+        return result;
+    }
+
+private:
+    vector<int> calculate_LPS(string& pattern)
+    {
+        const int PATTERN_SIZE = pattern.size();
+
+        /* Initialize with ZEROES */
+        vector<int> LPS(PATTERN_SIZE, 0);
+
+        int prefix_len = 0;
+        int i          = 1;
+
+        while (i < PATTERN_SIZE)
+        {
+            if (pattern[prefix_len] == pattern[i])
+            {
+                LPS[i] = prefix_len + 1;
+                prefix_len++;
+                i++;
+            }
+            else
+            {
+                if (prefix_len > 0)
+                    prefix_len = LPS[prefix_len - 1];
+                else
+                    i++;
+            }
+        }
+
+        return LPS;
+    }
+};
+
+class Solution_KMP {
+public:
+    vector<int> beautifulIndices(string s, string a, string b, int k)
+    {
+        KMP kmp;
+
+        vector<int> indices_a = kmp.kmp_algo(s, a);
+        vector<int> indices_b = kmp.kmp_algo(s, b);
+
+        vector<int> result;
+
+        int i = 0;
+        int j = 0;
+
+        while (i < indices_a.size() && j < indices_b.size())
+        {
+            if (abs(indices_a[i] - indices_b[j]) <= k)
+            {
+                result.push_back(indices_a[i]);
+                i++;
+            }
+            else if (indices_b[j] - indices_a[i] > k)
+            {
+                i++;
+            }
+            else
+            {
+                j++;
+            }
+        }
+
+        return result;
+    }
+};
