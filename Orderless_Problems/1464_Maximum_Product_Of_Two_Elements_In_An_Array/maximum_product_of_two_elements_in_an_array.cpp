@@ -46,6 +46,7 @@
 
 */
 
+#include <algorithm>
 #include <vector>
 using namespace std;
 
@@ -84,5 +85,64 @@ public:
         }
 
         return (one - 1) * (two - 1);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    It's important to know these little techniques in C++.
+
+    ########################################################################
+    nth_element(nums.begin(), nums.begin() + 1, nums.end(), greater<int>());
+    ########################################################################
+
+    + Arrange nums so that nums[1] contains the 2nd largest element.
+
+    + nums[0] is guaranteed to be GREATER THAN OR EQUAL to nums[1]. 
+
+    + Every element AFTER nums[1] is guaranteed to be LESS THAN OR EQUAL TO
+      nums[1].
+
+    For example:
+        nums = {5, 1, 8, 3, 7}
+
+
+    After we apply:
+
+    ########################################################################
+    nth_element(nums.begin(), nums.begin() + 1, nums.end(), greater<int>());
+    ########################################################################
+
+    Possible results are:
+
+        {8, 7, 5, 3, 1}
+        {8, 7, 1, 5, 3}
+        {8, 7, 3, 1, 5}
+
+    After the function, guarantees are:
+        + nums[1] == 7, i.e. the second-largest element
+        + Elems that come BEFORE index 1 are GREATER THAN OR EQUAL TO nums[1]
+        + Elems that come AFTER  index 1 are LESS    THAN OR EQUAL TO nums[1].
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  99.05% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_nth_element {
+public:
+    int maxProduct(vector<int>& nums)
+    {
+        nth_element(nums.begin(), nums.begin()+1, nums.end(), greater<int>());
+
+        return (nums[0] - 1) * (nums[1] - 1);
     }
 };
