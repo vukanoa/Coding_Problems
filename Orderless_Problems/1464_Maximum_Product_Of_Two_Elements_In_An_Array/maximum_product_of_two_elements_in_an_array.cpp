@@ -146,3 +146,38 @@ public:
         return (nums[0] - 1) * (nums[1] - 1);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Also important to know this technique in C++.
+
+    It sorts only first 'k' numbers in O(N * logk).
+    Since in this problem we only need first two elements, then k == 2.
+
+    Therefore the Time Complexity is: O(N * log2) --> O(N)
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  85.48% */
+
+/* Time  Complexity: O(N * logk) --> O(N) */ // Where k == 2
+/* Space Complexity: O(1)                 */
+class Solution_Partial_sort {
+public:
+    int maxProduct(vector<int>& nums)
+    {
+        partial_sort(nums.begin(),            // Begin
+                     nums.begin() + 2,        // Until kth idx(NON-inclusive)
+                     nums.end(),              // End
+                     greater<int>());         // Descending order
+
+        return (nums[0] - 1) * (nums[1] - 1);
+    }
+};
