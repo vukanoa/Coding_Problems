@@ -310,3 +310,84 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Here we not only reuse 's', thus reducing the Space Complexity down to O(1)
+    but we also do it in HALF THE TIME of the above solution since we are only
+    processing the first half of s.
+
+*/
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Optimized_Further {
+public:
+    string smallestPalindrome(string s)
+    {
+        const int N = s.size();
+        int freq[26] = {0};
+
+        /*
+            Traverse the only the first half   (N >> 1  <==>  N / 2)
+
+            If N is ODD--do NOT traverse that middle character since that
+            middle character absolute MUST and WILL remain where it already is.
+
+            No need to "rearrange" it. That's the only position where that
+            character can be at.
+
+            Example:
+
+                s = "fbgccyccgbf"
+                          ^
+                          |
+
+            No matter the lexicographical ordering of this PALINDROME(it MUST
+            remain a palindrome) can have 'y' and ANY OTHER POSITION than where
+            already is.
+
+
+            Also, [(s[i] & 31) -1] means that both s[i]='a' and s[i]='A' would
+            BOTH be at index 0.
+
+            'a' =  97  ==>   97 & 31 = 1  ==>   1 - 1 = 0
+            'A' =  65  ==>   65 & 31 = 1  ==>   1 - 1 = 0
+
+            ..
+
+            'c' =  99  ==>  99 & 31 = 3   ==>   3 - 1 = 2
+            'C' =  67  ==>  67 & 31 = 3   ==>   3 - 1 = 2
+
+            ...
+
+            'z' = 122  ==> 122 & 31 = 26  ==>  26 - 1 = 25
+            'Z' =  90  ==>  90 & 31 = 26  ==>  26 - 1 = 25
+
+        */
+        for (int i = 0; i < (N >> 1); i++)            
+            freq[(s[i] & 31) - 1]++; // Both 'a' and 'A' would be at 0
+
+        int idx = 0;
+        for (int i = 0; i < 26; i++)
+        {
+            while (freq[i]-- > 0)
+            {                
+                // Conversion to "char" is IMPLICIT
+                s[idx]       = i + 'a';
+                s[N-1 - idx] = i + 'a';
+
+                // Increment
+                idx++;
+            }
+        }
+
+        return s;
+    }
+};
