@@ -92,10 +92,10 @@ using namespace std;
 /* Space Complexity: O(N * logN)              */
 class TreeAncestor {
 private:
-    static constexpr int MAX_N = 5 * 1e4;
+    static constexpr int MAX_NODES = 5 * 1e4;
 
-    int up   [MAX_N + 1][20]; // log2(10^6) = 20
-    int depth[MAX_N + 1];
+    int up   [MAX_NODES][20]; // log2(n) == 16, but log2(10^6) == 20 
+    int depth[MAX_NODES];
 
     int LOG;
 public:
@@ -150,10 +150,71 @@ public:
         if (depth[node] < k)
             return -1;
         
-        for (int level = 0; level < LOG; level++) // eg. 19 = 1 + 2 + 16
+        for (int level = 0; level < LOG; level++) // eg. 19 == 1 + 2 + 16
         {
             if (k & (1 << level))
                 node = up[node][level];
+        }
+
+        return node;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    THis implkementation does NOT use "depth" vector.
+
+*/
+
+/* Time  Beats: 67.16% */
+/* Space Beats:  6.79% */
+
+/* Time  Complexity: O(N * logN  +  Q * logN) */
+/* Space Complexity: O(N * logN)              */
+class TreeAncestor_Without_Depths {
+private:
+    static constexpr int MAX_NODES = 5 * 1e4;
+    static constexpr int LOG_N     = 20; // log2(n) == 16, but log2(10^6) == 20
+
+    int up[MAX_NODES][LOG_N];
+
+public:
+    TreeAncestor_Without_Depths (int n, vector<int>& parent)
+    {
+        vector<vector<int>> par(n, vector<int>(20));
+
+        for (int node = 0; node < n; node++)
+            up[node][0] = parent[node];
+
+        for (int level = 1; level < LOG_N; level++)
+        {
+            for (int node = 0; node < n; node++)
+            {
+                if (up[node][level-1] == -1)
+                    up[node][level] = -1;
+                else
+                    up[node][level] = up[ up[node][level-1] ][level-1];
+            }
+        }
+    }
+
+    int getKthAncestor(int node, int k)
+    {
+        for (int level = 0; level < LOG_N; level++) // eg. 19 == 1 + 2 + 16
+        {
+            if (k & (1 << level))
+            {
+                node = up[node][level];
+
+                if (node == -1) // i.e. k is GREATER than the depth of "node"
+                    return -1;
+            }
         }
 
         return node;
