@@ -60,6 +60,11 @@ using namespace std;
     --- IDEA ---
     ------------
 
+    (Note: This Solution is for didactic purposes. It is NOT the most efficient
+           way to solve it. For the more efficient way, check out the 2nd
+           solution "Solution_Optimized" down below)
+
+
     The most important thing in this problem is to know that a palindrome can
     either be:
 
@@ -78,7 +83,6 @@ using namespace std;
                              |            |               |
                              |            |               |
                             b: 1        f: 5            a: 3
-
 
     So let me repeat again, if a palindrome is of ODD length there must be
     EXACTLY ONE character with ODD frequency. All of the other characters MUST
@@ -225,5 +229,84 @@ public:
 
 
         return left;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Simply count the frequencies of each character in string s and then go
+    through those frequencies in ALPHABETIC order and place two characters in
+    the result string, where one character goes at index "idx" and the other
+    at index "N-1 - idx".
+
+    Each time we increment the "idx" variable.
+
+    If 'N' is ODD, that means the original string s certainly has a MIDDLE
+    character that has an ODD frequency.
+
+    Now this is important--ODD frequency can either be 1 or 3,5,7,etc.
+
+    Why do we make this distinction?
+
+    Because there there are: 3, 5, 7, 9, etc. then we'd take two of those at
+    each turn and we'd place them at [idx] and [N-1 - idx] indices until we're
+    left with a SINGLE frequency character.
+
+    The SINGLE frequency character is the MIDDLE CHARACTER that we put at the
+    very end of the processing.
+
+    MIDDLE CHARACTER EXISTS IF AND ONLY IF THE N IS ODD!
+
+    Therefore, if (N & 1), i.e. "N is ODD", we put mid_chr at [idx] which is
+    now the middle position.
+
+*/
+
+/* Time  Beats: 80.00% */
+/* Space Beats: 80.00% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Optimized {
+public:
+    string smallestPalindrome(string s)
+    {
+        const int N = s.size();
+        string result(N, '0');
+
+        int freq[26] = {0};
+        for (const char& chr : s)
+            freq[chr - 'a']++;
+
+        int idx = 0;
+        char mid_chr = '0';
+        for (int i = 0; i < 26; i++)
+        {
+            if (freq[i] == 0)
+                continue;
+
+            while (freq[i] >= 2)
+            {
+                result[idx]       = static_cast<char>(i + 'a');
+                result[N-1 - idx] = static_cast<char>(i + 'a');
+
+                idx++;
+                freq[i] -= 2;
+            }   
+
+            if (freq[i] == 1)
+                mid_chr = static_cast<char>(i + 'a');
+        }
+
+        if (N & 1) // If size of string s is ODD--There is 1 char with freq 1
+            result[idx] = mid_chr;
+
+        return result;
     }
 };
