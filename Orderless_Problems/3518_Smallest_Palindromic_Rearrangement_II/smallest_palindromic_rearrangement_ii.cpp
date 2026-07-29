@@ -73,103 +73,164 @@
 using namespace std;
 
 /*
-    Steps:
+    ------------
+    --- IDEA ---
+    ------------
 
-    1. Find the frequency vector
+    My Example:
+        left_part_of_the_palindrome = "abbbcf"  <--  Sorted lexicographically
 
-    2: Find the half_freq vector
-       (if there is any odd freq then store it in middle variable)
+        There are 6! = 120 permutations:
 
-    3. Check if k > total permutation possible, if yes then return ""
+              1. abbbcf
+              2. abbbfc
+              3. abbcbf
+              4. abbcfb
+              5. abbfbc
+              6. abbfcb
+              7. abcbbf
+              8. abcbfb
+              9. abcfbb
+             10. abfbbc
+             11. abfbcb
+             ...
 
-    4. Take the char one by one and find the multinominal coef of remaining
 
-    5. if (coef >= k)
-           // Fix  this character in i-th position
-       else
-           // Skip this character in i-th position and try fixing next
-           // lexicographically smallest character for this i-th position
+    Even if N--i.e. size of string s--is ODD, we will NOT take the middle char
+    in the "left_part".
 
-    6. Reverse(left)
+    Why?
+    Because if there IS a middle charactr in a palindrome, two things are true:
 
-    7. return left + middle + reverse(left)
+        1. There is EXACTLY 1 character with an ODD frequency(i.e. middle_char)
+        2. The ONE AND ONLY index at which that char can be at is index: N/2
+
+    Therefore, even if there is a middle character--It will ALWAYS be at the
+    same position!
+
+            a e e c v c e e a       N = 9  (middle_char's freq is exactly 1)
+            0 1 2 3 4 5 6 7 8
+                    ^
+                    |
+                    |
+                  4 = N/2
+
+
+            a f f c f c f f a       N = 9  (middle_char's freq is NOT 1 )
+            0 1 2 3 4 5 6 7 8              (here middle_char's freq is 5)
+                    ^
+                    |
+                    |
+                  4 = N/2
+                    
+    That's why we do NOT take that additional frequency into account.
+    We'll only weork with:
+
+        "aeec" for the first  example
+        "affc" for the second example
+
+
+    Steps for solving this problem:
+
+        1: Find the frequency of this FIRST HALF of s, w/o the middle_chr is
+           exists
+
+        2. If (total_permutations < k) possible, then return ""
+
+        3. Take characters one-by-one and find the multinominal coef of
+           remaining.
+
+        4. if (coef >= k)
+               // Fix  this character at pos-th position
+           else
+               // Skip this character at pos-th position and try to fix next
+               // lexicographically smallest character for this pos-th position
+
+        5. right_part = reverse(left_part)
+
+        6. If (N % 2 == 0), i.e. size of s is ODD, then there is NO middle_chr
+               return left_part + right_part
+           else
+               return left_part + middle_chr + right_part
 
 */
 
-/* Time  Beats: 71.88% */
-/* Space Beats: 59.38% */
+/* Time  Beats: 71.01% */
+/* Space Beats: 75.36% */
 
 /* Time  Complexity: O(N + 26^2) --> O(N + 1) --> O(N) */
 /* Space Complexity: O(26) ---------------------> O(1) */
 class Solution {
-public:
+private:
     const int MAX_K = 1e6 + 1;
 
+public:
     string smallestPalindrome(string s, int k)
     {
-        // Step 1: Compute character frequencies
-        vector<int> freq(26, 0);
-        for (const char& chr : s)
-            freq[chr - 'a']++;
+        const int N = s.size();
 
-        // Step 2: Compute half-frequencies and find middle character (if any)
-        vector<int> half_freq(26, 0);
-        string middle = "";
+        // Step 1: Find the frequency of this FIRST HALF of s, w/o the
+        //         middle_chr is exists
+        int freq[26] = {0};
+        for (int i = 0; i < N/2; i++) // Process ONLY THE FIRST HALF! (w/o mid)
+            freq[s[i] - 'a']++;
 
-        for (int i = 0; i < 26; ++i)
-        {
-            if (freq[i] % 2 == 1)
-                middle = char(i + 'a');
+        char middle_chr = '#'; // Middle exists IF AND ONLY IF size N is ODD!
+        if (N & 1)
+            middle_chr = s[N/2];
 
-            half_freq[i] = freq[i] / 2;
-        }
-
-        const int HALF_LEN = s.length() / 2;
-        string left = "";
-
-        // Step 3: checking if k > total permutation -> if yes then return ""
-        long long total_permutation = multinomial(half_freq);
-
-        if (k > total_permutation)
+        // Step 2: If (total_permutations < k) then it's possible--return ""
+        long long total_permutations = multinomial(freq);
+        if (total_permutations < k)
             return "";
 
-        // Step 4: Take the char one-by-one and find the multinominal coef of
-        //         remaining characters
-        for (int i = 0; i < HALF_LEN; i++)
+        // Step 3: Take characters one-by-one and find the multinominal coef of
+        //         remaining.
+        string left_part = "";
+
+        for (int pos = 0; pos < N/2; pos++)
         {
-            for (int letter_idx = 0; letter_idx < 26; letter_idx++)
+            for (int i = 0; i < 26; i++)
             {
-                if (half_freq[letter_idx])
+                if (freq[i] > 0)
                 {
-                    half_freq[letter_idx]--;
-                    long long permutation = multinomial(half_freq);
+                    freq[i]--;
 
-                    // Step 5
-                    if (permutation >= k)
+                    long long permutations = multinomial(freq);
+
+                    // Step 4:
+                    if (permutations >= k)
                     {
-                        // Fix  this character in i-th position
-                        left += char('a' + letter_idx);
+                        // Fix this character at this "pos"-th position
+                        left_part += static_cast<char>(i + 'a');
 
-                        break;
+                        break; // Since we have successfully FIXED chr at "pos"
                     }
                     else
                     {
-                        // Skip this character in i-th position and try fixing
-                        // next lexicographically smallest character for this
-                        // i-th position
-                        k -= permutation;
-                        half_freq[letter_idx]++;
+                        // Skip this character--i.e. character (i + 'a')--for
+                        // "pos"-th position and try to fix next
+                        // lexicographically smallest character at this
+                        // "pos"-th position
+                        k -= permutations;
+                        freq[i]++;
                     }
                 }
             }
         }
 
-        // Step 6: reverse(left)
-        string right = left;
-        reverse(right.begin(), right.end());
+        // Step 5: right_part = reverse(left_part)
+        string right_part = left_part;
+        reverse(right_part.begin(), right_part.end());
 
-        // Step 7: return left + middle + reverse(left)
-        return left + middle + right;
+        // Step 6: If size of original stirng s is ODD--There is NO middle_chr
+        //        return left_part + right_part
+        //    else
+        //        return left_part + middle_chr + right_part
+        if (N % 2 == 0) // i.e. there is NO middle chr, i.e. N is EVEN
+            return left_part + right_part;
+
+        return left_part + middle_chr + right_part;
     }
 
 private:
@@ -189,7 +250,7 @@ private:
     */
     long long binomial(int n, int k)
     {
-        if (k > n)
+        if (n < k)
             return 0;
 
         /*
@@ -199,13 +260,13 @@ private:
               (     )   <===>   (     )
               (  k  )           ( n-k )
 
-            So, if k is more than n/2, then n - k is smaller.
+            So, if k is STRICTLY GREATER than n/2, then (n - k) is smaller.
         */
-        if (k > n - k)
+        if (k > n/2)
             k = n - k;
 
         long long result = 1;
-        for(int i = 1; i <= k; i++)
+        for (int i = 1; i <= k; i++)
         {
             result = result * (n - i + 1) / i;
 
@@ -216,8 +277,6 @@ private:
         return result;
     }
 
-
-
     /*
         Multinomial is:
 
@@ -225,7 +284,7 @@ private:
             -----------------
             (k1! * k2! * k3!)
 
-        Can we written as:
+        Can be written as:
 
             "n choose k1" * "(n - k1) choose k2" * "(n - k1 - k2) choose k3"
 
@@ -238,13 +297,13 @@ private:
 
         For example:
 
-        How many distinct permutations of the letters in ARKANSAS exist,
-        accounting for repeated letters?
+        How many DISTINCT permutations exist in a word "ARKANSAS"?
+        (accounting for repeated letters)
 
         Permutations of multiset elements
         In this case:
 
-            The total number of permutations of 8 letters is 8!8!
+            The total number of permutations of 8 letters is 8!
 
             But some letters repeat (e.g., ‘A’ appears 3 times), so you divide
             by the factorials of the counts of repeated elements to remove
@@ -258,6 +317,8 @@ private:
                         |   K   :    1   |
                         +----------------+
                         |   N   :    1   |
+                        +----------------+
+                        |   R   :    1   |
                         +----------------+
                         |   S   :    2   |
                         +----------------+
@@ -286,21 +347,21 @@ private:
                 Each of these is a Binomial Coefficient (i.e. "n choose k")
 
     */
-    long long multinomial(vector<int>& half_freq)
+    long long multinomial(int (&freq)[26])
     {
-        int total = accumulate(half_freq.begin(), half_freq.end(), 0);
+        int total_characters = accumulate(begin(freq), end(freq), 0);
 
-        long long result = 1;
+        long long result = 1LL;
         for (int i = 0; i < 26; i++)
         {
-            int count = half_freq[i];
+            int frequency_of_curr_chr = freq[i];
 
-            result *= binomial(total, count);
+            result *= binomial(total_characters, frequency_of_curr_chr);
 
             if (result >= MAX_K)
                 return MAX_K;
 
-            total -= count;
+            total_characters -= frequency_of_curr_chr;
         }
 
         return result;
