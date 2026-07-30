@@ -113,3 +113,34 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  54.67% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    int minimumPushes(string word)
+    {
+        const int N = word.size();
+        int result = 0;
+
+        for (int i = 0; i < N; i++)
+            result += i / 8 + 1;
+
+        return result;
+    }
+};
