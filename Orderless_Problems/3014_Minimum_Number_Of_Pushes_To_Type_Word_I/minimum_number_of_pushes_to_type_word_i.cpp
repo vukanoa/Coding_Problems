@@ -200,3 +200,63 @@ public:
         return 4*m*(m-1) + (N - 8*(m-1)) * m;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Similar to the above Solution.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  31.81% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Math_2 {
+public:
+    int minimumPushes(string word)
+    {
+        const int N = word.size();
+
+        const int remaining_letters        = N % 8;
+        const int complete_groups_of_eight = (N - remaining_letters) / 8;
+
+        return (4 * complete_groups_of_eight + remaining_letters) * (complete_groups_of_eight + 1);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Exactly the same as above, though implemented using bitwise operators.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  54.67% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Bit_Manipulation {
+public:
+    int minimumPushes(string word)
+    {
+        const int N = word.size();
+
+        const int complete_groups_of_eight = N >> 3;
+        const int remaining_letters        = N & 7;
+
+        return ((complete_groups_of_eight << 2) + remaining_letters) * (complete_groups_of_eight + 1);
+    }
+};
