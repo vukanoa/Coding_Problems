@@ -144,3 +144,59 @@ public:
         return result;
     }
 };
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This approach is based on the same greedy strategy as above Solution_2.
+
+    Instead of summing the number of key presses one by one, we can derive the
+    answer directly using a mathematical formula.
+
+    Let the length of the string word be N, and let
+
+        m = floor((N−1) / 8) + 1
+
+    denote the maximum number of key presses required for any letter.
+
+    There are m−1 complete groups, each containing 8 letters. The letters in
+    the i-th group require exactly i key presses, where:
+
+        1 <= i <= m-1
+
+    Therefore, these groups contribute:
+
+        8 * m * (m-1) / 2   ==>   4 * m * (m-1)
+
+    key presses in total.
+
+    The remaining N − 8 * (m−1) letters each require exactly m key presses,
+    contributing:
+
+        (N  -  8 * (m-1)) * m
+
+    key presses.
+    Hence, the total number of key presses is:
+
+        4 * m * (m-1) * (N  -  8 * (m-1)) * m
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats: 77.73% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Math {
+public:
+    int minimumPushes(string word)
+    {
+        const int N = word.size();
+        int m = (N-1) / 8 + 1;
+
+        return 4*m*(m-1) + (N - 8*(m-1)) * m;
+    }
+};
