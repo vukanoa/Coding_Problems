@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-
 /*
     ==============
     === MEDIUM ===
@@ -106,6 +102,11 @@
 
 */
 
+#include <algorithm>
+#include <cmath>
+#include <iostream>
+#include <vector>
+#include <queue>
 using namespace std;
 
 /*
@@ -144,7 +145,7 @@ using namespace std;
 /* Time  Beats: 98.45% */
 /* Space Beats: 40.29% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1), because LETTERS_IN_ALPHABET is a constant */
 class Solution {
 public:
@@ -206,7 +207,7 @@ public:
 /* Time  Beats: 99.00% */
 /* Space Beats: 98.11% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution_2 {
 public:
@@ -237,6 +238,47 @@ public:
 
             result += freq[i] * position;
         }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  72.47% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_3 {
+public:
+    int minimumPushes(string word)
+    {
+        int freq[26] = {};
+
+        for (const char& chr : word)
+            freq[chr - 'a']++;
+
+        // Insertion sort (descending)
+        for (int i = 1; i < 26; i++)
+        {
+            for (int j = i; j > 0 && freq[j] > freq[j-1]; j--)
+                swap(freq[j], freq[j-1]);
+        }
+
+        int result = 0;
+        for (int i = 0; i < 26 && freq[i] != 0; i++)
+            result += freq[i] * ((i / 8) + 1);
 
         return result;
     }
