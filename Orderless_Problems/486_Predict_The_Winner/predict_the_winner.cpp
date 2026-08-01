@@ -58,6 +58,7 @@
 */
 
 #include <cstring>
+#include <numeric>
 #include <vector>
 using namespace std;
 
@@ -76,7 +77,7 @@ using namespace std;
 /* Time  Complexity: O(N^2) */
 /* Space Complexity: O(N^2) */
 class Solution {
-    int memo[21][21]; // dp array
+    int memo[21][21];
 
 public:
     bool predictTheWinner(vector<int>& nums) 
@@ -90,7 +91,7 @@ public:
         for (const auto& num : nums)
             total += num;
 
-        int max_score = get_max_score(0, N-1, nums, total);
+        int max_score = solve(0, N-1, nums, total);
 
         return is_winner(max_score, total);
     }
@@ -101,18 +102,78 @@ private:
         return score >= total - score;
     }
 
-    int get_max_score(int left, int right, vector<int>& nums, int total) 
+    int solve(int L, int R, vector<int>& nums, int total) 
     {
-        if (left > right)
+        if (L > R)
             return 0;
 
-        if (memo[left][right] != -1)
-            return memo[left][right];
+        if (memo[L][R] != -1)
+            return memo[L][R];
 
         // Skip-Take logic
-        int take_left  = total - get_max_score(left+1, right  , nums, total - nums[left]);
-        int take_right = total - get_max_score(left  , right-1, nums, total - nums[right]);
+        int take_left  = total - solve(L+1, R  , nums, total - nums[L]);
+        int take_right = total - solve(L  , R-1, nums, total - nums[R]);
 
-        return memo[left][right] = max(take_left, take_right);
+        return memo[L][R] = max(take_left, take_right);
+    }
+};
+
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_With_Turns {
+private:
+    int memo[21][21][2];
+
+public:
+    bool predictTheWinner(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        long long total_sum = accumulate(nums.begin(), nums.end(), 0LL);
+
+        /* Solve */
+        int player1 = solve(0, N-1, true, nums);
+
+        return is_winner(player1, total_sum);
+    }
+
+private:
+    bool is_winner(int score, int total) 
+    {
+        return score >= (total - score);
+    }
+
+    int solve(int L, int R, bool turn1, vector<int>& nums)
+    {
+        if (L > R)
+            return 0;
+
+        if (memo[L][R][turn1] != -1)
+            return memo[L][R][turn1];
+
+        int take_front = turn1 ? nums[L] : 0;
+        int take_back  = turn1 ? nums[R] : 0;
+
+        take_front += solve(L+1, R  , !turn1, nums);
+        take_back  += solve(L  , R-1, !turn1, nums);
+
+        return memo[L][R][turn1] = turn1 ? max(take_front, take_back) :
+                                           min(take_front, take_back);
     }
 };
