@@ -291,3 +291,50 @@ public:
         return digits;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    In-Place Solution.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  28.43% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_In_Place {
+public:
+    vector<int> plusOne(vector<int>& digits)
+    {
+        const int N = digits.size();
+
+        digits[N-1]++; // Increment the last digit
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            if (digits[i] < 10)
+                break;
+
+            digits[i] = 0;
+
+            if (i > 0)
+            {
+                digits[i-1]++;
+            }
+            else
+            {
+                digits.push_back(0);
+                digits[i] = 1;
+            }
+        }
+
+        return digits;
+    }
+};
