@@ -225,7 +225,7 @@ public:
 
 /* Time  Complexity: O(2 * N) --> O(N) */
 /* Space Complexity: O(1)              */
-class Solution_In_Place_Almost {
+class Solution_3 {
 public:
     vector<int> plusOne(vector<int>& digits)
     {
@@ -244,6 +244,49 @@ public:
         }
 
         digits.insert(digits.begin(), 1); // O(N)
+
+        return digits;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  26.36% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_4 {
+public:
+    vector<int> plusOne(vector<int>& digits)
+    {
+        const int N = digits.size();
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            if (digits[i] + 1 < 10)
+            {
+                digits[i] += 1;
+                return digits;
+            }
+
+            digits[i] = 0;
+            if (i == 0)
+            {
+                digits.insert(digits.begin(), 1);
+                return digits;
+            }
+        }
 
         return digits;
     }
