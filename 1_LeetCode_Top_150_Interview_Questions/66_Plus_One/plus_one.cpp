@@ -152,6 +152,60 @@ public:
     --- IDEA ---
     ------------
 
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  26.36% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_2 {
+public:
+    vector<int> plusOne(vector<int>& digits)
+    {
+        const int N = digits.size();
+
+        vector<int> result(N+1, 0);
+
+        int add = 1;
+        for (int i = N-1; i >= 0; i--)
+        {
+            if (add == 0)
+            {
+                result[i+1] = digits[i];
+            }
+            else
+            {
+                if (digits[i] + add == 10)
+                    result[i+1] = 0;
+                else
+                {
+                    result[i+1] = digits[i] + add;
+                    add = 0;
+                }
+            }
+        }
+
+        if (add)
+            result[0] = 1;
+
+        if (result[0] == 0)
+            return vector<int>(result.begin() + 1, result.end());
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     Instead of checking if all elements are 9s, we try to be greedy.
     Keep incrementing and if we stumble upon a non-9 digit, then return
     immediately.
