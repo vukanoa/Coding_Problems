@@ -68,7 +68,78 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    TODO
+    Classic Skip-Take Memoization with Turns. Though, we do NOT need to track
+    Bob's points as those can be obtained implicitly from the total sum and
+    Alice's points, but this proves a point. It's a general and robust way to
+    solve these kinds of problems.
+
+*/
+
+/* Time  Beats: 31.43% */
+/* Space Beats: 33.44% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_Top_Down__Memoization_With_Turns {
+private:
+    int memo[501][501][2];
+
+public:
+    bool stoneGame(vector<int>& piles)
+    {
+        const int N = piles.size();
+
+        int total_sum = accumulate(piles.begin(), piles.end(), 0);
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        /* Solve */
+        int alice_points = solve(0, N-1, true, piles);
+
+        return (alice_points * 2) > total_sum;
+    }
+
+private:
+    int solve(int start, int end, bool alice_turn, vector<int>& piles)
+    {
+        if (start > end)
+            return 0;
+
+        if (memo[start][end][alice_turn] != -1)
+            return memo[start][end][alice_turn];
+
+        int take_first = 0;
+        int take_last  = 0;
+
+        if (alice_turn)
+        {
+            take_first = piles[start] + solve(start+1, end  , false, piles);
+            take_last  = piles[end]   + solve(start  , end-1, false, piles);
+        }
+        else
+        {
+            take_first =      0       + solve(start+1, end  , true , piles);
+            take_last  =      0       + solve(start  , end-1, true , piles);
+        }
+
+        return memo[start][end][alice_turn] = alice_turn ? max(take_first, take_last) :
+                                                           min(take_first, take_last);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Almost the same idea as above, though we do NOT use the 3rd dimensions.
+    Instead we track ONLY the points Alice gets.
+
+    Pick the one you find more intuitive.
 
 */
 
@@ -94,7 +165,7 @@ public:
         /* Solve */
         int alice_points = solve(0, N-1, 0, true, piles);
 
-        return alice_points > (total_sum / 2);
+        return (alice_points * 2) > total_sum;
     }
 
 private:
@@ -182,7 +253,7 @@ public:
 
         int alice_points = dp[0][N-1];
 
-        return alice_points > (total_sum / 2);
+        return (alice_points * 2) > total_sum;
     }
 };
 
@@ -244,7 +315,7 @@ public:
 
         int alice_points = dp[N-1];
 
-        return alice_points > (total_sum / 2);
+        return (alice_points * 2) > total_sum;
     }
 };
 
