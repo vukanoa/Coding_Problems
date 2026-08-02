@@ -148,7 +148,7 @@ private:
 
 /* Time  Complexity: O(N^2) */
 /* Space Complexity: O(N^2) */
-class Solution_Zero_Sum__Game_Theory {
+class Solution_Zero_Sum__Game_Theory__Top_Down__Memoization {
 private:
     int memo[21][21];
 
@@ -178,6 +178,52 @@ private:
         int take_last  = nums[end  ] - max_diff(start  , end-1, nums);
 
         return memo[start][end] = max(take_first, take_last);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 46.53% */
+/* Space Beats: 52.55% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_Zero_Sum__Game_Theory__Bottom_Up__Tabulation {
+public:
+    bool predictTheWinner(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        vector<vector<int>> dp(N, vector<int>(N, 0));
+
+        for (int start = N-1; start >= 0; start--)
+        {
+            for (int end = start; end < N; end++)
+            {
+                if (start == end)
+                {
+                    dp[start][end] = nums[start];
+                    continue;
+                }
+
+                int take_first = nums[start] - dp[start+1][end  ];
+                int take_last  = nums[end]   - dp[start  ][end-1];
+
+                dp[start][end] = max(take_first, take_last);
+            }
+        }
+
+        return dp[0][N-1] >= 0;
     }
 };
 
