@@ -136,8 +136,69 @@ private:
     --- IDEA ---
     ------------
 
-    Almost the same idea as above, though we do NOT use the 3rd dimensions.
-    Instead we track ONLY the points Alice gets.
+    Same as above, written in a Bottom-Up Tabulation way.
+
+*/
+
+/* Time  Beats: 5.00% */
+/* Space Beats: 5.00% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_Bottom_Up__Tabulation_With_Turns {
+public:
+    bool stoneGame(vector<int>& piles)
+    {
+        const int N = piles.size();
+
+        vector<vector<vector<int>>> dp(N, vector<vector<int>>(N, vector<int>(2, 0)));
+
+        for (int start = N-1; start >= 0; start--)
+        {
+            for (int end = start; end < N; end++)
+            {
+                int take_first = 0;
+                int take_last  = 0;
+
+                if (start == end)
+                {
+                    dp[start][end][true ] = piles[start];
+                    dp[start][end][false] = 0;
+                    continue;
+                }
+
+                /* Alice's Turn */
+                take_first = piles[start] + dp[start+1][end  ][false];
+                take_last  = piles[end  ] + dp[start  ][end-1][false];
+
+                dp[start][end][true]  = max(take_first, take_last);
+
+
+                /* Bob's Turn */
+                take_first =      0       + dp[start+1][end  ][true];
+                take_last  =      0       + dp[start  ][end-1][true];
+
+                dp[start][end][false] = min(take_first, take_last);
+            }
+        }
+
+        int total_sum    = accumulate(piles.begin(), piles.end(), 0);
+        int alice_points = dp[0][N-1][true];
+
+        return (alice_points * 2) > total_sum;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Almost the same idea as Memoization above, though we do NOT use the 3rd
+    dimension. Instead we track ONLY the points Alice gets.
 
     Pick the one you find more intuitive.
 
