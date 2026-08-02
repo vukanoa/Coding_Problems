@@ -77,6 +77,7 @@ using namespace std;
 /* Time  Complexity: O(N^2) */
 /* Space Complexity: O(N^2) */
 class Solution {
+private:
     int memo[21][21];
 
 public:
@@ -121,6 +122,67 @@ private:
 
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Classic example of a "Zero-sum game".
+
+    During Player 1's turn, choosing a value x increases the score difference
+    by X. Conversely, during Player 2's turn, choosing a value Y decreases the
+    score difference by Y.
+
+    Essentially, this is a "zero−sum" game:
+
+        + Every point gained by one player is effectively a point lost by the
+          other.
+
+        + Therefore, instead of tracking both scores separately, we only need
+          to track their score difference.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  69.53% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_Zero_Sum__Game_Theory {
+private:
+    int memo[21][21];
+
+public:
+    bool predictTheWinner(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        int max_diff_in_favor_of_player1 = max_diff(0, N-1, nums);
+
+        return max_diff_in_favor_of_player1 >= 0;
+    }
+
+private:
+    int max_diff(int start, int end, vector<int>& nums)
+    {
+        if (start == end)
+            return memo[start][end] = nums[start]; // Or nums[end] it's w/e
+
+        if (memo[start][end] != -1)
+            return memo[start][end];
+
+        int take_first = nums[start] - max_diff(start+1, end  , nums);
+        int take_last  = nums[end  ] - max_diff(start  , end-1, nums);
+
+        return memo[start][end] = max(take_first, take_last);
+    }
+};
+
+
+
 
 /*
     ------------
@@ -130,6 +192,9 @@ private:
     TODO
 
 */
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  85.04% */
 
 /* Time  Complexity: O(N^2) */
 /* Space Complexity: O(N^2) */
@@ -159,21 +224,29 @@ private:
         return score >= (total - score);
     }
 
-    int solve(int L, int R, bool turn1, vector<int>& nums)
+    int solve(int L, int R, bool player1_turn, vector<int>& nums)
     {
         if (L > R)
             return 0;
 
-        if (memo[L][R][turn1] != -1)
-            return memo[L][R][turn1];
+        if (memo[L][R][player1_turn] != -1)
+            return memo[L][R][player1_turn];
 
-        int take_front = turn1 ? nums[L] : 0;
-        int take_back  = turn1 ? nums[R] : 0;
+        int take_first = 0;
+        int take_last  = 0;
 
-        take_front += solve(L+1, R  , !turn1, nums);
-        take_back  += solve(L  , R-1, !turn1, nums);
+        if (player1_turn)
+        {
+            take_first = nums[L] + solve(L+1, R  , false, nums);
+            take_last  = nums[R] + solve(L  , R-1, false, nums);
+        }
+        else
+        {
+            take_first =     0   + solve(L+1, R  , true,  nums);
+            take_last  =     0   + solve(L  , R-1, true,  nums);
+        }
 
-        return memo[L][R][turn1] = turn1 ? max(take_front, take_back) :
-                                           min(take_front, take_back);
+        return memo[L][R][player1_turn] = player1_turn ? max(take_first, take_last) :
+                                                         min(take_first, take_last);
     }
 };
