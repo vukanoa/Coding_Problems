@@ -98,3 +98,52 @@ public:
         return true;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    We can treat the digits as linked list nodes and perform a standard
+    "Floyd's Algorithm" aka "Tortoise and Hare".
+
+*/
+
+/* Time Complexity:  O(log N) */
+/* Space Complexity: O(1)     */
+class Solution_Tortoise_and_Hare {
+public:
+    bool isHappy(int n)
+    {
+        int slow = n;
+        int fast = n;
+
+        do
+        {
+            slow = find_next(slow);
+            fast = find_next(find_next(fast));
+        }
+        while (slow != fast);
+
+        return slow == 1;
+    }
+
+private:
+    int find_next(int n)
+    {
+        int result = 0;
+
+        while (n != 0)
+        {
+            int digit = n % 10;
+
+            result += digit * digit;
+            n /= 10;
+        }
+
+        return result;
+    }
+};
