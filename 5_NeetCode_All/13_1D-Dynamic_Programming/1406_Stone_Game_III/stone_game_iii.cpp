@@ -402,7 +402,7 @@ public:
         fill(begin(memo), end(memo), INT_MIN);
 
         /* Solve */
-        int result = solve(0, stoneValue, N);
+        int result = solve(0, stoneValue);
 
         if (result == 0)
             return "Tie";
@@ -411,27 +411,41 @@ public:
     }
 
 private:
-    int solve(int idx, vector<int>& stoneValue, const int& N)
+    int solve(int idx, vector<int>& stoneValue)
     {
+        const int N = stoneValue.size();
+
         if (idx >= N)
             return 0;
 
         if (memo[idx] != INT_MIN)
             return memo[idx];
 
-        int result = INT_MIN;
+
+        int take_one   = INT_MIN;
+        int take_two   = INT_MIN;
+        int take_three = INT_MIN;
 
         int curr_sum = 0;
-        curr_sum += (idx + 0 < N) ? stoneValue[idx + 0] : 0;
-        result = max(result, curr_sum - solve(idx + 1, stoneValue, N));
 
-        curr_sum += (idx + 1 < N) ? stoneValue[idx + 1] : 0;
-        result = max(result, curr_sum - solve(idx + 2, stoneValue, N));
+        curr_sum  += (idx + 0 < N) ? stoneValue[idx + 0] : 0;
+        take_one   = curr_sum - solve(idx + 1, stoneValue);
 
-        curr_sum += (idx + 2 < N) ? stoneValue[idx + 2] : 0;
-        result = max(result, curr_sum - solve(idx + 3, stoneValue, N));
+        curr_sum  += (idx + 1 < N) ? stoneValue[idx + 1] : 0;
+        take_two   = curr_sum - solve(idx + 2, stoneValue);
 
-        return memo[idx] = result;
+        curr_sum  += (idx + 2 < N) ? stoneValue[idx + 2] : 0;
+        take_three = curr_sum - solve(idx + 3, stoneValue);
+
+        // If you use this version with an INITIALIZER LIST--You'll get a TLE!!
+        // return memo[idx] = max( {take_one, take_two, take_three} );
+        //
+        // The reason is quite simple: 
+        // Initializer_list constructs a temporary std::initializer_list object
+        // on every DP state. Since there are about 50,000 states, this adds
+        // noticeable overhead.
+
+        return memo[idx] = max(take_one, max(take_two, take_three));
     }
 };
 
