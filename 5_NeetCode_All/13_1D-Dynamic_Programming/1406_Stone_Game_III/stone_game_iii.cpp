@@ -158,13 +158,13 @@ public:
 
         for (int i = N-1; i >= 0; i--)
         {
-            int one   = stoneValue[i];
-            int two   = stoneValue[i] + stoneValue[i + 1];
-            int three = stoneValue[i] + stoneValue[i + 1] + stoneValue[i + 2];
+            int take_one   = stoneValue[i];
+            int take_two   = stoneValue[i] + stoneValue[i + 1];
+            int take_three = stoneValue[i] + stoneValue[i + 1] + stoneValue[i + 2];
 
-            dp[i & 3] = max( {one   - dp[(i + 1) & 3],
-                              two   - dp[(i + 2) & 3],
-                              three - dp[(i + 3) & 3]
+            dp[i & 3] = max( {take_one   - dp[(i + 1) & 3],
+                              take_two   - dp[(i + 2) & 3],
+                              take_three - dp[(i + 3) & 3]
                              });
         }
 
@@ -212,11 +212,11 @@ public:
 
         for (int i = N-2; i >= 0; i--)
         {
-            int take_first_one   = stoneValue[i + 0]                                         - next;
-            int take_first_two   = stoneValue[i + 0] + stoneValue[i + 1]                     - next_next;
-            int take_first_three = stoneValue[i + 0] + stoneValue[i + 1] + stoneValue[i + 2] - next_next_next;
+            int take_one   = stoneValue[i + 0]                                         - next;
+            int take_two   = stoneValue[i + 0] + stoneValue[i + 1]                     - next_next;
+            int take_three = stoneValue[i + 0] + stoneValue[i + 1] + stoneValue[i + 2] - next_next_next;
 
-            int curr = max( {take_first_one, take_first_two, take_first_three} );
+            int curr = max(take_one, max(take_two, take_three));
 
             next_next_next = next_next;
             next_next      = next;
@@ -238,35 +238,22 @@ public:
 
 
 /*
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
--------------------------------   DISCLAIMER   --------------------------------
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
+    ------------
+    --- IDEA ---
+    ------------
 
-    There are 4 "Memoization" Solutions down below.
-
-    First  two Solutions will give TLE(Time Limit Exceeded) on LeetCode.
-    Second two Solutions will pass.
-
-    All 4 of them use CORRECT Memoization technique, however the reason I am
-    including all 4 of them is to emphasize the sheer nuance that'll make a
-    Memoization Solution work or give a TLE.
-
-    It will also solidify your knowledge of Time Complexity and "what counts"
-    as an "expensive" computation.
-
-    It is beneficial to read all of them in order.
+    TODO
 
 */
 
+/* Time  Beats: 53.41% */
+/* Space Beats: 60.61% */
+
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution_TLE__Top_Down__Memoization { // Give TLE
+class Solution_Top_Down__Memoization_1 {
 private:
-    static constexpr int MAX_SIZE = 5 * 1e5;
+    static constexpr int MAX_SIZE = 5 * 1e4;
     int memo[MAX_SIZE + 4];
 
 public:
@@ -282,16 +269,16 @@ public:
         stoneValue.push_back(0);
 
         /* Solve */
-        int result = solve(0, stoneValue, N);
+        int alice_points = solve(0, stoneValue, N);
 
         /* POP, to restore original Input state */
         stoneValue.pop_back();
         stoneValue.pop_back();
 
-        if (result == 0)
+        if (alice_points == 0)
             return "Tie";
 
-        return result > 0 ? "Alice" : "Bob";
+        return alice_points > 0 ? "Alice" : "Bob";
     }
 
 private:
@@ -299,9 +286,6 @@ private:
     {
         if (idx >= N)
             return 0;
-
-        if (idx == N-1)
-            return stoneValue[N-1];
 
         if (memo[idx] != INT_MIN)
             return memo[idx];
@@ -310,18 +294,33 @@ private:
         int take_two   = stoneValue[idx] + stoneValue[idx + 1]                       - solve(idx + 2, stoneValue, N);
         int take_three = stoneValue[idx] + stoneValue[idx + 1] + stoneValue[idx + 2] - solve(idx + 3, stoneValue, N);
 
-        return memo[idx] = max( {take_one, take_two, take_three} );
+
+        // If you use this version with an INITIALIZER LIST--You'll get a TLE!!
+        //
+        // The line BELOW gives a TLE!!!
+        // return memo[idx] = max( {take_one, take_two, take_three} );
+        //
+        // The reason is quite simple: 
+        // Initializer_list constructs a temporary std::initializer_list object
+        // on every DP state. Since there are about 50,000 states, this adds
+        // noticeable overhead.
+
+        return memo[idx] = max(take_one, max(take_two, take_three));
     }
 };
 
 
 
 
+
+/* Time  Beats: 64.47% */
+/* Space Beats: 89.99% */
+
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution_TLE__Top_Down__Memoization_2 { // Gives TLE
+class Solution_Top_Down__Memoization_2 {
 private:
-    static constexpr int MAX_SIZE = 5 * 1e5;
+    static constexpr int MAX_SIZE = 5 * 1e4;
     int memo[MAX_SIZE + 4];
 
 public:
@@ -333,12 +332,12 @@ public:
         fill(begin(memo), end(memo), INT_MIN);
 
         /* Solve */
-        int result = solve(0, stoneValue, N);
+        int alice_points = solve(0, stoneValue, N);
 
-        if (result == 0)
+        if (alice_points == 0)
             return "Tie";
 
-        return result > 0 ? "Alice" : "Bob";
+        return alice_points > 0 ? "Alice" : "Bob";
     }
 
 private:
@@ -346,33 +345,52 @@ private:
     {
         if (idx >= N)
             return 0;
-
-        if (idx == N-1)
-            return stoneValue[N-1];
 
         if (memo[idx] != INT_MIN)
             return memo[idx];
 
         int first_one   = stoneValue[idx];
-        int first_two   = first_one + ((idx + 1 >= N) ? 0 : stoneValue[idx + 1]);
-        int first_three = first_two + ((idx + 2 >= N) ? 0 : stoneValue[idx + 2]);
+        int first_two   = first_one + ((idx + 1 < N) ? stoneValue[idx + 1] : 0);
+        int first_three = first_two + ((idx + 2 < N) ? stoneValue[idx + 2] : 0);
 
         int take_one   = first_one   - solve(idx + 1, stoneValue, N);
         int take_two   = first_two   - solve(idx + 2, stoneValue, N);
         int take_three = first_three - solve(idx + 3, stoneValue, N);
 
-        return memo[idx] = max( {take_one, take_two, take_three} );
+        // If you use this version with an INITIALIZER LIST--You'll get a TLE!!
+        //
+        // The line BELOW gives a TLE!!!
+        // return memo[idx] = max( {take_one, take_two, take_three} );
+        //
+        // The reason is quite simple: 
+        // Initializer_list constructs a temporary std::initializer_list object
+        // on every DP state. Since there are about 50,000 states, this adds
+        // noticeable overhead.
+
+        return memo[idx] = max(take_one, max(take_two, take_three));
     }
 };
 
 
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 74.18% */
+/* Space Beats: 88.20% */
+
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution_Working__Top_down_Memoization_1 { // Works
+class Solution_Top_Down__Memoization_3 {
 private:
-    static constexpr int MAX_SIZE = 5 * 1e5;
+    static constexpr int MAX_SIZE = 5 * 1e4;
     int memo[MAX_SIZE + 4];
 
 public:
@@ -397,9 +415,6 @@ private:
     {
         if (idx >= N)
             return 0;
-
-        if (idx == N-1)
-            return stoneValue[N-1];
 
         if (memo[idx] != INT_MIN)
             return memo[idx];
@@ -407,13 +422,13 @@ private:
         int result = INT_MIN;
 
         int curr_sum = 0;
-        curr_sum += idx + 0 >= N ? 0 : stoneValue[idx];
+        curr_sum += (idx + 0 < N) ? stoneValue[idx + 0] : 0;
         result = max(result, curr_sum - solve(idx + 1, stoneValue, N));
 
-        curr_sum += idx + 1 >= N ? 0 : stoneValue[idx + 1];
+        curr_sum += (idx + 1 < N) ? stoneValue[idx + 1] : 0;
         result = max(result, curr_sum - solve(idx + 2, stoneValue, N));
 
-        curr_sum += idx + 2 >= N ? 0 : stoneValue[idx + 2];
+        curr_sum += (idx + 2 < N) ? stoneValue[idx + 2] : 0;
         result = max(result, curr_sum - solve(idx + 3, stoneValue, N));
 
         return memo[idx] = result;
@@ -423,11 +438,20 @@ private:
 
 
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution_Working__Top_Down__Memoization_2 { // Works
+class Solution_Top_Down__Memoization_4 {
 private:
-    static constexpr int MAX = 5 * 1e5;
+    static constexpr int MAX = 5 * 1e4;
     int memo[MAX + 4];
 
 public:
@@ -439,12 +463,12 @@ public:
         fill(begin(memo), end(memo), INT_MIN);
 
         /* Solve */
-        int result = solve(0, stoneValue);
+        int alice_points = solve(0, stoneValue);
 
-        if (result == 0)
+        if (alice_points == 0)
             return "Tie";
 
-        return result > 0 ? "Alice" : "Bob";
+        return alice_points > 0 ? "Alice" : "Bob";
     }
 
 private:
@@ -454,9 +478,6 @@ private:
 
         if (idx >= N)
             return 0;
-
-        if (idx == N-1)
-            return stoneValue[N-1];
 
         if (memo[idx] != INT_MIN)
             return memo[idx];
