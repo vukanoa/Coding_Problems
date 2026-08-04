@@ -114,7 +114,7 @@ public:
 
 /* Time Complexity:  O(log N) */
 /* Space Complexity: O(1)     */
-class Solution_Tortoise_and_Hare {
+class Solution_Floyd__Tortoise_and_Hare {
 public:
     bool isHappy(int n)
     {
@@ -145,5 +145,64 @@ private:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Brent's Cycle Detection.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  68.46% */
+
+/* Time  Complexity: O(log N) */
+/* Space Complexity: O(1)     */
+class Solution_Brents_Cycle_Detection {
+public:
+    bool isHappy(int n)
+    {
+        int slow = n;
+        int fast = find_next(n);
+
+        int power = 1;
+        int steps_in_current_block = 1;
+
+        while (slow != fast)
+        {
+            if (power == steps_in_current_block)
+            {
+                slow = fast;
+                power *= 2;
+                steps_in_current_block = 0;
+            }
+
+            steps_in_current_block++;
+            fast = find_next(fast);
+        }
+
+        return fast == 1;
+    }
+
+private:
+    int find_next(int n)
+    {
+        int output = 0;
+        while (n != 0)
+        {
+            int digit = n % 10;
+
+            output += digit * digit;
+            n /= 10;
+        }
+
+        return output;
     }
 };
