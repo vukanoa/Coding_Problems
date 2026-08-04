@@ -75,8 +75,6 @@
 
 */
 
-using namespace std;
-
 // Definition for singly-linked list.
 struct ListNode {
     int val;
@@ -97,6 +95,12 @@ struct ListNode {
     It is VERY easy. I have no clue why is it marked "MEDIUM".
 
 */
+
+/* Time  Beats: 33.91% */
+/* Space Beats: 98.83% */
+
+/* Time  Complexity: O(N * log(min(A, B))) */
+/* Space Complexity: O(1)                  */
 class Solution {
 public:
     ListNode* insertGreatestCommonDivisors(ListNode* head)
