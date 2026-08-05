@@ -191,3 +191,151 @@ private:
         return false;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 58.97% */
+/* Space Beats: 57.24% */
+
+/* Time  Complexity: O(E * alpha(V)  +  V * alpha(V)) */
+/* Space Complexity: O(V + E)                         */
+class DSU {
+private:
+    vector<int> parent;
+    vector<int> size;
+
+    int components;
+
+public:
+    // O(N)
+    DSU (int n)
+    {
+        components = n;
+
+        size.resize(n);
+        parent.resize(n);
+        for (int i = 0; i < n; i++)
+        {
+            parent[i] = i;
+            size[i]   = 1;
+        }
+    }
+
+    // O(alpha(N)) amortized
+    int get_root(int node)
+    {
+        while (node != parent[node])
+        {
+            /* Inverse Ackerman function, <= 5 for all practical purposes */
+            parent[node] = parent[parent[node]];
+
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    // O(alpha(N)) amortized
+    bool union_components(int node_1, int node_2)
+    {
+        int root_1 = get_root(node_1);
+        int root_2 = get_root(node_2);
+
+        if (root_1 == root_2)
+            return false; // We have NOT merged
+
+        if (size[root_1] < size[root_2])
+            swap(root_1, root_2);
+
+        parent[root_2] = root_1;
+        size[root_1]  += size[root_2];
+        components--;
+
+        return true; // We have performed a MERGE(union) between 2 components
+    }
+
+    // O(alpha(N)) amortized
+    bool connected_components(int node_1, int node_2)
+    {
+        int root_1 = get_root(node_1);
+        int root_2 = get_root(node_2);
+
+        return root_1 == root_2;
+    }
+};
+
+class Solution_DSU_and_Coloring {
+public:
+    // O(E * alpha(V)  +  V * alpha(V))
+    vector<int> remainingMethods(int n, int k, vector<vector<int>>& invocations)
+    {
+        vector<int> result;
+        result.reserve(n);
+
+        /* Construct DSU data structure */
+        DSU dsu(n);
+
+        /* Build an Adjacency List */
+        vector<vector<int>> adj_list(n);
+
+        // O(E * alpha(V)) entire block
+        for (const auto& edge : invocations) // O(E)
+        {
+            const int& a = edge[0];
+            const int& b = edge[1];
+
+            adj_list[a].push_back(b);   // O(1)        amortized
+            dsu.union_components(a, b); // O(alpha(V)) amortized
+        }
+
+        /* Color SUSPICIOUS nodes using DFS */
+        vector<bool> visited   (n, false);
+        vector<bool> suspicious(n, false);
+        dfs(k, adj_list, visited, suspicious); // Color in O(V + E)
+
+        // O(V * alpha(V))
+        for (int node = 0; node < n; node++) // O(V)
+        {
+            if (suspicious[node])
+                continue;
+
+            // "node" is NOT suspicious and k is CERTAINLY suspicious
+            if (dsu.connected_components(node, k)) // O(alpha(V)) amortized
+            {
+                vector<int> result(n);
+                iota(result.begin(), result.end(), 0); // O(V)
+
+                return result;
+            }
+
+            result.push_back(node);
+        }
+
+        return result;
+    }
+
+    // O(V + E)
+    void dfs(int curr, vector<vector<int>>& adj_list, vector<bool>& visited, vector<bool>& suspicious)
+    {
+        visited[curr]    = true;
+        suspicious[curr] = true;
+
+        for (const int& neighbor : adj_list[curr])
+        {
+            if (visited[neighbor])
+                continue;
+
+            dfs(neighbor, adj_list, visited, suspicious);
+        }
+    }
+};
