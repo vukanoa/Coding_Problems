@@ -67,7 +67,6 @@
 
 #include <numeric>
 #include <unordered_map>
-#include <unordered_set>
 #include <vector>
 using namespace std;
 
@@ -76,36 +75,7 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    This one is not difficult if you know how to create an Adjacency List and
-    know how to do a basic DFS.
-
-    First, we need to "mark", or as I've put it "contaminate", all the sus ones
-    by starting from k-th method which is initially the only "suspicious' one.
-
-    After doing that, we have all the "suspicious" ones in HashSet "sus".
-    If the size of it is equal to 'n', then that means that all of the methods
-    are suspicious now and therefore we can remove all of them, thus we return
-    an empty vector.
-
-    However, if not all of them are "sus", then start from healthy ones, i.e.
-    ones that are not present int HashSet "sus" and iterate through "sus"
-    neighbors of those healthy ones and "heal"(i.e. make healthy) all of those
-    "sus" nodes which are pointed by the healthy node.
-
-    At the end we are checking:
-
-        if (n - healthy.size() < sus.size())
-            Then it's true that some "sus" node is pointing at the healthy one
-            and therefore we are NOT allowed to remove it, therefore since we
-            are not able to remove ALL of the "sus" methods, we should return
-            all 'n' ones as a result. (We are using "iota" function for
-           convenience, even if it's not required of us to return the methods in
-           order)
-
-
-        else
-            we return all the healthy ones as a result, since we can indeed
-            remove all of the "sus" ones.
+    TODO
 
 */
 
@@ -118,74 +88,106 @@ class Solution {
 public:
     vector<int> remainingMethods(int n, int k, vector<vector<int>>& invocations)
     {
-        std::unordered_map<int, std::vector<int>> adj_list;
+        unordered_map<int, vector<int>> adj_list;
 
-        /* Create an Adjacency List */
-        for (auto& entry : invocations)
-            adj_list[entry[0]].push_back(entry[1]);
+        /* Build an Adjacency List */
+        for (auto& edge : invocations)
+        {
+            const int& a = edge[0];
+            const int& b = edge[1];
 
-        unordered_set<int> sus;
-        sus.insert(k); // The initially suspicious one
+            adj_list[a].push_back(b);
+        }
 
-        dfs_contaminate(adj_list, sus, k, -1);
+        vector<bool> suspicious(n, false);
+        dfs_contaminate(-1, k, adj_list, suspicious);
 
-        if (sus.size() == n)
+        bool all_suspicious = true;
+        for (int i = 0; i < n; i++)
+        {
+            if ( ! suspicious[i])
+            {
+                all_suspicious = false;
+                break;
+            }
+        }
+
+        if (all_suspicious)
             return {};
 
-        unordered_set<int> healthy;
-        for (int method = 0; method < n; method++)
-        {
-            if (sus.count(method) || healthy.count(method))
-                continue; // Skip "contaminated"(i.e. suspicious) ones
+        vector<bool> healthy(n, false);
 
-            dfs_make_healthy(adj_list, sus, healthy, method, -1);
+        for (int node = 0; node < n; node++)
+        {
+            if (suspicious[node]) // Skip the suspicious nodes
+                continue;
+
+            if (healthy[node]) // Already healthy
+                continue;
+
+            if (dfs_make_healthy(-1, node, adj_list, suspicious, healthy))
+            {
+                vector<int> result(n);
+                iota(result.begin(), result.end(), 0);
+
+                return result;
+            }
         }
 
-        if (n - healthy.size() < sus.size())
-        {
-            vector<int> result(n);
-            iota(result.begin(), result.end(), 0);
+        vector<int> result;
 
-            return result;
+        for (int node = 0; node < n; node++)
+        {
+            if ( ! suspicious[node])
+                result.push_back(node);
         }
 
-        vector<int> result(healthy.begin(), healthy.end());
         return result;
     }
 
 private:
-    void dfs_contaminate(unordered_map<int, vector<int>>& adj_list, unordered_set<int>& sus, int curr_method, int prev_method)
+    void dfs_contaminate(int prev,
+                         int curr,
+                         unordered_map<int, vector<int>>& adj_list,
+                         vector<bool>& suspicious)
     {
-        for (const int& neighbor : adj_list[curr_method])
-        {
-            if (neighbor == prev_method)
-                continue; 
+        suspicious[curr] = true;
 
-            if (sus.count(neighbor))
+        for (const int& neighbor : adj_list[curr])
+        {
+            if (neighbor == prev)
                 continue;
 
-            sus.insert(neighbor);
-            dfs_contaminate(adj_list, sus, neighbor, curr_method);
+            if (suspicious[neighbor])
+                continue;
+
+            dfs_contaminate(curr, neighbor, adj_list, suspicious);
         }
     }
 
-    void dfs_make_healthy(unordered_map<int, vector<int>>& adj_list, unordered_set<int>& sus,  unordered_set<int>& healthy, int curr_method, int prev_method)
+    bool dfs_make_healthy(int prev,
+                          int curr,
+                          unordered_map<int, vector<int>>& adj_list,
+                          vector<bool>& suspicious,
+                          vector<bool>& healthy)
     {
-        if (healthy.count(curr_method))
-            return;
+        healthy[curr] = true;
 
-        healthy.insert(curr_method);
-
-        for (const int& neighbor : adj_list[curr_method])
+        for (const int& neighbor : adj_list[curr])
         {
-            if (neighbor == prev_method)
-                continue; 
+            if (neighbor == prev)
+                continue;
 
-            if (healthy.count(neighbor))
-                continue; // Skip this healthy one
+            if (suspicious[neighbor])
+                return true;
 
-            if (sus.count(neighbor))
-                dfs_make_healthy(adj_list, sus, healthy, neighbor, curr_method);
+            if (healthy[neighbor])
+                continue;
+
+            if (dfs_make_healthy(curr, neighbor, adj_list, suspicious, healthy))
+                return true;
         }
+
+        return false;
     }
 };
