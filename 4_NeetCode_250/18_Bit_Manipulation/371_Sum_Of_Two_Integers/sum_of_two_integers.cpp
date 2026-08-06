@@ -279,12 +279,13 @@ public:
     --- IDEA ---
     ------------
 
-    I believe this one is much more easy to understand even if it seems a bit
-    "ugly" at a first glance.
-
-    Also, it makes sure you have a good understanding of "unsigned" integers.
+    Another way to implement, without using the "+" or "-" operators anywhere
+    in the code.
 
 */
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  96.34% */
 
 /* Time  Complexity: O(1) */
 /* Space Complexity: O(1) */
@@ -292,78 +293,46 @@ class Solution_Bitwise_2 {
 public:
     int getSum(int a, int b)
     {
-        uint32_t result = 0;
-
         uint32_t ua = static_cast<uint32_t>(a);
         uint32_t ub = static_cast<uint32_t>(b);
 
-        int carry = 0;
-        int iteration = 0;
+        uint32_t result = 0;
+        uint32_t carry  = 0;
 
-        while ((ua != 0 || ub != 0 || carry != 0) && iteration < 32)
+        for (uint32_t mask = 1; mask != 0; mask <<= 1)
         {
-            uint32_t a_bit = ua & 1;
-            uint32_t b_bit = ub & 1;
+            uint32_t bit_a = ua & 1;
+            uint32_t bit_b = ub & 1;
 
-            uint32_t bit = a_bit ^ b_bit ^ carry;
+            uint32_t x = bit_a ^ bit_b ^ carry;
+            carry = (bit_a & bit_b) | (bit_a & carry) | (bit_b & carry);
 
-            carry = (a_bit & b_bit) | (a_bit & carry) | (b_bit & carry);
-
-            result |= (bit << iteration);
+            result <<= 1;
+            result |= x;
 
             ua >>= 1;
             ub >>= 1;
-            iteration++;
         }
 
-        return static_cast<int>(result);
+        return static_cast<int>(reverse_low_bits(result));
     }
-};
 
-
-
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    This one is almost equivalent to the above one, however it's much more
-    elegant. The reason I wanted to keep both is because it is beneficial to
-    see this part of the the above's Solution:
-
-        (ua != 0 || ub != 0 || carry != 0)
-
-    and also the use of unsinged integers.
-
-    However this one if much more elegant and straightforward.
-
-*/
-
-/* Time  Beats: 100.00% */
-/* Space Beats:  65.92% */
-
-/* Time  Complexity: O(1) */
-/* Space Complexity: O(1) */
-class Solution_Bitwise_3 {
-public:
-    int getSum(int a, int b)
+private:
+    // We need 'x' to be a uint32_t because we're doing a RIGHT-SHIFT and since
+    // x can be a negative number, we do not want to keep the 1 on the MSB
+    // while we shift.
+    uint32_t reverse_low_bits(uint32_t x)
     {
-        int result = 0;
+        uint32_t rev = 0;
 
-        int carry = 0;
-        for (int i = 0; i < 32; i++)
+        for (uint32_t mask = 1; mask != 0; mask <<= 1)
         {
-            int a_bit = (a >> i) & 1;
-            int b_bit = (b >> i) & 1;
+            rev <<= 1;
+            rev |= (x & 1);
 
-            int curr_bit = a_bit ^ b_bit ^ carry;
-
-            carry = (a_bit & b_bit) | (a_bit & carry) | (b_bit & carry);
-
-            result |= (curr_bit << i);
+            x >>= 1;
         }
 
-        return result;
+        return rev;
     }
 };
