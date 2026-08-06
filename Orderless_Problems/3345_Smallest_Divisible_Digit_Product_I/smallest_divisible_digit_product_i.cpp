@@ -42,69 +42,33 @@
 
 */
 
-#include <cmath>
-using namespace std;
-
 /* Time  Beats: 100.00% */
-/* Space Beats:  12.15% */
+/* Space Beats:  37.77% */
 
-/* Time  Complexity: O(1) */
-/* Space Complexity: O(1) */
+/* Time Complexity:  O((answer - n + 1) * log(answer)) */
+/* Space Complexity: O(1)                              */
 class Solution {
 public:
-    int smallestNumber(int n, int t)
+    int smallestNumber(int n, int t) 
     {
-        if (n % 10 == 0)
-            return n;
-
-        if (n <= 9)
+        int i = n;
+        for (;;)
         {
+            int number = i;
 
-            if (n <= t)
-                return t;
-
-            int div = static_cast<int>(ceil(1.0 * n / t));
-
-            return div * t < 10 ? div * t : 10;
-        }
-
-        int val = n / 10;
-        for (int i = n % 10; i <= 9; i++)
-        {
-            if ((val * i) % t == 0)
-                return val * 10 + i;
-        }
-
-        return val * 10 + 10;
-    }
-};
-
-
-/* Time  Complexity: O(1) */
-/* Space Complexity: O(1) */
-class Solution_2 {
-public:
-    int smallestNumber(int n, int t)
-    {
-        auto product_of_digits = [](int x)
-        {
-            int product = 1;
-
-            while (x > 0)
+            int sum = 1; // Neutral element for multiplication
+            while (number > 0)
             {
-                product *= (x % 10);
-                x /= 10;
+                sum    *= number % 10;
+                number /= 10;
             }
 
-            return product;
-        };
-
-        for (int i = n; i < n + 10; i++)
-        {
-            if (product_of_digits(i) % t == 0)
+            if (sum % t == 0)
                 return i;
+            
+            i++;
         }
-        
-        return -1;
+
+        return -1; // Unreachable.
     }
 };
