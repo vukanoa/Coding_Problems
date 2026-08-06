@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <numeric>
-
 /*
     ============
     === EASY ===
@@ -23,7 +19,7 @@
     complexity and O(n) runtime complexity?
 
     ====================================================
-    FUNCTION: int missingNumber(std::vector<int>& nums);
+    FUNCTION: int missingNumber(vector<int>& nums);
     ====================================================
 
     ==========================================================================
@@ -63,6 +59,9 @@
 
 */
 
+#include <numeric>
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -81,17 +80,19 @@
 /* Time  Beats: 94.70% */
 /* Space Beats: 90.75% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution_Add_Subtract{
+class Solution_Add_Subtract {
 public:
-    int missingNumber(std::vector<int>& nums)
+    int missingNumber(vector<int>& nums)
     {
+        const int N = nums.size();
+
         int sum = 0;
-        for (int i = 0; i <= nums.size(); i++)
+        for (int i = 0; i <= N; i++)
             sum += i;
 
-        for (int i = 0; i < nums.size(); i++)
+        for (int i = 0; i < N; i++)
             sum -= nums[i];
 
         return sum;
@@ -113,7 +114,7 @@ public:
     When XOR-ing two numbers a ^ b, if either is 0, the result is the non-0 one
 
     So, since we're told that "nums" contains n distinct numbers in the
-    range [0, n] where only ONE number is missing, we can XOR first n numbers
+    range [0, N] where only ONE number is missing, we can XOR first N numbers
     and then additionally XOR all the numbers in the vector "nums" which will
     leave us with the missing number.
 
@@ -129,8 +130,9 @@ public:
     1 ^ 1 = 0
     3 ^ 3 = 0
 
-    and when we XOR number 2(the only number of the first n numbers that we
+    and when we XOR number 2(the only number of the first N numbers that we
     didn't XOR yet) with the result up to this point, which is 0. So:
+
         2 ^ 0 = 2
 
     And that is the missing number we were looking for.
@@ -142,15 +144,17 @@ public:
 
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
-class Solution_XOR{
+class Solution_XOR {
 public:
-    int missingNumber(std::vector<int>& nums)
+    int missingNumber(vector<int>& nums)
     {
+        const int N = nums.size();
+
         int sum = 0;
-        for (int i = 0; i <= nums.size(); i++)
+        for (int i = 0; i <= N; i++)
             sum ^= i;
 
-        for (int i = 0; i < nums.size(); i++)
+        for (int i = 0; i < N; i++)
             sum ^= nums[i];
 
         return sum;
@@ -165,7 +169,39 @@ public:
     --- IDEA ---
     ------------
 
-    Same Idea, just implemented using Gaus' method for calculating first n
+    Another way to implement. I'm including more than one way because some will
+    have that "AHA" moment in one but not in other.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  71.51% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_XOR_2 {
+public:
+    int missingNumber(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        int result = N;
+        for (int i = 0; i < N; i++)
+            result ^= (i ^ nums[i]);
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same Idea, just implemented using Gaus' method for calculating first N
     numbers.
 
     Gaus used this method in math class to calculate sum of first 100 numbers
@@ -177,26 +213,54 @@ public:
 
     Therefore 49 * 100 + 100 + 50 = 4900 + 100 + 50 = 5050
 
-    And the formula is: n * (n + 1) / 2
+    And the formula is: N * (N + 1) / 2
 
 */
 
 /* Time  Beats: 99.94% */
 /* Space Beats: 47.95% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution_Gaus{
+class Solution_Gaus {
 public:
-    int missingNumber(std::vector<int>& nums)
+    int missingNumber(vector<int>& nums)
     {
-        int n = nums.size();
-        int sum = n * (n + 1) / 2; // Gaus: for calculating sum of first n
+        const int N = nums.size();
+        int sum_of_first_N = N * (N + 1) / 2;
 
-        for (int i = 0; i < n; i++)
-            sum -= nums[i];
+        for (int i = 0; i < N; i++)
+            sum_of_first_N -= nums[i];
 
-        return sum;
+        return sum_of_first_N;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way to implement Gaus' Solution.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  71.51% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Gaus_2 {
+public:
+    int missingNumber(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int sum = accumulate(nums.begin(), nums.end(), 0);
+
+        return (N * (N+1) / 2) - sum;
     }
 };
 
@@ -218,15 +282,16 @@ public:
 /* Time  Beats: 94.70% */
 /* Space Beats: 47.95% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
-class Solution_One_Loop{
+class Solution_Single_Loop {
 public:
-    int missingNumber(std::vector<int>& nums)
+    int missingNumber(vector<int>& nums)
     {
-        int sum = nums.size();
+        const int N = nums.size();
 
-        for (int i = 0; i < nums.size(); i++)
+        int sum = N;
+        for (int i = 0; i < N; i++)
             sum += i - nums[i];
 
         return sum;
