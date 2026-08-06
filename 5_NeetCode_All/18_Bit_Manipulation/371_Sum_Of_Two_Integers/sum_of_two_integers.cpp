@@ -34,42 +34,8 @@
     -1000 <= a, b <= 1000
 */
 
-#include <cmath>
 #include <cstdint>
 using namespace std;
-
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    1)
-        a + b
-
-
-    2)
-        2^a * 2^b = log2(2^a * 2^b)
-                  = log2(2^(a + b))
-                  = (a + b) * log2(2)
-                  = (a + b) * 1
-                  = (a + b)
-*/
-
-/* Time  Beats:   100% */
-/* Space Beats: 12.66% */
-
-/* Time  Complexity: O(1) */
-/* Space Complexity: O(1) */
-class Solution_Math {
-public:
-    int getSum(int a, int b)
-    {
-        return log(pow(2, a) * pow(2, b)) / log(2);
-    }
-};
-
-
-
 
 /*
     ------------
