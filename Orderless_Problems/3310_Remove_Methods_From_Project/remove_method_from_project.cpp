@@ -346,8 +346,8 @@ private:
 /* Time  Beats: 45.57% */
 /* Space Beats: 82.25% */
 
-/* Time  Complexity: O(N + E) */
-/* Space Complexity: O(N + E) */
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V + E) */
 class Solution_BFS_Coloring {
 private:
     static constexpr int MAXN = 100005;
@@ -426,6 +426,102 @@ public:
             iota(all_nodes.begin(), all_nodes.end(), 0);
 
             return all_nodes;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 94.07% */
+/* Space Beats: 81.80% */
+
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V + E) */
+class Solution_Topological_Sort__Kahns_Algorithm {
+public:
+    vector<int> remainingMethods(int n, int k, vector<vector<int>>& invocations)
+    {
+        /* Build an Adjacency List */
+        vector<vector<int>> adj_list(n);
+
+        /* Track incoming edges */
+        vector<int> in_degree(n, 0);
+
+        for (const auto& edge : invocations)
+        {
+            const int& a = edge[0];
+            const int& b = edge[1];
+
+            adj_list[a].push_back(b);
+            in_degree[b]++;
+        }
+
+
+        /*
+            Topological Sort (Kahn's Algorithm)
+
+            Start from suspicious method k and remove its outgoing edges.
+            Remaining in_degree tells us if suspicious nodes have external
+            callers.
+        */
+        vector<bool> suspicious(n, false);
+
+        queue<int> queue;
+        queue.push(k);
+
+        while ( ! queue.empty())
+        {
+            const int curr = queue.front();
+            queue.pop();
+
+            if (suspicious[curr])
+                continue;
+
+            suspicious[curr] = true;
+
+            for (const int& neighbor : adj_list[curr])
+            {
+                in_degree[neighbor]--;
+                queue.push(neighbor);
+            }
+        }
+
+        /*
+            If a suspicious node still has incoming edges,
+            then some non-suspicious node calls it.
+
+            Therefore we cannot remove suspicious methods.
+        */
+        bool can_remove_all = true;
+
+        for (int i = 0; i < n; i++)
+        {
+            if (suspicious[i] && in_degree[i] > 0)
+            {
+                can_remove_all = false;
+                break;
+            }
+        }
+
+        vector<int> result;
+        result.reserve(n);
+
+        for (int i = 0; i < n; i++)
+        {
+            if ( ! suspicious[i] ||  ! can_remove_all)
+                result.push_back(i);
         }
 
         return result;
