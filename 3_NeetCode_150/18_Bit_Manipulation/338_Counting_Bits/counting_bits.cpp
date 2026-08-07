@@ -439,3 +439,39 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  97.90% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Bottom_Up__Tabulation__Largest_Power_Of_Two {
+public:
+    vector<int> countBits(int n)
+    {
+        vector<int> result(n+1, 0);
+
+        int largest_pow_of_two_so_far = 0;
+        for (int num = 1; num <= n; num++)
+        {
+            if ((num & (num-1)) == 0) // if (num is a power of two)
+                largest_pow_of_two_so_far = num;
+
+            result[num] = 1 + result[num - largest_pow_of_two_so_far];
+        }
+
+        return result;
+    }
+};
