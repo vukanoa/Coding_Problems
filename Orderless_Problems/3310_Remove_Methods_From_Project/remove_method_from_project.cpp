@@ -66,9 +66,148 @@
 */
 
 #include <numeric>
+#include <queue>
 #include <unordered_map>
 #include <vector>
 using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 58.97% */
+/* Space Beats: 57.24% */
+
+/* Time  Complexity: O(E * alpha(V)  +  V * alpha(V)) */
+/* Space Complexity: O(V + E)                         */
+class DSU {
+private:
+    vector<int> parent;
+    vector<int> size;
+
+    int components;
+
+public:
+    DSU (int n)
+    {
+        components = n;
+
+        size.resize(n);
+        parent.resize(n);
+        for (int i = 0; i < n; i++)
+        {
+            parent[i] = i;
+            size[i]   = 1;
+        }
+    }
+
+    int get_root(int node)
+    {
+        while (node != parent[node])
+        {
+            /* Inverse Ackerman function, <= 5 for all practical purposes */
+            parent[node] = parent[parent[node]];
+
+            node = parent[node];
+        }
+
+        return node;
+    }
+
+    bool union_components(int node_1, int node_2)
+    {
+        int root_1 = get_root(node_1);
+        int root_2 = get_root(node_2);
+
+        if (root_1 == root_2)
+            return false; // We have NOT merged
+
+        if (size[root_1] < size[root_2])
+            swap(root_1, root_2);
+
+        parent[root_2] = root_1;
+        size[root_1]  += size[root_2];
+        components--;
+
+        return true; // We have performed a MERGE(union) between 2 components
+    }
+
+    bool connected_components(int node_1, int node_2)
+    {
+        int root_1 = get_root(node_1);
+        int root_2 = get_root(node_2);
+
+        return root_1 == root_2;
+    }
+};
+
+class Solution {
+public:
+    vector<int> remainingMethods(int n, int k, vector<vector<int>>& invocations)
+    {
+        /* Construct DSU data structure */
+        DSU dsu(n);
+
+        /* Build an Adjacency List */
+        vector<vector<int>> adj_list(n);
+
+        for (const auto& edge : invocations)
+        {
+            const int& a = edge[0];
+            const int& b = edge[1];
+
+            adj_list[a].push_back(b);
+            dsu.union_components(a, b);
+        }
+
+        vector<int> result;
+        result.reserve(n);
+
+        vector<bool> suspicious(n, false);
+        dfs(-1, 0, adj_list, suspicious); // Color
+
+        for (const auto& edge : invocations)
+        {
+            const int& a = edge[0];
+            const int& b = edge[1];
+
+            if ( ! suspicious[a] && suspicious[b] && dsu.connected_components(a, b))
+            {
+                vector<int> result(n);
+                iota(result.begin(), result.end(), 0);
+
+                return result;
+            }
+
+            if (suspicious[a] && suspicious[b])
+                continue;
+
+            result.push_back(a);
+        }
+
+        return result;
+    }
+
+    void dfs(int prev, int curr, vector<vector<int>>& adj_list, vector<bool>& suspicious)
+    {
+        suspicious[curr] = true;
+
+        for (const int& neighbor : adj_list[curr])
+        {
+            if (neighbor == prev)
+                continue;
+
+            dfs(curr, neighbor, adj_list, suspicious);
+        }
+    }
+};
+
+
 
 /*
     ------------
@@ -84,7 +223,7 @@ using namespace std;
 
 /* Time  Complexity: O(V + E) */
 /* Space Complexity: O(V + E) */
-class Solution {
+class Solution_DFS_and_Coloring {
 public:
     vector<int> remainingMethods(int n, int k, vector<vector<int>>& invocations)
     {
@@ -204,138 +343,91 @@ private:
 
 */
 
-/* Time  Beats: 58.97% */
-/* Space Beats: 57.24% */
+/* Time  Beats: 45.57% */
+/* Space Beats: 82.25% */
 
-/* Time  Complexity: O(E * alpha(V)  +  V * alpha(V)) */
-/* Space Complexity: O(V + E)                         */
-class DSU {
+/* Time  Complexity: O(N + E) */
+/* Space Complexity: O(N + E) */
+class Solution_BFS_Coloring {
 private:
-    vector<int> parent;
-    vector<int> size;
-
-    int components;
+    static constexpr int MAXN = 100005;
 
 public:
-    // O(N)
-    DSU (int n)
-    {
-        components = n;
-
-        size.resize(n);
-        parent.resize(n);
-        for (int i = 0; i < n; i++)
-        {
-            parent[i] = i;
-            size[i]   = 1;
-        }
-    }
-
-    // O(alpha(N)) amortized
-    int get_root(int node)
-    {
-        while (node != parent[node])
-        {
-            /* Inverse Ackerman function, <= 5 for all practical purposes */
-            parent[node] = parent[parent[node]];
-
-            node = parent[node];
-        }
-
-        return node;
-    }
-
-    // O(alpha(N)) amortized
-    bool union_components(int node_1, int node_2)
-    {
-        int root_1 = get_root(node_1);
-        int root_2 = get_root(node_2);
-
-        if (root_1 == root_2)
-            return false; // We have NOT merged
-
-        if (size[root_1] < size[root_2])
-            swap(root_1, root_2);
-
-        parent[root_2] = root_1;
-        size[root_1]  += size[root_2];
-        components--;
-
-        return true; // We have performed a MERGE(union) between 2 components
-    }
-
-    // O(alpha(N)) amortized
-    bool connected_components(int node_1, int node_2)
-    {
-        int root_1 = get_root(node_1);
-        int root_2 = get_root(node_2);
-
-        return root_1 == root_2;
-    }
-};
-
-class Solution_DSU_and_Coloring {
-public:
-    // O(E * alpha(V)  +  V * alpha(V))
     vector<int> remainingMethods(int n, int k, vector<vector<int>>& invocations)
     {
-        vector<int> result;
-        result.reserve(n);
-
-        /* Construct DSU data structure */
-        DSU dsu(n);
-
         /* Build an Adjacency List */
         vector<vector<int>> adj_list(n);
 
-        // O(E * alpha(V)) entire block
-        for (const auto& edge : invocations) // O(E)
+        /* Track incoming edges */
+        vector<int> in_degree(n, 0);
+
+        for (const auto& edge : invocations)
         {
             const int& a = edge[0];
             const int& b = edge[1];
 
-            adj_list[a].push_back(b);   // O(1)        amortized
-            dsu.union_components(a, b); // O(alpha(V)) amortized
+            adj_list[a].push_back(b);
+            in_degree[b]++;
         }
 
-        /* Color SUSPICIOUS nodes using DFS */
-        vector<bool> visited   (n, false);
+
+        /* BFS Color suspicious methods */
         vector<bool> suspicious(n, false);
-        dfs(k, adj_list, visited, suspicious); // Color in O(V + E)
 
-        // O(V * alpha(V))
-        for (int node = 0; node < n; node++) // O(V)
+        queue<int> queue;
+
+        queue.push(k);
+        suspicious[k] = true;
+
+        while ( ! queue.empty())
         {
-            if (suspicious[node])
-                continue;
+            const int curr = queue.front();
+            queue.pop();
 
-            // "node" is NOT suspicious and k is CERTAINLY suspicious
-            if (dsu.connected_components(node, k)) // O(alpha(V)) amortized
+            for (const int& neighbor : adj_list[curr])
             {
-                vector<int> result(n);
-                iota(result.begin(), result.end(), 0); // O(V)
+                in_degree[neighbor]--;
 
-                return result;
+                if ( ! suspicious[neighbor])
+                {
+                    suspicious[neighbor] = true;
+                    queue.push(neighbor);
+                }
+            }
+        }
+
+        /*
+            Check if all suspicious methods can be removed.
+
+            If a non-suspicious method invokes a suspicious method,
+            then removing suspicious methods is impossible.
+        */
+        bool can_remove_all = true;
+
+        vector<int> result;
+        result.reserve(n);
+
+        for (int i = 0; i < n; i++)
+        {
+            if (suspicious[i] && in_degree[i] > 0)
+            {
+                can_remove_all = false;
+                break;
             }
 
-            result.push_back(node);
+            if ( ! suspicious[i])
+                result.push_back(i);
+        }
+
+
+        if ( ! can_remove_all)
+        {
+            vector<int> all_nodes(n);
+            iota(all_nodes.begin(), all_nodes.end(), 0);
+
+            return all_nodes;
         }
 
         return result;
-    }
-
-    // O(V + E)
-    void dfs(int curr, vector<vector<int>>& adj_list, vector<bool>& visited, vector<bool>& suspicious)
-    {
-        visited[curr]    = true;
-        suspicious[curr] = true;
-
-        for (const int& neighbor : adj_list[curr])
-        {
-            if (visited[neighbor])
-                continue;
-
-            dfs(neighbor, adj_list, visited, suspicious);
-        }
     }
 };
