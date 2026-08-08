@@ -61,57 +61,70 @@
 */
 
 #include <climits>
-#include <set>
 #include <vector>
 using namespace std;
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 94.90% */
+/* Space Beats: 87.90% */
+
+/* Time  Complexity: O(3^N) */
+/* Space Complexity: O(2^N) */
 class Solution {
 private:
-    static const int MAXN = 16;
-    static const int TOTAL_MASKS = 1 << MAXN;
+    static const int MAX_N = 16;
+    static const int TOTAL_MASKS = 1 << MAX_N;
 
-    int subset_incompatibillity[TOTAL_MASKS];
+    int incompatibility[TOTAL_MASKS];
 
 public:
     int minimumIncompatibility(vector<int>& nums, int k)
     {
         const int N = nums.size();
-        const int FULL_MASK = (1 << N) - 1;
+        const int group_size = N / k;
 
+        const int FULL_MASK = (1 << N) - 1;
         const int INF = INT_MAX / 2;
 
-        for (int mask = 0; mask < (1 << N); mask++)
-        {
-            subset_incompatibillity[mask] = -1;
-        }
+        fill(incompatibility, incompatibility + (1 << N), -1);
 
-        for (int mask = 0; mask < (1 << N); mask++)
+        for (int mask = 0; mask <= FULL_MASK; mask++)
         {
-            set<int> subsets;
+            if (__builtin_popcount(mask) != group_size)
+                continue;
+
+            int mini = INT_MAX;
+            int maxi = INT_MIN;
             bool ok = true;
+
+            int seen = 0;
 
             for (int i = 0; i < N; i++)
             {
-                if (mask & (1 << i))
+                if ( ! (mask & (1 << i)))
+                    continue;
+
+                if (seen & (1 << nums[i]))
                 {
-                    if (subsets.count(nums[i]))
-                    {
-                        ok = false;
-                        break;
-                    }
-
-                    subsets.insert(nums[i]);
+                    ok = false;
+                    break;
                 }
+
+                seen |= (1 << nums[i]);
+                mini = min(mini, nums[i]);
+                maxi = max(maxi, nums[i]);
             }
 
-            if (ok && subsets.size() == N / k)
-            {
-                auto it1 = subsets.begin();
-                auto it2 = subsets.end();
-                --it2;
-
-                subset_incompatibillity[mask] = *it2 - *it1;
-            }
+            if (ok)
+                incompatibility[mask] = maxi - mini;
         }
 
         vector<int> dp(1 << N, INF);
@@ -122,19 +135,30 @@ public:
             if (dp[mask] == INF)
                 continue;
 
-            for (int sub = 0; sub <= FULL_MASK; sub++)
+            if (mask == FULL_MASK)
+                continue;
+
+            // Pick the first unused element
+            int remaining = FULL_MASK ^ mask;
+            int first_bit = remaining & -remaining;
+
+            // Enumerate only subsets of the REMAINING elements
+            // that contain first_bit
+            for (int sub = remaining; sub; sub = (sub - 1) & remaining)
             {
-                if (subset_incompatibillity[sub] == -1)
+                if ( ! (sub & first_bit))
                     continue;
 
-                if (mask & sub)
+                if (incompatibility[sub] == -1)
                     continue;
 
                 int new_mask = mask | sub;
-                dp[new_mask] = min(dp[new_mask], dp[mask] + subset_incompatibillity[sub]);
+
+                dp[new_mask] = min(dp[new_mask],
+                                   dp[mask    ] + incompatibility[sub]);
             }
         }
 
-        return (dp[FULL_MASK] == INF ? -1 : dp[FULL_MASK]);
+        return dp[FULL_MASK] == INF ? -1 : dp[FULL_MASK];
     }
 };
