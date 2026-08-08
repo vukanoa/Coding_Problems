@@ -41,6 +41,7 @@
 */
 
 #include <climits>
+#include <cstdlib>
 using namespace std;
 
 /*
@@ -118,27 +119,13 @@ class Solution {
 public:
     int reverse(int x)
     {
-        if (x == INT_MIN)
+        if (x == INT_MIN || x == 0)
             return 0;
 
+        bool negative = x < 0;
+        x = abs(x);
+
         int result = 0;
-
-        bool negative = false;
-        if (x < 0)
-        {
-            negative = true;
-
-            // Have we NOT checked:
-            //
-            //     if (x == INT_MIN)
-            //         return 0;
-            //
-            // then this would give as an OVERFLOW or we'd need "long long"
-            // which is forbiden to use in this Problem. (Although it still
-            // will be accepted for some reason)
-            x *= -1;
-        }
-
         while (x != 0)
         {
             int digit = x % 10;
@@ -223,25 +210,13 @@ class Solution_Only_One_If_Statement {
 public:
     int reverse(int x)
     {
-        if (x == INT_MIN)
+        if (x == INT_MIN || x == 0)
             return 0;
 
+        bool negative = x < 0;
+        x = abs(x);
+
         int result = 0;
-
-        bool negative = false;
-        if (x < 0)
-        {
-            negative = true;
-
-            // Have we NOT checked:
-            //
-            //     if (x == INT_MIN)
-            //         return 0;
-            //
-            // then this would give as an OVERFLOW or we'd need "long long".
-            x *= -1;
-        }
-
         while (x != 0)
         {
             int digit = x % 10;
