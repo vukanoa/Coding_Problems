@@ -251,6 +251,80 @@ private:
     --- IDEA ---
     ------------
 
+    This problem is essentially a "Zero Sum" game in Game Theory.
+
+    How do we know that it's a "Zero Sum" game?
+    The key reason is that EVERY stone eventually belongs to exactly ONE player
+
+*/
+
+/* Time  Beats: 77.21% */
+/* Space Beats: 68.94% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_Top_Down__Memoization_Suffix__Sum_Reduced_Dimension__Zero_Sum {
+private:
+    int memo[101][101]; // 2D instead of 3D
+
+public:
+    int stoneGameII(vector<int>& piles)
+    {
+        const int N = piles.size();
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        /* Suffix Sum */
+        vector<int> suffix_sum(N + 1, 0);
+        for (int i = N-1; i >= 0; i--)
+            suffix_sum[i] = piles[i] + suffix_sum[i + 1];
+
+        /* Solve */
+        return solve(0, 1, piles, suffix_sum);
+    }
+
+private:
+    int solve(int idx, int M, vector<int>& piles, vector<int>& suffix_sum)
+    {
+        const int N = piles.size();
+
+        if (idx >= N)
+            return 0;
+
+        if (memo[idx][M] != -1)
+            return memo[idx][M];
+
+        int result = 0;
+        int take   = 0;
+
+        for (int X = 1; X <= 2 * M; X++)
+        {
+            if (idx + X-1 >= N)
+                break;
+
+            take += piles[idx + X-1];
+
+            int remaining = suffix_sum[idx + X];
+            int opponent  = solve(idx + X, max(M, X), piles, suffix_sum);
+
+            int current = take + (remaining - opponent);
+
+            result = max(result, current);
+        }
+
+        return memo[idx][M] = result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     TODO
 
 */
