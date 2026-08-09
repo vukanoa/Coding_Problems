@@ -183,6 +183,78 @@ public:
 
 */
 
+/* Time  Beats: 54.67% */
+/* Space Beats: 68.94% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_Top_Down__Memoization__Prefix_Sum {
+private:
+    int memo[101][101][2];
+
+public:
+    int stoneGameII(vector<int>& piles)
+    {
+        const int N = piles.size();
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        /* Prefix Sum */
+        vector<int> prefix_sum(N, 0);
+        prefix_sum[0] = piles[0];
+        for (int i = 1; i < N; i++)
+            prefix_sum[i] = prefix_sum[i-1] + piles[i];
+
+        /* Solve */
+        return solve(0, 1, true, prefix_sum);
+    }
+
+private:
+    int solve(int idx, int M, bool alice_turn, vector<int>& prefix_sum)
+    {
+        const int N = prefix_sum.size();
+        if (idx >= N)
+            return 0;
+
+        if (memo[idx][M][alice_turn] != -1)
+            return memo[idx][M][alice_turn];
+
+        int result = alice_turn ? 0 : INT_MAX;
+
+        for (int X = 1; X <= 2*M; X++)
+        {
+            if (idx + (X-1) >= N)
+                break;
+
+            int take_stones;
+            if (alice_turn)
+                take_stones = (prefix_sum[idx + (X-1)] - (idx == 0 ? 0 : prefix_sum[idx - 1]));
+            else
+                take_stones = 0;
+
+            if (alice_turn)
+                result = max(result, take_stones + solve(idx + X, max(M, X), !alice_turn, prefix_sum));
+            else
+                result = min(result, take_stones + solve(idx + X, max(M, X), !alice_turn, prefix_sum));
+        }
+
+        return memo[idx][M][alice_turn] = result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
 /* Time  Beats: 73.45% */
 /* Space Beats: 52.69% */
 
