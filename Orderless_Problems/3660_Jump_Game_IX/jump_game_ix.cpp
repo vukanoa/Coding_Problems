@@ -120,3 +120,52 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 74.20% */
+/* Space Beats: 46.26% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Prefix_Suffix {
+public:
+    vector<int> maxValue(vector<int>& nums)
+    {
+        const int N = nums.size();
+        vector<int> prefix_max(N);
+        vector<int> suffix_min(N);
+
+        prefix_max[0]   = nums[0];
+        suffix_min[N-1] = nums[N-1];
+
+        for (int i = 1; i < N; i++)
+        {
+            prefix_max[i]       = max(prefix_max[i-1],       nums[i]      );
+            suffix_min[N-1 - i] = min(suffix_min[N-1 - i+1], nums[N-1 - i]);
+        }
+
+        vector<int> result(N);
+        result[N-1] = prefix_max[N-1];
+
+        for (int i = N-2; i >= 0; i--)
+        {
+            if (prefix_max[i] > suffix_min[i+1])
+                result[i] = result[i+1];
+            else
+                result[i] = prefix_max[i];
+        }
+
+        return result;
+    }
+};
