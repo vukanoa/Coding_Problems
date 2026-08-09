@@ -64,6 +64,7 @@
 
 */
 
+#include <climits>
 #include <stack>
 #include <unordered_map>
 #include <vector>
@@ -164,6 +165,55 @@ public:
                 result[i] = result[i+1];
             else
                 result[i] = prefix_max[i];
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Optimized above Solution. We do not need to have both "prefix" and "suffix"
+    vectors. We can calculate "suffix" one while we go, thus reducing the total
+    required Space, although the Space Complexity is the same in BigO notation.
+
+*/
+
+/* Time  Beats: 68.10% */
+/* Space Beats: 86.30% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Prefix_Suffix__Optimized{
+public:
+    vector<int> maxValue(vector<int>& nums)
+    {
+        const int N = nums.size();
+        vector<int> result(N);
+
+        vector<int> prefix_max(N);
+        prefix_max[0] = nums[0];
+
+        for (int i = 1; i < N; i++)
+            prefix_max[i] = max(prefix_max[i - 1], nums[i]);
+
+        int suffix_min = INT_MAX;
+
+        // Traverse from right to left
+        for (int i = N-1; i >= 0; i--)
+        {
+            if (prefix_max[i] > suffix_min)
+                result[i] = result[i + 1];
+            else
+                result[i] = prefix_max[i];
+
+            suffix_min = min(suffix_min, nums[i]);
         }
 
         return result;
