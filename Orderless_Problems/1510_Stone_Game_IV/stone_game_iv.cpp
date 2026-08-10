@@ -54,6 +54,7 @@
 
 */
 
+#include <cstring>
 #include <vector>
 using namespace std;
 
@@ -170,5 +171,56 @@ public:
         }
 
         return dp[n];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same idea as above, though wrritten in a Top-Down Memoization way.
+
+*/
+
+/* Time  Beats: 67.82% */
+/* Space Beats: 56.63% */
+
+/* Time  Complexity: O(n * sqrt(n)) */
+/* Space Complexity: O(n)           */
+class Solution_Top_Down__Memoization {
+private:
+    static constexpr int MAX_N = 1e5;
+    int memo[MAX_N + 1];
+
+public:
+    bool winnerSquareGame(int n)
+    {
+        /* Memset */
+        memset(memo, -1, sizeof(memo));
+
+        /* Solve */
+        return solve(n);
+    }
+
+private:
+    bool solve(int n)
+    {
+        if (n == 0)
+            return false;
+
+        if (memo[n] != -1)
+            return memo[n];
+
+        for (int i = 1; i*i <= n; i++)
+        {
+            if ( ! solve(n - i*i))
+                return memo[n] = true;
+        }
+
+        return memo[n] = false;
     }
 };
