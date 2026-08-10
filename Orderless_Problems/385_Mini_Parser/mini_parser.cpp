@@ -84,6 +84,20 @@ class NestedInteger {
     const vector<NestedInteger> &getList() const;
 };
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 85.21% */
+/* Space Beats: 35.36% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution {
 public:
     NestedInteger deserialize(string s)
@@ -99,12 +113,11 @@ private:
         {
             int number;
             in >> number;
-
             return NestedInteger(number);
         }
 
         char chr;
-        in >> chr; //[
+        in >> chr;
 
         NestedInteger list;
 
@@ -116,7 +129,8 @@ private:
                 in >> chr;
         }
 
-        in >> chr; //]
+        in >> chr;
+
         return list;
     }
 };
