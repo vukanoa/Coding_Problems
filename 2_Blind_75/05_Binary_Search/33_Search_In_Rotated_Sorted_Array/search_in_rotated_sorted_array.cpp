@@ -373,22 +373,25 @@ public:
 */
 
 /* Time  Beats: 100.00% */
-/* Space Beats:  65.87% */
+/* Space Beats:  95.73% */
 
 /* Time  Complexity: O(logN) */
 /* Space Complexity: O(1)    */
-class Solution {
+class Solution_Elegant {
 public:
     int search(vector<int>& nums, int target)
     {
         const int N = nums.size();
+        int result = -1;
 
         int pivot_idx = find_pivot_idx(0, N-1, nums);
 
-        if (target <= nums[N-1])
-            return my_lower_bound(pivot_idx, N-1, nums, target);
+        if (nums[pivot_idx] <= target && target <= nums[N-1])
+            result = my_lower_bound(pivot_idx, N-1          , target, nums);
+        else
+            result = my_lower_bound(0        , pivot_idx - 1, target, nums);
 
-        return my_lower_bound(0, pivot_idx-1, nums, target);
+        return result;
     }
 
 private:
@@ -396,30 +399,27 @@ private:
     {
         while (low < high)
         {
-            int mid = low + (high - low) / 2;
+            int mid = low + (high - low) / 2; // Low-leaning
 
-            if (nums[mid] < nums[high])
-                high = mid;
-            else
+            if (nums[mid] > nums[high])
                 low = mid + 1;
+            else
+                high = mid;
         }
 
-        return low; // Or "high", it doesn't matter
+        return low; // Or "high", it does NOT matter
     }
 
-    int my_lower_bound(int low, int high, vector<int>& nums, int target)
+    int my_lower_bound(int low, int high, int target, vector<int>& nums)
     {
         while (low < high)
         {
-            int mid = low + (high - low) / 2;
+            int mid = low + (high - low) / 2; // Low-leaning mid
 
-            if (nums[mid] == target)
-                return mid;
-
-            if (target < nums[mid])
-                high = mid - 1;
-            else
+            if (target > nums[mid])
                 low = mid + 1;
+            else
+                high = mid;
         }
 
         return nums[low] == target ? low : -1;
