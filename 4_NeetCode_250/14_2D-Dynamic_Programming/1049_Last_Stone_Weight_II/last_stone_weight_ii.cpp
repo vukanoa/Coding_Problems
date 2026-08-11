@@ -75,7 +75,7 @@ using namespace std;
 
 /* Time  Complexity: O(N * sum) */
 /* Space Complexity: O(N * sum) */
-class Solution_Bottom_Up_DP {
+class Solution_Bottom_Up__Tabulation {
 public:
     int lastStoneWeightII(vector<int>& stones)
     {
@@ -116,6 +116,44 @@ public:
 
 */
 
+/* Time  Beats: 63.00% */
+/* Space Beats: 59.40% */
+
+/* Time  Complexity: O(N * sum) */
+/* Space Complexity: O(sum)     */
+class Solution_Bottom_Up__Tabulation__Space_Optimized {
+public:
+    int lastStoneWeightII(vector<int>& stones)
+    {
+        int total_sum = accumulate(stones.begin(), stones.end(), 0);
+        int target = total_sum / 2;
+
+        vector<int> dp(target + 1, 0);
+
+        for (const int& stone : stones)
+        {
+            for (int t = target; t >= stone; t--)
+            {
+                dp[t] = max(dp[t], dp[t - stone] + stone);
+            }
+        }
+
+        return total_sum - 2 * dp[target];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
 /* Time  Beats: 11.52% */
 /* Space Beats:  9.07% */
 
@@ -139,21 +177,20 @@ public:
     }
 
 private:
-    int solve(int i, int target, int total_sum, const vector<int>& stones)
+    int solve(int idx, int target, int total_sum, const vector<int>& stones)
     {
         const int N = stones.size();
 
-        if (i == N)
+        if (idx == N)
             return abs(target - total_sum);
 
-        if (memo[i][target] != -1)
-            return memo[i][target];
+        if (memo[idx][target] != -1)
+            return memo[idx][target];
 
-        int put_in_left_subset  = solve(i + 1, target - stones[i], total_sum, stones);
-        int put_in_right_subset = solve(i + 1, target + stones[i], total_sum, stones);
+        int put_in_left_subset  = solve(idx + 1, target - stones[idx], total_sum, stones);
+        int put_in_right_subset = solve(idx + 1, target + stones[idx], total_sum, stones);
 
-        return memo[i][target] = min(put_in_left_subset,
-                                     put_in_right_subset);
+        return memo[idx][target] = min(put_in_left_subset, put_in_right_subset);
     }
 };
 
@@ -198,22 +235,22 @@ public:
     }
 
 private:
-    int solve(int i, int remaining, const vector<int>& stones)
+    int solve(int idx, int remaining, const vector<int>& stones)
     {
         const int N = stones.size();
 
-        if (i == N || remaining == 0)
+        if (idx == N || remaining == 0)
             return 0;
 
-        if (memo[i][remaining] != -1)
-            return memo[i][remaining];
+        if (memo[idx][remaining] != -1)
+            return memo[idx][remaining];
 
-        int skip = solve(i + 1, remaining, stones);
+        int skip = solve(idx + 1, remaining, stones);
 
         int take = 0;
-        if (stones[i] <= remaining)
-            take = stones[i] + solve(i + 1, remaining - stones[i], stones);
+        if (stones[idx] <= remaining)
+            take = stones[idx] + solve(idx + 1, remaining - stones[idx], stones);
 
-        return memo[i][remaining] = max(skip, take);
+        return memo[idx][remaining] = max(skip, take);
     }
 };
