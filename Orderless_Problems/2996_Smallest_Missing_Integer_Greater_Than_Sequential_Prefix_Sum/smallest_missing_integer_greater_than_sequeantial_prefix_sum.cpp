@@ -53,6 +53,7 @@
 
 */
 
+#include <bitset>
 #include <unordered_set>
 #include <vector>
 using namespace std;
@@ -89,6 +90,49 @@ public:
         }
 
         while (uset.count(sum))
+            sum++;
+
+        return sum;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  90.34% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Optimized {
+public:
+    int missingInteger(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        bitset<51> seen;
+        for (int i = 0; i < N; i++)
+            seen.set(nums[i]);
+
+        int sum = nums[0];
+        for (int j = 1; j < N; j++)
+        {
+            if ((nums[j-1] + 1) != nums[j])
+                break;
+
+            sum += nums[j];
+        }
+
+        while (sum <= 50 && seen.test(sum))
             sum++;
 
         return sum;
