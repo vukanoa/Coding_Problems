@@ -150,6 +150,47 @@ public:
     --- IDEA ---
     ------------
 
+    Implemented using Bitset instead, which is the most optimal since it uses
+    the least amount of Space.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  97.82% */
+
+/* Time  Complexity: O(N * sum) */
+/* Space Complexity: O(sum)     */
+class Solution_BOttom_Up__Tabulation__Bitset {
+public:
+    int lastStoneWeightII(vector<int>& stones)
+    {
+        int total_sum = accumulate(stones.begin(), stones.end(), 0);
+        int target = total_sum / 2;
+
+        bitset<3001> dp;
+        dp[0] = true;
+
+        for (const int& stone : stones)
+            dp |= (dp << stone);
+
+        for (int t = target; t >= 0; t--)
+        {
+            if (dp[t])
+                return total_sum - 2 * t;
+        }
+
+        return 0;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
     TODO
 
 */
@@ -161,7 +202,10 @@ public:
 /* Space Complexity: O(N * sum) */
 class Solution_Top_Down__Memoization__Left_or_Right_Subset {
 private:
-    vector<vector<int>> memo;
+    static constexpr int MAX_N   = 30;
+    static constexpr int MAX_SUM = MAX_N * 100;
+
+    int memo[MAX_N + 1][2 * MAX_SUM + 1];
 
 public:
     int lastStoneWeightII(vector<int>& stones)
@@ -170,8 +214,8 @@ public:
 
         int total_sum = accumulate(stones.begin(), stones.end(), 0);
 
-        /* Initialize */
-        memo = vector<vector<int>>(N, vector<int>(2 * total_sum + 1, -1));
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
 
         return solve(0, total_sum, total_sum, stones);
     }
@@ -216,7 +260,10 @@ private:
 /* Space Complexity: O(N * sum) */
 class Solution_Top_Down__Memoization__Skip_Take {
 private:
-    vector<vector<int>> memo;
+    static constexpr int MAX_N   = 30;
+    static constexpr int MAX_SUM = MAX_N * 100;
+
+    int memo[MAX_N + 1][MAX_SUM + 1];
 
 public:
     int lastStoneWeightII(vector<int>& stones)
@@ -226,8 +273,8 @@ public:
         int total_sum = accumulate(stones.begin(), stones.end(), 0);
         int target = total_sum / 2;
 
-        /* Initialize */
-        memo = vector<vector<int>>(N, vector<int>(target + 1, -1));
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
 
         int best = solve(0, target, stones);
 
