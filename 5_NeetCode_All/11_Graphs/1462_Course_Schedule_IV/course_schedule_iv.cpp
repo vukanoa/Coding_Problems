@@ -73,6 +73,7 @@
 
 */
 
+#include <queue>
 #include <unordered_set>
 #include <vector>
 using namespace std;
@@ -197,6 +198,109 @@ public:
             {
                 for (int j = 0; j < numCourses; j++)
                     connected[i][j] = connected[i][j] || connected[i][k] && connected[k][j];
+            }
+        }
+
+        vector<bool> answer;
+        answer.reserve(Q); // To prevent repeated reallocations
+        for (const vector<int>& query : queries)
+        {
+            const int& u = query[0];
+            const int& v = query[1];
+
+            answer.push_back(connected[u][v]);
+        }
+
+        return answer;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This problem is a direct application of Topological Sort(i.e. "Kahn's
+    algorithm") with addition to that, we need to maintain a matrix "connected"
+    which represents if course 'i' is a prerequisite of course 'j'.
+
+    Push all the vertices with indegree 0 to the queue, i.e. the ones with NO
+    prerequisites.
+
+    For all such vertices, decrease their neighbor's indegree by 1 since we are
+    removing current course from the queue.
+
+    For connected[i][j] such that i is prerequsite of j, make it true for
+    current course & ALL of its neighbors.
+
+    And also if current course had a prerequisite, that will apply to current
+    course's neighbour as well.
+
+    for(int i = 0; i < n; i++)
+    {
+        if(connected[i][curr_course])
+            table[i][neighbor] = true;
+    }
+
+*/
+
+/* Time  Beats: 71.20% */
+/* Space Beats: 51.86% */
+
+/* Time  Complexity: O(V^3) */
+/* Space Complexity: O(V^2) */
+class Solution_Topological_Sort__Kahn_Algo {
+public:
+    vector<bool> checkIfPrerequisite(int numCourses, vector<vector<int>>& prerequisites, vector<vector<int>>& queries)
+    {
+        const int V = numCourses;
+        const int E = prerequisites.size();
+        const int Q = queries.size();
+
+        /* Build an Adjacency List  &  Indegree List */
+        vector<unordered_set<int>> adj_list (numCourses, unordered_set<int>());
+        vector<int>                in_degree(numCourses, 0);
+
+        for (const vector<int>& edge : prerequisites)
+        {
+            const int& a = edge[0];
+            const int& b = edge[1];
+
+            adj_list[a].insert(b);
+            in_degree[b]++;
+        }
+
+
+        vector<vector<bool>> connected(numCourses, vector<bool>(numCourses, false));
+
+        queue<int> queue;
+        for (int i = 0; i < numCourses; i++)
+        {
+            if (in_degree[i] == 0)
+                queue.push(i);
+        }
+
+        while ( ! queue.empty())
+        {
+            int curr_course = queue.front();
+            queue.pop();
+
+            for (const int& neighbor : adj_list[curr_course])
+            {
+                connected[curr_course][neighbor] = true;
+
+                for (int i = 0; i < numCourses; i++)
+                {
+                    if (connected[i][curr_course]) // If 'i' is a prereq of ME
+                        connected[i][neighbor] = true; // It's a prereq of NEI
+                }
+                in_degree[neighbor]--;
+
+                if (in_degree[neighbor] == 0)
+                    queue.push(neighbor);
             }
         }
 
