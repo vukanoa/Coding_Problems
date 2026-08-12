@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-
 /*
     ==============
     === MEDIUM ===
@@ -26,9 +22,9 @@
 
     A subarray is a contiguous non-empty sequence of elements within an array.
 
-    ===============================
-    FUNCTION:
-    ===============================
+    ==========================================================
+    FUNCTION: int maxSubarrayLength(vector<int>& nums, int k);
+    ==========================================================
 
     ==========================================================================
     ================================ EXAMPLES ================================
@@ -69,6 +65,9 @@
 
 */
 
+#include <vector>
+#include <unordered_map>
+
 using namespace std;
 
 /*
@@ -83,32 +82,38 @@ using namespace std;
 /* Time  Beats: 69.65% */
 /* Space Beats: 30.76% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
 class Solution {
 public:
     int maxSubarrayLength(vector<int>& nums, int k)
     {
-        const int n = nums.size();
+        const int N = nums.size();
         int result = 0;
 
-        unordered_map<int, int> umap;
+        unordered_map<int, int> freq;
 
         int left  = 0;
         int right = 0;
 
-        while (right < n)
+        while (right < N)
         {
-            umap[nums[right]]++;
+            freq[nums[right]]++;
 
-            while (umap[nums[right]] > k)
+            while (freq[nums[right]] > k)
             {
-                umap[nums[left]]--;
+                freq[nums[left]]--;
+
+                if (freq[nums[left]] == 0)
+                    freq.erase(nums[left]);
+
+                // Incrment
                 left++;
             }
 
             result = max(result, right - left + 1);
 
+            // Increment
             right++;
         }
 
