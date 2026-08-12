@@ -103,7 +103,8 @@ class Solution {
 public:
     vector<bool> checkIfPrerequisite(int numCourses, vector<vector<int>>& prerequisites, vector<vector<int>>& queries)
     {
-        const int N = prerequisites.size();
+        const int V = numCourses;
+        const int E = prerequisites.size();
         const int Q = queries.size();
 
         vector<bool> answer;
@@ -152,5 +153,63 @@ private:
             children[course].insert(neighbor);
             children[course].insert(children[neighbor].begin(), children[neighbor].end());
         }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 10.90% */
+/* Space Beats: 84.08% */
+
+/* Time  Complexity: O(V^3) */
+/* Space Complexity: O(V^2) */
+class Solution_Floyd_warshall {
+public:
+    vector<bool> checkIfPrerequisite(int numCourses, vector<vector<int>>& prerequisites, vector<vector<int>>& queries)
+    {
+        const int V = numCourses;
+        const int E = prerequisites.size();
+        const int Q = queries.size();
+
+        vector<vector<bool>> connected = vector(numCourses, vector<bool>(numCourses, false));
+
+        for (const vector<int>& edge : prerequisites)
+        {
+            const int& a = edge[0];
+            const int& b = edge[1];
+
+            connected[a][b] = true;
+        }
+
+        for (int k = 0; k < numCourses; k++)
+        {
+            for (int i = 0; i < numCourses; i++)
+            {
+                for (int j = 0; j < numCourses; j++)
+                    connected[i][j] = connected[i][j] || connected[i][k] && connected[k][j];
+            }
+        }
+
+        vector<bool> answer;
+        answer.reserve(Q); // To prevent repeated reallocations
+        for (const vector<int>& query : queries)
+        {
+            const int& u = query[0];
+            const int& v = query[1];
+
+            answer.push_back(connected[u][v]);
+        }
+
+        return answer;
     }
 };
