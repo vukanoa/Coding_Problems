@@ -481,3 +481,199 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Segment Tree Implementation.
+
+*/
+
+/* Time  Beats: 58.39% */
+/* Space Beats: 80.54% */
+
+/* Time  Complexity: O(N  +  K * logN) */
+/* Space Complexity: O(N)              */
+class SegmentTree {
+public:
+    void construct_segment_tree(int idx,
+                                int start,
+                                int end,
+                                string& s,
+                                vector<int>& prefix,
+                                vector<int>& suffix,
+                                vector<int>& longest,
+                                vector<char>& left_char,
+                                vector<char>& right_char)
+    {
+        if (start == end)
+        {
+            prefix[idx]     = 1;
+            suffix[idx]     = 1;
+            longest[idx]    = 1;
+            left_char[idx]  = s[start];
+            right_char[idx] = s[start];
+
+            return;
+        }
+
+        int mid = start + (end - start) / 2;
+
+        // 0-indexed
+        construct_segment_tree(2*idx + 1, start, mid, s,
+                                                      prefix,
+                                                      suffix,
+                                                      longest,
+                                                      left_char,
+                                                      right_char);
+
+        construct_segment_tree(2*idx + 2, mid+1, end, s,
+                                                      prefix,
+                                                      suffix,
+                                                      longest,
+                                                      left_char,
+                                                      right_char);
+
+
+        int left  = 2*idx + 1;
+        int right = 2*idx + 2;
+
+        int left_length  = mid - start + 1;
+        int right_length = end - mid;
+
+        left_char[idx]  = left_char[left];
+        right_char[idx] = right_char[right];
+
+        prefix[idx] = prefix[left];
+
+        if (prefix[left] == left_length && right_char[left] == left_char[right])
+            prefix[idx] = prefix[left] + prefix[right];
+
+        suffix[idx] = suffix[right];
+
+        if (suffix[right] == right_length && right_char[left] == left_char[right])
+            suffix[idx] = suffix[right] + suffix[left];
+
+        longest[idx] = max(longest[left], longest[right]);
+
+        if (right_char[left] == left_char[right])
+            longest[idx] = max(longest[idx], suffix[left] + prefix[right]);
+    }
+
+
+    void update_segment_tree(int idx,
+                             int start,
+                             int end,
+                             int update_idx,
+                             char new_letter,
+                             vector<int>& prefix,
+                             vector<int>& suffix,
+                             vector<int>& longest,
+                             vector<char>& left_char, vector<char>& right_char)
+    {
+        if (start == end)
+        {
+            prefix[idx]     = 1;
+            suffix[idx]     = 1;
+            longest[idx]    = 1;
+            left_char[idx]  = new_letter;
+            right_char[idx] = new_letter;
+
+            return;
+        }
+
+        int mid = start + (end - start) / 2;
+
+        // 0-indexed
+        if (update_idx <= mid)
+        {
+            update_segment_tree(2*idx + 1, start, mid, update_idx,
+                                                       new_letter,
+                                                       prefix,
+                                                       suffix,
+                                                       longest,
+                                                       left_char,
+                                                       right_char);
+        }
+        else
+        {
+            update_segment_tree(2*idx + 2, mid+1, end, update_idx,
+                                                       new_letter,
+                                                       prefix,
+                                                       suffix,
+                                                       longest,
+                                                       left_char,
+                                                       right_char);
+        }
+
+
+        int left  = 2*idx + 1;
+        int right = 2*idx + 2;
+
+        int left_length  = mid - start + 1;
+        int right_length = end - mid;
+
+        left_char[idx]  = left_char[left];
+        right_char[idx] = right_char[right];
+
+        prefix[idx] = prefix[left];
+
+        if (prefix[left] == left_length && right_char[left] == left_char[right])
+        {
+            prefix[idx] = prefix[left] + prefix[right];
+        }
+
+        suffix[idx] = suffix[right];
+
+        if (suffix[right] == right_length && right_char[left] == left_char[right])
+        {
+            suffix[idx] = suffix[right] + suffix[left];
+        }
+
+        longest[idx] = max(longest[left], longest[right]);
+
+        if (right_char[left] == left_char[right])
+        {
+            longest[idx] = max(longest[idx], suffix[left] + prefix[right]);
+        }
+    }
+};
+
+class Solution_Segment_Tree {
+public:
+    vector<int> longestRepeating(string s, string queryCharacters, vector<int>& queryIndices)
+    {
+        const int N = s.size();
+        const int K = queryCharacters.size();
+
+        vector<int> prefix(4 * N);
+        vector<int> suffix(4 * N);
+        vector<int> longest(4 * N);
+
+        vector<char> left_char (4 * N);
+        vector<char> right_char(4 * N);
+
+        SegmentTree seg_tree;
+
+        seg_tree.construct_segment_tree(0, 0, N-1, s, prefix, suffix, longest, left_char, right_char);
+
+        vector<int> result(K, 0);
+
+        for (int query_idx = 0; query_idx < K; query_idx++)
+        {
+            int idx         = queryIndices[query_idx];
+            char new_letter = queryCharacters[query_idx];
+
+            seg_tree.update_segment_tree(0, 0, N-1, idx, new_letter, prefix, suffix, longest, left_char, right_char);
+
+            result[query_idx] = longest[0];
+        }
+
+        return result;
+    }
+};
