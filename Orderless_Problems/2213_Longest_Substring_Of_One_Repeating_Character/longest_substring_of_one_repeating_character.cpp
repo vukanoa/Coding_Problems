@@ -256,7 +256,7 @@ public:
 
 /* Time  Complexity: O(N  +  K * logN) */
 /* Space Complexity: O(N)              */
-class Solution_Single_Set {
+class Solution_2 {
 public:
     vector<int> longestRepeating(string s, string queryCharacters, vector<int>& queryIndices)
     {
@@ -350,6 +350,130 @@ public:
 
                 s[idx] = new_letter;
             }
+
+            result[query_idx] = *lengths.rbegin();
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same, but even better implementation.
+
+*/
+
+/* Time  Beats: 46.98% */
+/* Space Beats: 19.46% */
+
+/* Time  Complexity: O(N  +  K * logN) */
+/* Space Complexity: O(N)              */
+class Solution_3 {
+public:
+    vector<int> longestRepeating(string s, string queryCharacters, vector<int>& queryIndices)
+    {
+        const int N = s.size();
+        const int K = queryIndices.size();
+
+        vector<int> result(K, 0);
+
+        set<int> boundaries;
+        set<int> lengths;
+        vector<int> count(N + 1);
+
+        auto add_length = [&](int length)
+        {
+            if (++count[length] == 1)
+                lengths.insert(length);
+        };
+
+        auto remove_length = [&](int length)
+        {
+            if (--count[length] == 0)
+                lengths.erase(length);
+        };
+
+        boundaries.insert(0);
+        boundaries.insert(N);
+
+        int L = 0;
+
+        for (int R = 1; R < N; R++)
+        {
+            if (s[R-1] != s[R])
+            {
+                boundaries.insert(R);
+                add_length(R - L);
+
+                L = R;
+            }
+        }
+
+        add_length(N - L);
+
+        auto update = [&](int idx, bool insert_boundary)
+        {
+            if (insert_boundary)
+            {
+                auto iter = boundaries.lower_bound(idx);
+                int next  = *iter;
+                int prev  = *std::prev(iter);
+
+                remove_length(next - prev);
+
+                add_length(idx  - prev);
+                add_length(next - idx);
+
+                boundaries.insert(idx);
+            }
+            else
+            {
+                auto iter = boundaries.find(idx);
+                int prev  = *std::prev(iter);
+                int next  = *std::next(iter);
+
+                remove_length(idx  - prev);
+                remove_length(next - idx);
+
+                add_length(next - prev);
+
+                boundaries.erase(iter);
+            }
+        };
+
+
+
+        for (int query_idx = 0; query_idx < K; query_idx++)
+        {
+            int idx         = queryIndices[query_idx];
+            char new_letter = queryCharacters[query_idx];
+
+            if (idx > 0)
+            {
+                bool old_boundary = s[idx-1] != s[idx];
+                bool new_boundary = s[idx-1] != new_letter;
+
+                if (old_boundary != new_boundary)
+                    update(idx, new_boundary);
+            }
+
+            if (idx+1 < N)
+            {
+                bool old_boundary = s[idx]     != s[idx+1];
+                bool new_boundary = new_letter != s[idx+1];
+
+                if (old_boundary != new_boundary)
+                    update(idx+1, new_boundary);
+            }
+
+            s[idx] = new_letter;
 
             result[query_idx] = *lengths.rbegin();
         }
