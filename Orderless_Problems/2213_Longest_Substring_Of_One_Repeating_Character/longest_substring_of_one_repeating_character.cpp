@@ -60,7 +60,9 @@
 
 */
 
+#include <climits>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 using namespace std;
@@ -231,6 +233,125 @@ public:
             ++longest[new_length][new_letter];
 
             result[query_idx] = longest.begin()->first;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, written in a better way.
+
+*/
+
+/* Time  Beats: 18.79% */
+/* Space Beats: 16.11% */
+
+/* Time  Complexity: O(N  +  K * logN) */
+/* Space Complexity: O(N)              */
+class Solution_Single_Set {
+public:
+    vector<int> longestRepeating(string s, string queryCharacters, vector<int>& queryIndices)
+    {
+        const int N = s.size();
+        const int K = queryCharacters.size();
+
+        vector<int> result(K, 0);
+
+        set<pair<int,int>> intervals;
+        multiset<int> lengths;
+
+        for (int L = 0; L < N;)
+        {
+            int R = L;
+
+            while (R < N && s[R] == s[L])
+                R++;
+
+            intervals.insert( {L, R-1} );
+            lengths.insert(R - L);
+
+            L = R;
+        }
+
+        for (int query_idx = 0; query_idx < K; query_idx++)
+        {
+            int idx         = queryIndices[query_idx];
+            char new_letter = queryCharacters[query_idx];
+
+            if (s[idx] != new_letter)
+            {
+                /* Current Interval */
+                auto current = intervals.upper_bound( {idx, INT_MAX} );
+                --current;
+
+                int L = current->first;
+                int R = current->second;
+
+                intervals.erase(current);
+                lengths.erase(lengths.find(R - L + 1));
+
+
+                /* Split LEFT Interval */
+                if (L <= idx-1)
+                {
+                    intervals.insert( {L, idx-1} );
+                    lengths.insert(idx - L);
+                }
+
+                /* Split RIGHT Interval */
+                if (idx+1 <= R)
+                {
+                    intervals.insert( {idx+1, R} );
+                    lengths.insert(R - idx);
+                }
+
+
+                int new_L = idx;
+                int new_R = idx;
+
+
+                /* Merge RIGHT Interval */
+                auto right = intervals.lower_bound( {idx+1, 0} );
+
+                if (right != intervals.end() && right->first == idx+1 && s[idx+1] == new_letter)
+                {
+                    lengths.erase(lengths.find(right->second - right->first + 1));
+                    new_R = right->second;
+                    intervals.erase(right);
+                }
+
+
+                /* Merge LEFT Interval */
+                auto left = intervals.lower_bound( {idx, 0} );
+
+                if (left != intervals.begin())
+                {
+                    --left;
+
+                    if (left->second == idx-1 && s[idx-1] == new_letter)
+                    {
+                        lengths.erase(lengths.find(left->second - left->first + 1));
+                        new_L = left->first;
+                        intervals.erase(left);
+                    }
+                }
+
+                /* Insert NEW Interval */
+                intervals.insert( {new_L, new_R} );
+                lengths.insert(new_R - new_L + 1);
+
+                s[idx] = new_letter;
+            }
+
+            result[query_idx] = *lengths.rbegin();
         }
 
         return result;
