@@ -42,7 +42,6 @@
 */
 
 #include <string>
-#include <vector>
 using namespace std;
 
 /*
@@ -63,28 +62,29 @@ class Solution {
 public:
     int maximumLengthSubstring(string s)
     {
-        const int N = s.length();
+        const int N = s.size();
         int result = 0;
+
+        int freq[26] = {0}; // On the Stack
 
         int L = 0;
         int R = 0;
-
-        vector<int> freq(26, 0);
-        int max_freq = 0;
         while (R < N)
         {
-            freq[s[R] - 'a']++;
+            ++freq[s[R] - 'a'];
 
-            while (L < R && freq[s[R] - 'a'] > 2)
+            while (freq[s[R] - 'a'] > 2)
             {
-                freq[s[L] - 'a']--;
-                L++;
+                --freq[s[L] - 'a'];
+
+                // Increment
+                ++L;
             }
 
             result = max(result, R - L + 1);
 
-            // Increment
-            R++;
+            // Incrment
+            ++R;
         }
 
         return result;
