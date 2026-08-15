@@ -160,3 +160,85 @@ public:
         return 0; // All zeroes
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    
+    The XOR of all elements is either zero or non-zero.
+
+        Case 1: If total XOR != 0:
+
+            + Array nums is already valid, we simply take all elements, then
+                return N;
+
+
+        Case 2: If total XOR == 0:
+
+            nums is currently invalid, therefore we must remove SOME element.
+
+            + Subcases:
+                1) At least one NON-ZERO element exists in nums, thus we remove
+                   this one NON-ZERO element and return N-1;
+
+                2) All elements are 0, thus we return 0;
+
+
+
+    If the total XOR=0 and at least a single non-zero value exists, then
+    Excluding a non-zero value, also produces a non-zero XOR.
+
+        nums = [0, 0, 9, 0, 2, 1]
+
+                                                exclude one non-zero number
+
+          +---------+                               +---------+
+        0 | 0 0 0 0 |                             0 | 0 0 0 0 |
+          +---------+                               +---------+
+        0 | 0 0 0 0 |                             0 | 0 0 0 0 |
+          +---------+                               +---------+
+        9 | 1 0 0 1 |                        -----9-|-#-#-#-#-|---- (crossed)
+          +---------+                               +---------+
+        0 | 0 0 0 0 |                             0 | 0 0 0 0 |
+          +---------+                               +---------+
+        2 | 0 0 1 0 |                             2 | 0 0 1 0 |
+          +---------+                               +---------+
+       11 | 1 0 1 1 |  XOR                       11 | 1 0 1 1 |  XOR
+          +---------+                               +---------+
+  total=0 | 0 0 0 0 |                       total=9 | 1 0 0 1 |
+          +---------+                               +---------+
+
+
+    Since we want the longest subsequence, it is optimal to exclude only one
+    number.
+
+*/
+
+/* Time  Beats: 11.18% */
+/* Space Beats: 88.49% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_4 {
+public:
+    int longestSubsequence(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        int total_xor = 0;
+        int at_least_one_positive = 0;
+
+        for (const int& num : nums)
+        {
+            at_least_one_positive |= num > 0;
+            total_xor ^= num;
+        }
+
+        return at_least_one_positive * (N - !total_xor);
+    }
+};
