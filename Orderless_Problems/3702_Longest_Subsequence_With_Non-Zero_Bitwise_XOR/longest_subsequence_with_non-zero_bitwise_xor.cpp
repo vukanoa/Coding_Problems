@@ -46,6 +46,8 @@
 
 */
 
+#include <numeric>
+#include <unordered_set>
 #include <vector>
 using namespace std;
 
@@ -70,23 +72,53 @@ public:
         const int N = nums.size();
         int result = 0;
 
-        int xor_val = 0;
-        int zeroes = 0;
+        int total_xor    = 0;
+        int zeroes_count = 0;
 
         for (const int& num : nums)
         {
             if (num == 0)
-            {
-                zeroes++;
-                continue;
-            }
+                zeroes_count++;
 
-            xor_val ^= num;
+            total_xor ^= num;
         }
 
-        if (zeroes == N) // All zeroes
+        if (zeroes_count == N) // All zeroes
             return 0;
         
-        return xor_val == 0 ? N-1 : N;
+        return total_xor == 0 ? N-1 : N;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:   4.61% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    int longestSubsequence(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        int total_xor = accumulate(nums.begin(), nums.end(), 0, bit_xor<>());
+        if (total_xor != 0)
+            return N;
+
+        unordered_set<int> uset(nums.begin(), nums.end());
+
+        return (uset.size() == 1 && *uset.begin() == 0) ? 0 : N-1;
     }
 };
