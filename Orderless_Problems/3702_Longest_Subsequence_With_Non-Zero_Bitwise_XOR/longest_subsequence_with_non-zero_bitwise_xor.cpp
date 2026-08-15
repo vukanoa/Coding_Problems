@@ -172,13 +172,13 @@ public:
     
     The XOR of all elements is either zero or non-zero.
 
-        Case 1: If total XOR != 0:
+        Case 1: If total_xor != 0:
 
             + Array nums is already valid, we simply take all elements, then
                 return N;
 
 
-        Case 2: If total XOR == 0:
+        Case 2: If total_xor == 0:
 
             nums is currently invalid, therefore we must remove SOME element.
 
@@ -240,5 +240,97 @@ public:
         }
 
         return at_least_one_positive * (N - !total_xor);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    (Same as above, though this one is more EXPLICIT, it's much easier to
+     write this one with the explanation below)
+    
+
+
+    The XOR of all elements is either zero or non-zero.
+
+        Case 1: If total_xor != 0:
+
+            + Array nums is already valid, we simply take all elements, then
+                return N;
+
+
+        Case 2: If total_xor == 0:
+
+            nums is currently invalid, therefore we must remove SOME element.
+
+            + Subcases:
+                1) At least one NON-ZERO element exists in nums, thus we remove
+                   this one NON-ZERO element and return N-1;
+
+                2) All elements are 0, thus we return 0;
+
+
+
+    If the total XOR=0 and at least a single non-zero value exists, then
+    Excluding a non-zero value, also produces a non-zero XOR.
+
+        nums = [0, 0, 9, 0, 2, 1]
+
+                                                exclude one non-zero number
+
+          +---------+                               +---------+
+        0 | 0 0 0 0 |                             0 | 0 0 0 0 |
+          +---------+                               +---------+
+        0 | 0 0 0 0 |                             0 | 0 0 0 0 |
+          +---------+                               +---------+
+        9 | 1 0 0 1 |                        -----9-|-#-#-#-#-|---- (crossed)
+          +---------+                               +---------+
+        0 | 0 0 0 0 |                             0 | 0 0 0 0 |
+          +---------+                               +---------+
+        2 | 0 0 1 0 |                             2 | 0 0 1 0 |
+          +---------+                               +---------+
+       11 | 1 0 1 1 |  XOR                       11 | 1 0 1 1 |  XOR
+          +---------+                               +---------+
+  total=0 | 0 0 0 0 |                       total=9 | 1 0 0 1 |
+          +---------+                               +---------+
+
+
+    Since we want the longest subsequence, it is optimal to exclude only one
+    number.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  22.70% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_5 { // Explicit Implementation
+public:
+    int longestSubsequence(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        int total_xor = 0;
+        bool at_least_one_positive = false;
+
+        for (const int& num : nums)
+        {
+            at_least_one_positive |= num > 0; // Check if NON-ZERO exists
+            total_xor ^= num;                 // Compute the total XOR
+        }
+
+        if (total_xor != 0)
+            return N;  // Case 1: total_xor is a non-zero number
+
+        if (at_least_one_positive)
+            return N - 1; // Case 2 (subcase 'a'): Remove 1 NON-ZERO element
+
+        return 0; // Case 2 (subcase 'b'): All elements are 0
     }
 };
