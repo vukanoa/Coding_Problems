@@ -106,7 +106,7 @@ public:
 /* Space Beats:   4.61% */
 
 /* Time  Complexity: O(N) */
-/* Space Complexity: O(1) */
+/* Space Complexity: O(N) */
 class Solution_2 {
 public:
     int longestSubsequence(vector<int>& nums)
@@ -120,5 +120,43 @@ public:
         unordered_set<int> uset(nums.begin(), nums.end());
 
         return (uset.size() == 1 && *uset.begin() == 0) ? 0 : N-1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Another way to impleent it. More explicit.
+
+*/
+
+/* Time  Beats: 43.09% */
+/* Space Beats: 22.70% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_3 {
+public:
+    int longestSubsequence(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        int total_xor = accumulate(nums.begin(), nums.end(), 0, bit_xor<>());
+        if (total_xor != 0)
+            return N;
+
+        unordered_set<int> uset(nums.begin(), nums.end());
+        for (const int& num : uset)
+        {
+            if ((total_xor ^ num) != 0)
+                return N-1;
+        }
+
+        return 0; // All zeroes
     }
 };
