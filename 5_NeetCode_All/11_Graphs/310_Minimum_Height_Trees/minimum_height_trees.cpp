@@ -144,3 +144,103 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 63.72% */
+/* Space Beats: 49.02% */
+
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V)      */
+class Solution_Find_Centroids_of_The_Tree__DFS {
+public:
+    vector<int> findMinHeightTrees(int n, vector<vector<int>>& edges)
+    {
+        const int E = edges.size();
+
+        if (n == 1)
+            return {0};
+
+        vector<vector<int>> adj_list(n, vector<int>());
+
+        for (const auto& edge : edges)
+        {
+            const int& a = edge[0];
+            const int& b = edge[1];
+
+            /* Undirected edge */
+            adj_list[a].push_back(b);
+            adj_list[b].push_back(a);
+        }
+
+        int diameter_endpoint_A = dfs(0             ,      -1, adj_list).first;
+        int diameter_endpoint_B = dfs(diameter_endpoint_A, -1, adj_list).first;
+
+        vector<int> path;
+
+        find_path(diameter_endpoint_A, diameter_endpoint_B, -1, adj_list, path);
+
+        const int L = path.size();
+
+        if (L % 2 == 1)
+            return {path[L / 2]};
+
+        return {path[L / 2 - 1], path[L / 2]};
+    }
+
+private:
+    pair<int, int> dfs(int node, int parent, vector<vector<int>>& adj_list)
+    {
+        int farthest_node = node;
+        int max_distance  = 0;
+
+        for (const int& neighbor : adj_list[node])
+        {
+            if (neighbor == parent)
+                continue;
+
+            auto result = dfs(neighbor, node, adj_list);
+
+            const int& farthest_node_from_neighbor = result.first;
+            const int& distance_from_neighbor      = result.second;
+
+            if (distance_from_neighbor + 1 > max_distance)
+            {
+                farthest_node = farthest_node_from_neighbor;
+                max_distance  = distance_from_neighbor + 1;
+            }
+        }
+
+        return {farthest_node, max_distance};
+    }
+
+    bool find_path(int node, int target, int parent, vector<vector<int>>& adj_list, vector<int>& path)
+    {
+        path.push_back(node);
+
+        if (node == target)
+            return true;
+
+        for (const int& neighbor : adj_list[node])
+        {
+            if (neighbor == parent)
+                continue;
+
+            if (find_path(neighbor, target, node, adj_list, path))
+                return true;
+        }
+
+        path.pop_back();
+        return false;
+    }
+};
