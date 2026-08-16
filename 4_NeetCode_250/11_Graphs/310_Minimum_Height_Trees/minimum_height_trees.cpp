@@ -68,66 +68,74 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    TODO
+    Doing a Kahn's Algorithm, i.e. Topological sort, however since we're
+    dealing with UNDIRECTED edges, we're NOT pushing elements with degree[node]
+    == 0, but degree[node] == 1, as those are the "leaves".
+
+    Then we slowly go inwards.
 
 */
 
-/* Time  Beats: 98.03% */
-/* Space Beats: 72.29% */
+/* Time  Beats: 13.11% */
+/* Space Beats: 11.46% */
 
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution_MTH_BFS {
+/* Time  Complexity: O(V + E) */
+/* Space Complexity: O(V + E) */
+class Solution_Topological_Sort__Kahn_Algorithm {
 public:
     vector<int> findMinHeightTrees(int n, vector<vector<int>>& edges)
     {
-        if(n == 0)
-            return {};
-        else if(n == 1)
+        const int E = edges.size();
+
+        if (n == 1)
             return {0};
 
+        if (E == 1)
+            return {0, 1};
+
+        /* Build an Adjacency List */
+        vector<vector<int>> adj_list(n, vector<int>());
+        vector<int> degree(n, 0);
+
+        for (const auto& edge : edges)
+        {
+            const int& a = edge[0];
+            const int& b = edge[1];
+
+            /* Undirected edge */
+            adj_list[a].push_back(b);
+            adj_list[b].push_back(a);
+
+            ++degree[a];
+            ++degree[b];
+        }
+
+        queue<int> queue;
+
+        for (int node = 0; node < n; node++)
+        {
+            if (degree[node] == 1)
+                queue.push(node);
+        }
+
         vector<int> result;
-
-        vector<vector<int>> adj(n);
-        vector<int> degrees(n, 0);
-
-        for (int i = 0; i < edges.size(); i++)
+        while ( ! queue.empty())
         {
-            adj[edges[i][0]].push_back(edges[i][1]); // Creating adjacent list
-            adj[edges[i][1]].push_back(edges[i][0]);
-
-            degrees[edges[i][1]]++; // Updating how many edges each node has
-            degrees[edges[i][0]]++;
-        }
-
-        queue<int>queue;
-        for (int i = 0; i < n; i++)
-        {
-            if (degrees[i] == 1) // Adding all the leaf nodes
-                queue.push(i);
-        }
-
-        while (!queue.empty())
-        {
-            /* Clear vector before we start traversing level by level */
             result.clear();
+            int level_size = queue.size();
 
-            int size = queue.size();
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < level_size; i++)
             {
-                int curr = queue.front();
+                int node = queue.front();
                 queue.pop();
 
-                /*
-                    Goal is to get a vector of just 1 or 2 nodes avaiable.
-                */
-                result.push_back(curr); // Adding nodes to vector.
+                result.push_back(node);
 
-                for (auto& neighbor : adj[curr])
+                for (const int& neighbor : adj_list[node])
                 {
-                    degrees[neighbor]--;        // Removing currrent leaf nodes
+                    --degree[neighbor];
 
-                    if (degrees[neighbor] == 1) // Adding currrent leaf nodes
+                    if (degree[neighbor] == 1)
                         queue.push(neighbor);
                 }
             }
