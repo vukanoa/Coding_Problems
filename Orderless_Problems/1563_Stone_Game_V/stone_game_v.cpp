@@ -130,3 +130,79 @@ private:
         return memo[left][right] = result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, though this implementation uses INCLUSIVE Prefix_Sum
+    implementation.
+
+    This one is MUCH more intuitive to me, but usually people write the above
+    version more frequently.
+
+    It's beneficial to be aware of both.
+
+*/
+
+/* Time  Beats: 95.53% */
+/* Space Beats: 97.18% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_Top_Down__Memoization__Inclusive_PRefix_Sum {
+private:
+    int memo[501][501];
+    int prefix_sum[501];
+
+public:
+    int stoneGameV(vector<int>& stoneValue)
+    {
+        const int N = stoneValue.size();
+
+        /* Prefix Sum */
+        prefix_sum[0] = stoneValue[0];
+
+        for (int i = 1; i < N; i++)
+            prefix_sum[i] = prefix_sum[i-1] + stoneValue[i];
+
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo));
+
+        return solve(0, N-1, stoneValue);
+    }
+
+private:
+    int solve(int left, int right, vector<int>& stoneValue)
+    {
+        if (left >= right)
+            return 0;
+
+        if (memo[left][right] != -1)
+            return memo[left][right];
+
+        int result = 0;
+
+        for (int mid = left; mid < right; mid++)
+        {
+            int left_sum  = prefix_sum[mid]   - (left > 0 ? prefix_sum[left - 1] : 0);
+            int right_sum = prefix_sum[right] - prefix_sum[mid];
+
+            if (left_sum <= right_sum)
+                result = max(result, left_sum  + solve(left   , mid  , stoneValue));
+
+            if (left_sum >= right_sum)
+                result = max(result, right_sum + solve(mid + 1, right, stoneValue));
+
+            /* Prunning branch */
+            if (2 * min(left_sum, right_sum) <= result)
+                break;
+        }
+
+        return memo[left][right] = result;
+    }
+};
