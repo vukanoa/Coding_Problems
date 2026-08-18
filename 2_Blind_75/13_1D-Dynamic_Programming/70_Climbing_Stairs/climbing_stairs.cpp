@@ -83,6 +83,8 @@
 */
 
 #include <cstring>
+#include <vector>
+using namespace std;
 
 /*
     ------------
@@ -101,7 +103,7 @@
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution_Bottom_Up__1D_DP_Array {
+class Solution {
 public:
     int climbStairs(int n)
     {
@@ -110,10 +112,55 @@ public:
         dp[1] = 1;
 
         /* Fibonacci */
-        for (int i = 2; i <= n; i++)
+        for (int i = 2; i < n+1; i++)
             dp[i] = dp[i-2] + dp[i-1];
 
         return dp[n];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    This is written in a specific "Memoization" form. It's important to be
+    aware of this "form" if you plan to learn true Memoization technique.
+
+*/
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solutionm_Memoization {
+private:
+    int memo[46];
+
+public:
+    int climbStairs(int n)
+    {
+        /* Memset */
+        memset(memo, -1, sizeof(memo));
+
+        return solve(n); // n <==> highest, top, stair-level
+    }
+
+private:
+    int solve(int n)
+    {
+        if (n == 0) return 0;
+        if (n == 1) return 1;
+        if (n == 2) return 2;
+        
+        if (memo[n] != -1)
+            return memo[n];
+        
+        int step_down_1_step  = solve(n-1);
+        int step_down_2_steps = solve(n-2);
+
+        return memo[n] = step_down_1_step + step_down_2_steps;
     }
 };
 
@@ -142,10 +189,13 @@ class Solution_Efficient {
 public:
     int climbStairs(int n)
     {
+        if (n == 1)
+            return 1;
+
         int prev_prev = 1;
         int prev      = 1;
 
-        for (int i = 2; i <= n; i++)
+        for (int i = 3; i < n+1; i++)
         {
             int curr = prev_prev + prev;
 
@@ -153,7 +203,7 @@ public:
             prev      = curr;
         }
 
-        return prev;
+        return prev_prev + prev;
     }
 };
 
@@ -165,41 +215,49 @@ public:
     --- IDEA ---
     ------------
 
-    This is written in a specific "Memoization" form. It's important to be
-    aware of this "form" if you plan to learn true Memoization technique.
+    TODO
 
 */
 
-/* Time  Beats: 100.00% */
-/* Space Beats:  68.78% */
+/* Time  Beats:  5.03% */
+/* Space Beats: 56.51% */
 
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
-class Solution_Memoization {
-private:
-    int memo[46];
-
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(1)    */
+class Solution_Matrix_Exponentiation {
 public:
     int climbStairs(int n)
     {
-        /* Memset */
-        memset(memo, -1, sizeof(memo));
+        if (n == 1)
+            return 1;
 
-        return memoization(n);
+        vector<vector<long long>> matrix = { {1, 1}, {1, 0} };
+        vector<vector<long long>> result = matrixPow(matrix, n);
+
+        return result[0][0];
     }
 
 private:
-    int memoization(int n)
+    vector<vector<long long>> matrix_multiplication(vector<vector<long long>>& A,vector<vector<long long>>& B)
     {
-        if (n == 0 || n == 1)
-            return 1;
-        
-        if (memo[n] != -1)
-            return memo[n];
-        
-        int take_prev_prev = memoization(n-1);
-        int take_prev      = memoization(n-2);
+        return { {A[0][0] * B[0][0]  +  A[0][1] * B[1][0],   A[0][0] * B[0][1]  +  A[0][1] * B[1][1]},
+                 {A[1][0] * B[0][0]  +  A[1][1] * B[1][0],   A[1][0] * B[0][1]  +  A[1][1] * B[1][1]}};
+    }
 
-        return memo[n] = take_prev_prev + take_prev;
+    vector<vector<long long>> matrixPow(vector<vector<long long>>& matrix, int exponent)
+    {
+        vector<vector<long long>> result = { {1, 0}, {0, 1} };
+        vector<vector<long long>> base = matrix;
+
+        while (exponent > 0)
+        {
+            if (exponent & 1)
+                result = matrix_multiplication(result, base);
+
+            base = matrix_multiplication(base, base);
+            exponent /= 2;
+        }
+
+        return result;
     }
 };

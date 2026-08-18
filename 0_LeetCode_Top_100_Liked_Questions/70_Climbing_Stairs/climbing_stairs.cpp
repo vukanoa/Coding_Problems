@@ -82,6 +82,10 @@
 
 */
 
+#include <cstring>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -99,7 +103,6 @@
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-#include <cstring>
 class Solution {
 public:
     int climbStairs(int n)
@@ -201,5 +204,60 @@ public:
         }
 
         return prev_prev + prev;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats:  5.03% */
+/* Space Beats: 56.51% */
+
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(1)    */
+class Solution_Matrix_Exponentiation {
+public:
+    int climbStairs(int n)
+    {
+        if (n == 1)
+            return 1;
+
+        vector<vector<long long>> matrix = { {1, 1}, {1, 0} };
+        vector<vector<long long>> result = matrixPow(matrix, n);
+
+        return result[0][0];
+    }
+
+private:
+    vector<vector<long long>> matrix_multiplication(vector<vector<long long>>& A,vector<vector<long long>>& B)
+    {
+        return { {A[0][0] * B[0][0]  +  A[0][1] * B[1][0],   A[0][0] * B[0][1]  +  A[0][1] * B[1][1]},
+                 {A[1][0] * B[0][0]  +  A[1][1] * B[1][0],   A[1][0] * B[0][1]  +  A[1][1] * B[1][1]}};
+    }
+
+    vector<vector<long long>> matrixPow(vector<vector<long long>>& matrix, int exponent)
+    {
+        vector<vector<long long>> result = { {1, 0}, {0, 1} };
+        vector<vector<long long>> base = matrix;
+
+        while (exponent > 0)
+        {
+            if (exponent & 1)
+                result = matrix_multiplication(result, base);
+
+            base = matrix_multiplication(base, base);
+            exponent /= 2;
+        }
+
+        return result;
     }
 };
