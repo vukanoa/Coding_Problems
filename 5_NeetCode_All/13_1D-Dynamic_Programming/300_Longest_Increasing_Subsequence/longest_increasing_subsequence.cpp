@@ -352,11 +352,11 @@ public:
 
     int get(int idx)
     {
-        int ans = 0;
+        int result = 0;
         for (; idx > 0; idx -= idx & -idx)
-            ans = max(ans, bit[idx]);
+            result = max(result, bit[idx]);
 
-        return ans;
+        return result;
     }
 
     void update(int idx, int val)
@@ -374,10 +374,10 @@ public:
         int base = 10001;
         MaxBIT bit(20001);
 
-        for (int x : nums)
+        for (const int& num : nums)
         {
-            int subLongest = bit.get(base + x - 1);
-            bit.update(base + x, subLongest + 1);
+            int sub_longest = bit.get(base + num - 1);
+            bit.update(base + num, sub_longest + 1);
         }
 
         return bit.get(20001);
@@ -427,16 +427,16 @@ class Solution_BIT_Compress {
 public:
     int lengthOfLIS(vector<int>& nums)
     {
-        int nUnique = compress(nums);
-        MaxBIT bit(nUnique);
+        int UNIQUE_N = compress(nums);
+        MaxBIT bit(UNIQUE_N);
 
-        for(int x : nums)
+        for (const int& num : nums)
         {
-            int subLongest = bit.get(x - 1);
-            bit.update(x, subLongest + 1);
+            int sub_longest = bit.get(num - 1);
+            bit.update(num, sub_longest + 1);
         }
 
-        return bit.get(nUnique);
+        return bit.get(UNIQUE_N);
     }
 
     int compress(vector<int>& nums)
@@ -446,11 +446,116 @@ public:
         /* Sort */
         sort(unique_sorted.begin(), unique_sorted.end());
 
-        unique_sorted.erase(unique(unique_sorted.begin(), unique_sorted.end()), unique_sorted.end()); // Remove duplicated values
+        /* Remove duplicated values */
+        unique_sorted.erase(unique(unique_sorted.begin(), unique_sorted.end()),
+                            unique_sorted.end());
 
-        for (int& x : nums)
-            x = lower_bound(unique_sorted.begin(), unique_sorted.end(), x) - unique_sorted.begin() + 1;
+        for (int& num : nums)
+        {
+            auto iter = lower_bound(unique_sorted.begin(), unique_sorted.end(), num);
+            num = iter - unique_sorted.begin() + 1;
+        }
 
         return unique_sorted.size();
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Segment Tree Solution.
+
+*/
+
+/* Time  Beats: 74.29% */
+/* Space Beats: 37.60% */
+
+/* Time Complexity:  O(N log N) */
+/* Space Complexity: O(N)       */
+class SegmentTree {
+public:
+    vector<int> seg_tree;
+
+    SegmentTree(int N)
+    {
+        seg_tree.resize(4 * N);
+    }
+
+    void update_segment_tree(int idx, int start, int end, int pos, int value)
+    {
+        if (start == end)
+        {
+            seg_tree[idx] = value;
+            return;
+        }
+
+        int mid = start + (end - start) / 2;
+
+        if (pos <= mid)
+            update_segment_tree(2*idx + 1, start, mid, pos, value);
+        else
+            update_segment_tree(2*idx + 2, mid+1, end, pos, value);
+
+        seg_tree[idx] = max(seg_tree[2*idx + 1],
+                            seg_tree[2*idx + 2]);
+    }
+
+    int range_max_query(int idx, int start, int end, int q_left, int q_right)
+    {
+        if (q_left <= start && end <= q_right) // Total Overlap
+            return seg_tree[idx];
+
+        if (q_right < start || end < q_left) // NO Overlap
+            return 0;
+
+        int mid = start + (end - start) / 2;
+
+        return max(range_max_query(2*idx + 1, start, mid, q_left, q_right),
+                   range_max_query(2*idx + 2, mid+1, end, q_left, q_right));
+    }
+};
+
+class Solution {
+public:
+    int lengthOfLIS(vector<int>& nums)
+    {
+        const int NUMS_SIZE = nums.size();
+        vector<int> sorted_nums = nums;
+
+        /* Sort */
+        sort(sorted_nums.begin(), sorted_nums.end());
+
+        /* Remove duplicates  */
+        sorted_nums.erase(unique(sorted_nums.begin(), sorted_nums.end()),
+                          sorted_nums.end());
+
+        vector<int> order(NUMS_SIZE);
+
+        for (int i = 0; i < NUMS_SIZE; i++)
+        {
+            order[i] = lower_bound(sorted_nums.begin(), sorted_nums.end(),
+                                   nums[i]) - sorted_nums.begin();
+        }
+
+        int N = sorted_nums.size();
+
+        SegmentTree seg_tree(N);
+        int LIS = 0;
+
+        for (const int& num : order)
+        {
+            int curr_LIS = seg_tree.range_max_query(0, 0, N-1, 0, num-1) + 1;
+
+            seg_tree.update_segment_tree(0, 0, N-1, num, curr_LIS);
+
+            LIS = max(LIS, curr_LIS);
+        }
+
+        return LIS;
     }
 };
