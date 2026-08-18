@@ -106,16 +106,16 @@ public:
     {
         const int N = nums.size();
 
-        vector<int> counter(51, 0);
+        vector<int> freq(51, 0);
         for (const int& num : nums)
-            counter[num]++;
+            freq[num]++;
 
         if (k == 1)
         {
             int result = -1;
             for (int num = 50; num >= 0; num--)
             {
-                if (counter[num] == 1)
+                if (freq[num] == 1)
                 {
                     result = num;
                     break;
@@ -129,12 +129,57 @@ public:
             return *max_element(nums.begin(), nums.end());
         }
 
-        if (nums[0] == nums[N-1] || (counter[nums[0]] != 1 && counter[nums[N-1]] != 1))
+        if (nums[0] == nums[N-1] || (freq[nums[0]] != 1 && freq[nums[N-1]] != 1))
             return -1;
 
-        if (counter[nums[0]] == 1 && counter[nums[N-1]] == 1)
+        if (freq[nums[0]] == 1 && freq[nums[N-1]] == 1)
             return max(nums[0], nums[N-1]);
 
-        return counter[nums[0]] == 1 ? nums[0] : nums[N-1];
+        return freq[nums[0]] == 1 ? nums[0] : nums[N-1];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 46.24% */
+/* Space Beats: 65.79% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Elegant {
+public:
+    int largestInteger(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+        int result = -1;
+
+        int freq[51] = {};
+
+        for (const int& num : nums)
+            freq[num]++;
+
+        for (int i = 0; i < N; i++)
+        {
+            if (k == N)
+            {
+                result = max(result, nums[i]);
+            }
+            else if (freq[nums[i]] == 1 && (k == 1 || i == 0 || i == N-1))
+            {
+                result = max(result, nums[i]);
+            }
+        }
+
+        return result;
     }
 };
