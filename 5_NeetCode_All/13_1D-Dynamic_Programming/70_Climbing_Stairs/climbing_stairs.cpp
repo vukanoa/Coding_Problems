@@ -82,6 +82,7 @@
 
 */
 
+#include <cmath>
 #include <cstring>
 #include <vector>
 using namespace std;
@@ -259,5 +260,37 @@ private:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  57.30% */
+
+/* Time  Complexity: O(logN) */
+/* Space Complexity: O(1)    */
+class Solution_Golden_Ratio {
+public:
+    int climbStairs(int n)
+    {
+        double sqrt_of_5 = sqrt(5);
+
+        double phi = (1 + sqrt_of_5) / 2;
+        double psi = (1 - sqrt_of_5) / 2;
+
+        ++n;
+
+        return round((pow(phi, n) - pow(psi, n)) / sqrt_of_5);
     }
 };
