@@ -66,6 +66,7 @@
 */
 
 #include <algorithm>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -144,5 +145,59 @@ private:
         }
 
         return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 80.74% */
+/* Space Beats: 78.38% */
+
+/* Time  Complexity: O(M) */
+/* Space Complexity: O(M) */
+class Solution_Bitset {
+public:
+    int maxNumberOfFamilies(int n, vector<vector<int>>& reservedSeats)
+    {
+        const int M = reservedSeats.size();
+
+        int left   = 0b11110000;
+        int middle = 0b11000011;
+        int right  = 0b00001111;
+
+        unordered_map<int, int> occupied;
+
+        for (const vector<int>& entry : reservedSeats)
+        {
+            const int& row  = entry[0];
+            const int& seat = entry[1];
+
+            if (seat >= 2 && seat <= 9)
+                occupied[row] |= (1 << (seat - 2));
+        }
+
+        int result = (n - occupied.size()) * 2;
+
+        for (auto& [row, bitmask] : occupied)
+        {
+            if (((bitmask | left)   == left)   ||
+                ((bitmask | middle) == middle) ||
+                ((bitmask | right)  == right))
+            {
+                ++result;
+            }
+        }
+
+        return result;
     }
 };
