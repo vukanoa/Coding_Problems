@@ -63,6 +63,7 @@
 
 */
 
+#include <algorithm>
 #include <vector>
 using namespace std;
 
@@ -100,5 +101,49 @@ public:
         arr1.insert(arr1.end(), arr2.begin(), arr2.end());
 
         return arr1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  98.43% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Two_Pointers {
+public:
+    vector<int> resultArray(vector<int>& nums)
+    {
+        const int N = nums.size();
+        vector<int> arr(N);
+
+        arr[0]     = nums[0];
+        arr[N - 1] = nums[1];
+
+        int left  = 0;
+        int right = N-1;
+
+        for (int i = 2; i < N; i++)
+        {
+            if (arr[left] > arr[right])
+                arr[++left]  = nums[i];
+            else
+                arr[--right] = nums[i];
+        }
+
+        reverse(arr.begin() + right, arr.end());
+
+        return arr;
     }
 };
