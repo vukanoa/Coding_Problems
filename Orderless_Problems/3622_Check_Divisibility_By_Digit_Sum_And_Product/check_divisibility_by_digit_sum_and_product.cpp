@@ -60,23 +60,31 @@
 /* Time  Beats: 100.00% */
 /* Space Beats:  69.23% */
 
-/* Time  Complexity: O(logN) */
-/* Space Complexity: O(1)    */
+/* Time  Complexity: O(log(n)) */
+/* Space Complexity: O(1)      */
 class Solution {
 public:
     bool checkDivisibility(int n)
     {
-        int tmp = n;
+        int remaining_n = n;
 
-        long long prod = 1LL;
-        long long sum  = 0LL;
-        while (tmp > 0)
+        /*
+            We're using "int" types for "sum" and "prod" because there is AT
+            MOST 6 digits in n and since 9^6 = 531441 < INT_MAX, it means we're
+            safe using "int" types.
+        */
+
+        int sum  = 0;
+        int prod = 1;
+        while (remaining_n > 0)
         {
-            int digit = tmp % 10;
-            tmp /= 10;
+            int digit = remaining_n % 10;
 
+            sum  += digit;
             prod *= digit;
-            sum += digit;
+
+            // Chop off currently last digit
+            remaining_n /= 10;
         }
 
         return n % (sum + prod) == 0;
