@@ -99,7 +99,7 @@ using namespace std;
 
 /* Time  Complexity: O(M  +  N * log(LLONG_MAX)) */
 /* Space Complexity: O(N)                        */
-class Solution {
+class Solution_Binary_Search_On_Range {
 public:
     long long minInitialStrength(vector<int>& monsters, vector<vector<int>>& boosts)
     {
@@ -155,5 +155,61 @@ private:
         }
 
         return true;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 92.06% */
+/* Space Beats: 74.19% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Greedy {
+public:
+    long long minInitialStrength(vector<int>& monsters, vector<vector<int>>& boosts)
+    {
+        const int N = monsters.size();
+        const int M = boosts.size();
+
+        vector<long long> sweep_line(N, 0LL);
+
+        /* Reversed Sweep Line */
+        for (const vector<int>& boost : boosts)
+        {
+            const int& l = boost[0];
+            const int& r = boost[1];
+            const int& v = boost[2];
+
+            sweep_line[r] += v;
+
+            if (l > 0)
+                sweep_line[l - 1] -= v;
+        }
+
+        long long required_strength = 0;
+        long long curr_bonus = 0;
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            curr_bonus += sweep_line[i];
+
+            if (required_strength > 0)
+                required_strength += monsters[i];
+            else
+                required_strength = max(0LL, 1LL * monsters[i] - curr_bonus);
+        }
+
+        return required_strength;
     }
 };
