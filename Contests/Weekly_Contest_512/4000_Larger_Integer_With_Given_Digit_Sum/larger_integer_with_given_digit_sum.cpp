@@ -154,6 +154,9 @@ public:
 
 */
 
+/* Time  Beats: 100.00% */
+/* Space Beats:  79.64% */
+
 /* Time  Complexity: O(n) */
 /* Space Complexity: O(1) */
 class Solution_Greedy_2 {
@@ -177,5 +180,37 @@ public:
             return -1;
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  53.84% */
+
+/* Time  Complexity: O(1) */
+/* Space Complexity: O(1) */
+class Solution_Constant {
+private:
+    static constexpr int pow[] = {0, 1, 10, 100, 1000, 10000, 100000};
+
+public:
+    int largestInteger(int n, int s)
+    {
+        if (n*9 < s)
+            return -1;
+
+        auto [quotient, remainder] = div(s, 9);        
+        return pow[n + 1] - pow[n - quotient + 1] + remainder * pow[n - quotient];
     }
 };
