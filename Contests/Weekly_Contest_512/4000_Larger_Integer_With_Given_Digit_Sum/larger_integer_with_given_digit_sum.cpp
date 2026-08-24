@@ -141,3 +141,41 @@ public:
         return stoi(str);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(1) */
+class Solution_Greedy_2 {
+public:
+    int largestInteger(int n, int s)
+    {
+        int result = 0;
+
+        while (n > 0)
+        {
+            int digit = min(9, s);
+            s -= digit;
+
+            result = result*10 + digit;
+
+            // Decrement
+            --n;
+        }
+
+        if (s > 0)
+            return -1;
+
+        return result;
+    }
+};
