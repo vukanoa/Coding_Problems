@@ -52,6 +52,7 @@
 */
 
 #include <cmath>
+#include <string>
 using namespace std;
 
 /*
@@ -94,5 +95,49 @@ public:
         }
 
         return -1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  79.64% */
+
+/* Time  Complexity: O(n) */
+/* Space Complexity: O(n) */
+class Solution_Greedy {
+public:
+    int largestInteger(int n, int s)
+    {
+        if (9*n < s)
+            return -1;
+
+        if (s == 0)
+            return 0;
+
+        string str = "";
+
+        while (n > 0)
+        {
+            int digit = min(9, s);
+            str += static_cast<char>(digit + '0');
+
+            s -= digit;
+
+            // Decrement
+            --n;
+        }
+
+        return stoi(str);
     }
 };
