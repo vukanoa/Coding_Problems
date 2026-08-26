@@ -87,6 +87,9 @@ using namespace std;
 
 */
 
+/* Time  Beats: 7.56% */
+/* Space Beats: 5.79% */
+
 /* Time  Complexity: O(N^3) */
 /* Space Complexity: O(N)   */
 class Solution {
@@ -115,5 +118,66 @@ public:
         }
 
         return "";
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats: 45.09% */
+
+/* Time  Complexity: O(N^) */
+/* Space Complexity: O(N)  */
+class Solution_Sliding_Window {
+public:
+    string shortestBeautifulSubstring(string s, int k)
+    {
+        if (count(s.begin(), s.end(), '1') < k)
+            return "";
+
+        const int N = s.size();
+
+        string result = s;
+        int ones = 0;
+
+        int left  = 0;
+        int right = 0;
+
+        while (right < N)
+        {
+            ones += s[right] - '0';
+
+            while (ones > k || s[left] == '0')
+            {
+                ones -= s[left] - '0';
+                ++left;
+            }
+
+            if (ones == k)
+            {
+                string substring = s.substr(left, right - left + 1);
+
+                if (substring.size() < result.size() ||
+                    (substring.size() == result.size() && substring < result))
+                {
+                    result = std::move(substring);
+                }
+            }
+
+            // Increment
+            ++right;
+        }
+
+        return result;
     }
 };
