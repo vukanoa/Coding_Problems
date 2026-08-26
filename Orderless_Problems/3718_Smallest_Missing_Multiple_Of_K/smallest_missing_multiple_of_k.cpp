@@ -46,6 +46,7 @@
 
 */
 
+#include <cstdint>
 #include <unordered_set>
 #include <vector>
 using namespace std;
@@ -77,5 +78,44 @@ public:
         }
 
         return multiple;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  94.70% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Space_Efficient {
+public:
+    int missingMultiple(vector<int>& nums, int k)
+    {
+        uint64_t multiples[2] = {0, 0};
+
+        for (const int& num : nums)
+        {
+            if (num % k == 0)
+            {
+                int idx = num / k - 1;
+
+                multiples[idx >> 6] |= 1ULL << (idx & 63);
+            }
+        }
+
+        int block = multiples[0] == -1ULL;
+
+        return (block * 64 + __bit_width(++multiples[block] & -multiples[block])) * k;
     }
 };
