@@ -75,6 +75,7 @@
 */
 
 #include <algorithm>
+#include <cstdint>
 #include <string>
 using namespace std;
 
@@ -179,5 +180,63 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 26.70% */
+/* Space Beats: 82.87% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Bit_Manipulation {
+private:
+    int bit_width(__uint128_t x)
+    {
+        uint64_t hi = x >> 64;
+
+        return hi ? 128 - __builtin_clzll(hi)
+                  :  64 - __builtin_clzll(static_cast<uint64_t>(x));
+    }
+
+public:
+    string shortestBeautifulSubstring(string s, int k)
+    {
+        const int N = s.size();
+
+        int start = N;
+        __uint128_t curr = 0;
+        __uint128_t best = -1;
+
+        for (int i = 0; i < N; i++)
+        {
+            curr = (curr << 1) | (s[i] & 1);
+            k   -= s[i] & 1;
+
+            if (k < 0)
+            {
+                k = 0;
+                curr &= (static_cast<__uint128_t>(1) << (bit_width(curr) - 1)) - 1;
+            }
+
+            if (k == 0 && curr < best)
+            {
+                start = i - bit_width(curr) + 1;
+                best = curr;
+            }
+        }
+
+        return std::move(s).substr(start, bit_width(best));
     }
 };
