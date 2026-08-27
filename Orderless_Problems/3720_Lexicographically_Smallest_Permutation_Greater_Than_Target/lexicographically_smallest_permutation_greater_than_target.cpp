@@ -59,8 +59,19 @@
 
 */
 
+#include <algorithm>
 #include <string>
+#include <vector>
 using namespace std;
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
 
 /* Time  Beats: 24.84% */
 /* Space Beats: 19.11% */
@@ -134,6 +145,72 @@ private:
     string get_min_string(int freq[26])
     {
         string result;
+        for (int i = 0; i < 26; i++)
+            result.append(freq[i], static_cast<char>(i + 'a'));
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 57.32% */
+/* Space Beats: 94.90% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Reverse_Greedy {
+public:
+    string lexGreaterPermutation(string s, string target)
+    {
+        const int N = s.size();
+
+        int freq[26] = {};
+        for (int i = 0; i < N; i++)
+        {
+            ++freq[s[i]      - 'a'];
+            --freq[target[i] - 'a'];
+        }
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            int target_chr = target[i] - 'a';
+            ++freq[target_chr];
+
+            if (*min_element(begin(freq), end(freq)) < 0)
+                continue;
+
+            for (int j = target_chr + 1; j < 26; j++)
+            {
+                if (freq[j])
+                {
+                    --freq[j];
+
+                    target[i] = static_cast<char>(j + 'a');
+                    target.resize(i + 1);
+
+                    return target + get_min_string(freq);
+                }
+            }
+        }
+
+        return "";
+    }
+
+    string get_min_string(int freq[26])
+    {
+        string result;
+
         for (int i = 0; i < 26; i++)
             result.append(freq[i], static_cast<char>(i + 'a'));
 
