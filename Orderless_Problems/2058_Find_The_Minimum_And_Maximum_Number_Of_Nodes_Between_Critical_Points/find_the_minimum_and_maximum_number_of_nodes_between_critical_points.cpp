@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -72,144 +69,76 @@
 
 */
 
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode() : val(0), next(nullptr) {}
- *     ListNode(int x) : val(x), next(nullptr) {}
- *     ListNode(int x, ListNode *next) : val(x), next(next) {}
- * };
- */
+#include <climits>
+#include <vector>
+using namespace std;
 
-/*
-    ------------
-    --- IDEA ---
-    ------------
-
-    Intuitive.
-
-*/
-
-/* Time  Beats: 82.68% */
-/* Space Beats: 35.95% */
-
-/* Time  Complexity: O(n) */
-/* Space Complexity: O(n) */
-class Solution {
-public:
-    std::vector<int> nodesBetweenCriticalPoints(ListNode* head)
-    {
-        std::vector<int> criticals;
-        int minima = INT_MAX;
-        int maxima = INT_MIN;
-
-        int index = 1; // Starts at 1
-
-        ListNode* prev = nullptr;
-        ListNode* next;
-
-        ListNode* curr = head;
-        while (curr)
-        {
-            next = curr->next;
-
-            if (prev && next)
-            {
-                if ((prev->val < curr->val && curr->val > next->val) ||
-                    (prev->val > curr->val && curr->val < next->val))
-                {
-                    if ( ! criticals.empty())
-                    {
-                        minima = std::min(minima, index - criticals.back());
-                        maxima = index - criticals[0];
-                    }
-
-                    criticals.push_back(index);
-                }
-            }
-
-            prev = curr;
-            curr = curr->next;
-
-            index++;
-        }
-
-        if (minima == INT_MAX || maxima == INT_MAX)
-            return {-1, -1};
-
-        return {minima, maxima};
-    }
+// Definition for singly-linked list.
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
 };
 
-
-
-
 /*
     ------------
     --- IDEA ---
     ------------
 
-    Improve Space Complexity from O(n) to O(1).
-
-    Actually, it was maximally O(n/2), but that is consideredd O(n).
+    TODO
 
 */
 
-/* Time  Beats: 99.85% */
-/* Space Beats: 99.71% */
+/* Time  Beats: 57.39% */
+/* Space Beats: 95.97% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    std::vector<int> nodesBetweenCriticalPoints(ListNode* head)
+    vector<int> nodesBetweenCriticalPoints(ListNode* head)
     {
-        ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0); // Accelerates
+        if (head->next->next == nullptr)
+            return {-1, -1};
 
-        int minima = INT_MAX;
-        int maxima = INT_MIN;
+        int min_distance = INT_MAX;
+        
+        int prev_critical_idx = -1;
 
         int first_critical_idx = -1;
         int last_critical_idx  = -1;
 
-        int index = 1; // Starts at 1
+        ListNode* prev = head;
+        ListNode* curr = head->next;
 
-        ListNode* prev = nullptr;
-        ListNode* next;
-
-        ListNode* curr = head;
-        while (curr)
+        int idx = 0;
+        while (curr->next != nullptr)
         {
-            next = curr->next;
-
-            if (prev && next)
+            if ((prev->val < curr->val && curr->val > curr->next->val) ||
+                (prev->val > curr->val && curr->val < curr->next->val))
             {
-                if ((prev->val < curr->val && curr->val > next->val) ||
-                    (prev->val > curr->val && curr->val < next->val))
-                {
-                    if (first_critical_idx > -1)
-                    {
-                        minima = std::min(minima, index - last_critical_idx);
-                        maxima = index - first_critical_idx;
-                    }
-                    else
-                        first_critical_idx = index;
+                if (first_critical_idx == -1)
+                    first_critical_idx = idx;
 
-                    last_critical_idx = index;
-                }
+                last_critical_idx = idx;
+
+                if (prev_critical_idx != -1)
+                    min_distance = min(min_distance, idx - prev_critical_idx);
+
+                prev_critical_idx = idx;
             }
 
+            // Increment
             prev = curr;
             curr = curr->next;
-
-            index++;
+            ++idx;
         }
 
-        if (minima == INT_MAX || maxima == INT_MAX)
+        if (min_distance == INT_MAX)
             return {-1, -1};
 
-        return {minima, maxima};
+        return {min_distance, last_critical_idx - first_critical_idx};
     }
 };
