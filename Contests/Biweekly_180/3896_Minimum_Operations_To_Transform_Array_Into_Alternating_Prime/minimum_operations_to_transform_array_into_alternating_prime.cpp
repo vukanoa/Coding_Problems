@@ -83,8 +83,8 @@ using namespace std;
 /* Time  Beats: 20.20% */
 /* Space Beats: 24.79% */
 
-/* Time  Complexity: O(M  +  N * log) */ // M == max(nums[i])
-/* Space Complexity: O(M)             */
+/* Time  Complexity: O(MAX_NUM * loglogMAX_NUM  +  N * logMAX_NUM) */
+/* Space Complexity: O(MAX_NUM)                                    */
 class Solution {
 private:
     class Sieve {
@@ -151,6 +151,63 @@ public:
                 auto it = upper_bound(primes.begin(), primes.end(), nums[i]);
 
                 result += *it - nums[i];
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+/* Time  Complexity: O(MAX_NUM * loglogMAX_NUM  +  N) */
+/* Space Complexity: O(MAX_NUM)                        */
+class Solution_2 {
+private:
+    static const int MAX_NUM = 1e5 + 100;
+    bool sieve[MAX_NUM];
+
+    void create_sieve()
+    {
+        sieve[0] = sieve[1] = true;
+
+        for (int i = 2; i * i <= MAX_NUM; i++)
+        {
+            if (sieve[i])
+                continue;
+
+            for (int j = i * i; j < MAX_NUM; j += i)
+                sieve[j] = true;
+        }
+    }
+
+public:
+    int minOperations(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        create_sieve();
+
+        for (int i = 0; i < N; i++)
+        {
+            int num = nums[i];
+
+            if (i & 1) // Index 'i' is ODD
+            {
+                while ( ! sieve[num])
+                {
+                    ++num;
+                    ++result;
+                }
+            }
+            else // Index 'i' is EVEN
+            {
+                while (sieve[num])
+                {
+                    ++num;
+                    ++result;
+                }
             }
         }
 
