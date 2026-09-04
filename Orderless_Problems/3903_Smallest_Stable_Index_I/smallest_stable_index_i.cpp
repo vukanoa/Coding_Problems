@@ -117,3 +117,48 @@ public:
         return -1;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    It's a nice small "trick" for these kind of problems. Use only a single
+    additional array and as for the other, simply use a "running variable"
+    instead.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  73.61% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_2 {
+public:
+    int firstStableIndex(vector<int>& nums, int k)
+    {
+        static constexpr int MAX_N = 100;
+        const int N = nums.size();
+
+        int suffix_min[MAX_N];
+        suffix_min[N-1] = nums.back();
+
+        for (int i = N-2; i >= 0; i--)
+            suffix_min[i] = min(suffix_min[i + 1], nums[i]);        
+
+        int prefix_max = 0;
+        for (int i = 0; i < N; i++)
+        {
+            prefix_max = max(prefix_max, nums[i]);
+
+            if (prefix_max - suffix_min[i] <= k)
+                return i;
+        }
+
+        return -1;
+    }
+};
