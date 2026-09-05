@@ -111,7 +111,7 @@ using namespace std;
 
 /* Time  Complexity: O(2^M * M^2) */
 /* Space Complexity: O(2^M * M^2) */
-class Solution {
+class Solution_Top_Down__Memoization {
 private:
     long long memo[1 << 16][16];
 
@@ -163,5 +163,77 @@ private:
         }
 
         return memo[mask][last] = result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, but written in a Bottom-Up, i.e. "Tabulation" way.
+
+*/
+
+/* Time  Beats: 69.58% */
+/* Space Beats: 30.48% */
+
+/* Time  Complexity: O(M^2 * 2^M) */
+/* Space Complexity: O(M   * 2^M) */
+class Solution_Bottom_Up__Tabulation {
+public:
+    long long elevatorRequests(int n, int start, vector<vector<int>>& requests)
+    {
+        const int M = requests.size();
+        const int FULL_MASK = (1 << M) - 1;
+
+        long long result = LLONG_MAX;
+
+        vector<vector<long long>> dp(1 << M, vector<long long>(M, LLONG_MAX));
+
+        for (int i = 0; i < M; i++)
+        {
+            long long arrival = requests[i][0];
+            long long floor   = requests[i][1];
+
+            long long travel = llabs(1LL * start - floor);
+
+            dp[1 << i][i] = max(travel, arrival);
+        }
+
+        for (int mask = 1; mask < (1 << M); mask++)
+        {
+            for (int i = 0; i < M; i++)
+            {
+                if ( ! (mask & (1 << i)))
+                    continue;
+
+                if (dp[mask][i] == LLONG_MAX)
+                    continue;
+
+                for (int j = 0; j < M; j++)
+                {
+                    if (mask & (1 << j))
+                        continue;
+
+                    long long distance   = llabs(1LL * requests[i][1] - requests[j][1]);
+                    long long reach_time = dp[mask][i] + distance;
+
+                    long long new_time = max(reach_time, 1LL * requests[j][0]);
+
+                    int new_mask = mask | (1 << j);
+
+                    dp[new_mask][j] = min(dp[new_mask][j], new_time);
+                }
+            }
+        }
+
+        for (int i = 0; i < M; i++)
+            result = min(result, dp[FULL_MASK][i]);
+
+        return result;
     }
 };
