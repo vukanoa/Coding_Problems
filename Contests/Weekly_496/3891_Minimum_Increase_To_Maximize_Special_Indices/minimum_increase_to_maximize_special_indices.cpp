@@ -133,3 +133,55 @@ public:
         return dp[1];
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Space Efficient way to do DP for this problem.
+
+*/
+
+/* Time  Beats: 91.69% */
+/* Space Beats: 94.25% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Space_Efficient {
+public:
+    long long minIncrease(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        long long next      = 0LL;
+        long long next_next = 0LL;
+
+        int next_needed_peaks = 0;
+        for (int i = N-2; i >= 1; i--)
+        {
+            // Needed peaks starting from index 'i' onwards
+            int curr_needed_peaks = (N - i) / 2;
+
+            long long increment = max(0LL,
+                                      1LL + max(nums[i-1], nums[i+1]) - nums[i]);
+
+            long long curr;
+            if (curr_needed_peaks == next_needed_peaks)
+                curr = min(next, increment + next_next);
+            else
+                curr = increment + next_next;
+
+            if (i % 2 == 0)
+                ++next_needed_peaks;
+
+            next_next = next;
+            next      = curr;
+        }
+
+        return next;
+    }
+};
