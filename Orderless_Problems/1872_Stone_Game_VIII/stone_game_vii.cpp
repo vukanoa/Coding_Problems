@@ -84,6 +84,7 @@
 */
 
 #include <cstring>
+#include <numeric>
 #include <vector>
 using namespace std;
 
@@ -101,7 +102,7 @@ using namespace std;
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
-class Solution {
+class Solution_Top_Down__Memoization {
 private:
     static constexpr int MAX_N = 1e5;
     int memo[MAX_N];
@@ -137,5 +138,120 @@ private:
         int next_diff = max_diff(idx + 1, prefix_sum);
 
         return memo[idx] = max(prefix_sum[idx] - next_diff, next_diff);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 89.73% */
+/* Space Beats: 63.79% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Bottom_up__Tabulation {
+public:
+    int stoneGameVIII(vector<int>& stones)
+    {
+        const int N = stones.size();
+
+        /* Prefix Sum */
+        vector<int> prefix_sum(N);
+        prefix_sum[0] = stones[0];
+
+        for (int i = 1; i < N; i++)
+            prefix_sum[i] = prefix_sum[i-1] + stones[i];
+
+        /* Compute Result */
+        int result = prefix_sum[N-1];
+        for (int i = N-2; i > 0; i--)
+            result = max(result, prefix_sum[i] - result);
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, however here we're using "partial_sum" function from STD &
+    we're using utility "back_inserted".
+
+    It is really handy to know these, so I wanted to include it separately.
+
+*/
+
+/* Time  Beats: 61.69% */
+/* Space Beats: 23.91% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Bottom_up__Tabulation__using_Partial_Sum_and_Back_Inserter {
+public:
+    int stoneGameVIII(vector<int>& stones)
+    {
+        const int N = stones.size();
+
+        /* Prefix Sum */
+        vector<int> prefix_sum;
+        prefix_sum.reserve(N); // To prevent repeated reallocations
+        std::partial_sum(stones.begin(), stones.end(), std::back_inserter(prefix_sum));
+
+        /* Compute Result */
+        int result = prefix_sum[N-1];
+        for (int i = N-2; i > 0; i--)
+            result = max(result, prefix_sum[i] - result);
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 45.51% */
+/* Space Beats: 63.79% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Bottom_up__Tabulation__using_Partial_Sum_without_Back_Inserter {
+public:
+    int stoneGameVIII(vector<int>& stones)
+    {
+        const int N = stones.size();
+
+        /* Prefix Sum */
+        vector<int> prefix_sum(N);
+        std::partial_sum(stones.begin(), stones.end(), prefix_sum.begin());
+
+        /* Compute Result */
+        int result = prefix_sum[N-1];
+        for (int i = N-2; i > 0; i--)
+            result = max(result, prefix_sum[i] - result);
+
+        return result;
     }
 };
