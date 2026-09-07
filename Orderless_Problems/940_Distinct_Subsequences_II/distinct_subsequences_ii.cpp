@@ -139,3 +139,46 @@ public:
         return sum;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  90.96% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Optimized_Space {
+public:
+    int distinctSubseqII(string s)
+    {
+        const int N   = s.size();
+        const int MOD = 1e9 + 7;
+
+        vector<int> freq_ending_with(26, 0);
+
+        int sum = 0;
+
+        for (int i = 0; i < N; i++)
+        {
+            // New_subsequences - duplicate_subsequences
+            int curr_net_subsequences = (1 + sum - freq_ending_with[s[i] - 'a'] + MOD) % MOD;
+
+            sum = (sum + curr_net_subsequences) % MOD;
+
+            // Update subsequences ending with this character
+            freq_ending_with[s[i] - 'a'] = (freq_ending_with[s[i] - 'a'] + curr_net_subsequences) % MOD;
+        }
+
+        return sum;
+    }
+};
