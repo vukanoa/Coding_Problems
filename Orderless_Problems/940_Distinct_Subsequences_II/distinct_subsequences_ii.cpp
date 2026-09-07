@@ -68,8 +68,8 @@ using namespace std;
 /* Time  Beats:  5.15% */
 /* Space Beats: 55.30% */
 
-/* Time  Complexity: O(N) */
-/* Space Complexity: O(N) */
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N)   */
 class Solution {
 public:
     int distinctSubseqII(string s)
@@ -93,5 +93,49 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  43.73% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Linear_using_Character_Groups {
+public:
+    int distinctSubseqII(string s)
+    {
+        const int N   = s.size();
+        const int MOD = 1e9 + 7;
+
+        vector<int> dp(N, 1);
+        vector<int> freq_ending_with(26, 0);
+
+        int sum = 0;
+
+        for (int i = 0; i < N; i++)
+        {
+            // New = single_chr + ALL_old_subsequences - duplicates_ending_with_s[i]
+            dp[i] = (1 + sum - freq_ending_with[s[i]- 'a'] + MOD) % MOD;
+
+            sum = (sum + dp[i]) % MOD;
+
+            // Add all new subsequences ending with s[i]
+            freq_ending_with[s[i] - 'a'] = (freq_ending_with[s[i] - 'a'] + dp[i]) % MOD;
+        }
+
+        return sum;
     }
 };
