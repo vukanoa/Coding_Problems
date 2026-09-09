@@ -89,7 +89,7 @@ using namespace std;
 
 /* Time  Complexity: O(m * n * (m  +  n)) */
 /* Space Complexity: O(m * n)             */
-class Solution {
+class Solution_Top_Down__Memoization {
 private:
     long long memo[201][201];
 
@@ -100,9 +100,9 @@ public:
 
         for (const auto& entry : prices)
         {
-            int h = entry[0];
-            int w = entry[1];
-            int p = entry[2];
+            const int& h = entry[0];
+            const int& w = entry[1];
+            const int& p = entry[2];
 
             price_table[h][w] = p;
         }
@@ -137,5 +137,62 @@ private:
         }
 
         return memo[height][width] = result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, written in a Bottom-Up Tabulation fashion.
+
+*/
+
+/* Time  Beats: 84.38% */
+/* Space Beats: 90.63% */
+
+/* Time  Complexity: O(m * n * (m  +  n)) */
+/* Space Complexity: O(m * n)             */
+class Solution_Bottom_Up__Tabulation {
+public:
+    long long sellingWood(int m, int n, vector<vector<int>>& prices)
+    {
+        long long dp[201][201] = {};
+
+        int price_table[201][201] = {};
+        for (const auto& entry : prices)
+        {
+            const int& h = entry[0];
+            const int& w = entry[1];
+            const int& p = entry[2];
+
+            price_table[h][w] = p;
+        }
+
+        for (int height = 1; height <= m; height++)
+        {
+            for (int width = 1; width <= n; width++)
+            {
+                dp[height][width] = price_table[height][width];
+
+                for (int h = 1; h < height; h++)
+                {
+                    dp[height][width] = max(dp[height][width],   dp[h         ][width    ]
+                                                               + dp[height - h][width    ]);
+                }
+
+                for (int w = 1; w < width; w++)
+                {
+                    dp[height][width] = max(dp[height][width],   dp[height    ][w        ]
+                                                               + dp[height    ][width - w]);
+                }
+            }
+        }
+
+        return dp[m][n];
     }
 };
