@@ -118,3 +118,62 @@ public:
         return false;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 77.91% */
+/* Space Beats: 82.82% */
+
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(1)     */
+class Solution_Space_Efficient {
+public:
+    bool matchReplacement(string s, string sub, vector<vector<char>>& mappings)
+    {
+        const int N = s.size();
+        const int M = sub.size();
+        const int RANGE = 'z' - '0' + 1;
+
+        bool multi_map[RANGE][RANGE] = {};
+
+        /* Populate Multi Map */
+        for (const auto& entry : mappings)
+        {
+            const char& old_chr = entry[0];
+            const char& old_new = entry[1];
+
+            multi_map[old_chr - '0'][old_new - '0'] = true;
+        }
+
+        for (int i = 0; i + M <= N; ++i)
+        {
+            int j = 0;
+
+            while (j < M)
+            {
+                const char& s_chr   = s[i + j];
+                const char& sub_chr = sub[j];
+
+                if (s_chr != sub_chr && !multi_map[sub_chr - '0'][s_chr - '0'])
+                    break;
+
+                ++j;
+            }
+
+            if (j == M)
+                return true;
+        }
+
+        return false;
+    }
+};
