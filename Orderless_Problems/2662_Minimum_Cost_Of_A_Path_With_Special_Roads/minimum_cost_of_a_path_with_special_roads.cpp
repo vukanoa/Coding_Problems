@@ -80,6 +80,7 @@
 #include <climits>
 #include <cstdlib>
 #include <queue>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -180,5 +181,111 @@ public:
         }
 
         return distance[1];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 32.11% */
+/* Space Beats: 19.54% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_for_DENSE_Graph__faster_but_less_memory_efficient {
+public:
+    int minimumCost(vector<int>& start, vector<int>& target, vector<vector<int>>& specialRoads)
+    {
+        const int N = specialRoads.size();
+
+        vector<pair<int,int>> coordinates;
+        coordinates.push_back( {start[0],  start[1]}  ); // Push SOURCE
+        coordinates.push_back( {target[0], target[1]} ); // Push TARGET
+
+        for (const vector<int>& road : specialRoads)
+        {
+            coordinates.push_back( {road[0], road[1]} );
+            coordinates.push_back( {road[2], road[3]} );
+        }
+
+        const int TOTAL_NODES = coordinates.size();
+        unordered_map<int, vector<pair<int,int>>> adj_list;
+
+        /* Normal Manhattan Distance */
+        for (int node = 0; node < TOTAL_NODES; node++)
+        {
+            const int& x1 = coordinates[node].first;
+            const int& y1 = coordinates[node].second;
+
+            for (int neighbor = 0; neighbor < TOTAL_NODES; neighbor++)
+            {
+                if (node == neighbor)
+                    continue;
+
+                const int& x2 = coordinates[neighbor].first;
+                const int& y2 = coordinates[neighbor].second;
+
+                int cost = abs(x2 - x1) +
+                           abs(y2 - y1);
+
+                adj_list[node].push_back( {neighbor, cost} );
+            }
+        }
+
+        /* Special Roads */
+        for (int i = 0; i < N; i++)
+        {
+            int source_node = 2 * i + 2;
+            int target_node = source_node + 1;
+            int cost        = specialRoads[i][4];
+
+            adj_list[source_node].push_back( {target_node, cost} );
+        }
+
+        return dijkstra_for_dense_graphs(TOTAL_NODES, adj_list, 0, 1);
+    }
+
+private:
+    int dijkstra_for_dense_graphs(int n, unordered_map<int, vector<pair<int,int>>>& adj_list, int source, int target)
+    {
+        vector<int> distance(n, INT_MAX);
+        distance[source] = 0;
+
+        vector<bool> visited(n, false);
+
+        for (int i = 0; i < n; i++)
+        {
+            int node = -1;
+
+            for (int j = 0; j < n; j++)
+            {
+                if ( ! visited[j] && (node == -1 || distance[j] < distance[node]))
+                    node = j;
+            }
+
+            if (distance[node] == INT_MAX)
+                break;
+
+            visited[node] = true;
+
+            for (const auto& [neighbor, weight] : adj_list[node])
+            {
+                int new_distance = distance[node] + weight;
+
+                if (new_distance < distance[neighbor])
+                    distance[neighbor] = new_distance; // Relaxation
+            }
+        }
+
+        return distance[target] == INT_MAX ? -1 : distance[target];
     }
 };
