@@ -278,3 +278,79 @@ public:
         return dp[N].second;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Elegant as above, but actually matches the first Solution in this file much
+    more since it sorts by START as well.
+
+    I wanted to first include the one with "sort by end" since that is a common
+    theme in "interval" problems.
+
+*/
+
+/* Time  Beats: 66.30% */
+/* Space Beats: 71.74% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Sorting_by_Start {
+public:
+    vector<int> maximumWeight(vector<vector<int>>& intervals)
+    {
+        const int N = intervals.size();
+
+        /* Add indices to "intervals" */
+        for (int i = 0; i < N; i++)
+            intervals[i].push_back(i);
+
+        /* Sort */
+        sort(intervals.begin(), intervals.end(),
+        [](const vector<int>& a, const vector<int>& b)
+        {
+            return a[0] < b[0];
+        });
+
+        vector<int> interval_starts(N);
+        for (int i = 0; i < N; i++)
+            interval_starts[i] = intervals[i][0];
+
+        vector<pair<long long, vector<int>>> dp(N + 1, {0, {}});
+        for (int used = 0; used < 4; used++)
+        {
+            vector<pair<long long, vector<int>>> new_dp(N + 1, {0, {}});
+
+            for (int i = N - 1; i >= 0; i--)
+            {
+                const int& start  = intervals[i][0];
+                const int& end    = intervals[i][1];
+                const int& weight = intervals[i][2];
+                const int& index  = intervals[i][3];
+
+                auto it = upper_bound(interval_starts.begin(), interval_starts.end(), end);
+                int next_idx = it - interval_starts.begin();
+
+                auto take = dp[next_idx];
+
+                take.first -= weight;
+                take.second.insert( upper_bound(take.second.begin(), take.second.end(), index), index);
+
+                new_dp[i] = min(take, new_dp[i + 1]);
+            }
+
+            dp = std::move(new_dp);
+        }
+
+        /* Restore original "intervals" */
+        for (int i = 0; i < N; i++)
+            intervals[i].pop_back();
+
+        return dp[0].second;
+    }
+};
