@@ -189,3 +189,92 @@ public:
         return result_array;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    I'm leaving both Solutions here because it's always nice to see why one
+    Solution is better.
+
+    A common "trick" in Interval problems is to try and "Sort by end times".
+
+    If we do exactl that here, then the Solution because many times more
+    elegant than the one above. Although both Solutions have the same BigO Time
+    and Space Complexities, however the above one is much LESS elegant and has
+    more constant facts that are sloving it down unnecessarily.
+
+    Also, since here we're sorting by the "End times", the Solution kind of
+    becomes reverse.
+
+    Instead of:
+        "best solution starting at/after interval i",
+
+    now it's:
+        "the best solution using only the first i intervals"
+
+*/
+
+/* Time  Beats: 60.87% */
+/* Space Beats: 71.74% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Sorting_by_End {
+public:
+    vector<int> maximumWeight(vector<vector<int>>& intervals)
+    {
+        const int N = intervals.size();
+
+        /* Add indices to "intervals" */
+        for (int i = 0; i < N; i++)
+            intervals[i].push_back(i);
+
+        /* Sort */
+        sort(intervals.begin(), intervals.end(),
+        [](const vector<int>& a, const vector<int>& b)
+        {
+            return a[1] < b[1];
+        });
+
+        vector<int> interval_ends(N);
+        for (int i = 0; i < N; i++)
+            interval_ends[i] = intervals[i][1];
+
+        vector<pair<long long, vector<int>>> dp(N + 1, {0, {}});
+        for (int used = 0; used < 4; used++)
+        {
+            vector<pair<long long, vector<int>>> new_dp(N + 1, {0, {}});
+
+            for (int i = 1; i <= N; i++)
+            {
+                const int& start  = intervals[i - 1][0];
+                const int& end    = intervals[i - 1][1];
+                const int& weight = intervals[i - 1][2];
+                const int& index  = intervals[i - 1][3];
+
+                auto it      = lower_bound(interval_ends.begin(), interval_ends.end(), start);
+                int prev_idx = it - interval_ends.begin();
+
+                auto take = dp[prev_idx];
+
+                take.first -= weight;
+                take.second.insert( upper_bound(take.second.begin(), take.second.end(), index), index);
+
+                new_dp[i] = min(take, new_dp[i - 1]);
+            }
+
+            dp = std::move(new_dp);
+        }
+
+        /* Restore original "intervals" */
+        for (int i = 0; i < N; i++)
+            intervals[i].pop_back();
+
+        return dp[N].second;
+    }
+};
