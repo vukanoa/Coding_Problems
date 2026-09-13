@@ -73,7 +73,7 @@ using namespace std;
 /* Space Beats: 68.83% */
 
 /* Time  Complexity: O(N^4) */
-/* Space Complexity: O(N^4) */
+/* Space Complexity: O(1)   */
 class Solution {
 public:
     int largestOverlap(vector<vector<int>>& img1, vector<vector<int>>& img2)
@@ -181,5 +181,67 @@ private:
             // Increment
             ++shifts_up;
         }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    An Elegant way of doing the same. It's less verbose and maybe more
+    difficult to grasp, but it's much more elegant and concise.
+
+*/
+
+/* Time  Beats: 50.00% */
+/* Space Beats: 98.21% */
+
+/* Time  Complexity: O(N^4) */
+/* Space Complexity: O(1)   */
+class Solution_Concise_Elegant {
+public:
+    int largestOverlap(vector<vector<int>>& img1, vector<vector<int>>& img2)
+    {
+        const int N = img1.size();
+        int result = 0;
+
+        for (int dx = -(N-1); dx < N; dx++)
+        {
+            for (int dy = -(N-1); dy < N; dy++)
+            {
+                int count = 0;
+
+                // Compare with current "dx"(i.e. HORIZONTAL shift) and
+                //         with current "dy"(i.e. VERTICAL   shoft) of img1
+                for (int row = 0; row < N; row++)
+                {
+                    for (int col = 0; col < N; col++)
+                    {
+                        int img2_row = row + dx;
+                        int img2_col = col + dy;
+
+                        if (img2_row <  0 || img2_col <  0)
+                            continue;
+
+                        if (img2_row >= N || img2_col >= N)
+                            continue;
+
+                        if (img1[row     ][col     ] == 1 &&
+                            img2[img2_row][img2_col] == 1)
+                        {
+                            ++count;
+                        }
+                    }
+                }
+
+                result = max(result, count);
+            }
+        }
+
+        return result;
     }
 };
