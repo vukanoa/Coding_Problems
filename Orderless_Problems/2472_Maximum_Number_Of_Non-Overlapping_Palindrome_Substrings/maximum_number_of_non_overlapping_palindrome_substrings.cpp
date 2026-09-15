@@ -244,3 +244,58 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  91.36% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Greedy {
+public:
+    int maxPalindromes(string s, int k)
+    {
+        const int N = s.size();
+
+        if (k == 1)
+            return N;
+
+        int result = 0;
+
+        int start = 0;
+        while (start <= N - k)
+        {
+            int step = 1;
+
+            for (int substr_len : {k, k + 1})
+            {
+                if (start + substr_len <= N &&
+                    equal(s.begin() + start,                        // 1st range start
+                          s.begin() + start + (substr_len / 2),     // 1st range end(EXLUSIVE)
+                          s.rbegin() + (N - (start + substr_len)))) // 2nd range start
+                {
+                    step = substr_len;
+
+                    ++result;
+                    break;
+                }
+            }
+
+            // Increment
+            start += step;
+        }
+
+        return result;
+    }
+};
