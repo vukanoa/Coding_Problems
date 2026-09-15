@@ -84,10 +84,10 @@ public:
         /////////////////////////////////////////////////////////////////////////////
 
         /* ODD length palindromes */
-        for (int start = 0; start < N; start++)
+        for (int center = 0; center < N; center++)
         {
-            int L = start;
-            int R = start;
+            int L = center;
+            int R = center;
 
             bool found_palindrome_of_at_least_size_k = false;
             int substr_len;
@@ -110,10 +110,10 @@ public:
         }
 
         /* EVEN length palindromes */
-        for (int start = 0; start < N-1; start++)
+        for (int center = 0; center < N-1; center++)
         {
-            int L = start;
-            int R = start + 1;
+            int L = center;
+            int R = center + 1;
 
             bool found_palindrome_of_at_least_size_k = false;
             int substr_len;
@@ -167,5 +167,80 @@ public:
         }
 
         return dp[intervals.begin()->first];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 76.70% */
+/* Space Beats: 91.36% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(1)   */
+class Solution_Simpler_And_more_memory_Efficinet {
+public:
+    int maxPalindromes(string s, int k)
+    {
+        const int N = s.size();
+
+        int result = 0;
+        int last_end = -1;
+
+        for (int center = 0; center < N; center++)
+        {
+            /* ODD length palindrome */
+            int L = center;
+            int R = center;
+
+            while (L >= 0 && R < N && s[L] == s[R])
+            {
+                int substr_len = R - L + 1;
+
+                // >= k && does NOT overlap with previous palindromic substring
+                if (substr_len >= k && last_end < L)
+                {
+                    ++result;
+
+                    last_end = R;
+                    break;
+                }
+
+                --L;
+                ++R;
+            }
+
+            /* EVEN length palindrome */
+            L = center;
+            R = center + 1;
+
+            while (L >= 0 && R < N && s[L] == s[R])
+            {
+                int substr_len = R - L + 1;
+
+                // >= k && does NOT overlap with previous palindromic substring
+                if (substr_len >= k && last_end < L)
+                {
+                    ++result;
+
+                    last_end = R;
+                    break;
+                }
+
+                --L;
+                ++R;
+            }
+        }
+
+        return result;
     }
 };
