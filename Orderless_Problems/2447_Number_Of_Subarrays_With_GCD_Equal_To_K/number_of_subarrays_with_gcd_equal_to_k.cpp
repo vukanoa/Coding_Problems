@@ -53,6 +53,7 @@
 */
 
 #include <numeric>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -87,6 +88,51 @@ public:
                 if (curr_gcd == k)
                     ++result;
             }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 81.01% */
+/* Space Beats:  5.44% */
+
+/* Time  Complexity: O(N * log(M)) */  //  M is the maximum value of "nums"
+/* Space Complexity: O(N)          */
+class Solution_Efficient {
+public:
+    int subarrayGCD(vector<int>& nums, int k)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        unordered_map<int, int> GCDs;
+        for (int i = 0; i < N; i++)
+        {
+            unordered_map<int, int> tmp_GCDs;
+
+            if (nums[i] % k == 0)
+            {
+                ++GCDs[nums[i]];
+
+                for (const auto& [prev_gcd, count] : GCDs)
+                    tmp_GCDs[gcd(prev_gcd, nums[i])] += count;
+            }
+
+            result += tmp_GCDs[k];
+            swap(GCDs, tmp_GCDs);
         }
 
         return result;
