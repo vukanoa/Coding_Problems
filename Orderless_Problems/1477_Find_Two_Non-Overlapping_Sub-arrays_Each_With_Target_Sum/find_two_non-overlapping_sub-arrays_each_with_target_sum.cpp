@@ -54,20 +54,157 @@
 
 */
 
+#include <climits>
 #include <vector>
 using namespace std;
 
 /*
     ------------
-    --- IDEA ---
+    --- IDEA ---  (Explanation by "eunice", not my own)
     ------------
 
-    TODO
 
+    +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    |  3  |  4  |  3  |  2  |  1  |  3  |  1  |  3  |  6  |  1  |      N = 10
+    +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+       0     1     2     3     4     5     6     7     8     9   
+
+    In 2D array, finding these subarrays is simply a matter of moving forward
+    or downward:
+
+        + If the current sum is less than k, we move forward to include the
+          next prefix sum.
+
+        + If the current sum is greater than k, we move down to the next row,
+          effectively removing the leftmost element from the subarray.
+
+
+                        Running prefix_sum [i ... n-1]
+
+        +-----+#####+     +     +     +     +     +     +     +     +
+        |  3  #  7  # 10  | 12  | 13  | 16  | 17  | 20  | 26  | 27  |
+        +-----+#####+#####+~~~~~+     +     +     +     +     +     +
+              |  4  #  7  #  9  | 10  | 13  | 14  | 17  | 23  | 24  |
+              +-----+#####+-----+-----+-----+     +     +     +     +
+                    |  3  |  5  |  6  |  9  | 10  | 13  | 19  | 20  |
+                    +     +-----+-----+-----+#####+-----+     +     +
+                          |  2  |  3  |  6  #  7  # 10  | 16  | 17  |
+                          +     +     +-----+#####+-----+     +     +
+                                |  1  |  4  |  5  |  8  | 14  | 15  |
+                                +     +     +     +#####+-----+     +
+                                      |  3  |  4  #  7  # 13  | 14  |
+                                      +     +     +#####+-----+     +
+                                            |  1  |  4  | 10  | 11  |
+                                            +     +     +-----+     +
+                                                  |  3  |  9  | 10  |
+                                                  +     +-----+#####+
+                                                        |  6  #  7  #
+                                                        +-----+#####+
+                                                              |  1  |
+                                                              +     +
+
+    Whenever we find an element equal to target, this corresponds to a subarray
+    with:
+        
+        sum == "target"
+
+
+
+    Given the left and right pointers "start" and "end", its corresponding
+    length is simply:
+
+        curr_subarray_len = end − start + 1
+
+
+        +-----+-----=     +     +     +     +     +     +     +     +
+        |  3  |  7  | 10    12    13    16    17    20    26    27   
+        +-----+-----+-----+     +     +     +     +     +     +     +
+              |  4  |  7  |  9    10    13    14    17    23    24   
+              +-----+-----+     +     +     +     +     +     +     +
+                       3     5     6     9    10    13    19    20   
+                    +     +-----+-----+-----+-----+     +     +     +
+                          |  2  |  3  |  6  |  7  | 10    16    17   
+                          +-----+-----+-----+-----+     +     +     +
+                                   1     4     5     8    14    15   
+                                +     +-----+-----+-----+     +     +
+                                      |  3  |  4  |  7  | 13    14   
+                                      +-----+-----+-----+     +     +
+                                               1     4    10    11   
+                                            +     +     +     +     +
+                                                     3     9    10   
+                                                  +     +-----+-----+
+                                                        |  6  |  7  |
+                                                        +-----+-----+
+                                                                 1   
+                                                              +     +
+
+    We want the two smallest lengths, but it is not that simple, since the two
+    subarrays must also be non–overlapping.
+
+
+
+    Avoiding Overlap
+
+    Here, we are at index end=7, where:
+
+        The curr_subarray_len = 3 
+        The leftmost index of the current subarray is start = 5.
+        To prevent overlap, the previous subarrays MUST end BEFORE index 5.
+
+
+    We check the min length among all subarrays that end BEFORE the left index
+    i=5, then add it to the current length.
+
+    Essentially, this box contains the non–overlapping subarrays as seen before
+    start:
+                                                        |                   
+                                                        |start  end
+                                                        |  |     |
+                                                        |  |     |
+                                                        |  v     v
+           0     1     2     3     4     5     6     7  |  8     9   
+                                                        |
+        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     +     +
+        @  3  |  7  | 10    12    13    16    17    20  @ 26    27   
+        @-----+-----+-----+     +     +     +     +     @     +     +
+        @     |  4  |  7  |  9    10    13    14    17  @ 23    24   
+        @     +-----+-----+     +     +     +     +     @     +     +
+        @              3     5     6     9    10    13  @ 19    20   
+        @           +     +-----+-----+-----+-----+     @     +     +
+        @                 |  2  |  3  |  6  |  7  | 10  @ 16    17   
+        @                 +-----+-----+-----+-----+     @     +     +
+        @                          1     4     5     8  @ 14    15   
+        @                       +     +-----+-----+-----@     +     +
+        @                             |  3  |  4  |  7  @ 13    14   
+        @                             +-----+-----+-----@     +     +
+        @                                      1     4  @ 10    11   
+        @                                   +     +     @     +     +
+        @            dp[7] = 2                       3  @  9    10   
+        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-----+-----+
+                                                        |  6  |  7  |
+                                                        +-----+-----+
+                                                        |        1   
+                                                        |     +     +
+                                                        |
+                                                        |
+
+
+    We can cache the minimum length of subarrays found in this area as we slide
+    the array:
+
+        + For every current subarray arr[start ... end], we pair its length
+          with the minimum length cached BEFORE index start.
+
+        + The minimum sum is our final answer.
+
+
+    For Space Optimization: Since we only need the min length found so far in
+                            the area to the left, the entire dp array can be
+                            replaced with a single variable.
 */
 
-/* Time  Beats: 75.52% */
-/* Space Beats: 79.38% */
+/* Time  Beats: 81.70% */
+/* Space Beats: 67.23% */
 
 /* Time  Complexity: O(N) */
 /* Space Complexity: O(N) */
@@ -76,13 +213,14 @@ public:
     int minSumOfLengths(vector<int>& arr, int target)
     {
         const int N = arr.size();
-        int result = N+1;
+        int result  = INT_MAX;
 
-        vector<int> dp(N+1, N);
-        int sum    = 0;
-        int start  = 0;
+        vector<int> dp(N, INT_MAX);
 
-        for (int end = start; end < N; end++)
+        int start = 0;
+        int sum   = 0;
+
+        for (int end = 0; end < N; end++)
         {
             sum += arr[end];
 
@@ -92,15 +230,20 @@ public:
                 ++start;
             }
 
-            dp[end + 1] = dp[end];
-
             if (sum == target)
             {
-                result      = min(result  , end - start + 1 + dp[start]);
-                dp[end + 1] = min(dp[end] , end - start + 1            );
+                int curr_subarray_len = end - start + 1;
+
+                if (start > 0 && dp[start - 1] != INT_MAX)
+                    result = min(result, curr_subarray_len + dp[start - 1]);
+
+                dp[end] = curr_subarray_len;
             }
+
+            if (end > 0)
+                dp[end] = min(dp[end], dp[end - 1]);
         }
 
-        return result == N+1 ? -1 : result;
+        return result == INT_MAX ? -1 : result;
     }
 };
