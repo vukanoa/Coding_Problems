@@ -70,6 +70,7 @@
 
 #include <climits>
 #include <cstdlib>
+#include <set>
 #include <vector>
 using namespace std;
 
@@ -164,5 +165,141 @@ private:
 
         return table[L                   ][power] &
                table[R - (1 << power) + 1][power];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+
+    Observations:
+
+    1. If we start taking AND of elements of any sequence, the AND value will
+       either remain the same or decrease.
+
+       Let arr[1], arr[2], arr[3] be the sequence:
+
+           -> a1 = arr[1]
+           -> a2 = arr[1] & arr[2]
+           -> a3 = arr[1] & arr[2] & arr[3]
+
+       We can say:
+
+           a1 >= a2 >= a3
+
+       because while taking AND we cannot set a bit. Therefore, the AND value
+       either remains the same or decreases.
+
+
+    2. The AND value can decrease at most the number of set bits in arr times,
+       i.e. at most max(log(arr)) times.
+
+
+
+    3. The number of unique AND values of subarrays starting at any position is
+       AT MOST LOG(arr[i]), where arr[i] is the first element of the subarray.
+
+
+
+    4. The AND values of subarrays starting at index i can be calculated from
+       the AND values of subarrays starting at index i + 1.
+
+       subarray_AND_values[i] contains the AND values of subarrays starting
+       from index i.
+
+       For example, let:
+
+           arr[] = [2, 6, 7, 2, 4]
+
+       Subarrays starting at index 4:
+
+           [4]                    -> subarray_AND_values[4] = {4}
+
+       Subarrays starting at index 3:
+
+           [2], [2, 4]            -> subarray_AND_values[3] = {2, 0}
+
+       Subarrays starting at index 2:
+
+           [7], [7, 2], [7, 2, 4]
+                                   -> subarray_AND_values[2] = {7, 2, 0}
+
+       AND_table[i, len] is the AND of the subarray starting at index i with
+       length len.
+
+       Observe that:
+
+           AND_table[i, 1] = arr[i]
+           AND_table[i, 2] = arr[i] & AND_table[i + 1, 1    ]
+           AND_table[i, 3] = arr[i] & AND_table[i + 1, 2    ]
+           AND_table[i, 4] = arr[i] & AND_table[i + 1, 3    ]
+           ...
+           AND_table[i, j] = arr[i] & AND_table[i + 1, j - 1]
+
+       Also, AND_table[i + 1, j] is present in subarray_AND_values[i + 1], by
+       the definition of subarray_AND_values[i].
+
+       Therefore, subarray_AND_values[i] can be calculated from
+
+           subarray_AND_values[i + 1],
+
+       because the AND values in:
+
+           subarray_AND_values[i    ]
+
+       are simply arr[i] AND-ed with the values in:
+
+           subarray_AND_values[i + 1].
+
+
+
+       From Observation (3), we can conclude:
+
+           subarray_AND_values[i].size() <= log(max(arr)) <= 20
+
+       because arr.size() <= 10^6.
+
+*/
+
+/* Time  Beats: 63.45% */
+/* Space Beats: 45.32% */
+
+/* Time  Complexity: O(N * log(max(arr))) */
+/* Space Complexity: O(N * log(max(arr))) */
+class Solution_DP {
+public:
+    int closestToTarget(vector<int>& arr, int target)
+    {
+        const int N = arr.size();
+        int result = INT_MAX;
+
+        vector<set<int>> AND_table(N);
+
+        /* Calculate unique AND values of subarrays starting at each index */
+        AND_table[N - 1].insert(arr[N - 1]);
+
+        for (int L = N-2; L >= 0; L--)
+        {
+            AND_table[L].insert(arr[L]);
+
+            for (const int& value : AND_table[L + 1])
+            {
+                AND_table[L].insert(arr[L] & value);
+            }
+        }
+
+        /* Find the closest AND value to target */
+        for (int L = 0; L < N; L++)
+        {
+            for (int value : AND_table[L])
+                result = min(result, abs(value - target));
+        }
+
+        return result;
     }
 };
