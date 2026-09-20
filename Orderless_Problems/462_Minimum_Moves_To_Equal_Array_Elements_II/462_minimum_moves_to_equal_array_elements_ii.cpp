@@ -118,3 +118,40 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    It's important to know this function if you're using C++. But even if you
+    are not, this is a handy "trick" and technique.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  13.54% */
+
+/* Time  Complexity: O(N) average */
+/* Space Complexity: O(1)         */
+class Solution_Average_Linear {
+public:
+    int minMoves2(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        // Fixing ths median element
+        nth_element(nums.begin(), nums.begin() + (N/2), nums.end());
+
+        int median = nums[N/2];
+
+        for (int i = 0; i < N; i++)
+            result += abs(nums[i] - median); // Adding absolute difference
+
+        return result;
+    }
+};
