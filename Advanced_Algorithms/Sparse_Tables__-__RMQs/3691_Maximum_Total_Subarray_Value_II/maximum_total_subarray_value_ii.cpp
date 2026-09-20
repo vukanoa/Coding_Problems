@@ -74,7 +74,183 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    TODO
+    (Sparse Tables are NOT explained here. You need to know that before hand
+    since it's not that difficult. THe explanation is mainly due to the
+    additional complexity of this problem)
+
+    We are told we CANNOT select the same subarray more than once.
+
+    How can we find the maximum possible total value for k unique subarrays?
+                                                         ~~~~~~~~~~~~~~~~~~
+                                          ________________________|
+                                          |
+                0  1  2  3  4  5          v
+        nums = [1, 2, 5, 3, 6, 4]         k = 7
+
+
+    We know that in every array, of size N, there are exactly N^2 subarrays.
+    Also, keep in mind what is considered a "value" in this problem.:
+
+
+        The value of a subarray nums[l..r] is defined as:
+
+            max(nums[l..r]) - min(nums[l..r]).
+
+
+
+    So let's "draw" a table with ALL the VALUES(!!) for EACH and every subarray.
+
+
+                                        RIGHT
+
+                           0     1     2     3     4     5
+                        +-----+-----+-----+-----+-----+-----+
+                     0  |  0  |  1  |  4  |  4  |  5  |  5  |
+                        +-----+-----+-----+-----+-----+-----+
+                     1  |     |  0  |  3  |  3  |  3  |  4  |
+                        +-----+-----+-----+-----+-----+-----+
+                     2  |     |     |  0  |  2  |  3  |  3  |
+           LEFT         +-----+-----+-----+-----+-----+-----+
+                     3  |     |     |     |  0  |  3  |  3  |
+                        +-----+-----+-----+-----+-----+-----+
+                     4  |     |     |     |     |  0  |  2  |
+                        +-----+-----+-----+-----+-----+-----+
+                     5  |     |     |     |     |     |  0  |
+                        +-----+-----+-----+-----+-----+-----+
+
+
+
+    If you're confused about how to read this table, let's pick a random
+    subarray from our nums:
+
+                                0  1  2  3  4  5
+                        nums = [1, 2, 5, 3, 6, 4]
+                                   ^^^^^^^
+                                   L     R
+
+    So our subarray is from L=1, up to and including R=3.
+    This subarray has a value of:
+
+        max(L, R) - min(L, R) ==> 5 - 2 = 3
+
+    And in our table above that's at [L][R].
+
+
+
+    Now, there's something VERY interesting that you may not notice and it's
+    this:
+
+        The VALUES in each ROW, of this table, are sorted in ASCENDING order!
+
+
+    This is a HUGE thing.
+    But why is that the case?
+    It's because subarrays values MONOTONICALLY increase as the range expands
+    to the right.
+
+    And why is THAT the case?
+    Because as we move to the right, i.e. expand our subarray, we can either
+    have a:
+
+        + New LARGEST  element
+        + New SMALLEST element
+        + An element that is already between our SMALLEST and LARGEST
+
+    So in the WORST case every LONGER subarray for each row (i.e. for each
+    starting index) will have the SAME value as previous subarray.
+
+    And if it's not the WORST case then the value will INCREASE!
+    Either because we've found a new LARGEST element or a new SMALLEST element
+    within this new subarray.
+
+
+    So, how can this help us?
+    We don't need to calculate and recompute every value.
+
+    As we've said--The subarray spanning from L to the very end of nums, i.e.
+    up to and including index n−1, is GUARANTEED to contain the MAXIMUM VALUE
+    for that ROW, so we "reveal" or compute these values using a constant time
+    lookup data structure, called "Sparse Table":
+
+
+                                                     MAX FOR EACH ROW
+                                                          |
+                                        RIGHT             |
+                                                          v
+                           0     1     2     3     4     5
+                        +-----+-----+-----+-----+-----+-----+
+                     0  |  ?  |  ?  |  ?  |  ?  |  ?  |  5  |
+                        +-----+-----+-----+-----+-----+-----+
+                     1  |     |  ?  |  ?  |  ?  |  ?  |  4  |
+                        +-----+-----+-----+-----+-----+-----+
+                     2  |     |     |  ?  |  ?  |  ?  |  3  |
+           LEFT         +-----+-----+-----+-----+-----+-----+
+                     3  |     |     |     |  ?  |  ?  |  3  |
+                        +-----+-----+-----+-----+-----+-----+
+                     4  |     |     |     |     |  ?  |  2  |
+                        +-----+-----+-----+-----+-----+-----+
+                     5  |     |     |     |     |     |  0  |
+                        +-----+-----+-----+-----+-----+-----+
+
+    The computed values will be inserted into a max_heap to identify the
+    LARGEST VALUE that is currently available.
+
+                        +-----+-----+-----+-----+-----+-----+
+            max_heap    |  5  |  4  |  3  |  3  |  2  |  0  |
+                        +-----+-----+-----+-----+-----+-----+
+
+
+
+
+    We know that the entire array itself containts the first maximum value,
+    (which also corresponds the current max value in the max_heap)
+
+    We add this LARGEST VALUE to the out result.
+            |
+            |                           RIGHT
+            |
+            |              0     1     2     3     4     5
+            |           +-----+-----+-----+-----+-----+-----+
+            |        0  |  ?  |  ?  |  ?  |  ?  |  ?  |  5  |
+            |           +-----+-----+-----+-----+-----+-----+
+       _____|        1  |     |  ?  |  ?  |  ?  |  ?  |  4  |
+       |                +-----+-----+-----+-----+-----+-----+
+       |             2  |     |     |  ?  |  ?  |  ?  |  3  |
+       |   LEFT         +-----+-----+-----+-----+-----+-----+
+       |             3  |     |     |     |  ?  |  ?  |  3  |
+       |                +-----+-----+-----+-----+-----+-----+
+       |             4  |     |     |     |     |  ?  |  2  |
+       |                +-----+-----+-----+-----+-----+-----+
+       |             5  |     |     |     |     |     |  0  |
+       |                +-----+-----+-----+-----+-----+-----+
+       |
+       |                +-----+-----+-----+-----+-----+-----+
+       |    max_heap    |  5  |  4  |  3  |  3  |  2  |  0  |
+       |                +-----+-----+-----+-----+-----+-----+
+       |                   ^
+       |___________________|
+
+
+    and after selecting it, we "reveal" the next_candidate.
+    How do we do that "reveal" exactly?
+
+    We know that the next largest for that ROW (i.e. starting index) is from a
+    subarray with size ONE LESS than the previous one.
+
+    If the previous one was [0, N-1], the next_candidate value comes from the
+    subarray [0, N-2].
+
+
+    Or in genera--If the previous one was [L, R], then next comes from [L, R-1]
+
+    We'll always have N elents in our Heap and we'll keep taking the top one
+    each time.
+
+    We'll take at most k such values. And each time we take a value we will
+    "reveal" the next_candiate as explained above.
+
+
+    At the end we simply return the total value that is stored in "result".
 
 */
 
