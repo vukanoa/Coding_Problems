@@ -107,3 +107,48 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Complexity: O(N + M) */ // M is the maximum endpoint value
+/* Space Complexity: O(M)     */
+class Solution_Linear {
+public:
+    int countIntersectingIntervals(vector<vector<int>>& intervals)
+    {
+        int intersecting_pair_count = 0;
+        int active_interval_count   = 0;
+        int max_end        = 0;
+
+        int interval_start_count[101] = {};
+        int interval_end_count[101]   = {};
+
+        for (const auto& interval : intervals)
+        {
+            ++interval_start_count[interval[0]];
+            ++interval_end_count[interval[1]];
+
+            max_end = max(max_end, interval[1]);
+        }
+
+        for (int point = 0; point <= max_end; point++)
+        {
+            int intervals_starting_here = interval_start_count[point];
+
+            intersecting_pair_count += active_interval_count * intervals_starting_here + intervals_starting_here * (intervals_starting_here - 1) / 2;
+            active_interval_count   += intervals_starting_here - interval_end_count[point];
+        }
+
+        return intersecting_pair_count;
+    }
+};
