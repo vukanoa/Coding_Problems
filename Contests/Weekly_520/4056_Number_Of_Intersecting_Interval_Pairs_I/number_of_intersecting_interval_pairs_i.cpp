@@ -120,6 +120,53 @@ public:
 
 */
 
+/* Time  Beats: 56.25% */
+/* Space Beats: 12.50% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(logN)     */
+class Solution_Without_Using_Binary_Search {
+public:
+    long long countIntersectingIntervals(vector<vector<int>>& intervals)
+    {
+        const int N = intervals.size();
+        long long result = 1LL * N * (N - 1) / 2;
+
+        vector<pair<int, bool>> positions;
+        for (const auto& interval : intervals)
+        {
+            positions.push_back( {interval[0], false} ); // start
+            positions.push_back( {interval[1], true}  ); // end
+        }
+
+        /* Sort */
+        sort(positions.begin(), positions.end());
+
+        long long ended_interval_count = 0;
+        for (const auto& [point, is_end_point] : positions)
+        {
+            if ( ! is_end_point)
+                result -= ended_interval_count;
+
+            ended_interval_count += is_end_point;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
 /* Time  Complexity: O(N + M) */ // M is the maximum endpoint value
 /* Space Complexity: O(M)     */
 class Solution_Linear {
