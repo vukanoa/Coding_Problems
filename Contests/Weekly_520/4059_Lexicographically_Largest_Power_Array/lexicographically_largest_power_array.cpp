@@ -75,16 +75,18 @@ using namespace std;
 
 /* Time  Complexity: O(15 * N) */
 /* Space Complexity: O(15 * N) */
-class Solution {
+class Solution_Recursive {
 private:
+    const int MAX_BITS = 15;
+
     vector<int> result;
     vector<bool> is_done;
 
 public:
     vector<int> largestPower(vector<int>& nums)
     {
-        result.assign(15, 0);
-        is_done.assign(15, false);
+        result.assign(MAX_BITS, 0);
+        is_done.assign(MAX_BITS, false);
 
         maximize_power(nums, 0);
 
@@ -92,14 +94,14 @@ public:
     }
 
 
-    void maximize_power(const vector<int>& nums, int i)
+    void maximize_power(const vector<int>& nums, int ith_bit)
     {
-        if (i == 15)
+        if (ith_bit == 15)
             return;
 
-        if (is_done[i])
+        if (is_done[ith_bit])
         {
-            maximize_power(nums, i + 1);
+            maximize_power(nums, ith_bit + 1);
             return;
         }
 
@@ -108,7 +110,7 @@ public:
 
         for (const int& num : nums)
         {
-            if (num & (1 << (14 - i)))
+            if (num & (1 << (14 - ith_bit)))
                 L.push_back(num);
             else
                 R.push_back(num);
@@ -117,14 +119,91 @@ public:
 
         if ( ! L.empty())
         {
-            result[i] += L.size();
-            maximize_power(L, i + 1);
+            result[ith_bit] += L.size();
+            maximize_power(L, ith_bit + 1);
         }
 
         if ( ! R.empty())
         {
-            is_done[i] = true;
-            maximize_power(R, i + 1);
+            is_done[ith_bit] = true;
+            maximize_power(R, ith_bit + 1);
         }
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 49.66% */
+/* Space Beats:  7.29% */
+
+/* Time  Complexity: O(15 * N) */
+/* Space Complexity: O(15 * N) */
+class Solution_Iterative {
+private:
+    const int MAX_BITS = 15;
+
+    vector<int> result;
+    vector<bool> is_done;
+
+public:
+    vector<int> largestPower(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        result.assign(MAX_BITS, 0);
+        is_done.assign(MAX_BITS, false);
+
+        vector<vector<int>> groups = { nums };
+
+        for (int ith_bit = 0; ith_bit < MAX_BITS; ith_bit++)
+        {
+            vector<vector<int>> next_groups;
+
+            for (const auto& group : groups)
+            {
+                if (is_done[ith_bit])
+                {
+                    next_groups.push_back(group);
+                    continue;
+                }
+
+                vector<int> set_bit_group;
+                vector<int> unset_bit_group;
+
+                for (const int& num : group)
+                {
+                    if (num & (1 << (14 - ith_bit)))
+                        set_bit_group.push_back(num);
+                    else
+                        unset_bit_group.push_back(num);
+                }
+
+                if ( ! set_bit_group.empty())
+                {
+                    result[ith_bit] += set_bit_group.size();
+                    next_groups.push_back(set_bit_group);
+                }
+
+                if ( ! unset_bit_group.empty())
+                {
+                    is_done[ith_bit] = true;
+                    next_groups.push_back(unset_bit_group);
+                }
+            }
+
+            groups = next_groups;
+        }
+
+        return result;
     }
 };
