@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -57,6 +54,11 @@
 
 */
 
+#include <algorithm>
+#include <numeric>
+#include <vector>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -72,12 +74,14 @@
         1. Minimum Operations(removals)
         2. Either remove the leftmost or the rightmost element from the array
 
-    Instead, how you should think about this problem:
-        1. MAXIMUM elements that are NOT the result
-        2. Elements that are consecutive and:
-           a) That are NOT on the edges
-            OR
-           b) That are at most connected to one edge
+    Instead, we ought to INVERT the problem! Instead, we are searching for:
+
+        MAXIMUM elements that are NOT the result
+
+    or in other words:
+
+        Elements that are consecutive and are at most connected to ONE edge
+
 
     So we want to get the biggest consecutive window of elements that are NOT
     the result, so that the remaining elements sum up to x.
@@ -85,11 +89,11 @@
     By MAXIMIZING our NON-RESULT elements, we are MINIMIZING the result
     elements.
 
-    However, instead of finding different length windows that when subtracted
-    from the total sum of the array and taking the biggest one, we can only
+    However, instead of finding different length windows--that when subtracted
+    from the total sum of the array--and taking the biggest one, we can only
     search for a window that sums up to (total_sum - x) instead.
 
-    Therefore, we'll use a Sliding Window technique.
+    Therefore, we'll use a standard "Sliding Window" technique.
 
 *******************************************************************************
 ********************************** SIMULATION *********************************
@@ -102,12 +106,12 @@
     but I'm going to simulate my Solution.
 
 
-                    nums = [3, 2, 2, 9, 6, 1, 1, 2, 3],  x = 7
+            nums = [3, 2, 2, 9, 6, 1, 1, 2, 3],  x = 7
 
-                    total_sum = 29
-                    desired_middle_sum = total_sum - x ==> 29 - 7 => 22
+            total_sum = 29
+            inverted_x = total_sum - x ==> 29 - 7 => 22
 
-                    curr_sum = 0
+            curr_sum = 0
 
 -------------------------------------------------------------------------------
 
@@ -119,10 +123,10 @@
 
         curr_sum = 3
 
-        if (curr_sum > desired_middle_sum) // It is NOT
+        if (curr_sum > inverted_x)     // It is NOT
             /
 
-        if (curr_sum == desired_middle_sum) // It is NOT
+        if (curr_sum == inverted_x)    // It is NOT
             /
 
 -------------------------------------------------------------------------------
@@ -134,10 +138,10 @@
 
         curr_sum = 5
 
-        if (curr_sum > desired_middle_sum) // It is NOT
+        if (curr_sum > inverted_x)     // It is NOT
             /
 
-        if (curr_sum == desired_middle_sum) // It is NOT
+        if (curr_sum == inverted_x)    // It is NOT
             /
 
 -------------------------------------------------------------------------------
@@ -149,10 +153,10 @@
 
         curr_sum = 7
 
-        if (curr_sum > desired_middle_sum) // It is NOT
+        if (curr_sum > inverted_x)     // It is NOT
             /
 
-        if (curr_sum == desired_middle_sum) // It is NOT
+        if (curr_sum == inverted_x)    // It is NOT
             /
 
 -------------------------------------------------------------------------------
@@ -164,10 +168,10 @@
 
         curr_sum = 16
 
-        if (curr_sum > desired_middle_sum) // It is NOT
+        if (curr_sum > inverted_x)     // It is NOT
             /
 
-        if (curr_sum == desired_middle_sum) // It is NOT
+        if (curr_sum == inverted_x)    // It is NOT
             /
 
 -------------------------------------------------------------------------------
@@ -179,10 +183,10 @@
 
         curr_sum = 22
 
-        if (curr_sum > desired_middle_sum) // It is NOT
+        if (curr_sum > inverted_x)     // It is NOT
             /
 
-        if (curr_sum == desired_middle_sum) // IT is INDEED
+        if (curr_sum == inverted_x)    // IT is INDEED
             max_window = max(max_window, R - L + 1) ==> max(0, 5) ==> 5;
 
 -------------------------------------------------------------------------------
@@ -194,9 +198,9 @@
 
         curr_sum = 23
 
-        if (curr_sum > desired_middle_sum) // IT is INDEED
+        if (curr_sum > inverted_x)    // IT is INDEED
             curr_sum -= nums[L]
-            L++
+            ++L
 
 
         nums = [3, 2, 2, 9, 6, 1, 1, 2, 3],  x = 7
@@ -205,7 +209,7 @@
 
         curr_sum = 20
 
-        if (curr_sum == desired_middle_sum) // It is NOT
+        if (curr_sum == inverted_x)    // It is NOT
             /
 
 -------------------------------------------------------------------------------
@@ -217,10 +221,10 @@
 
         curr_sum = 21
 
-        if (curr_sum > desired_middle_sum) // It is NOT
+        if (curr_sum > inverted_x)     // It is NOT
             /
 
-        if (curr_sum == desired_middle_sum) // It is NOT
+        if (curr_sum == inverted_x)    // It is NOT
             /
 
 -------------------------------------------------------------------------------
@@ -232,7 +236,7 @@
 
         curr_sum = 23
 
-        if (curr_sum > desired_middle_sum) // It is NOT
+        if (curr_sum > inverted_x)     // It is NOT
             curr_sum -= nums[L]
             L++
 
@@ -243,7 +247,7 @@
 
         curr_sum = 21
 
-        if (curr_sum == desired_middle_sum) // It is NOT
+        if (curr_sum == inverted_x)    // It is NOT
             /
 
 -------------------------------------------------------------------------------
@@ -255,7 +259,7 @@
 
         curr_sum = 24
 
-        if (curr_sum > desired_middle_sum) // IT is INDEED
+        if (curr_sum > inverted_x)     // IT is INDEED
             curr_sum -= nums[L]
             L++
 
@@ -266,48 +270,57 @@
 
         curr_sum = 22
 
-        if (curr_sum == desired_middle_sum) // IT is INDEED
+        if (curr_sum == inverted_x)    // IT is INDEED
             max_window = max(max_window, R - L + 1) ==> max(5, 7) ==> 7;
 
 
     return max_window; // 7
--------------------------------------------------------------------------------
 
 */
 
 /* Time  Beats: 99.23% */
 /* Space Beats: 34.13% */
 
-/* Time  Complexity: O(n) */
+/* Time  Complexity: O(N) */
 /* Space Complexity: O(1) */
 class Solution {
 public:
-    int minOperations(std::vector<int>& nums, int x)
+    int minOperations(vector<int>& nums, int x)
     {
-        int total_sum = 0;
-        for (int& num : nums)
-            total_sum += num;
+        int total_sum = accumulate(nums.begin(), nums.end(), 0);
+        int min_elem  = *min_element(nums.begin(), nums.end());
 
-        int desired_middle_sum = total_sum - x;
-        int curr_sum = 0;
+        if (total_sum < x || min_elem > x)
+            return -1;
+
+        const int N = nums.size();
+
+        int inverted_x = total_sum - x; // Desired middle sum
+        int curr_sum   = 0;
 
         int left  = 0;
         int right = 0;
 
-        int max_window = -1; // Middle window, that's why it's "maximum"
-        while (right < nums.size())
+        int max_window = -1; // Middle CONSECUTIVE window(i.e. subarray)
+        while (right < N)
         {
             curr_sum += nums[right];
 
-            while (left <= right && curr_sum > desired_middle_sum)
-                curr_sum -= nums[left++];
+            while (left <= right && curr_sum > inverted_x)
+            {
+                curr_sum -= nums[left];
 
-            if (curr_sum == desired_middle_sum)
-                max_window = std::max(max_window, right - left + 1);
+                // Increment
+                ++left;
+            }
 
-            right++;
+            if (curr_sum == inverted_x)
+                max_window = max(max_window, right - left + 1);
+
+            // Increment
+            ++right;
         }
 
-        return max_window == -1 ? -1 : nums.size() - max_window;
+        return max_window == -1 ? -1 : N - max_window;
     }
 };
