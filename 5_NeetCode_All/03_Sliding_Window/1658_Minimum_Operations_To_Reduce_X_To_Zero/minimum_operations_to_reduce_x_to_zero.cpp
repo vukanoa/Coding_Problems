@@ -385,10 +385,10 @@ public:
             if (*it == target)
             {
                 // +1 because indices are 0-based
-                int left_elements  = i                        + 1;
-                int right_elements = it - suffix_sum.rbegin() + 1;
+                int left_elements_count  = i                        + 1;
+                int right_elements_count = it - suffix_sum.rbegin() + 1;
 
-                result = min(result, left_elements + right_elements);
+                result = min(result, left_elements_count + right_elements_count);
             }
         }
 
@@ -401,5 +401,127 @@ public:
             result = min(result, static_cast<int>(it_only_right - suffix_sum.rbegin() + 1));
 
         return result == INT_MAX ? -1 : result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, however this one uses my own forward and backward
+    lower_bound imeplementations instead of the ones provided by the std
+    library.
+
+    It is VERY beneficial to learn how to implement your REVERSED binary search
+    (and forward of course) since INterviewers usually don't like you to use
+    the libraries for such simple algorithms.
+
+    Therefore, learning these can pay the dividends in the future. Almost
+    literally.
+
+*/
+
+/* Time  Beats: 22.34% */
+/* Space Beats: 23.26% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_CUSTOM_Binary_Search_on_Prefix_and_Suffix_sum {
+public:
+    int minOperations(vector<int>& nums, int x)
+    {
+        int total_sum = accumulate(nums.begin(), nums.end(), 0);
+        int min_elem  = *min_element(nums.begin(), nums.end());
+
+        if (total_sum < x || min_elem > x)
+            return -1;
+
+        const int N = nums.size();
+        int result = INT_MAX;
+
+        vector<int> prefix_sum(N, 0);
+        vector<int> suffix_sum(N, 0);
+
+        prefix_sum[0]   = nums[0];
+        suffix_sum[N-1] = nums[N-1];
+
+        for (int i = 1; i < N; i++)
+        {
+            prefix_sum[0   + i] = prefix_sum[0   + i - 1] + nums[0   + i];
+            suffix_sum[N-1 - i] = suffix_sum[N-1 - i + 1] + nums[N-1 - i];
+        }
+
+        for (int i = 0; i < N && prefix_sum[i] <= x; i++)
+        {
+            int left_sum = prefix_sum[i];
+            int target   = x - left_sum;
+
+            if (i + 1 >= N)
+                continue;
+
+            int suffix_idx = my_reversed_lower_bound(N-1, i+1, target, suffix_sum);
+
+            if (suffix_idx != -1 && suffix_sum[suffix_idx] == target)
+            {
+                int left_elements_count  = i + 1;
+                int right_elements_count = N - suffix_idx;
+
+                result = min(result, left_elements_count + right_elements_count);
+            }
+        }
+
+        /* Only elements from the LEFT */
+        int left_idx = my_lower_bound(0, N - 1, x, prefix_sum);
+
+        if (prefix_sum[left_idx] == x)
+            result = min(result, left_idx + 1);
+
+        /* Only elements from the RIGHT */
+        int right_idx = my_reversed_lower_bound(N - 1, 0, x, suffix_sum);
+
+        if (right_idx != -1 && suffix_sum[right_idx] == x)
+            result = min(result, N - right_idx);
+
+
+        return result == INT_MAX ? -1 : result;
+    }
+
+private:
+    int my_lower_bound(int low, int high, int target, vector<int>& nums)
+    {
+        while (low < high)
+        {
+            int mid = low + (high - low) / 2;
+
+            if (target > nums[mid])
+                low = mid + 1;
+            else
+                high = mid;
+        }
+
+        return low;
+    }
+
+    int my_reversed_lower_bound(int low, int high, int target, vector<int>& nums)
+    {
+        while (high < low)
+        {
+            int mid = high + (low - high + 1) / 2;
+
+            if (nums[mid] >= target)
+                high = mid;
+            else
+                low = mid - 1;
+        }
+
+        const int N = nums.size();
+        if (high >= 0 && high < N && nums[high] >= target)
+            return high;
+
+        return -1;
     }
 };
