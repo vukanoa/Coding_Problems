@@ -55,6 +55,7 @@
 */
 
 #include <algorithm>
+#include <climits>
 #include <numeric>
 #include <vector>
 using namespace std;
@@ -322,5 +323,83 @@ public:
         }
 
         return max_window == -1 ? -1 : N - max_window;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    THis is a LESS efficient Solution than the one above, howver it's a very
+    nice Solution to understand since it has a few of the fundamental
+    techniques such as:
+
+        1. How to populate both prefix_sum and suffix_sum in a single loop
+
+        2. How to do a Binary Search (i.e. lower_bound) in REVERSE order, i.e.
+           on an array that has elements sorted in DECREASING order, so it's
+           INCREASING when going in REVERSE order.
+
+*/
+
+/* Time  Beats: 23.26% */
+/* Space Beats: 23.26% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Binary_Search_on_Prefix_and_Suffix_sum {
+public:
+    int minOperations(vector<int>& nums, int x)
+    {
+        int total_sum = accumulate(nums.begin(), nums.end(), 0);
+        int min_elem  = *min_element(nums.begin(), nums.end()   );
+
+        if (total_sum < x || min_elem > x)
+            return -1;
+
+
+        const int N = nums.size();
+        int result = INT_MAX;
+
+        vector<int> prefix_sum(N, 0);
+        vector<int> suffix_sum(N, 0);
+
+        prefix_sum[0  ] = nums[0];
+        suffix_sum[N-1] = nums[N-1];
+        for (int i = 1; i < N; i++)
+        {
+            prefix_sum[0   + i] = prefix_sum[0   + i - 1] + nums[0   + i];
+            suffix_sum[N-1 - i] = suffix_sum[N-1 - i + 1] + nums[N-1 - i];
+        }
+
+        for (int i = 0; i < N && prefix_sum[i] < x; i++)
+        {
+            int left_sum = prefix_sum[i];
+            int target   = x - left_sum;
+            auto it = lower_bound(suffix_sum.rbegin(), suffix_sum.rend() - i, target);
+
+            if (*it == target)
+            {
+                // +1 because indices are 0-based
+                int left_elements  = i                        + 1;
+                int right_elements = it - suffix_sum.rbegin() + 1;
+
+                result = min(result, left_elements + right_elements);
+            }
+        }
+
+        auto it_only_left = lower_bound(prefix_sum.begin(), prefix_sum.end(), x);
+        if (*it_only_left == x)
+            result = min(result, static_cast<int>(it_only_left - prefix_sum.begin() + 1));
+
+        auto it_only_right = lower_bound(suffix_sum.rbegin(), suffix_sum.rend(), x);
+        if (*it_only_right == x)
+            result = min(result, static_cast<int>(it_only_right - suffix_sum.rbegin() + 1));
+
+        return result == INT_MAX ? -1 : result;
     }
 };
