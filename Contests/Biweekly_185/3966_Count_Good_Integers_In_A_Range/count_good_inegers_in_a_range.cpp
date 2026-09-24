@@ -123,18 +123,18 @@ private:
 
         for (int curr_digit = 0; curr_digit <= limit_digit; curr_digit++)
         {
-            int new_tight = tight && (curr_digit == limit_digit);
+            int next_tight = tight && (curr_digit == limit_digit);
 
             if ( ! started && curr_digit == 0)
             {
-                result += solve(str_num, idx + 1, new_tight, false, -1, k);
+                result += solve(str_num, idx + 1, next_tight, false, -1, k);
             }
             else
             {
                 if (started && abs(curr_digit - prev_digit) > k)
                     continue;
 
-                result += solve(str_num, idx + 1, new_tight, true, curr_digit, k);
+                result += solve(str_num, idx + 1, next_tight, true, curr_digit, k);
             }
         }
 
@@ -224,18 +224,18 @@ private:
 
         for (int curr_digit = 0; curr_digit <= limit_digit; curr_digit++)
         {
-            int new_tight = tight && (curr_digit == limit_digit);
+            int next_tight = tight && (curr_digit == limit_digit);
 
             if (prev_digit == -1 && curr_digit == 0)
             {
-                result += solve(str_num, idx + 1, new_tight, -1, k);
+                result += solve(str_num, idx + 1, next_tight, -1, k);
             }
             else
             {
                 if (prev_digit != -1 && abs(curr_digit - prev_digit) > k)
                     continue;
 
-                result += solve(str_num, idx + 1, new_tight, curr_digit, k);
+                result += solve(str_num, idx + 1, next_tight, curr_digit, k);
             }
         }
 
