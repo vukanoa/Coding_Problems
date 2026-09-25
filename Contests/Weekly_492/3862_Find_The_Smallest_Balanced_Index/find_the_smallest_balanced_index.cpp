@@ -159,3 +159,46 @@ public:
         return -1;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TOOD
+
+*/
+
+/* Time  Beats: 57.25% */
+/* Space Beats: 87.68% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Two_Pointers {
+public:
+    int smallestBalancedIndex(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        unsigned long long L_sum     = accumulate(nums.begin(), nums.end(), 0ULL);
+        unsigned long long R_product = 1ULL;
+
+        for (int i = N-1; i >= 0; i--)
+        {
+            L_sum -= nums[i];
+
+            if (L_sum == R_product)
+                return i;
+
+            if (R_product > L_sum / nums[i])  // R_product can only INCREASE
+                break;                        // L_sum     can only DECREASE
+
+            R_product *= nums[i];
+        }
+
+        return -1;
+    }
+};
