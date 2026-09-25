@@ -68,6 +68,7 @@
 
 */
 
+#include <numeric>
 #include <vector>
 using namespace std;
 
@@ -99,6 +100,54 @@ public:
         {
             prefix_sum[0    + i] = static_cast<unsigned __int128>(prefix_sum [0   + i - 1] + nums[0   + i - 1]);
             suffix_prod[N-1 - i] = static_cast<unsigned __int128>(suffix_prod[N-1 - i + 1] * nums[N-1 - i + 1]);
+        }
+
+        for (int i = 1; i < N; i++)
+        {
+            if (prefix_sum[i] == suffix_prod[i])
+                return i;
+        }
+
+        return -1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 50.24% */
+/* Space Beats: 22.71% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_unsigned_long_long {
+public:
+    int smallestBalancedIndex(vector<int>& nums)
+    {
+        const int N = nums.size();
+
+        unsigned long long total_sum = accumulate(nums.begin(), nums.end(), 0ULL); 
+
+        vector<unsigned long long> prefix_sum (N, 0LL);
+        vector<unsigned long long> suffix_prod(N, 1LL);
+
+        for (int i = 1; i < N; i++)
+        {
+            prefix_sum[i] = 1ULL * prefix_sum [i - 1] + nums[i - 1];
+
+            if (suffix_prod[N-1 - i + 1] > total_sum / nums[N-1 - i + 1])
+                suffix_prod[N-1 - i] = total_sum + 1;
+            else
+                suffix_prod[N-1 - i] = 1ULL * suffix_prod[N-1 - i + 1] * nums[N-1 - i + 1];
         }
 
         for (int i = 1; i < N; i++)
