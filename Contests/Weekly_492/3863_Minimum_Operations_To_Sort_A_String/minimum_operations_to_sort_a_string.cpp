@@ -94,11 +94,13 @@ public:
         
         // ASCII
         char min_chr = 'z' + 1; // '{' (open brace)
-        char max_chr = 'A' - 1; // '`' (backtick)
+        char max_chr = 'a' - 1; // '`' (backtick)
 
         int min_chr_idx = -1;
         int max_chr_idx = -1;
 
+        // Find LEFTMOST  index of the SMALLEST character (i.e. min chr)
+        // Find RIGHTMOST index of the LARGEST  character (i.e. max chr)
         for (int i = 0; i < N; i++)
         {
             if (s[i] < min_chr)
@@ -118,5 +120,43 @@ public:
             return 1;
         
         return (min_chr_idx == N-1 && max_chr_idx == 0) ? 3 : 2;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 88.11% */
+/* Space Beats: 61.89% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    int minOperations(string s)
+    {
+        const int N = s.size();
+
+        if (is_sorted(begin(s), end(s)))
+            return 0;
+
+        if (N == 2)
+            return -1;
+
+        auto [it_min_chr, it_max_chr] = minmax_element(s.begin() + 1, s.end() - 1);
+
+        if (s[0] <= s[N-1] && (s[0] <= *it_min_chr || *it_max_chr <= s[N-1]))
+            return 1;
+
+        return (s[N-1] < *it_min_chr && s[0] > *it_max_chr) ? 3 : 2;
     }
 };
