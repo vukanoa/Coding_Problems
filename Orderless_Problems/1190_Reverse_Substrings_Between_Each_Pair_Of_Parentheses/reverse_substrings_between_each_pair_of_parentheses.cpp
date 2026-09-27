@@ -51,6 +51,8 @@
 
 */
 
+#include <algorithm>
+#include <stack>
 #include <vector>
 #include <string>
 using namespace std;
@@ -94,6 +96,8 @@ public:
                 result += s[i];
             }
         }
+
+        return result;
     }
 };
 
@@ -151,6 +155,140 @@ public:
             }
             else
                 result += s[i];
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Imagine the string as a path where every matching pair of parentheses--i.e.
+    '(' and ')'--form a TWO–WAY portal.
+
+
+    Algorithm:
+        1. We start at the beginning and walk to the right.
+
+        2. When we encounter a letter (i.e. [a-z]), we collect it.
+
+        3. When we encounter a portal (i.e. '(' and ')'), we instantly TELEPORT
+           TO THE OTHER END of the portal and then REVERSE(toggle) DIRECTION.
+
+
+    Toggle-ing direction makes us encounter the letters inside the portal from
+    the opposite direction which is exactly what reversing the corresponding
+    substirng does in the original string.
+
+
+
+
+    In the first for-loop we're forming portals.
+        + Each time we encounter a '(' we push its index onto the stack.
+
+        + Each time we encounter a ')' pop the index from the stack which
+          represents the index of the MATCHING OPENING parenthesis. Then we
+          put OTHER parenthesis' index inside the "portal" vector for each of
+          the parenthessis.
+
+          Example:
+
+                   s =  ( u ( l o v e ) i ) 
+                        0 1 2 3 4 5 6 7 8 9
+                        |   |       __| __|
+                        |   |       |   |  
+                        ----C-------C---C--
+                            |       |   | |
+                            |       |   | |
+                        ----C-------C---- |
+                        |   |       |     |
+                        |   |     ---     |
+                        |   |     |       |
+                        |   ------C----   |
+                        |         |   |   |
+                        |         |   |   |
+                        |   ------|   |   |
+                        |   |         |   |
+                        v   v         v   v
+              portal = [9   7         2   0]
+                        0 1 2 3 4 5 6 7 8 9
+
+
+
+    In the second for-loop, since every parenthesis has already been paired
+    with exactly one MATCHING parenthesis, there is no need to distinguish
+    between '(' and ')'.
+
+    Thus, we simply treat both as a PORTAL.
+
+    We begin with a POSITIVE STEP (i.e. moving to to the RIGHT). Whenever we
+    encounter a portal:
+
+        + JUMP to its corresponding matching index using the "portal" vector.
+        + TOGGLE the direction by changing this to a negative.
+
+    The letters are then collected into the result string as they are
+    encountered.
+
+    The portals only change the location and direction of movement, so no
+    actual substring reversal is needed.
+
+
+    At the end, we simply return result.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  65.80% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_Portal_Jumping {
+public:
+    string reverseParentheses(string s)
+    {
+        const int N = s.size();
+        string result;
+        result.reserve(N);
+
+        vector<int> portal(N);
+        stack<int>  stack;
+
+        for (int i = 0; i < N; i++)
+        {
+            if (s[i] == '(')
+            {
+                stack.push(i);
+            }
+            else if (s[i] == ')')
+            {
+                portal[i]         = stack.top();
+                portal[portal[i]] = i;
+
+                stack.pop();
+            }
+        }
+
+        int direction = 1;
+        for (int i = 0; i < N; i += direction)
+        {
+            if (s[i] >= 'a') // isdigit(s[i]), since ASCII '(' & ')' == 40 & 41
+            {
+                result += s[i];
+            }
+            else
+            {
+                i = portal[i]; // Jump to the MATCHING parenthesis
+
+                // TOGGLE direction
+                direction = -direction;
+            }
         }
 
         return result;
