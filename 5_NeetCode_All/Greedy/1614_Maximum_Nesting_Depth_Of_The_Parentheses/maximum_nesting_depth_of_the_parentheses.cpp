@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
     ============
     === EASY ===
@@ -48,6 +46,8 @@
 
 */
 
+
+#include <string>
 using namespace std;
 
 /*
@@ -68,9 +68,9 @@ class Solution {
 public:
     int maxDepth(string s)
     {
-        int max_depth  = 0;
-        int curr_depth = 0;
+        int result  = 0;
 
+        int depth = 0;
         for (const char& chr : s)
         {
             if (chr != '(' && chr != ')')
@@ -78,13 +78,49 @@ public:
 
             if (chr == '(')
             {
-                curr_depth++;
-                max_depth = max(max_depth, curr_depth);
+                ++depth;
+                result = max(result, depth);
             }
             else
-                curr_depth--;
+                --depth;
         }
 
-        return max_depth;
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    A more compact/elegant way of writing the same idea.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  85.53% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Compact {
+public:
+    int maxDepth(string& s)
+    {
+        int result = 0;
+
+        int depth = 0;
+        for (const char& chr: s)
+        {
+            depth += (chr == '(') - (chr == ')');
+
+            // Potentially update result
+            result = max(result, depth);
+        }
+
+        return result;  
     }
 };
