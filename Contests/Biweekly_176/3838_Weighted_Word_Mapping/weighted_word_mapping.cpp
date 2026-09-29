@@ -93,18 +93,58 @@ public:
         const int N = words.size();
 
         string result;
-        result.reserve(N);
+        result.reserve(N); // To prevent repeated reallocations
 
         for (const string& word : words)
         {
-            int weight_sum = 0;
+            int sum = 0;
             for (const char& chr : word)
             {
-                weight_sum += weights[chr - 'a'];
-                weight_sum %= 26;
+                sum += weights[chr - 'a'];
+                sum %= 26;
             }
 
-            result += 'z' - weight_sum;
+            result += 'z' - sum;
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  13.12% */
+
+/* Time  Complexity: O(N * M) */
+/* Space Complexity: O(N)     */
+class Solution_2 {
+public:
+    string mapWordWeights(vector<string>& words, vector<int>& weights)
+    {
+        const int N = words.size();
+
+        string result;
+        result.reserve(N); // To prevent repeated reallocations
+
+        for (int word_idx = 0; word_idx < N; word_idx++)
+        {
+            int sum = 0;
+            for (const char& chr : words[word_idx])
+                sum += weights[chr - 'a'];
+
+            sum %= 26;
+            result += static_cast<char>((25 - sum) + 'a');
         }
 
         return result;
