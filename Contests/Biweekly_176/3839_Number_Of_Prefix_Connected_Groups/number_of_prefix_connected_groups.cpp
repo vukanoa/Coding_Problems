@@ -77,6 +77,7 @@
 */
 
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 using namespace std;
@@ -168,5 +169,46 @@ public:
             trie.add_word(word, 0, k, groups);
 
         return groups.size();
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 72.93% */
+/* Space Beats: 61.57% */
+
+/* Time  Complexity: O(S)     */
+/* Space Complexity: O(U + K) */ // U = Number of UNIQUE k-length prefixes
+class Solution_Hash_Map {
+public:
+    int prefixConnected(vector<string>& words, int k)
+    {
+        const int N = words.size();
+        unordered_map<string, int> umap;
+
+        for (int i = 0; i < N; i++)
+        {
+            if (words[i].size() >= k)
+                ++umap[words[i].substr(0, k)];
+        }
+
+        int groups = 0;
+        for (auto [k_len_prefix, frequency] : umap)
+        {
+            if (frequency >= 2)
+                ++groups;
+        }
+
+        return groups;
     }
 };
