@@ -114,3 +114,34 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  81.16% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    vector<int> maxDepthAfterSplit(string seq)
+    {
+        const int N = seq.size();
+        vector<int> answer(N);
+
+        for (int i = 0; i < N; i++)
+            answer[i] = (i & 1 ^ (seq[i] == '('));
+
+        return answer;
+    }
+};
