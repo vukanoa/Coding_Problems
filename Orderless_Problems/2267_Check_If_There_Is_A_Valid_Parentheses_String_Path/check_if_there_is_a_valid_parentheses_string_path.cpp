@@ -127,3 +127,59 @@ private:
         return memo[row][col][balance] = result;
     }
 };
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, though implemented using the Bottom-Up approach.
+
+    '(' in ASCII is 40, which is an EVEN number
+    ')' in ASCII is 41, which is an ODD  number, i.e. (')' & 1) == 1
+
+*/
+
+/* Time  Beats: 5.27% */
+/* Space Beats: 9.78% */
+
+/* Time  Complexity: O(ROWS * COLS * (ROWS + COLS)) */
+/* Space Complexity: O(ROWS * COLS * (ROWS + COLS)) */
+class Solution_Bottom_Up__Tabulation {
+public:
+    bool hasValidPath(vector<vector<char>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        // (grid[0][0] & 1 == 1)  <==>   grid[0][0] == ')'
+        if (((ROWS + COLS) & 1) == 0 || (grid[0][0] & 1) || (grid[ROWS-1][COLS-1] & 1) == 0)
+            return false;
+
+        vector<vector<unordered_set<int>>> dp(ROWS + 1, vector<unordered_set<int>>(COLS + 1));
+        dp[0][0].insert(0);
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                int value = 1 - ((grid[row][col] & 1) << 1);
+
+                for (const auto& balance : dp[row][col])
+                {
+                    int next_balance = balance + value;
+
+                    if (next_balance < 0)
+                        continue;
+
+                    dp[row+1][col  ].insert(next_balance);
+                    dp[row  ][col+1].insert(next_balance);
+                }
+            }
+        }
+
+        return dp[ROWS][COLS-1].count(0);
+    }
+};
