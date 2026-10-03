@@ -112,3 +112,51 @@ public:
         return 0;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Bitmask way of checking whether a character is a vowel.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  65.59% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Bitmask {
+public:
+    static int vowelConsonantScore(string& s)
+    {
+        constexpr unsigned vowel_mask = (1 << ('a' - 'a')) | 
+                                        (1 << ('e' - 'a')) |
+                                        (1 << ('i' - 'a')) |
+                                        (1 << ('o' - 'a')) |
+                                        (1 << ('u' - 'a'));
+        int vowels     = 0;
+        int consonants = 0;
+
+        for (const int& chr : s)
+        {
+            if ( ! isalpha(chr))
+                continue;
+
+            if (vowel_mask & (1 << (chr - 'a')))
+                ++vowels;
+            else
+                ++consonants;
+        }
+
+
+        if (consonants > 0)
+            return vowels / consonants;
+
+        return 0;
+    }
+};
