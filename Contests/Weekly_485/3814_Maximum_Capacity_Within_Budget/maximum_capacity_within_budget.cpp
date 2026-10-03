@@ -126,3 +126,76 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, thought this one uses Binary Search instead of TWo Pointers.
+    Bottleneck is Sorting so there is no difference in Big O Time Complexity.
+
+*/
+
+/* Time  Beats: 47.83% */
+/* Space Beats: 71.54% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Binary_Search {
+public:
+    int maxCapacity(vector<int>& costs, vector<int>& capacity, int budget)
+    {
+        const int N = costs.size();
+        int result = 0;
+
+        vector<pair<int, int>> machines(N);
+        for (int i = 0; i < N; i++)
+            machines[i] = {costs[i], capacity[i]};
+
+        /* Sort by COST in ASCENDING order */
+        sort(machines.begin(), machines.end());
+
+        vector<int> costs_sorted(N);
+        for (int i = 0; i < N; i++)
+            costs_sorted[i] = machines[i].first;
+
+        /* Best capacity using ONE machine */
+        vector<int> dp(N);
+        dp[0] = machines[0].second;
+
+        for (int i = 1; i < N; i++)
+            dp[i] = max(dp[i - 1], machines[i].second);
+
+        /* Using TWO machines */
+        for (int i = 0; i < N; i++)
+        {
+            const int& cost     = machines[i].first;
+            const int& capacity = machines[i].second;
+
+            const int remaining_budget = budget - cost;
+
+            if (remaining_budget <= 0)
+                continue;
+
+            // Can we afford this machine alone?
+            if (cost < budget)
+                result = max(result, capacity);
+
+            // Find the largest cost STRICTLY LESS THAN remaining_budget
+            auto it = lower_bound(costs_sorted.begin(), costs_sorted.end(), remaining_budget);
+            const int j = it - costs_sorted.begin() - 1;
+
+            // Ensure we DON'T select the current machine twice
+            const int partner_idx = min(i-1, j);
+
+            if (partner_idx >= 0)
+                result = max(result, capacity + dp[partner_idx]);
+        }
+
+        return result;
+    }
+};
