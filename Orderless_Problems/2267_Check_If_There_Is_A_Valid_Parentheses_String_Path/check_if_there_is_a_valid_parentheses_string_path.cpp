@@ -65,8 +65,10 @@
 
 */
 
+#include <bitset>
 #include <cstring>
 #include <vector>
+#include <unordered_set>
 using namespace std;
 
 /*
@@ -181,5 +183,47 @@ public:
         }
 
         return dp[ROWS][COLS-1].count(0);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  96.38% */
+
+/* Time  Complexity: O(ROWS * COLS * (ROWS + COLS)) */
+/* Space Complexity: O(ROWS * COLS * (ROWS + COLS)) */
+class Solution_Bitmasking_magic {
+public:
+    bool hasValidPath(vector<vector<char>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        if (~(ROWS + COLS) & 1 || (grid[0][0] & 1) || ~grid.back().back() & 1)
+            return 0;
+
+        vector<bitset<102>> dp(COLS + 1);
+        dp[1].set(0);
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                dp[col + 1] = ((dp[col + 1] | dp[col]) << 1) >> ((grid[row][col] & 1) << 1);
+            }
+        }
+
+        return dp[COLS].test(0);
     }
 };
