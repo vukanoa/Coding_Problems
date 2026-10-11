@@ -24,11 +24,6 @@
     If multiple valid pairs achieve the maximum product, you may return any of
     them.
 
-    =====
-    Note: Please do not copy the description during the contest to maintain the
-          integrity of your submissions. 
-    =====
-
     ====================================================================
     FUNCTION: vector<int> maxProductPair(vector<int>& nums, int target);
     ====================================================================
