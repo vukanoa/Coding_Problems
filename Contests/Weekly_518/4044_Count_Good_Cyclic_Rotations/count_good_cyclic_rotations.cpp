@@ -89,3 +89,50 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 55.71% */
+/* Space Beats: 83.92% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Space_Efficient {
+public:
+    int countGoodRotations(vector<int>& nums)
+    {
+        const int N = nums.size();
+        long long result = 0LL; 
+
+        long long total_sum = 0LL; 
+        for (const int& number : nums)
+            total_sum += number; 
+
+        long long left_half_sum = 0LL;
+        for (int i = 0; i < N; i++)
+        {
+            if (i >= N/2)
+            {
+                if (left_half_sum != (total_sum - left_half_sum))
+                    ++result; 
+
+                // Remove the leftmost one in the current left_half subarray
+                left_half_sum -= nums[i - N/2]; 
+            }
+
+            left_half_sum += nums[i]; // Rotate 
+        }
+
+        return result;
+    }
+};
