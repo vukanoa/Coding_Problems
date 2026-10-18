@@ -55,6 +55,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <numeric>
 #include <vector>
 using namespace std;
 
@@ -102,5 +103,42 @@ public:
         }
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 87.47% */
+/* Space Beats: 15.44% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_2 {
+public:
+    long long maxAlternatingSum(vector<int>& nums)
+    {
+        vector<long long> squares;
+        for (const int& num : nums)
+            squares.push_back(1LL * num * num);
+
+        int h = squares.size() / 2;
+
+        // Quickselect: the smallest half in front, any order
+        nth_element(squares.begin(), squares.begin() + h, squares.end());
+
+        long long total = accumulate(squares.begin(), squares.end(), 0LL);
+        long long small = accumulate(squares.begin(), squares.begin() + h, 0LL);
+
+        return total - 2 * small; // Add everything, then flip the smallest half to minus
     }
 };
