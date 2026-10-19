@@ -160,3 +160,80 @@ private:
         return merged_intervals;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Similar idea, but a bit differently implemented. Maybe this one is better.
+
+*/
+
+/* Time  Complexity: O(N * logN  +  M * logM) */
+/* Space Complexity: O(M)                     */
+class Solution_2 {
+public:
+    int minSelection(vector<vector<int>>& availableIntervals, vector<vector<int>>& targetIntervals)
+    {
+        const int N = availableIntervals.size();
+        const int M = targetIntervals.size();
+        int result = 0;
+
+        /* Sort BOTH in ASCENDING order */
+        sort(availableIntervals.begin(), availableIntervals.end());
+        sort(targetIntervals.begin(), targetIntervals.end());
+
+        /* Merge */
+        vector<vector<int>> merged;
+        merged.reserve(M); // Prevent repeated reallocations
+        for (const auto& t : targetIntervals)
+        {
+            const int& curr_start = t[0];
+            const int& curr_end   = t[1];
+
+            if (merged.empty() || merged.back()[1] < curr_start)
+            {
+                merged.push_back( {curr_start, curr_end} );
+            }
+            else
+            {
+                merged.back()[1] = max(merged.back()[1], curr_end);
+            }
+        }
+
+
+        /* Line sweep */
+        int i     = 0;
+        int reach = -1;
+        for (const auto& t : merged)
+        {
+            const int& target_start = t[0];
+            const int& target_end   = t[1];
+
+            /* Extend */
+            while (reach < target_end)
+            {
+                int start = max(reach, target_start);
+                int end   = reach;
+
+                while (i < N && availableIntervals[i][0] <= start)
+                {
+                    end = max(end, availableIntervals[i][1]);
+                    i++;
+                }
+
+                if (end <= reach || end < target_start)
+                    return -1;
+
+                ++result;
+                reach = end;
+            }
+        }
+
+        return result;
+    }
+};
