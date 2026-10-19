@@ -167,3 +167,97 @@ public:
         return root;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    THe exact same idea, however the "tricky" part is writte in another way.
+    This may "click" for you.
+
+*/
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_2 {
+public:
+    int findColoredRoot(vector<vector<int>>& edges, string colors)
+    {
+        const int N = colors.size();
+
+        vector<int>   degree(N, 0);
+        vector<int> indegree(N, 0);
+
+        unordered_map<char,int> color_to_number;
+        color_to_number['R'] = 0;
+        color_to_number['B'] = 1;
+        color_to_number['W'] = 2;
+
+        for (const auto& edge : edges)
+        {
+            int u = edge[0];
+            int v = edge[1];
+
+            ++degree[u];
+            ++degree[v];
+
+            int color_u = color_to_number[colors[u]];
+            int color_v = color_to_number[colors[v]];
+
+            if (color_u == color_v)
+                return -1;
+
+            int next_color_of_u = (color_u + 1) % 3;
+
+            if (next_color_of_u == color_v) // u --> v (u=PARENT, v=child)
+                ++indegree[v];
+            else                            // v --> u (v=PARENT, u=child)
+                ++indegree[u];
+        }
+
+        int root                 = -1;
+        int nodes_without_parent =  0;
+        for (int node = 0; node < N; node++)
+        {
+            if (indegree[node] == 0)
+            {
+                root = node;
+                ++nodes_without_parent;
+            }
+        }
+
+        // There MUST be EXACTLY 1 root
+        if (nodes_without_parent != 1)
+            return -1;
+
+
+
+        /**************************/
+        /* Binary Tree properties */
+        /**************************/
+
+        // ROOT node must have a degree of AT MOST 2 nodes:
+        //
+        //     2 child nodes and NO parent
+        //
+        if (degree[root] > 2)
+            return -1;
+
+
+        // OTHER, non-ROOT, nodes must have a degree of AT MOST 3 nodes:
+        // 
+        //     2 child nodes and 1 parent
+        //
+        for (int node = 0; node < N; node++)
+        {
+            if (node != root && degree[node] > 3)
+                return -1;
+        }
+
+        return root;
+    }
+};
