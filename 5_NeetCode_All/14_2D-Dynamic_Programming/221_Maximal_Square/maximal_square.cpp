@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-
 /*
     ==============
     === MEDIUM ===
@@ -67,6 +64,9 @@
 
 */
 
+#include <bits/stdc++.h>
+using namespace std;
+
 /*
     ------------
     --- IDEA ---
@@ -76,52 +76,59 @@
 
 */
 
-/* Time  Beats: 29.28% */
-/* Space Beats: 11.12% */
+/* Time  Beats: 14.44% */
+/* Space Beats: 82.54% */
 
-/* Time  Complexity: O(n^2) */
-/* Space Complexity: O(n^2) */
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
 class Solution {
+private:
+    int memo[501][501];
+
+    int ROWS;
+    int COLS;
+
 public:
-    int maximalSquare(std::vector<std::vector<char>> matrix)
+    int maximalSquare(vector<vector<char>> matrix)
     {
-        int ROWS = matrix.size();
-        int COLS = matrix[0].size();
+        ROWS = matrix.size();
+        COLS = matrix[0].size();
 
-        std::vector<std::vector<int>> cache_square_len(ROWS, std::vector(COLS, -1));
+        /* Memset */
+        memset(memo, 0xff, sizeof(memo)); // 0xff is -1 in "Two's complement"
 
-        std::function<int(int, int)> helper;
+        /* Solve */
+        solve(0, 0, matrix);
 
-        /* LAMBDA */
-        helper = [&](int r, int c) -> int
+        /* Get Result */
+        int max_side = 0;
+        for (int row = 0; row < ROWS; row++)
         {
-            if (r >= ROWS || c >= COLS)
-                return 0;
-
-            if (cache_square_len[r][c] == -1)
-            {
-                int down     = helper(r+1, c  );
-                int right    = helper(r  , c+1);
-                int diagonal = helper(r+1, c+1);
-
-                cache_square_len[r][c] = 0;
-
-                if (matrix[r][c] == '1')
-                    cache_square_len[r][c] = 1 + std::min( {down, right, diagonal} );
-            }
-
-            return cache_square_len[r][c];
-        };
-
-        helper(0, 0);
-
-        int max = INT_MIN;
-        for (int i = 0; i < ROWS; i++)
-        {
-            for (int j = 0; j < COLS; j++)
-                max = std::max(max, cache_square_len[i][j]);
+            for (int col = 0; col < COLS; col++)
+                max_side = max(max_side, memo[row][col]);
         }
 
-        return max * max;
+        return max_side * max_side;
+    }
+
+private:
+    int solve(int row, int col, vector<vector<char>>& matrix)
+    {
+        if (row >= ROWS || col >= COLS)
+            return 0;
+
+        if (memo[row][col] != -1)
+            return memo[row][col];
+
+        int down     = solve(row+1, col  , matrix);
+        int right    = solve(row  , col+1, matrix);
+        int diagonal = solve(row+1, col+1, matrix);
+
+        memo[row][col] = 0;
+
+        if (matrix[row][col] == '1')
+            memo[row][col] = 1 + min( {down, right, diagonal} );
+
+        return memo[row][col];
     }
 };
