@@ -72,6 +72,15 @@
 #include <vector>
 using namespace std;
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
 /* Time  Beats: 35.36% */
 /* Space Beats: 96.01% */
 
@@ -110,6 +119,7 @@ public:
             }
         }
 
+        /* Find Result */
         for (int row = ROWS-1; row >= 0; row--)
         {
             for (int col = COLS-1; col >= 0; col--)
@@ -157,5 +167,91 @@ private:
             memo[row][col] = 1 + min( min(down, right), diagonal );
 
         return memo[row][col];
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, though written in an Bottom-Up way.
+
+*/
+
+/* Time  Beats: 68.46% */
+/* Space Beats: 38.65% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
+class Solution_Bottom_Up__Tabulation {
+public:
+    int maxArea(vector<vector<int>>& mat)
+    {
+        const int ROWS = mat.size();
+        const int COLS = mat[0].size();
+        int result = 0;
+
+        vector<vector<int>> dp      (ROWS+1, vector<int>(COLS+1, 0));
+        vector<vector<int>> max_side(ROWS+1, vector<int>(COLS+1, 0));
+
+        /* Populate "memo" */
+        for (int row = ROWS-1; row >= 0; row--)
+        {
+            for (int col = COLS-1; col >= 0; col--)
+            {
+                if (mat[row][col] == 0)
+                    continue;
+
+                int down     = row+1 < ROWS                 ? dp[row+1][col  ] : 0;
+                int right    = col+1 < COLS                 ? dp[row  ][col+1] : 0;
+                int diagonal = row+1 < ROWS && col+1 < COLS ? dp[row+1][col+1] : 0;
+
+                dp[row][col] = 1 + min( min(down, right), diagonal );
+            }
+        }
+
+        /* Populate "max_side" */
+        for (int row = ROWS-1; row >= 0; row--)
+        {
+            for (int col = COLS-1; col >= 0; col--)
+            {
+                max_side[row][col] = max( {      dp[row  ][col  ],
+                                           max_side[row+1][col  ],
+                                           max_side[row  ][col+1],
+                                           max_side[row+1][col+1]} );
+            }
+        }
+
+        /* Find Result */
+        for (int row = ROWS-1; row >= 0; row--)
+        {
+            for (int col = COLS-1; col >= 0; col--)
+            {
+                int k = dp[row][col];
+
+                if (k == 0)
+                    continue;
+
+                if (row+k < ROWS)
+                {
+                    int side_len = min(k, max_side[row+k][0]);
+
+                    result = max(result, side_len * side_len);
+                }
+
+                if (col+k < COLS)
+                {
+                    int side_len = min(k, max_side[0][col+k]);
+
+                    result = max(result, side_len * side_len);
+                }
+            }
+        }
+
+        return result;
     }
 };
