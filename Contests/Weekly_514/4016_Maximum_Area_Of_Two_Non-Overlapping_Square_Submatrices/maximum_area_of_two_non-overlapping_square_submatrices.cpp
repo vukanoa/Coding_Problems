@@ -67,29 +67,20 @@
 
 */
 
+#include <algorithm>
 #include <cstring>
 #include <vector>
 using namespace std;
 
-/*
-    ------------
-    --- IDEA ---
-    ------------
+/* Time  Beats: 35.36% */
+/* Space Beats: 96.01% */
 
-    TODO
-
-*/
-
-/* Time  Beats: 51.30% */
-/* Space Beats: 97.72% */
-
-/* Time  Complexity: O(ROWS * COLS * log(ROWS * COLS)) */
-/* Space Complexity: O(ROWS * COLS * log(ROWS * COLS)) */
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */
 class Solution {
 private:
-    int memo[501][501];
-    int max_row_size[502];
-    int max_col_size[502];
+    int memo    [501][501];
+    int max_side[501][501];
 
     int ROWS;
     int COLS;
@@ -99,65 +90,49 @@ public:
     {
         ROWS = mat.size();
         COLS = mat[0].size();
+        int result = 0;
 
         /* Memset */
-        memset(memo, 0xff, sizeof(memo)); // 0xff is -1 in "2's complement"
-        memset(max_row_size, 0, sizeof(max_row_size));
-        memset(max_col_size, 0, sizeof(max_col_size));
+        memset(memo,     0xff, sizeof(memo));      // 0xff is -1 in "2's compl"
+        memset(max_side, 0x00, sizeof(max_side));
 
         /* Populate "memo" */
         solve(0, 0, mat);
 
-        /* Get Maximum Square Size Per Row */
-        for (int row = 0; row < ROWS; row++)
+        for (int row = ROWS-1; row >= 0; row--)
         {
-            for (int col = 0; col < COLS; col++)
+            for (int col = COLS-1; col >= 0; col--)
             {
-                max_row_size[row] = max(max_row_size[row], memo[row][col]);
-                max_col_size[col] = max(max_col_size[col], memo[row][col]);
+                max_side[row][col] = max( {    memo[row  ][col  ],
+                                           max_side[row+1][col  ],
+                                           max_side[row  ][col+1],
+                                           max_side[row+1][col+1]} );
             }
         }
 
-        /* Suffix Maximums */
-        for (int row = ROWS - 1; row >= 0; row--)
-            max_row_size[row] = max(max_row_size[row], max_row_size[row+1]);
-
-        for (int col = COLS - 1; col >= 0; col--)
-            max_col_size[col] = max(max_col_size[col], max_col_size[col+1]);
-
-        /* Binary Search */
-        int start = 1;
-        int end   = min(ROWS, COLS);
-        int result = 0;
-
-        while (start <= end)
+        for (int row = ROWS-1; row >= 0; row--)
         {
-            int k = start + (end - start) / 2;
-            bool found = false;
-
-            for (int row = 0; row < ROWS && !found; row++)
+            for (int col = COLS-1; col >= 0; col--)
             {
-                for (int col = 0; col < COLS; col++)
-                {
-                    if (memo[row][col] < k)
-                        continue;
+                int k = memo[row][col];
 
-                    if ((row + k < ROWS && max_row_size[row+k] >= k) ||
-                        (col + k < COLS && max_col_size[col+k] >= k))
-                    {
-                        found = true;
-                        break;
-                    }
+                if (k == 0)
+                    continue;
+
+                if (row+k < ROWS)
+                {
+                    int side_len = min(k, max_side[row+k][0]);
+
+                    result= max(result, side_len * side_len);
+                }
+
+                if (col+k < COLS)
+                {
+                    int side_len = min(k, max_side[0][col+k]);
+
+                    result= max(result, side_len * side_len);
                 }
             }
-
-            if (found)
-            {
-                result = k * k;
-                start  = k + 1;
-            }
-            else
-                end = k - 1;
         }
 
         return result;
