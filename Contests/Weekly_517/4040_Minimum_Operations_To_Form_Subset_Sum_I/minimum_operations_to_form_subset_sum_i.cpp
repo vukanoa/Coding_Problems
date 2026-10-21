@@ -73,13 +73,21 @@
 #include <vector>
 using namespace std;
 
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
 
 /* Time  Beats: 23.97% */
 /* Space Beats: 93.84% */
 
 /* Time  Complexity: O(N * sum * log(max(sum))) */
 /* Space Complexity: O(N * sum * log(max(sum))) */
-class Solution {
+class Solution_Top_Down__Memoization {
 private:
     int memo[101][5001];
 
@@ -156,5 +164,71 @@ private:
         }
 
         return memo[idx][sum] = result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 59.77% */
+/* Space Beats: 50.29% */
+
+/* Time  Complexity: O(N * sum * log(max(sum))) */
+/* Space Complexity: O(N * sum * log(max(sum))) */
+class Solution_Bottom_Up__Tabulation {
+public:
+    int minOperations(vector<int>& nums, int sum)
+    {
+        vector<int> dp(sum+1, INT_MAX);
+        dp[0] = 0;
+
+        for (int number : nums)
+        {
+            vector<pair<int,int>> options;
+
+            long long operations = 0;
+            long long val        = number;
+            while (val <= sum)
+            {
+                options.push_back({(int)val, (int)operations});
+
+                ++operations;
+                val *= 2;
+            }
+
+            operations = 1;
+            val        = number;
+            while (val > 0)
+            {
+                if (val/2 > 0 && val/2 <= sum)
+                    options.push_back( {val/2, operations} );
+
+                ++operations;
+                val /= 2;
+            }
+
+            vector<int> next = dp;
+            for (auto& [val, operations] : options)
+            {
+                for (int curr_sum = sum; curr_sum >= val; curr_sum--)
+                {
+                    if (dp[curr_sum - val] != INT_MAX)
+                        next[curr_sum] = min(next[curr_sum], dp[curr_sum - val] + operations);
+                }
+            }
+
+            dp = next;
+        }
+
+        return dp[sum] == INT_MAX ? -1 : dp[sum];
     }
 };
