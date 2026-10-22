@@ -63,6 +63,8 @@
 
 */
 
+#include <algorithm>
+#include <climits>
 #include <vector>
 using namespace std;
 
@@ -104,5 +106,78 @@ public:
             return min(N - nums.back(), nums.back()) + 1;
 
         return -1;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Maybe this one is more intuitive, though it's LESS Space efficient.
+
+*/
+
+/* Time  Beats: 9.45% */
+/* Space Beats: 5.12% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_2 {
+public:
+    int minOperations(vector<int>& nums)
+    {
+        const int N = nums.size();
+        if (N <= 1)
+            return 0;
+        
+        int result = INT_MAX;
+
+        vector<int> one = nums;
+        one.insert(one.end(), nums.begin(), nums.end());
+
+        int consecutive = 0;
+        for (int i = 1; i < 2*N; i++)
+        {
+            if (one[i-1] + 1 == one[i])
+                ++consecutive;
+            else
+                consecutive = 0;
+
+            if (consecutive == N-1)
+            {
+                int k = i - (N-1); // Required left rotations
+
+                // Option 1:   0 Reversals + k       left rotations
+                // Option 2:   1 Reversal  + (N - k) left rotations
+
+                result = min(result, min(k, (N - k) + 2));
+                break;
+            }
+        }
+
+        vector<int> two = nums;
+        reverse(two.begin(), two.end());
+        two.insert(two.end(), nums.rbegin(), nums.rend());
+
+        consecutive = 0;
+        for (int i = 1; i < 2*N; i++)
+        {
+            if (two[i-1] + 1 == two[i])
+                ++consecutive;
+            else
+                consecutive = 0;
+
+            if (consecutive == N-1)
+            {
+                result = min(result, min(i - (N-1) + 1, 2*N - i));
+                break;
+            }
+        }
+
+        return result == INT_MAX ? -1 : result;
     }
 };
