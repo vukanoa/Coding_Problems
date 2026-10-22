@@ -154,3 +154,49 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Binary Serach Solution.
+
+*/
+
+/* Time  Beats: 43.83% */
+/* Space Beats: 99.88% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Binary_Search {
+public:
+    long long countIntersectingIntervals(vector<vector<int>>& intervals)
+    {
+        const int N = intervals.size();
+        long long result = 0LL;
+
+        /* Sort */
+        sort(intervals.begin(), intervals.end());
+
+        for (int i = 0; i < N; i++)
+        {
+            const int& start = intervals[i][0];
+            const int& end   = intervals[i][1];
+
+            auto it = upper_bound(intervals.begin() + i + 1, intervals.end(), end, [](int value, const auto& interval) {
+                return value < interval[0];
+            });
+
+            --it; // Move back by one
+            int last_intersection_idx = it - intervals.begin();
+
+            result += static_cast<long long>(last_intersection_idx - i);
+        }
+
+        return result;
+    }
+};
