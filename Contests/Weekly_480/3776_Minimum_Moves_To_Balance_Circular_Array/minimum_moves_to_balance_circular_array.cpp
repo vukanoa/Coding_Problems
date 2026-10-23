@@ -167,3 +167,70 @@ public:
         return operations;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 64.29% */
+/* Space Beats: 99.40% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Elegant {
+public:
+    long long minMoves(vector<int>& balance)
+    {
+        const int N = balance.size();
+        long long operations = 0LL;
+
+        int idx_of_negative = -1;
+        long long total = 0LL;
+
+        for (int i = 0; i < N; i++)
+        {
+            total += balance[i];
+
+            if (balance[i] < 0)
+                idx_of_negative = i;
+        }
+
+        if (idx_of_negative == -1)
+            return 0;
+
+        if (total < 0)
+            return -1;
+
+
+        int       distance = 1;
+        long long required = -1LL * balance[idx_of_negative];
+        while (required > 0)
+        {
+            int L = (idx_of_negative - distance % N + N) % N;
+            int R = (idx_of_negative + distance        ) % N;
+
+            long long storage = balance[L];
+            if (R != L)
+                storage += balance[R];
+
+            long long transferred = min(required, storage);
+
+            operations += 1LL * distance * transferred;
+            required   -= transferred;
+
+
+            // Increment
+            ++distance;
+        }
+
+        return operations;
+    }
+};
