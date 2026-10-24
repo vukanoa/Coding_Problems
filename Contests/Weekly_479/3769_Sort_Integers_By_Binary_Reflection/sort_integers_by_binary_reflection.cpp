@@ -93,8 +93,8 @@ public:
         vector<int> result; // "result" space usually isn't count as "extra"
         result.reserve(N);
         
-        vector<pair<int,int>> vec; // This makes Space Complexity O(N)
-        vec.reserve(N);
+        vector<pair<int,int>> reflection_and_orig_idx; // This makes Space Complexity O(N)
+        reflection_and_orig_idx.reserve(N);
 
         for (int i = 0; i < N; i++)
         {
@@ -120,14 +120,16 @@ public:
             // Get rid of leading zeroes in "binary reflection"(i.e. reversed)
             idx = bin_str_without_leading_zeroes.find('1');
             bin_str_without_leading_zeroes = bin_str_without_leading_zeroes.substr(idx);
+
+            long long reflection = stoi(bin_str_without_leading_zeroes, nullptr, 2);
             
-            vec.push_back( {stoi(bin_str_without_leading_zeroes, nullptr, 2), i} );
+            reflection_and_orig_idx.push_back( {reflection, i} );
         }
 
         // Sort first by decimal representation of "binary reflection" and
         // if they're EQUAL, then make sure the originally smaller one gets
         // first
-        sort(vec.begin(), vec.end(), [&](const pair<int,int>& a, const pair<int,int>& b){
+        sort(reflection_and_orig_idx.begin(), reflection_and_orig_idx.end(), [&](const pair<int,int>& a, const pair<int,int>& b){
             if (a.first == b.first)
                 return nums[a.second] < nums[b.second];
 
@@ -135,9 +137,77 @@ public:
         });
 
         // Populate reuslt
-        for (const auto& entry : vec)
-            result.push_back(nums[entry.second]);
+        for (const auto& [reflection, orig_idx] : reflection_and_orig_idx)
+            result.push_back(nums[orig_idx]);
 
         return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 60.50% */
+/* Space Beats: 48.00% */
+
+/* Time  Complexity: O(N * logN  +  N * logV) */ // where 'V' is max(nums)
+/* Space Complexity: O(N)                     */
+class Solution_2 {
+public:
+    vector<int> sortByReflection(vector<int>& nums)
+    {
+        const int N = nums.size();
+        vector<int> result; // "result" space usually isn't count as "extra"
+        result.reserve(N);
+
+        vector<pair<long long, int>> reflection_and_original;
+        reflection_and_original.reserve(N); // To prevent repeated reallocations
+
+        for (const int& orig_val : nums)
+        {
+            long long reflection = binary_reflection_of(orig_val);
+
+            reflection_and_original.push_back( {reflection, orig_val} );
+        }
+
+        sort(reflection_and_original.begin(), reflection_and_original.end(), [](const auto& a, const auto& b) {
+            if (a.first == b.first)
+                return a.second < b.second;
+
+            return a.first < b.first;
+        });
+
+        for (const auto& [reflection, orig_val] : reflection_and_original)
+            result.push_back(orig_val);
+
+        return result;
+    }
+
+private:
+    long long binary_reflection_of(int value)
+    {
+        long long binary_reflection = 0;
+
+        while (value > 0)
+        {
+            // LSB = Least Significant Bit (currently after 0 or more SHRs)
+            long long LSB = value & 1LL;
+
+            binary_reflection = (binary_reflection << 1) | LSB;
+
+            // SHR(i.e. Shift RIGHT) so that we check next MORE significant bit
+            value >>= 1;
+        }
+
+        return binary_reflection;
     }
 };
