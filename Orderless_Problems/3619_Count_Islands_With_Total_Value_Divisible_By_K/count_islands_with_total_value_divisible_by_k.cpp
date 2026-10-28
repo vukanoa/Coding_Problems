@@ -90,7 +90,7 @@ public:
                     dfs(row, col, grid, visited, sum);
 
                     if (sum > 0LL && sum % k == 0)
-                        result++;
+                        ++result;
                 }
             }
         }
@@ -113,9 +113,96 @@ private:
         visited[row][col] = true; // Mark
         sum += grid[row][col];
 
-        dfs(row - 1, col   , grid, visited, sum);
-        dfs(row + 1, col   , grid, visited, sum);
-        dfs(row    , col -1, grid, visited, sum);
-        dfs(row    , col +1, grid, visited, sum);
+        /* Signing Cross order */
+        dfs(row-1, col  , grid, visited, sum);
+        dfs(row+1, col  , grid, visited, sum);
+        dfs(row  , col-1, grid, visited, sum);
+        dfs(row  , col+1, grid, visited, sum);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    More Space efficient, but we DO have an additional traversal through an
+    entire "grid" since we need to restore the original values.
+
+    So it's a trade-off that could be discussed.
+
+    Usually Time is more important since memory is cheap, but nowadays, i.e.
+    October 2026, memory is super expensive, so maybe it's not even such a
+    crazy idea to have an additional traversal but save some Space.
+
+    I don't know.
+
+*/
+
+/* Time  Beats: 67.45% */
+/* Space Beats: 68.31% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS * COLS) */ // due to RECURSION, but w/o that: O(1)
+class Solution_Improved {
+public:
+    int countIslands(vector<vector<int>>& grid, int k)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+        int result = 0;
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                if (grid[row][col] <= 0) // 0 --> water, negative_val --> visited land cell
+                    continue;
+                
+                long long sum = 0LL;
+                dfs(row, col, grid, sum);
+
+                if (sum % k == 0)
+                    ++result;
+            }
+        }
+
+        // Restore original values of "grid", since it's passed by a reference
+        // and thus we do NOT want to change what was passed to this function
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                if (grid[row][col] < 0)
+                    grid[row][col] *= -1; // Restore original value
+            }
+        }
+
+        return result;
+    }
+
+private:
+    void dfs(int row, int col, vector<vector<int>>& grid, long long& sum)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        if (row < 0 || col < 0 || row >= ROWS || col >= COLS)
+            return;
+
+        if (grid[row][col] <= 0) // 0 --> water, negative_val --> visited land cell
+            return;
+
+        sum += grid[row][col];
+        grid[row][col] *= -1; // Mark as VISITED
+
+        /* Signing Cross order */
+        dfs(row-1, col  , grid, sum); // Up
+        dfs(row+1, col  , grid, sum); // Down
+        dfs(row  , col-1, grid, sum); // Left
+        dfs(row  , col+1, grid, sum); // Right
     }
 };
