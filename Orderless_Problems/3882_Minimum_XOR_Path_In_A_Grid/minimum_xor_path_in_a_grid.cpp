@@ -69,6 +69,7 @@
 
 */
 
+#include <bitset>
 #include <climits>
 #include <vector>
 using namespace std;
@@ -126,5 +127,73 @@ private:
         int down  = solve(row+1, col  , xor_value, grid);
 
         return memo[row][col][xor_value] = min(right, down);
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 97.93% */
+/* Space Beats: 96.28% */
+
+/* Time  Complexity: O(ROWS * COLS * 1024) */
+/* Space Complexity: O(   1 * COLS * 1024) */
+class Solution_Bottom_Up__Tabulation__Bitset {
+public:
+    int minCost(vector<vector<int>>& grid)
+    {
+        static constexpr int MAX_XOR = 1024;
+
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+
+        vector<bitset<MAX_XOR>> reachable_xor_values(COLS);
+        reachable_xor_values[0][0] = 1;   // Bit 0 in this column is reachable(i.e. 1)
+        // reachable_xor_values[0] = 0x1; // bitset=0x1 means only bit 0 is reachable
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                /* Get XOR values reachable from ABOVE or from the LEFT */
+                bitset<1024> previous_xor_values;
+
+                auto& above_xor_values = reachable_xor_values[col];
+              //auto& left_xor_values  = reachable_xor_values[col-1];
+
+                if (col > 0)
+                    previous_xor_values = above_xor_values | reachable_xor_values[col - 1];
+                else
+                    previous_xor_values = above_xor_values;
+
+                /* Clear previous states before storing the new ones */
+                reachable_xor_values[col].reset();
+
+                /* Append the current grid value to every reachable XOR */
+                for (int xor_value = 0; xor_value < MAX_XOR; xor_value++)
+                {
+                    if (previous_xor_values[xor_value])
+                        reachable_xor_values[col][xor_value ^ grid[row][col]] = 1;
+                }
+            }
+        }
+
+        /* Find the minimum reachable XOR at the bottom-right cell */
+        for (int xor_value = 0; xor_value < MAX_XOR; xor_value++)
+        {
+            if (reachable_xor_values[COLS - 1][xor_value])
+                return xor_value;
+        }
+
+        return -1;
     }
 };
