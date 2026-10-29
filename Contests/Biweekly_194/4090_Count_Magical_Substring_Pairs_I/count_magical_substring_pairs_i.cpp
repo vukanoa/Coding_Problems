@@ -146,3 +146,58 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 74.82% */
+/* Space Beats: 88.42% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Bit_Manipulation {
+public:
+    int countMagicalPairs(string s)
+    {
+        const int N = s.size();
+        int result = 0LL;
+
+        // Fix the middle split point 'j' where s1 ends (at j) and s2 begins (at j+1)
+        for (int j = 0; j < N-1; j++)
+        {
+            // count_of_subarrays_with[distinct] stores how many left substrings s[i..j] have exactly "distinct" characters
+            int count_of_subarrays_with[27] = {};
+            int L_freq = 0;
+            int R_freq = 0;
+
+            // Step 1: Expand s1 = s[i..j] to the left and record distinct character counts
+            for (int i = j; i >= 0; i--)
+            {
+                L_freq |= 1 << (s[i] - 'a'); // same as ++L_freq[s[i] - 'a'], if we had: int L_freq[26] = {}
+
+                int distinct_chars_in_s1 = __builtin_popcount(L_freq); // Count set bits
+                ++count_of_subarrays_with[distinct_chars_in_s1];
+            }
+
+            // Step 2: Expand s2 = s[j+1..k] to the right and match with s1 counts
+            for (int k = j+1; k < N; k++)
+            {
+                R_freq |= 1 << (s[k] - 'a'); // same as ++R_freq[s[k] - 'a'], if we had: int R_freq[26] = {}
+
+                int distinct_chars_in_s2 = __builtin_popcount(R_freq); // count set bits
+                result += count_of_subarrays_with[distinct_chars_in_s2]; // Add all valid LEFT subarrays that had THE SAME count
+            }
+        }
+
+        return result;
+    }
+};
