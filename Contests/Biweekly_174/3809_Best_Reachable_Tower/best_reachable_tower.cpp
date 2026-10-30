@@ -85,6 +85,7 @@
 */
 
 #include <algorithm>
+#include <climits>
 #include <cstdlib>
 #include <vector>
 using namespace std;
@@ -145,5 +146,61 @@ public:
             return {-1, -1};
         
         return {reachable[0][1], reachable[0][2]};
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 45.45% */
+/* Space Beats: 40.61% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Linear {
+public:
+    vector<int> bestTower(vector<vector<int>>& towers, vector<int>& center, int radius)
+    {
+        vector<int> result = {INT_MAX, INT_MAX};
+
+        const int& cx = center[0];
+        const int& cy = center[1];
+
+        int best_quality = 0;
+        for (const vector<int>& entry : towers)
+        {
+            const int& x = entry[0];
+            const int& y = entry[1];
+            const int& q = entry[2];
+
+            int manhattan_distance = abs(x - cx) + abs(y - cy);
+
+            if (manhattan_distance > radius)
+                continue;
+
+            if (q > best_quality)
+            {
+                best_quality = q;
+                result = {x, y};
+            }
+            else if (q == best_quality)
+            {
+                result = min(result, {x, y});
+            }
+        }
+
+        if (result[0] == INT_MAX)
+            return {-1, -1};
+
+        return result;
     }
 };
