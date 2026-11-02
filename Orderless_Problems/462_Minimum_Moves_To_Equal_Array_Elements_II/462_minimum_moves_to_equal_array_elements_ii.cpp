@@ -155,3 +155,54 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 13.28% */
+/* Space Beats: 79.95% */
+
+/* Time  Complexity: O(N * logN) */
+/* Space Complexity: O(N)        */
+class Solution_Binary_Search {
+public:
+    int minMoves2(vector<int>& nums)
+    {
+        int low  = *min_element(nums.begin(), nums.end());
+        int high = *max_element(nums.begin(), nums.end());
+
+        while (low < high)
+        {
+            int mid = low + (high - low) / 2; // Low-leaning mid
+
+            long long curr_result = 0LL;
+            long long next_result = 0LL;
+
+            for (const int& num : nums)
+            {
+                curr_result += abs(    mid - num);
+                next_result += abs(1 + mid - num);
+            }
+
+            if (curr_result > next_result)
+                low = mid + 1;
+            else
+                high = mid;
+        }
+
+        int result = 0;
+        for (const int& num : nums)
+            result += abs(low - num);
+
+        return result;
+    }
+};
