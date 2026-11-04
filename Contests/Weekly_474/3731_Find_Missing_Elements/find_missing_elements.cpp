@@ -59,6 +59,8 @@
 */
 
 #include <bitset>
+#include <climits>
+#include <unordered_set>
 #include <vector>
 using namespace std;
 
@@ -76,7 +78,7 @@ using namespace std;
 
 /* Time  Complexity: O(N + D) */ // Where D = (largest - smallest + 1)
 /* Space Complexity: O(N)     */
-class Solution_xx2 {
+class Solution_1 {
 public:
     vector<int> findMissingElements(vector<int>& nums)
     {
@@ -96,10 +98,56 @@ public:
             seen.set(num);
         }
 
-        for (int num = smallest+1; num < largest; num++)
+        for (int i = smallest; i <= largest; i++)
         {
-            if ( ! seen.test(num))
-                result.push_back(num);
+            if ( ! seen.test(i))
+                result.push_back(i);
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats:  9.08% */
+/* Space Beats: 17.64% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(N) */
+class Solution_2 {
+public:
+    vector<int> findMissingElements(vector<int>& nums)
+    {
+        const int N = nums.size();
+        vector<int> result;
+        
+        unordered_set<int> uset;
+        int smallest = INT_MAX;
+        int largest  = INT_MIN;
+
+        for (int i = 0; i < N; i++)
+        {
+            smallest = min(smallest, nums[i]);
+            largest  = max(largest, nums[i]);
+
+            uset.insert(nums[i]);
+        }
+
+        for (int i = smallest; i <= largest; i++)
+        {
+            if (uset.count(i) == 0) // does NOT exist
+                result.push_back(i);
         }
 
         return result;
