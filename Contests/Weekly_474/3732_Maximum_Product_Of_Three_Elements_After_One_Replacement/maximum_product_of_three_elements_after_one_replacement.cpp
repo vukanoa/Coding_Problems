@@ -108,3 +108,46 @@ public:
         return result;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 85.90% */
+/* Space Beats: 40.38% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Linear {
+public:
+    long long maxProduct(const vector<int>& nums)
+    {
+        long long largest        = 0;
+        long long second_largest = 0;
+
+        for (const int& num : nums)
+        {
+            long long abs_num = llabs(1LL * num);
+
+            if (abs_num >= largest)
+            {
+                second_largest = largest;
+                largest        = abs_num;
+            }
+            else if (abs_num > second_largest)
+            {
+                second_largest = abs_num;
+            }
+        }
+
+        return largest * second_largest * 1e5;
+    }
+};
