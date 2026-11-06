@@ -80,7 +80,9 @@
 
 */
 
+#include <algorithm>
 #include <string>
+#include <vector>
 using namespace std;
 
 /*
@@ -195,6 +197,119 @@ public:
 
                 int distinct_chars_in_s2 = __builtin_popcount(R_freq); // count set bits
                 result += count_of_subarrays_with[distinct_chars_in_s2]; // Add all valid LEFT subarrays that had THE SAME count
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Linear.
+
+*/
+
+/* Time  Beats: 98.68% */
+/* Space Beats: 84.35% */
+
+/* Time  Complexity: O(N * 26 * log(26)) */
+/* Space Complexity: O(N * 27)           */
+class Solution_Linear {
+private:
+    static constexpr int MAX_N = 2000;
+
+public:
+    long long countMagicalPairs(string s)
+    {
+        const int N = s.size();
+        long long result = 0LL;
+
+
+        int L_subarrays_count_with[MAX_N + 1][27] = {};
+        int R_subarrays_count_with[MAX_N + 1][27] = {};
+
+        int last_idx[26];
+
+        /* Build L_subarrays_count_with */
+        fill(last_idx, last_idx + 26, -1);
+
+        for (int i = 0; i < N; i++)
+        {
+            last_idx[s[i] - 'a'] = i;
+
+            int distinct_char_indices[26];
+            int L_distinct = 0;
+
+            for (const int& idx : last_idx)
+            {
+                if (idx != -1)
+                {
+                    distinct_char_indices[L_distinct] = idx;
+                    ++L_distinct;
+                }
+            }
+
+            /* Sort in DESCENDING order */
+            sort(distinct_char_indices, distinct_char_indices + L_distinct, greater<int>());
+
+            for (int distinct = 1; distinct <= L_distinct; distinct++)
+            {
+                L_subarrays_count_with[i][distinct] = distinct_char_indices[distinct-1];
+
+                if (distinct < L_distinct)
+                    L_subarrays_count_with[i][distinct]  -= distinct_char_indices[distinct];
+                else
+                    L_subarrays_count_with[i][distinct]  -= -1;
+            }
+        }
+
+        /* Build R_subarrays_count_with */
+        fill(last_idx, last_idx + 26, N);
+
+        for (int i = N - 1; i >= 0; i--)
+        {
+            last_idx[s[i] - 'a'] = i;
+
+            int distinct_char_indices[26];
+            int R_distinct = 0;
+
+            for (const int& idx : last_idx)
+            {
+                if (idx != N)
+                {
+                    distinct_char_indices[R_distinct] = idx;
+                    ++R_distinct;
+                }
+            }
+
+            /* Sort in ASCENDING order */
+            sort(distinct_char_indices, distinct_char_indices + R_distinct);
+
+            for (int distinct = 1; distinct <= R_distinct; distinct++)
+            {
+                if (distinct < R_distinct)
+                    R_subarrays_count_with[i][distinct] = distinct_char_indices[distinct];
+                else
+                    R_subarrays_count_with[i][distinct] = N;
+
+                R_subarrays_count_with[i][distinct] -= distinct_char_indices[distinct-1];
+            }
+        }
+
+        /* Count Magical Pairs */
+        for (int j = 0; j < N - 1; j++)
+        {
+            for (int distinct = 1; distinct <= 26; distinct++)
+            {
+                result += 1LL * L_subarrays_count_with[j  ][distinct] *
+                                R_subarrays_count_with[j+1][distinct];
             }
         }
 
