@@ -130,3 +130,83 @@ public:
         return max((total_bad_indices + 1) / 2, max_count);
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 98.85% */
+/* Space Beats: 97.70% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution___Boyer_Moore_Majority_Voting_Algorithm {
+public:
+    int minSwaps(vector<int>& nums, vector<int>& forbidden)
+    {
+        const int N = nums.size();
+
+
+        int total_forbidden  = 0;
+
+        int majority_element = -1;
+        int count            = 0;
+
+        // First pass: Count forbidden positions and find "majority element"
+        for (int i = 0; i < N; i++)
+        {
+            if (nums[i] != forbidden[i])
+                continue;
+
+            ++total_forbidden;
+
+            if (nums[i] == majority_element)
+            {
+                ++count;
+            }
+            else
+            {
+                --count;
+
+                if (count <= 0) // '<' because of the initial iteration
+                {
+                    majority_element = nums[i];
+                    count = 1; // Reset
+                }
+            }
+        }
+
+        int available_positions_for_majority_elem  = 0;
+        int forbidden_positions_with_majority_elem = 0;
+
+        // Second pass: Find out if we can disperse majority elements that are
+        //              currently at FORBIDDEN positions
+        for (int i = 0; i < N; i++)
+        {
+            if (nums[i] == majority_element)
+            {
+                if (forbidden[i] == majority_element)
+                    ++forbidden_positions_with_majority_elem;  
+            }
+            else
+            {
+                if (forbidden[i] != majority_element)
+                    ++available_positions_for_majority_elem;
+            }
+        }
+
+        // Impossible if not enough valid, NOT forbidden, places
+        if (forbidden_positions_with_majority_elem > available_positions_for_majority_elem)
+            return -1;
+
+        return max(forbidden_positions_with_majority_elem, (total_forbidden+1) / 2);
+    }
+};
