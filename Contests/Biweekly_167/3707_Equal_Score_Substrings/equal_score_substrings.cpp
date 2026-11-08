@@ -52,6 +52,7 @@
 
 */
 
+#include <numeric>
 #include <string>
 using namespace std;
 
@@ -85,6 +86,51 @@ public:
             curr_score += s[i] - 'a' + 1;
 
             if (2 * curr_score == total_score)
+                return true;
+        }
+
+        return false;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 35.83% */
+/* Space Beats: 33.07% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_2 {
+public:
+    bool scoreBalance(string s)
+    {
+        const int N = s.size();
+        int total_score = accumulate(s.begin(), s.end(), 0);
+
+        total_score -= (N * 'a');
+        total_score += (N * 1);
+
+        if (total_score & 1)
+            return false;
+
+        int target = total_score / 2;
+
+        int curr_score = 0;
+        for (const char& chr : s)
+        {
+            curr_score += (chr - 'a' + 1);
+
+            if (curr_score == target)
                 return true;
         }
 
