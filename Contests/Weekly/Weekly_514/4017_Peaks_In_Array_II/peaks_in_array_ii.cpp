@@ -1,3 +1,5 @@
+// Izmenio neke stvari 2026-10-22
+// da bih bolje objasnio sebi.
 /*
     ============
     === HARD ===
@@ -145,13 +147,18 @@ public:
     int tree_size;
     vector<Node> seg_tree;
 
+    // Because the sum 1 + 2 + ... + n = n * (n + 1) / 2; here: n = L-2
+    // so substituting gives:
+    //
+    //     (L-2) * ((L-2) + 1) / 2 = (L-2) * (L-1) / 2.
+    //
     // count_subarrays_of_length_at_least_two(long long segment_length)
-    long long count_subarrays(long long length)
+    long long count_subarrays(long long len)
     {
-        if (length <= 0)
+        if (len <= 0)
             return 0;
 
-        return (length-1) * (length-2) / 2;
+        return (len-2) * (len-1) / 2;
     }
 
     Node merge(const Node& L, const Node& R)

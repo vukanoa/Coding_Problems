@@ -88,6 +88,7 @@
 */
 
 #include <algorithm>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -96,7 +97,8 @@ using namespace std;
     --- IDEA ---
     ------------
 
-    TODO
+    We've used "compressed_values" trick, even if it's not strictly necessary.
+    However, it's a nice "trick" to know.
 
 */
 
@@ -105,7 +107,7 @@ using namespace std;
 
 /* Time  Complexity: O(N^2) */
 /* Space Complexity: O(N)   */
-class Solution {
+class Solution_Compressed_Values {
 public:
     int countStaircase(vector<int>& nums)
     {
@@ -145,6 +147,72 @@ public:
                 int value = compressed_values[right];
 
                 if (first_appearance_position[value] == 0) // had NOT appear yet
+                {
+                    ++distinct_count;
+                    first_appearance_position[value] = distinct_count;
+                    freq[value] = 1;
+
+                    if (freq[value] == first_appearance_position[value])
+                        ++satisfied_count;
+                }
+                else
+                {
+                    if (freq[value] == first_appearance_position[value])
+                        --satisfied_count;
+
+                    ++freq[value];
+
+                    if (freq[value] == first_appearance_position[value])
+                        ++satisfied_count;
+                }
+
+                if (satisfied_count == distinct_count)
+                    ++result;
+            }
+        }
+
+        return result;
+    }
+};
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Same as above, though much simpler code. However, it is a bitt less
+    efficient since we have to has elements each time, whereas before we've
+    sorted and pre-computed and then had an O(1) access.
+
+*/
+
+/* Time  Beats:  9.09% */
+/* Space Beats: 27.27% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N)   */
+class Solution_Hash_Map {
+public:
+    int countStaircase(vector<int>& nums)
+    {
+        const int N = nums.size();
+        int result = 0;
+
+        for (int left = 0; left < N; left++)
+        {
+            unordered_map<int,int> freq;
+            unordered_map<int,int> first_appearance_position;
+
+            int distinct_count  = 0;
+            int satisfied_count = 0;
+
+            for (int right = left; right < N; right++)
+            {
+                int value = nums[right];
+
+                if (first_appearance_position.find(value) == first_appearance_position.end())
                 {
                     ++distinct_count;
                     first_appearance_position[value] = distinct_count;
