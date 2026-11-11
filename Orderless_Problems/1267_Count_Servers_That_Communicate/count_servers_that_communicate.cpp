@@ -96,8 +96,8 @@ public:
 
         int result = 0;
 
-        vector<int> rows(ROWS, 0);
-        vector<int> cols(COLS, 0);
+        vector<int> servers_in_row(ROWS, 0);
+        vector<int> servers_in_col(COLS, 0);
 
         for (int row = 0; row < ROWS; row++)
         {
@@ -105,8 +105,8 @@ public:
             {
                 if (grid[row][col] == 1)
                 {
-                    rows[row]++;
-                    cols[col]++;
+                    ++servers_in_row[row];
+                    ++servers_in_col[col];
                 }
             }
         }
@@ -117,10 +117,88 @@ public:
             {
                 if (grid[row][col] == 1)
                 {
-                    if (rows[row] > 1 || cols[col] > 1)
-                        result++;
+                    if (servers_in_row[row] > 1 || servers_in_col[col] > 1)
+                        ++result;
                 }
             }
+        }
+
+        return result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 14.23% */
+/* Space Beats: 30.43% */
+
+/* Time  Complexity: O(ROWS * COLS) */
+/* Space Complexity: O(ROWS + COLS) */
+class Solution_2 {
+public:
+    int countServers(vector<vector<int>>& grid)
+    {
+        const int ROWS = grid.size();
+        const int COLS = grid[0].size();
+        int result = 0;
+        
+        vector<int> more_than_two(ROWS, 0);
+
+        vector<bool> used_to_be_more_than_one_in(ROWS, false);
+        vector<bool> more_than_one_in           (COLS, false);
+
+        vector<int>  servers_in_row  (ROWS, 0);
+
+        for (int col = 0; col < COLS; col++)
+        {
+            int in_curr_column = 0;
+            for (int row = 0; row < ROWS; row++)
+            {
+                if (grid[row][col] == 1)
+
+                
+                if (grid[row][col] == 1)
+                {
+                   ++in_curr_column;
+                   ++servers_in_row[row];
+
+                    if (servers_in_row[row] == 2)
+                        used_to_be_more_than_one_in[row] = true;
+                }
+
+
+            }
+
+            if (in_curr_column >= 2)
+            {
+                more_than_one_in[col] = true;
+                result += in_curr_column;
+            }
+        }
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            for (int col = 0; col < COLS; col++)
+            {
+                if (grid[row][col] == 1 && more_than_one_in[col])
+                    --servers_in_row[row];
+            }
+        }
+
+        for (int row = 0; row < ROWS; row++)
+        {
+            if (used_to_be_more_than_one_in[row])
+                result += servers_in_row[row];
         }
 
         return result;
