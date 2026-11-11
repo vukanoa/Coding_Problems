@@ -125,29 +125,32 @@ private:
             if (neighbor == parent)
                 continue;
 
-            // From this point downwards, "neighbor" is certainly a CHILD of "node"
-            dfs(neighbor, node);
+            // From this point downwards, "neighbor" is a CHILD of "node"
+            const int& child = neighbor; // For readability
+
+            dfs(child, node);
+
+            const int& max_weight_with_k_child_edges           = dp[child][0];
+            const int& max_weight_with_k_minus_one_child_edges = dp[child][1];
             
-            base += dp[neighbor][0];
+            base += max_weight_with_k_child_edges;
 
-            const int& max_weight_with_k_child_edges           = dp[neighbor][0];
-            const int& max_weight_with_k_minus_one_child_edges = dp[neighbor][1];
 
-            // 'w' is a weight of the edge that connects "node" with its CHILD "neighbor"
+            // 'w' is a weight of the edge that connects "node" with its CHILD
             long long gain = 1LL * (max_weight_with_k_minus_one_child_edges + w) - max_weight_with_k_child_edges;
 
             gains.push_back(gain);
         }
-        
-        /* Sort in DESCENDING order */
+
+        /* Sort in DESCENDING order (i.e. LARGER gains first) */
         sort(gains.begin(), gains.end(), greater<long long>());
         const int GAINS_SIZE = gains.size();
-        
 
-        /********************************/
-        /* WITH an edge with its parent */
-        /********************************/
-        // Take up to K edges from the current node(NOT including edge with parent)
+
+        /***********************************/
+        /* WITHOUT an edge with its parent */
+        /***********************************/
+        // Take up to K edges from the current node, where edge with its parent is NOT used
         dp[node][0] = base;
         int allowed_children_edges = K;
         
@@ -163,10 +166,10 @@ private:
             }
         }
         
-        /***********************************/
-        /* WITHOUT an edge with its parent */
-        /***********************************/
-        // Take take up to (K-1) edges from the current node since one edge is already used with parent
+        /********************************/
+        /* WITH an edge with its parent */
+        /********************************/
+        // Take take up to (K-1) edges from the current node, since the edge with its parent is already used
         dp[node][1] = base;
         allowed_children_edges = K-1;
         
