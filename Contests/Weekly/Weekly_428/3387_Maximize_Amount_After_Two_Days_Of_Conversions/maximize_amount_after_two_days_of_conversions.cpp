@@ -216,3 +216,48 @@ private:
         return max_amount;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 84.06% */
+/* Space Beats: 91.30% */
+
+/* Time  Complexity: O(E1^2  +  E2^2) */
+/* Space Complexity: O(V)             */
+class Solution_Bellman_Ford {
+public:
+    double maxAmount(string initialCurrency, vector<vector<string>>& pairs1, vector<double>& rates1, vector<vector<string>>& pairs2, vector<double>& rates2)
+    {
+        unordered_map<string, double> max_amount;
+        max_amount[initialCurrency] = 1.0;
+
+        bellman_ford(max_amount, pairs1, rates1); // Day1
+        bellman_ford(max_amount, pairs2, rates2); // Day2
+
+        return max_amount[initialCurrency]; 
+    }
+
+    void bellman_ford(unordered_map<string, double>& max_amount, vector<vector<string>>& pairs, vector<double>& rates)
+    {
+        const int E = pairs.size();
+
+        for (int relax_iteration = 0; relax_iteration < pairs.size(); relax_iteration++)
+        {
+            for (int i = 0; i < E; i++)
+            {
+                max_amount[pairs[i][1]] = max(max_amount[pairs[i][1]], max_amount[pairs[i][0]] * rates[i]);
+                max_amount[pairs[i][0]] = max(max_amount[pairs[i][0]], max_amount[pairs[i][1]] / rates[i]);
+            }
+        } 
+    }
+};
