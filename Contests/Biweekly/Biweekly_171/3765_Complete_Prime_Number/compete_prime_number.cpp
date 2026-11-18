@@ -76,10 +76,10 @@ using namespace std;
 */
 
 /* Time  Beats: 100.00% */
-/* Space Beats: 99.98% */
+/* Space Beats:  99.98% */
 
-/* Time  Complexity: O(D^2) */ // D == number of digits in num
-/* Space Complexity: O(1)   */
+/* Time  Complexity: O(D * sqrt(num)) */  // D == number of digits in num
+/* Space Complexity: O(1)             */
 class Solution {
 public:
     bool completePrime(int num)
@@ -92,10 +92,10 @@ public:
         {
             curr_prefix = multiplier * (remaining_number % 10) + curr_prefix;
 
-            if (curr_prefix == 1 || !is_prime(curr_prefix))
+            if (curr_prefix == 1 ||  ! is_prime(curr_prefix))
                 return false;
 
-            if (remaining_number == 1 || ! is_prime(remaining_number))
+            if (remaining_number == 1 ||  ! is_prime(remaining_number))
                 return false;
 
             remaining_number /= 10; 
@@ -130,36 +130,34 @@ private:
     ------------
 
     TODO
-    A little easier to grasp.
 
 */
 
 /* Time  Beats: 100.00% */
-/* Space Beats:  46.60% */
+/* Space Beats:  25.00% */
 
-/* Time  Complexity: O(D^2) */
-/* Space Complexity: O(D)   */
+/* Time  Complexity: O(D^2 + D * sqrt(num)) */  // D == number of digits in num
+/* Space Complexity: O(D)                   */
 class Solution_2 {
 public:
     bool completePrime(int num)
     {
-        string s = to_string(num);
-        const int N = s.size();
+        string str_num = to_string(num);
+        const int N = str_num.size();
 
-        // Check all prefixes
-        int current_prefix = 0;
+        string str;
+        str.reserve(N); // To prevent reallocations
         for (int i = 0; i < N; i++)
         {
-            current_prefix = current_prefix * 10 + (s[i] - '0');
-            if (!is_prime(current_prefix))
+            str += str_num[i];
+            
+            if ( ! is_prime(stoi(str)))
                 return false;
         }
-
-        // Check all suffixes
-        for (int i = 0; i < N; i++)
+        
+        for (int i = N-1; i >= 0; i--)
         {
-            int current_suffix = stoi(s.substr(i));
-            if (!is_prime(current_suffix))
+            if ( ! is_prime(  stoi(str_num.substr(i))  )  )
                 return false;
         }
 
@@ -169,12 +167,12 @@ public:
 private:
     bool is_prime(int num)
     {
-        if (num <= 1)
+        if (num == 1)
             return false;
 
         for (int factor = 2; factor * factor <= num; factor++)
         {
-            if (num % factor == 0)
+            if (num % factor == 0) // num is DIVISIBLE by factor
                 return false;
         }
 
