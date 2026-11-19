@@ -20,9 +20,9 @@
 
     Return the minimum inversion count among all subarrays of nums with length k.
 
-    ===============================
-    FUNCTION:  
-    ===============================
+    ================================================================
+    FUNCTION: long long minInversionCount(vector<int>& nums, int k);
+    ================================================================
 
     ==========================================================================
     ================================ EXAMPLES ================================
@@ -83,45 +83,54 @@ using namespace std;
 /* Time  Beats:  89.38% */
 /* Space Beats: 100.00% */
 
-/* Time  Complexity: O(N * logN) */
+/* Time  Complexity:
+    O(N * logN  +  k * log(SORTED_SIZE)  +  (N - k) * log(SORTED_SIZE)) ===>
+    O(N * logN  +  N * log(SORTED_SIZE))                                ===>
+    O(N * logN  +  N * logN)                                            ===>
+    O(2 * N * logN)                                                     ===>
+    O(N * logN)
+
+    Final TC:
+            O(N * logN)
+
+*/
 /* Space Complexity: O(N)        */
-class FenwickTree {
+class Fenwick_Tree {
 private:
-    vector<int> fenwick_sum;
+    vector<int> fenwick;
     int n;
 
 public:
-    FenwickTree(int n) :
-        n(n), fenwick_sum(n + 1, 0)
+    Fenwick_Tree(int n) :
+        n(n), fenwick(n + 1, 0)
     {}
 
-    int prefix_sum(int i)
+    int prefix_sum(int i) // Prefix sum up to and INCLUDING index 'i'
     {
-        int result = 0;
+        int sum = 0;
 
         while (i > 0)
         {
-            result += fenwick_sum[i];
+            sum += fenwick[i];
 
             // Clear last Set bit
             i -= i & -i;
         }
 
-        return result;
+        return sum;
     }
 
     void update(int i, int delta)
     {
         while (i <= n)
         {
-            fenwick_sum[i] += delta;
+            fenwick[i] += delta;
 
             // Add Last SET bit
             i += i & -i;
         }
     }
 };
-
 
 class Solution {
 public:
@@ -132,49 +141,59 @@ public:
 
         const int N = nums.size();
 
+        /**************************/
         /* Coordinate Compression */
+        /**************************/
+        // O(N * logN)
         vector<int> sorted_nums = nums;
         sort(sorted_nums.begin(), sorted_nums.end());
         sorted_nums.erase(unique(sorted_nums.begin(), sorted_nums.end()), sorted_nums.end());
 
         const int SORTED_SIZE = sorted_nums.size();
+        Fenwick_Tree fenwick(SORTED_SIZE);
 
-        FenwickTree fenwick(SORTED_SIZE);
-
+        /*****************************/
         /* Initialize Sliding Window */
+        /*****************************/
+        // O(k * log(SORTED_SIZE))
         long long inversions = 0LL;
 
         for (int i = 0; i < k; i++)
         {
             auto it = lower_bound(sorted_nums.begin(), sorted_nums.end(), nums[i]);
-            const int compressed_ifx = it - sorted_nums.begin() + 1;
+            const int compressed_idx = it - sorted_nums.begin() + 1;
 
-            inversions += i - fenwick.prefix_sum(compressed_ifx);
-            fenwick.update(compressed_ifx, 1);
+            inversions += i - fenwick.prefix_sum(compressed_idx);
+            fenwick.update(compressed_idx, 1);
         }
 
         long long result = inversions;
 
+        /******************/
         /* Sliding Window */
+        /******************/
+        // O((N - k) * log(SORTED_SIZE))
         for (int i = k; i < N; i++)
         {
             /* Remove Outgoing Element */
             const int outgoing_element = nums[i - k];
 
-            auto it = lower_bound(sorted_nums.begin(), sorted_nums.end(), outgoing_element);
+            auto it = lower_bound(sorted_nums.begin(), sorted_nums.end(), outgoing_element); // O(log(SORTED_SIZE)) from BinarySearch
             int outgoing_idx = it - sorted_nums.begin() + 1;
 
-            inversions -= fenwick.prefix_sum(outgoing_idx - 1);
-            fenwick.update(outgoing_idx, -1);
+            inversions -= fenwick.prefix_sum(outgoing_idx - 1); // O(log(SORTED_SIZE)) from Fenwick_Tree operation
+            fenwick.update(outgoing_idx, -1);                   // O(log(SORTED_SIZE)) from Fenwick_Tree operation
+
 
             /* Add Incoming Element */
             int incoming_element = nums[i];
 
-            it = lower_bound(sorted_nums.begin(), sorted_nums.end(), incoming_element);
+            it = lower_bound(sorted_nums.begin(), sorted_nums.end(), incoming_element); // O(log(SORTED_SIZE)) from BinarySearch
             int incoming_idx = it - sorted_nums.begin() + 1;
 
-            inversions += (k - 1) - fenwick.prefix_sum(incoming_idx);
-            fenwick.update(incoming_idx, 1);
+            inversions += (k - 1) - fenwick.prefix_sum(incoming_idx); // O(log(SORTED_SIZE)) from Fenwick_Tree operation
+            fenwick.update(incoming_idx, 1);                          // O(log(SORTED_SIZE)) from Fenwick_Tree operation
+
 
             /* Update Result */
             result = min(result, inversions);
