@@ -56,6 +56,7 @@
 */
 
 #include <algorithm>
+#include <climits>
 #include <vector>
 using namespace std;
 
@@ -87,5 +88,81 @@ public:
         return min( {abs(nums[0] - nums[N-3]),
                      abs(nums[2] - nums[N-1]),
                      abs(nums[1] - nums[N-2])} );
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  41.45% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Single_Pass {
+public:
+    int minimizeSum(vector<int>& nums)
+    {
+        const int N = nums.size();
+        if (N == 3)
+            return 0;
+
+        int first_smallest  = INT_MAX;
+        int second_smallest = INT_MAX;
+        int third_smallest  = INT_MAX;
+
+        int first_largest  = INT_MIN;
+        int second_largest = INT_MIN;
+        int third_largest  = INT_MIN;
+
+        for (const int& num : nums)
+        {
+            /* Smallest */
+            if (num < first_smallest)
+            {
+                third_smallest  = second_smallest;
+                second_smallest = first_smallest;
+                first_smallest  = num;
+            }
+            else if (num < second_smallest)
+            {
+                third_smallest  = second_smallest;
+                second_smallest = num;
+            }
+            else if (num < third_smallest)
+            {
+                third_smallest = num;
+            }
+
+            /* Largest */
+            if (num > first_largest)
+            {
+                third_largest  = second_largest;
+                second_largest = first_largest;
+                first_largest  = num;
+            }
+            else if (num > second_largest)
+            {
+                third_largest  = second_largest;
+                second_largest = num;
+            }
+            else if (num > third_largest)
+            {
+                third_largest = num;
+            }
+        }
+
+        return min( {abs(first_smallest  - third_largest ),
+                     abs(third_smallest  - first_largest ),
+                     abs(second_smallest - second_largest)} );
     }
 };
