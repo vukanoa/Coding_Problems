@@ -82,32 +82,34 @@ class Solution {
 public:
     vector<int> findSubtreeSizes(vector<int>& parent, string s)
     {
-        vector<vector<int>> adj_list(s.length());
-        vector<int> answer(s.length(), 0);
+        const int N = parent.size();
+        vector<vector<int>> children(N);
+        vector<int> answer(N, 0);
         
-        for (int i = 1; i < parent.size(); i++)
-            adj_list[parent[i]].push_back(i);
+        for (int node = 1; node < N; node++)
+            children[ parent[node] ].push_back(node);
         
         unordered_map<char, vector<int>> state;
-        calculate_subtree_sizes(0, adj_list, s, state, answer);
+        calculate_subtree_sizes(0, children, s, state, answer);
         
         return answer;
     }
 
 private:
-    void calculate_subtree_sizes(int curr_node, vector<vector<int>>& adj_list, string& s, unordered_map<char, vector<int>>& state, vector<int> &answer)
+    void calculate_subtree_sizes(int curr_node, vector<vector<int>>& children, string& s, unordered_map<char, vector<int>>& state, vector<int> &answer)
     {
         answer[curr_node] = 1;
         state[s[curr_node]].push_back(curr_node);
         
-        for (int child_node : adj_list[curr_node])
+        for (const int& child_node : children[curr_node])
         {
-            calculate_subtree_sizes(child_node, adj_list, s, state, answer);
+            calculate_subtree_sizes(child_node, children, s, state, answer);
             
-            if(!state[s[child_node]].empty())
+            if ( ! state[s[child_node]].empty())
             {
-                int ancestorNode = state[s[child_node]].back();
-                answer[ancestorNode] += answer[child_node];
+                int ancestor_node = state[s[child_node]].back();
+
+                answer[ancestor_node] += answer[child_node];
             }
             else
             {
