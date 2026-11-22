@@ -91,3 +91,47 @@ public:
         return rightmost_a_idx < leftmost_b_idx;
     }
 };
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    Look at the example and it'll become painfully obvious:
+
+    +-----------+-------------------+------------------+
+    |   s       |  an a after a b?  |  contains "ba"?  |
+    +-----------+-------------------+------------------+
+    |   aaabbb  |  no               |  no              |
+    +-----------+-------------------+------------------+
+    |   aaa     |  no               |  no              |
+    +-----------+-------------------+------------------+
+    |   bbb     |  no               |  no              |
+    +-----------+-------------------+------------------+
+    |   abab    |  yes              |  yes   a[ba]b    |
+    +-----------+-------------------+------------------+
+    |   bbaa    |  yes              |  yes   b[ba]a    |
+    +-----------+-------------------+------------------+
+    |   abbaaa  |  yes              |  yes   ab[ba]aa  |
+    +-----------+-------------------+------------------+
+
+    So if substring "ba" does NOT exist, then it means all a's do appear before
+    all the b's.
+
+*/
+
+/* Time  Beats: 100.00% */
+/* Space Beats:  96.90% */
+
+/* Time  Complexity: O(N) */
+/* Space Complexity: O(1) */
+class Solution_Simple {
+public:
+    bool checkString(string s)
+    {
+        return s.find("ba") == string::npos;
+    }
+};
