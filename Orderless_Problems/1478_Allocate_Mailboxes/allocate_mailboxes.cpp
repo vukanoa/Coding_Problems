@@ -89,6 +89,7 @@ public:
         memset(memo, 0xff, sizeof(memo));
 
 
+        /* Calculate Costs */
         for (int i = 0; i < N; i++)
         {
             for (int j = 0; j < N; j++)
@@ -122,5 +123,65 @@ public:
             result = min(result, cost[idx][j] + solve(j + 1, k-1, houses));
 
         return memo[k][idx] = result;
+    }
+};
+
+
+
+
+/*
+    ------------
+    --- IDEA ---
+    ------------
+
+    TODO
+
+*/
+
+/* Time  Beats: 27.31% */
+/* Space Beats: 63.66% */
+
+/* Time  Complexity: O(N^2) */
+/* Space Complexity: O(N^2) */
+class Solution_Bottom_Up__Tabulation {
+private:
+    const int INF = 1e9;
+
+public:
+    int minDistance(vector<int>& houses, int k)
+    {
+        const int N = houses.size();
+
+        /* Sort */
+        sort(houses.begin(), houses.end());
+
+        /* Calculate Costs */
+        vector<vector<int>> cost(N, vector<int>(N, 0));
+
+        for (int i = 0; i < N; i++)
+        {
+            for (int j = i; j < N; j++)
+            {
+                int median_pos = houses[(i + j) / 2];
+
+                for (int m = i; m <= j; m++)
+                    cost[i][j] += abs(median_pos - houses[m]);
+            }
+        }
+
+        /* DP */
+        vector<vector<int>> dp(k + 1, vector<int>(N + 1, INF));
+        dp[0][N] = 0;
+
+        for (int remaining = 1; remaining <= k; remaining++)
+        {
+            for (int idx = N-1; idx >= 0; idx--)
+            {
+                for (int j = idx; j < N; j++)
+                    dp[remaining][idx] = min(dp[remaining][idx], cost[idx][j] + dp[remaining - 1][j + 1]);
+            }
+        }
+
+        return dp[k][0];
     }
 };
